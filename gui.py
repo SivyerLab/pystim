@@ -900,12 +900,8 @@ class InputPanel(wx.Panel):
                     self.sub_panel_dict[param][item].Show()
                 else:
                     self.sub_panel_dict[param][item].Hide()
-            # calls to redraw
-            # not sure which of these are unnecessary
+            # redraw
             self.Fit()
-            self.GetParent().Layout()
-            self.GetParent().GetParent().Layout()
-            self.Refresh()
 
     def get_param_dict(self):
         """
@@ -1195,7 +1191,7 @@ class MyFrame(wx.Frame):
         self.SetSizer(self.win_sizer)
         self.win_sizer.Fit(self)
 
-        # hide unnecessary subpanels
+        # show/hide subpanels
         for panel in self.input_nb.GetChildren():
             for k in iter(panel.sub_panel_dict.viewkeys()):
                 for k2 in iter(panel.sub_panel_dict[k].viewkeys()):
@@ -1203,6 +1199,7 @@ class MyFrame(wx.Frame):
                         panel.sub_panel_dict[k][k2].Hide()
                     else:
                         panel.sub_panel_dict[k][k2].Show()
+                        panel.Fit()
 
 
         # draw frame
@@ -1271,7 +1268,6 @@ class MyFrame(wx.Frame):
             defaults['screen_num'] = int(defaults['screen_num'])
 
             self.win_open = True
-            print defaults['fullscreen']
             StimProgram.GlobalDefaults(**defaults)
             StimProgram.make_window()
 
