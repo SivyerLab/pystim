@@ -132,12 +132,14 @@ class GlobalDefaults(object):
         'position': [0, 0],
         'protocol_reps': 1,
         'background': [-1, 0, -1],
-        'fullscreen': False
+        'fullscreen': False,
+        'screen_num': 1
     }
 
     def __init__(self, frame_rate=None, pix_per_micron=None, scale=None,
                  offset=None, display_size=None, position=None,
-                 protocol_reps=None, background=None, fullscreen=None):
+                 protocol_reps=None, background=None, fullscreen=None,
+                 screen_num=None):
         """
         Constructor
         :param frame_rate:
@@ -152,7 +154,8 @@ class GlobalDefaults(object):
         if scale is not None:
             self.defaults['scale'] = scale
         if offset is not None:
-            self.defaults['offset'] = offset
+            self.defaults['offset'] = [offset[0] * pix_per_micron,
+                                       offset[1] * pix_per_micron]
         if display_size is not None:
             self.defaults['display_size'] = display_size
         if position is not None:
@@ -163,7 +166,8 @@ class GlobalDefaults(object):
             self.defaults['background'] = background
         if fullscreen is not None:
             self.defaults['fullscreen'] = fullscreen
-
+        if screen_num is not None:
+            self.defaults['screen_num'] = screen_num
     def __str__(self):
         """
         for displaying info about all stim parameters
@@ -200,34 +204,37 @@ class StimDefaults(object):
         self.shape = shape
         self.orientation = orientation
         self.fill_mode = fill_mode
-        self.size_check_x = size_check_x
-        self.size_check_y = size_check_y
+        self.size_check_x = size_check_x * GlobalDefaults.defaults['pix_per_micron']
+        self.size_check_y = size_check_y * GlobalDefaults.defaults['pix_per_micron']
         self.num_check = num_check
-        self.height = height
-        self.width = width
-        self.outer_diameter = outer_diameter
-        self.inner_diameter = inner_diameter
+        self.height = height * GlobalDefaults.defaults['pix_per_micron']
+        self.width = width * GlobalDefaults.defaults['pix_per_micron']
+        self.outer_diameter = outer_diameter * GlobalDefaults.defaults['pix_per_micron']
+        self.inner_diameter = inner_diameter * GlobalDefaults.defaults['pix_per_micron']
         self.delay = delay
         self.duration = duration
         self.timing = timing
         self.intensity = intensity
         self.fill_seed = fill_seed
         self.move_seed = move_seed
-        self.speed = speed
+        self.speed = speed* GlobalDefaults.defaults['pix_per_micron']
         self.num_dirs = num_dirs
         self.start_dir = start_dir
-        self.start_radius = start_radius
-        self.travel_distance = travel_distance
+        self.start_radius = start_radius * GlobalDefaults.defaults['pix_per_micron']
+        self.travel_distance = travel_distance * GlobalDefaults.defaults['pix_per_micron']
         self.sf = sf
         self.contrast_channel = contrast_channel
         self.filename = filename
-        self.movie_x_loc = movie_x_loc
-        self.movie_y_loc = movie_y_loc
+        self.movie_x_loc = movie_x_loc * GlobalDefaults.defaults['pix_per_micron']
+        self.movie_y_loc = movie_y_loc * GlobalDefaults.defaults['pix_per_micron']
         self.period_mod = period_mod
         if location is None:
             self.location = [0, 0]
         else:
-            self.location = location
+            self.location = [location[0] * GlobalDefaults.defaults[
+                'pix_per_micron'],
+                             location[1] * GlobalDefaults.defaults[
+                'pix_per_micron']]
         if color is None:
             self.color = [-1, 1, -1]
         else:
@@ -936,14 +943,19 @@ def main_wgui(params):
 
 def make_window():
     global my_window
+    print GlobalDefaults.defaults['fullscreen']
+    print GlobalDefaults.defaults['screen_num']
     my_window = visual.Window(size=GlobalDefaults.defaults['display_size'],
-                              monitor="iMac", units="pix", colorSpace="rgb",
-                              winType='pyglet', allowGUI=False,
+                              monitor="testMonitor", units="pix",
+                              colorSpace="rgb", winType='pyglet',
+                              allowGUI=False,
                               pos=GlobalDefaults.defaults['position'],
                               color=GlobalDefaults.defaults['background'],
                               fullscr=GlobalDefaults.defaults['fullscreen'],
                               viewPos=GlobalDefaults.defaults['offset'],
-                              viewScale=GlobalDefaults.defaults['scale'])
+                              viewScale=GlobalDefaults.defaults['scale'],
+                              screen=GlobalDefaults.defaults['screen_num']
+                              )
 
 
 def close_window():

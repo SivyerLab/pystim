@@ -44,35 +44,35 @@ shape_param = OrderedDict([
 
     ('location',
      {'type'    : 'list',
-      'label'   : 'location',
+      'label'   : 'location (um)',
       'default' : [0, 0],
       'is_child': False}
      ),
 
     ('height',
      {'type'    : 'text',
-      'label'   : 'height',
+      'label'   : 'height (um)',
       'default' : 100,
       'is_child': True}
      ),
 
     ('width',
      {'type'    : 'text',
-      'label'   : 'width',
+      'label'   : 'width (um)',
       'default' : 50,
       'is_child': True}
      ),
 
     ('inner_diameter',
      {'type'    : 'text',
-      'label'   : 'inner diameter',
+      'label'   : 'inner diameter (um)',
       'default' : 50,
       'is_child': True}
      ),
 
     ('outer_diameter',
      {'type'    : 'text',
-      'label'   : 'outer diameter',
+      'label'   : 'outer diameter (um)',
       'default' : 100,
       'is_child': True}
      ),
@@ -172,14 +172,14 @@ fill_param = OrderedDict([
 
     ('size_check_x',
      {'type'    : 'text',
-      'label'   : 'size check x',
+      'label'   : 'size check x (um)',
       'default' : 50,
       'is_child': True}
      ),
 
     ('size_check_y',
      {'type'    : 'text',
-      'label'   : 'size check y',
+      'label'   : 'size check y (um)',
       'default' : 50,
       'is_child': True}
      ),
@@ -208,7 +208,7 @@ motion_param = OrderedDict([
 
     ('speed',
      {'type'    : 'text',
-      'label'   : 'speed',
+      'label'   : 'speed (um/hz)',
       'default' : 10,
       'is_child': True}
      ),
@@ -229,14 +229,14 @@ motion_param = OrderedDict([
 
     ('start_radius',
      {'type'    : 'text',
-      'label'   : 'start radius',
+      'label'   : 'start radius (um)',
       'default' : 300,
       'is_child': True}
      ),
 
     ('travel_distance',
      {'type'    : 'text',
-      'label'   : 'travel distance',
+      'label'   : 'travel distance (um)',
       'default' : 50,
       'is_child': True}
      ),
@@ -259,7 +259,7 @@ motion_param = OrderedDict([
 global_default_param = OrderedDict([
     ('display_size',
      {'type'    : 'list',
-      'label'   : 'display size (xy)',
+      'label'   : 'display size (pixels)',
       'default' : [400, 400],
       'is_child': False}
      ),
@@ -273,7 +273,7 @@ global_default_param = OrderedDict([
 
     ('offset',
      {'type'    : 'list',
-      'label'   : 'offset',
+      'label'   : 'offset (um)',
       'default' : [0, 0],
       'is_child': False}
      ),
@@ -313,8 +313,16 @@ global_default_param = OrderedDict([
       'is_child': False}
      ),
 
+    ('screen_num',
+     {'type'    : 'choice',
+      'label'   : 'screen number',
+      'choices' : ['1', '2'],
+      'default' : '1',
+      'is_child': False}
+     ),
+
     ('fullscreen',
-     {'type'    : 'radio',
+     {'type'    : 'choice',
       'label'   : 'fullscreen',
       'choices' : ['True', 'False'],
       'default' : 'False',
@@ -1260,8 +1268,10 @@ class MyFrame(wx.Frame):
                 defaults['fullscreen'] = True
             else:
                 defaults['fullscreen'] = False
+            defaults['screen_num'] = int(defaults['screen_num'])
 
             self.win_open = True
+            print defaults['fullscreen']
             StimProgram.GlobalDefaults(**defaults)
             StimProgram.make_window()
 
