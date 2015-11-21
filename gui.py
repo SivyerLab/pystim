@@ -1171,7 +1171,7 @@ class MyFrame(wx.Frame):
         self.win_sizer.Add(panel_button_sizer)
 
         # place on monitor (arbitrary)
-        self.SetPosition((1400, 100))
+        self.SetPosition((1400, 500))
 
         # HACK FOR PROPER SIZING
         # TODO: better sizing

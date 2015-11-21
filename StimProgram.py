@@ -741,14 +741,26 @@ class TestBoard(RandomlyMovingShape):
         self.colors = None
 
     def make_stim(self):
+        def print_array(array):
+            for i in range(self.num_check):
+                for j in range(self.num_check):
+                    print array[i*self.num_check+j],
+                print ""
+
         xys = []
         for y in range(self.num_check/-2, self.num_check/2):
             for x in range(self.num_check/-2, self.num_check/2):
                 xys.append((self.size_check_x*x, self.size_check_y*y))
 
         self.colors = numpy.ndarray((self.num_check**2, 3))
-        self.colors[::] = self.get_color_contrast()
-        self.colors[1::2] *= [1, 0, 1]
+        self.colors[::] = GlobalDefaults.defaults['background']
+
+        self.index = numpy.zeros((self.num_check, self.num_check))
+        self.index[0::2, 0::2] = 1
+        self.index[1::2, 1::2] = 1
+        self.index = numpy.concatenate(self.index[:])
+
+        self.colors[numpy.where(self.index)] = self.get_color_contrast()
 
         self.stim = visual.ElementArrayStim(my_window,
                                             nElements=self.num_check**2,
@@ -766,12 +778,12 @@ class TestBoard(RandomlyMovingShape):
 
     def get_timing(self, frame):
         rgb = self.rgb_timing(frame)
-        self.colors[::2] = rgb
+        self.colors[numpy.where(self.index)] = rgb
         return self.colors
 
-    def set_rgb(self, rgb):
+    def set_rgb(self, colors):
         # pass
-        self.stim.setColors(rgb)
+        self.stim.setColors(colors)
 
 
 class Movie(Shape):
@@ -943,8 +955,6 @@ def main_wgui(params):
 
 def make_window():
     global my_window
-    print GlobalDefaults.defaults['fullscreen']
-    print GlobalDefaults.defaults['screen_num']
     my_window = visual.Window(size=GlobalDefaults.defaults['display_size'],
                               monitor="testMonitor", units="pix",
                               colorSpace="rgb", winType='pyglet',
