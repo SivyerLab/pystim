@@ -492,25 +492,19 @@ class Shape(StimDefaults):
         instantiates PsychoPy stimulus object
         :return: nothing
         """
-        # checks if location value passed
-        # if so, turns into list
-        try:
-            loc = self.location.split(" ")
-            # cast as ints
-            for i in range(len(loc)):
-                loc[i] = int(loc[i])
-        # else already as list
-        except AttributeError:
-            loc = self.location
-
-        self.stim = visual.GratingStim(win=my_window,
-                                       tex=self.get_texture(),
-                                       mask=self.get_mask(),
-                                       size=self.get_size(), pos=loc,
-                                       ori=self.orientation,
-                                       color=self.get_color_contrast())
-        self.stim.sf *= self.sf
-        self.stim.phase = 1
+        if self.fill_mode == 'random' or self.fill_mode == 'checkerboard':
+            self.__class__ = TestBoard
+            self.make_stim()
+        else:
+            self.stim = visual.GratingStim(win=my_window,
+                                           tex=self.get_texture(),
+                                           mask=self.get_mask(),
+                                           size=self.get_size(),
+                                           pos=self.location,
+                                           ori=self.orientation,
+                                           color=self.get_color_contrast())
+        # self.stim.sf *= self.sf
+        # self.stim.phase = 1
 
     def animate(self, frame):
         """
@@ -741,12 +735,6 @@ class TestBoard(RandomlyMovingShape):
         self.colors = None
 
     def make_stim(self):
-        def print_array(array):
-            for i in range(self.num_check):
-                for j in range(self.num_check):
-                    print array[i*self.num_check+j],
-                print ""
-
         xys = []
         for y in range(self.num_check/-2, self.num_check/2):
             for x in range(self.num_check/-2, self.num_check/2):
@@ -756,9 +744,14 @@ class TestBoard(RandomlyMovingShape):
         self.colors[::] = GlobalDefaults.defaults['background']
 
         self.index = numpy.zeros((self.num_check, self.num_check))
-        self.index[0::2, 0::2] = 1
-        self.index[1::2, 1::2] = 1
-        self.index = numpy.concatenate(self.index[:])
+        if self.fill_mode == 'checkerboard':
+            self.index[0::2, 0::2] = 1
+            self.index[1::2, 1::2] = 1
+            self.index = numpy.concatenate(self.index[:])
+        elif self.fill_mode == 'random':
+            self.index = numpy.concatenate(self.index[:])
+            for i in range(len(self.index)):
+                self.index[i] = self.fill_random.randint(0,1)
 
         self.colors[numpy.where(self.index)] = self.get_color_contrast()
 
@@ -876,8 +869,11 @@ def run_stim(stim_list, verbose=False):
         # prep stims
         to_animate = []
         for i in range(len(stim_list)):
-            if stim_list[i].parameters['fill_mode'] == 'checkerboard':
-                to_animate.append(TestBoard(**stim_list[i].parameters))
+            # if stim_list[i].parameters['fill_mode'] == 'checkerboard' or \
+            #                 stim_list[i].parameters['fill_mode'] == 'random':
+            #     to_animate.append(TestBoard(**stim_list[i].parameters))
+            if not True:
+                pass
             else:
                 # instantiate stim objects by looking up string in globals()
                 to_animate.append(globals()[stim_list[i].stim_type](
