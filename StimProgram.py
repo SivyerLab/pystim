@@ -195,8 +195,9 @@ class StimDefaults(object):
                  duration=0.5, location=None, timing="step", intensity=1,
                  color=None, fill_seed=1, move_seed=1, speed=10,
                  num_dirs=4, start_dir=0, start_radius=300, travel_distance=50,
-                 sf=1, contrast_channel="Green", filename=None, movie_x_loc=0,
-                 movie_y_loc=0, period_mod=1):
+                 sf=1, contrast_channel="Green", movie_filename=None, movie_x_loc=0,
+                 movie_y_loc=0, period_mod=1, image_width=100, image_height=100,
+                 image_filename=None):
         """
         default variable constructors
         """
@@ -224,10 +225,13 @@ class StimDefaults(object):
         self.travel_distance = travel_distance * GlobalDefaults.defaults['pix_per_micron']
         self.sf = sf
         self.contrast_channel = contrast_channel
-        self.filename = filename
+        self.movie_filename = movie_filename
         self.movie_x_loc = movie_x_loc * GlobalDefaults.defaults['pix_per_micron']
         self.movie_y_loc = movie_y_loc * GlobalDefaults.defaults['pix_per_micron']
         self.period_mod = period_mod
+        self.image_filename = image_filename
+        self.image_height = image_height
+        self.image_width = image_width
         if location is None:
             self.location = [0, 0]
         else:
@@ -380,7 +384,9 @@ class Shape(StimDefaults):
         determines size of stim
         :return: size of stim as tuple
         """
-        if self.shape == "circle" or self.shape == "annulus":
+        if self.fill_mode == 'image':
+            stim_size = (self.image_width, self.image_height)
+        elif self.shape == "circle" or self.shape == "annulus":
             stim_size = self.outer_diameter
         elif self.shape == "rectangle":
             if self.fill_mode == "random" or \
@@ -389,6 +395,8 @@ class Shape(StimDefaults):
                              self.num_check * self.size_check_y)
             else:
                 stim_size = (self.width, self.height)
+        else:
+            stim_size = (self.width, self.height)
 
         return stim_size
 
@@ -495,6 +503,9 @@ class Shape(StimDefaults):
         if self.fill_mode == 'random' or self.fill_mode == 'checkerboard':
             self.__class__ = TestBoard
             self.make_stim()
+        elif self.fill_mode == 'image':
+            self.__class__ = ImageStim
+            self.make_stim()
         else:
             self.stim = visual.GratingStim(win=my_window,
                                            tex=self.get_texture(),
@@ -519,6 +530,19 @@ class Shape(StimDefaults):
         else:
             pass
 
+
+class ImageStim(Shape):
+    """
+    Class for stims that are image files
+    """
+    def make_stim(self):
+        print self.get_size()
+        self.stim = visual.ImageStim(win=my_window,
+                                     size=self.get_size(),
+                                     pos=self.location,
+                                     ori=self.orientation,
+                                     image=self.image_filename,
+                                     color=self.get_color_contrast())
 
 class MovingShape(Shape):
     """
@@ -728,9 +752,7 @@ class RandomlyMovingShape(MovingShape):
 
 
 class TestBoard(RandomlyMovingShape):
-    def __init__(self, **kwargs):
-        super(TestBoard, self).__init__(**kwargs)
-
+    def __init__(self):
         # instance attributes
         self.colors = None
 
@@ -805,7 +827,7 @@ class Movie(Shape):
         :return: nothing
         """
         # load and start movie
-        self.mov = visual.MovieStim(my_window, filename=self.filename)
+        self.mov = visual.MovieStim(my_window, filename=self.movie_filename)
         # self.mov.loadMovie(self.filename)
         # self.mov.play()
 

@@ -143,7 +143,7 @@ fill_param = OrderedDict([
      {'type'    : 'choice',
       'label'   : 'fill mode',
       'choices' : ['uniform', 'sine', 'square', 'concentric', 'checkerboard',
-                   'random'],
+                   'random', 'image'],
       'default' : 'uniform',
       'is_child': False,
       'children': {
@@ -152,7 +152,8 @@ fill_param = OrderedDict([
           'concentric'  : ['sf'],
           'checkerboard': ['size_check_x', 'size_check_y', 'num_check'],
           'random'      : ['size_check_x', 'size_check_y', 'num_check',
-                           'fill_seed']
+                           'fill_seed'],
+          'image'      : ['image_filename', 'image_height', 'image_width'],
       }}
      ),
 
@@ -189,6 +190,27 @@ fill_param = OrderedDict([
       'label'   : 'number of checks',
       'default' : 64,
       'is_child': True}
+     ),
+
+    ('image_filename',
+     {'type'    : 'path',
+      'label'   : 'filename',
+      'default' : None,
+      'is_child': True}
+     ),
+
+    ('image_height',
+     {'type'    : 'text',
+      'label'   : 'height (um)',
+      'default' : 100,
+      'is_child': True}
+     ),
+
+    ('image_width',
+     {'type'    : 'text',
+      'label'   : 'width (um)',
+      'default' : 100,
+      'is_child': True}
      )
 ])
 
@@ -202,7 +224,7 @@ motion_param = OrderedDict([
       'children': {
           'moving': ['speed', 'start_dir', 'num_dirs', 'start_radius'],
           'random': ['speed', 'travel_distance', 'move_seed'],
-          'movie' : ['filename']
+          'movie' : ['movie_filename']
       }}
      ),
 
@@ -248,7 +270,7 @@ motion_param = OrderedDict([
       'is_child': True}
      ),
 
-    ('filename',
+    ('movie_filename',
      {'type'    : 'path',
       'label'   : 'filename',
       'default' : './testMovie_1mb_1280x720.mp4',
@@ -399,7 +421,7 @@ class DirPanel(wx.Panel):
         if _platform == "darwin":
             self.browser = wx.FileCtrl(self, wildCard='*.txt', size=(200, -1),
                 defaultDirectory=
-                    './stims/')
+                    './psychopy/stims/')
         elif _platform == "win32":
             self.browser = wx.FileCtrl(self, wildCard='*.txt', size=(200, -1),
                 defaultDirectory=
@@ -448,11 +470,14 @@ class DirPanel(wx.Panel):
 
         to_save = []
         for stim in my_frame.l1.stim_info_list:
-            stim.parameters['move_type'] = stim.stim_type
-            to_save.append(stim.parameters)
+            params = copy.deepcopy(stim.parameters)
+            params['move_type'] = stim.stim_type
+            to_save.append(params)
 
         # get path and open file to write
         path = save_dialog.GetPath()
+
+
 
         with open(path, 'w') as f:
             json.dump(to_save, f)
@@ -683,7 +708,7 @@ class InputPanel(wx.Panel):
         self.sub_panel_dict = None
         self.type = None
         self.input_dict = None
-        self.verbose = False
+        self.verbose = True
 
         # load defaults
         self.param_dict = OrderedDict(params)
