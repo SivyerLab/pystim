@@ -399,11 +399,11 @@ class DirPanel(wx.Panel):
         if _platform == "darwin":
             self.browser = wx.FileCtrl(self, wildCard='*.txt', size=(200, -1),
                 defaultDirectory=
-                    '/Users/alex/PycharmProjects/StimProgram/stims/')
+                    './stims/')
         elif _platform == "win32":
             self.browser = wx.FileCtrl(self, wildCard='*.txt', size=(200, -1),
                 defaultDirectory=
-                    'C:\Users\Alex\PycharmProjects\StimProgram\stims')
+                    '.\\psychopy\\stims\\')
 
         # add to sizer
         panel_sizer.Add(self.browser, 1, wx.BOTTOM | wx.TOP | wx.EXPAND,
