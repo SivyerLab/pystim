@@ -12,6 +12,7 @@ import numpy
 import pprint
 import re
 import sys
+import csv
 # import u3
 
 sys.setrecursionlimit(100)
@@ -133,13 +134,14 @@ class GlobalDefaults(object):
         'protocol_reps': 1,
         'background': [-1, 0, -1],
         'fullscreen': False,
-        'screen_num': 1
+        'screen_num': 1,
+        'trigger_wait': 0.1
     }
 
     def __init__(self, frame_rate=None, pix_per_micron=None, scale=None,
                  offset=None, display_size=None, position=None,
                  protocol_reps=None, background=None, fullscreen=None,
-                 screen_num=None):
+                 screen_num=None, trigger_wait=None):
         """
         Constructor
         :param frame_rate:
@@ -168,6 +170,8 @@ class GlobalDefaults(object):
             self.defaults['fullscreen'] = fullscreen
         if screen_num is not None:
             self.defaults['screen_num'] = screen_num
+        if screen_num is not None:
+            self.defaults['trigger_wait'] = trigger_wait
     def __str__(self):
         """
         for displaying info about all stim parameters
@@ -197,7 +201,7 @@ class StimDefaults(object):
                  num_dirs=4, start_dir=0, start_radius=300, travel_distance=50,
                  sf=1, contrast_channel="Green", movie_filename=None, movie_x_loc=0,
                  movie_y_loc=0, period_mod=1, image_width=100, image_height=100,
-                 image_filename=None):
+                 image_filename=None, table_filename=None):
         """
         default variable constructors
         """
@@ -232,6 +236,7 @@ class StimDefaults(object):
         self.image_filename = image_filename
         self.image_height = image_height
         self.image_width = image_width
+        self.table_filename = table_filename
         if location is None:
             self.location = [0, 0]
         else:
@@ -504,8 +509,14 @@ class Shape(StimDefaults):
             self.__class__ = TestBoard
             self.make_stim()
         elif self.fill_mode == 'image':
-            self.__class__ = ImageStim
-            self.make_stim()
+            # self.__class__ = ImageStim
+            # self.make_stim()
+            self.stim = visual.ImageStim(win=my_window,
+                                     size=self.get_size(),
+                                     pos=self.location,
+                                     ori=self.orientation,
+                                     image=self.image_filename,
+                                     color=self.get_color_contrast())
         else:
             self.stim = visual.GratingStim(win=my_window,
                                            tex=self.get_texture(),
@@ -530,19 +541,6 @@ class Shape(StimDefaults):
         else:
             pass
 
-
-class ImageStim(Shape):
-    """
-    Class for stims that are image files
-    """
-    def make_stim(self):
-        print self.get_size()
-        self.stim = visual.ImageStim(win=my_window,
-                                     size=self.get_size(),
-                                     pos=self.location,
-                                     ori=self.orientation,
-                                     image=self.image_filename,
-                                     color=self.get_color_contrast())
 
 class MovingShape(Shape):
     """
@@ -696,6 +694,67 @@ class MovingShape(Shape):
             pass
 
 
+class TableStim(MovingShape):
+    """
+    class where object motion is determined by table of x,y coordinates
+    """
+    def __init__(self, **kwargs):
+        """
+        Constructor
+        :param kwargs:
+        :return: nothing
+        """
+        # pass parameters to super
+        super(TableStim, self).__init__(**kwargs)
+
+    def get_draw_times(self):
+        """
+        determines frames during which to draw stimulus
+        overrides super method
+        :return: last frame number as int
+        """
+        self.start_stim = self.delay * GlobalDefaults.defaults['frame_rate']
+
+        # need to generate movement once to calculate num_frames
+        frames = len(self.get_move_array()[0])
+        self.end_stim = frames + self.start_stim
+        self.draw_time = self.end_stim - self.start_stim
+
+        # return end stim time for calculating max frame time
+        return self.end_stim
+
+    def get_move_array(self, *args):
+        f = self.table_filename
+
+        x_cord = []
+        y_cord = []
+
+        with open(f, 'rU') as csv_file:
+            rows = csv.reader(csv_file, delimiter='\t')
+            for row in rows:
+                try:
+                    x = float(row[0])* GlobalDefaults.defaults['pix_per_micron']
+                    y = float(row[1]) * GlobalDefaults.defaults['pix_per_micron']
+                    x_cord.append(x)
+                    y_cord.append(y)
+                except ValueError:
+                    pass
+
+        x = scipy.array(x_cord)
+        y = scipy.array(y_cord)
+
+        return x, y
+
+    def generate_movement(self):
+        """
+        calls get_starting_pos() and get_move_array() with proper variables
+        to get new movement coordinates
+        :return: nothing
+        """
+        self.frame_counter = 0
+        self.x_moves, self.y_moves = self.get_move_array()
+
+
 class RandomlyMovingShape(MovingShape):
     """
     Class for randomly moving shape stimuli
@@ -703,8 +762,6 @@ class RandomlyMovingShape(MovingShape):
     def __init__(self, **kwargs):
         """
         Constructor
-        :param travel_distance: number of pixels stim moves before going
-        in new direction
         :param kwargs:
         :return: nothing
         """
@@ -838,7 +895,7 @@ class Movie(Shape):
             pass
         self.mov.draw()
 
-''''def send_trigger(wait):
+'''def send_trigger(GlobalDefaults.defaults['trigger_wait']):
     """
     Triggers recording device by sending short voltage spike
     from a LabJack U3-HV

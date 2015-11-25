@@ -218,13 +218,14 @@ motion_param = OrderedDict([
     ('move_type',
      {'type'    : 'choice',
       'label'   : 'move type',
-      'choices' : ['static', 'moving', 'random', 'movie'],
+      'choices' : ['static', 'moving', 'table', 'random', 'movie'],
       'default' : 'static',
       'is_child': False,
       'children': {
           'moving': ['speed', 'start_dir', 'num_dirs', 'start_radius'],
           'random': ['speed', 'travel_distance', 'move_seed'],
-          'movie' : ['movie_filename']
+          'movie' : ['movie_filename'],
+          'table' : ['table_filename']
       }}
      ),
 
@@ -274,6 +275,13 @@ motion_param = OrderedDict([
      {'type'    : 'path',
       'label'   : 'filename',
       'default' : './testMovie_1mb_1280x720.mp4',
+      'is_child': True}
+     ),
+
+    ('table_filename',
+     {'type'    : 'path',
+      'label'   : 'filename',
+      'default' : None,
       'is_child': True}
      )
 ])
@@ -325,6 +333,13 @@ global_default_param = OrderedDict([
      {'type'    : 'text',
       'label'   : 'protocol reps',
       'default' : 1,
+      'is_child': False}
+     ),
+
+    ('trigger_wait',
+     {'type'    : 'text',
+      'label'   : 'trigger wait',
+      'default' : 0.5,
       'is_child': False}
      ),
 
@@ -518,6 +533,8 @@ class DirPanel(wx.Panel):
                 stim_type = 'random'
             elif stim_type == 'Movie':
                 stim_type = 'movie'
+            elif stim_type == 'TableStim':
+                stim_type = 'table'
 
             my_frame.l1.add_stim(stim_type, stim_param)
 
@@ -625,6 +642,8 @@ class ListPanel(wx.Panel):
             stim_type = 'RandomlyMovingShape'
         elif stim_type == 'movie':
             stim_type = 'Movie'
+        elif stim_type == 'table':
+            stim_type = 'TableStim'
 
         stim_info = StimProgram.StimInfo(stim_type, param_dict,
                                          self.index + 1)
@@ -670,6 +689,8 @@ class ListPanel(wx.Panel):
             stim_type = 'random'
         elif stim_type == 'Movie':
             stim_type = 'movie'
+        elif stim_type == 'TableStim':
+            stim_type = 'table'
         param_dict['move_type'] = stim_type
 
         # load globals
@@ -708,7 +729,7 @@ class InputPanel(wx.Panel):
         self.sub_panel_dict = None
         self.type = None
         self.input_dict = None
-        self.verbose = True
+        self.verbose = False
 
         # load defaults
         self.param_dict = OrderedDict(params)
@@ -948,6 +969,8 @@ class InputPanel(wx.Panel):
                 self.type = 'RandomlyMovingShape'
             elif stim_type == 'movie':
                 self.type = 'Movie'
+            elif stim_type == 'table':
+                stim_type = 'TableStim'
         return params
 
     def set_value(self, param, value):
@@ -1145,11 +1168,11 @@ class MyFrame(wx.Frame):
         panel_row = wx.BoxSizer(wx.HORIZONTAL)
 
         # add notebook to sizer
-        panel_row.Add(self.input_nb, 1)
+        panel_row.Add(self.input_nb, 1, wx.EXPAND)
 
         # instantiate global panel and add to sizer
         self.g1 = GlobalPanel(global_default_param, self)
-        panel_row.Add(self.g1, 0, wx.TOP, border=5)
+        panel_row.Add(self.g1, 1, wx.TOP | wx.EXPAND, border=5)
 
         # sizer for buttons under panel_row
         stim_buttons_sizer = wx.BoxSizer(wx.HORIZONTAL)
@@ -1179,7 +1202,7 @@ class MyFrame(wx.Frame):
 
         # sizer for panel and buttons
         panel_button_sizer = wx.BoxSizer(wx.VERTICAL)
-        panel_button_sizer.Add(panel_row)
+        panel_button_sizer.Add(panel_row, 1, wx.EXPAND)
         panel_button_sizer.Add(stim_buttons_sizer, border=10,
                                flag=wx.BOTTOM | wx.ALIGN_CENTER_HORIZONTAL |
                                wx.ALIGN_CENTER_VERTICAL)
