@@ -100,6 +100,14 @@ timing_param = OrderedDict([
       'is_child': False}
      ),
 
+    ('trigger',
+     {'type'    : 'choice',
+      'label'   : 'trigger',
+      'choices' : ['True', 'False'],
+      'default' : 'False',
+      'is_child': False}
+     ),
+
     # ('stim_reps',
     #  {'type'    : 'text',
     #   'label'   : 'stim repetitions',
@@ -274,7 +282,7 @@ motion_param = OrderedDict([
     ('movie_filename',
      {'type'    : 'path',
       'label'   : 'filename',
-      'default' : './testMovie_1mb_1280x720.mp4',
+      'default' : None,
       'is_child': True}
      ),
 
@@ -365,6 +373,14 @@ global_default_param = OrderedDict([
       'default' : 'False',
       'is_child': False}
      ),
+
+    ('log',
+     {'type'    : 'choice',
+      'label'   : 'log',
+      'choices' : ['True', 'False'],
+      'default' : 'False',
+      'is_child': False}
+     )
     # ('object_list', 1)
 ])
 
@@ -476,8 +492,13 @@ class DirPanel(wx.Panel):
         """
         my_frame = event.GetEventObject().GetParent().GetParent()
 
+        if _platform == 'darwin':
+            default_dir = './psychopy/stims/'
+        elif _platform == 'win32':
+            default_dir = '.\\psychopy\\stims\\'
+
         save_dialog = wx.FileDialog(my_frame, message='File path',
-            defaultDir='/Users/alex/PycharmProjects/StimProgram/stims/',
+            defaultDir=default_dir,
             wildcard='*.txt', style=wx.FD_SAVE | wx.FD_OVERWRITE_PROMPT)
 
         if save_dialog.ShowModal() == wx.ID_CANCEL:
@@ -491,8 +512,6 @@ class DirPanel(wx.Panel):
 
         # get path and open file to write
         path = save_dialog.GetPath()
-
-
 
         with open(path, 'w') as f:
             json.dump(to_save, f)
@@ -679,6 +698,13 @@ class ListPanel(wx.Panel):
         selected = self.list_control.GetFirstSelected()
         param_dict = copy.deepcopy(self.stim_info_list[selected].parameters)
 
+        # change True/False back to string
+        for k, v in param_dict.iteritems():
+            if type(v) == bool and v == True:
+                param_dict[k] = 'True'
+            elif type(v) == bool and v == False:
+                param_dict[k] = 'False'
+
         # re-add stim type
         stim_type = copy.deepcopy(self.stim_info_list[selected].stim_type)
         if stim_type == 'Shape':
@@ -692,11 +718,6 @@ class ListPanel(wx.Panel):
         elif stim_type == 'TableStim':
             stim_type = 'table'
         param_dict['move_type'] = stim_type
-
-        # load globals
-        for param, control in my_frame.g1.input_dict.iteritems():
-            if param in param_dict:
-                my_frame.g1.set_value(param, param_dict[param])
 
         # load in panels and subpanels
         for panel in my_frame.input_nb.GetChildren():
@@ -956,6 +977,10 @@ class InputPanel(wx.Panel):
         """
         params = {}
         for k, v in self.param_dict.iteritems():
+            if v['default'] == 'True':
+                v['default'] = True
+            elif v['default'] == 'False':
+                v['default'] = False
             params[k] = v['default']
 
         # remove move type from dictionary and set as instance attribute
@@ -970,7 +995,7 @@ class InputPanel(wx.Panel):
             elif stim_type == 'movie':
                 self.type = 'Movie'
             elif stim_type == 'table':
-                stim_type = 'TableStim'
+                self.type = 'TableStim'
         return params
 
     def set_value(self, param, value):
@@ -1219,7 +1244,7 @@ class MyFrame(wx.Frame):
         self.win_sizer.Add(panel_button_sizer)
 
         # place on monitor (arbitrary)
-        self.SetPosition((1400, 500))
+        self.SetPosition((500, 500))
 
         # HACK FOR PROPER SIZING
         # TODO: better sizing
@@ -1309,10 +1334,10 @@ class MyFrame(wx.Frame):
                                     defaults['display_size'][0]*2,
                                   float(defaults["offset"][1])/
                                     defaults['display_size'][1]*2]
-            if defaults['fullscreen'] == "True":
-                defaults['fullscreen'] = True
-            else:
-                defaults['fullscreen'] = False
+            # if defaults['fullscreen'] == "True":
+            #     defaults['fullscreen'] = True
+            # else:
+            #     defaults['fullscreen'] = False
             defaults['screen_num'] = int(defaults['screen_num'])
 
             self.win_open = True

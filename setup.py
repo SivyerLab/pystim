@@ -47,7 +47,8 @@ setup(console=['gui.py'],
               'includes' : ['scipy.*', 'scipy.integrate', 'scipy.special.*',
                             'scipy.linalg.*', 'scipy.integrate',
                             'scipy.sparse.csgraph._validation',
-                            'multiprocessing', 'PIL.*',
+                            'multiprocessing',
+                            'PIL.*',
                             'psychopy.visual.*']
           }
       })

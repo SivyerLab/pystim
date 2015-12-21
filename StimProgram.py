@@ -6,14 +6,21 @@ Program for presenting visual stimuli to patch clamped retinal neurons"
 
 from psychopy import visual, logging, core, event, filters
 from random import Random
-from scipy import signal
+from time import strftime, localtime
 import scipy
 import numpy
 import pprint
 import re
 import sys
 import csv
-# import u3
+import os
+global has_u3
+try:
+    import u3
+    has_u3 = True
+except ImportError:
+    has_u3 = False
+
 
 sys.setrecursionlimit(100)
 
@@ -24,7 +31,7 @@ __email__ = "tomlinsa@ohsu.edu"
 __status__ = "Prototype"
 
 # suppress extra warnings
-logging.console.setLevel(logging.CRITICAL)
+# logging.console.setLevel(logging.CRITICAL)
 
 
 class StimInfo(object):
@@ -50,7 +57,7 @@ class StimInfo(object):
         :return:
         """
         pp = pprint.PrettyPrinter(indent=2, width=1)
-        return '\nStim #{}:\n{} (passed parameters):\n{}\n'.format(
+        return '\nStim #{}:\n{}:\n{}\n'.format(
             self.number, self.stim_type, str(pp.pformat(self.parameters)))
 
 
@@ -134,6 +141,7 @@ class GlobalDefaults(object):
         'protocol_reps': 1,
         'background': [-1, 0, -1],
         'fullscreen': False,
+        'log': False,
         'screen_num': 1,
         'trigger_wait': 0.1
     }
@@ -141,7 +149,7 @@ class GlobalDefaults(object):
     def __init__(self, frame_rate=None, pix_per_micron=None, scale=None,
                  offset=None, display_size=None, position=None,
                  protocol_reps=None, background=None, fullscreen=None,
-                 screen_num=None, trigger_wait=None):
+                 screen_num=None, trigger_wait=None, log=None):
         """
         Constructor
         :param frame_rate:
@@ -172,6 +180,8 @@ class GlobalDefaults(object):
             self.defaults['screen_num'] = screen_num
         if screen_num is not None:
             self.defaults['trigger_wait'] = trigger_wait
+        if log is not None:
+            self.defaults['log'] = log
     def __str__(self):
         """
         for displaying info about all stim parameters
@@ -201,7 +211,7 @@ class StimDefaults(object):
                  num_dirs=4, start_dir=0, start_radius=300, travel_distance=50,
                  sf=1, contrast_channel="Green", movie_filename=None, movie_x_loc=0,
                  movie_y_loc=0, period_mod=1, image_width=100, image_height=100,
-                 image_filename=None, table_filename=None):
+                 image_filename=None, table_filename=None, trigger=False):
         """
         default variable constructors
         """
@@ -222,7 +232,7 @@ class StimDefaults(object):
         self.intensity = intensity
         self.fill_seed = fill_seed
         self.move_seed = move_seed
-        self.speed = speed* GlobalDefaults.defaults['pix_per_micron']
+        self.speed = speed * GlobalDefaults.defaults['pix_per_micron'] / GlobalDefaults.defaults['frame_rate']
         self.num_dirs = num_dirs
         self.start_dir = start_dir
         self.start_radius = start_radius * GlobalDefaults.defaults['pix_per_micron']
@@ -237,6 +247,7 @@ class StimDefaults(object):
         self.image_height = image_height
         self.image_width = image_width
         self.table_filename = table_filename
+        self.trigger = trigger
         if location is None:
             self.location = [0, 0]
         else:
@@ -459,10 +470,10 @@ class Shape(StimDefaults):
             color_factor = (0.5 * scipy.sin(self.period_mod * scipy.pi *
                                             time_fraction - scipy.pi/2) + 0.5)
         elif self.timing == "square":
-            color_factor = (signal.square(self.period_mod * 2 * scipy.pi *
+            color_factor = (scipy.signal.square(self.period_mod * 2 * scipy.pi *
                                           time_fraction, duty=0.5) - 1) / 2 + 1
         elif self.timing == "sawtooth":
-            color_factor = (signal.sawtooth(self.period_mod * 2 * scipy.pi *
+            color_factor = (scipy.signal.sawtooth(self.period_mod * 2 * scipy.pi *
                                             time_fraction, width=1) - 1) / 2\
                            + 1
         elif self.timing == "linear":
@@ -536,7 +547,11 @@ class Shape(StimDefaults):
         """
         # if supposed to be drawn
         if self.start_stim <= frame < self.end_stim:
+            # send trigger at just before first frame that stim object is drawn
+            if self.trigger and self.start_stim == frame:
+                send_trigger()
             self.set_rgb(self.get_timing(frame))
+            # print "draw"
             self.stim.draw()
         else:
             pass
@@ -689,6 +704,9 @@ class MovingShape(Shape):
                 # self.get_phase()
             except (AttributeError, IndexError, TypeError):
                 self.generate_movement()
+                # trigger labjack to start recording
+                if self.trigger and self.__class__ == MovingShape:
+                    send_trigger()
                 self.animate(frame)
         else:
             pass
@@ -885,37 +903,42 @@ class Movie(Shape):
         """
         # load and start movie
         self.mov = visual.MovieStim(my_window, filename=self.movie_filename)
-        # self.mov.loadMovie(self.filename)
-        # self.mov.play()
+        self.mov.pause()
 
     def animate(self, frame):  # idk whats wrong not working
         # if within animation range
         if self.start_stim <= frame < self.end_stim:
+            if self.start_stim == frame:
+                self.mov.play()
             # play movie
-            pass
-        self.mov.draw()
+            self.mov.draw()
+            if self.end_stim == frame:
+                self.mov.stop()
 
-'''def send_trigger(GlobalDefaults.defaults['trigger_wait']):
+def send_trigger():
     """
     Triggers recording device by sending short voltage spike
     from a LabJack U3-HV
     :param wait: amount of time to pause after voltage spike
     :return: nothing
     """
-    # initialize
-    d = u3.U3()
-    # voltage spike for 0.1 seconds with LED off flash
-    # 0 low, 1 high, on flexible IO #4
-    d.setFIOState(4, 1)
-    # LED off
-    d.getFeedback(u3.LED(State=False))
-    core.wait(0.1)
-    # reset
-    d.setFIOState(4, 0)
-    d.getFeedback(u3.LED(State=True))
-    # wait x seconds
-    core.wait(wait)
-    d.close()'''
+    if has_u3:
+        # initialize
+        d = u3.U3()
+        # voltage spike for 0.1 seconds with LED off flash
+        # 0 low, 1 high, on flexible IO #4
+        d.setFIOState(4, 1)
+        # LED off
+        d.getFeedback(u3.LED(State=False))
+        core.wait(0.1)
+        # reset
+        d.setFIOState(4, 0)
+        d.getFeedback(u3.LED(State=True))
+        # wait x seconds
+        core.wait(GlobalDefaults.defaults['trigger_wait'])
+        d.close()
+    elif not has_u3:
+        print 'no labjack module/driver'
 
 
 def run_stim(stim_list, verbose=False):
@@ -934,6 +957,7 @@ def run_stim(stim_list, verbose=False):
     if verbose:
         for i in range(len(stim_list)):
             print stim_list[i]
+
 
     # stat counters
     rep_count = 0
@@ -1016,6 +1040,41 @@ def run_stim(stim_list, verbose=False):
         format((rep_count * num_frames + frame_count) / elapsed_time_count)
     print "Elapsed time: {0:.3f} seconds.\n". \
         format(elapsed_time_count)
+
+    if GlobalDefaults.defaults['log']:
+        time = localtime()
+        time_string = strftime('%Y_%m_%d_%H%M%S', time)
+        file_name = 'stimlog_' + time_string + '.txt'
+
+        if sys.platform == 'darwin':
+            path = './psychopy/logs/'
+            if not os.path.exists(path):
+                os.makedirs(path)
+            path += strftime('%Y_%m_%d', time) + '/'
+            if not os.path.exists(path):
+                os.makedirs(path)
+
+        elif sys.platform == 'win32':
+            path = '.\\psychopy\\logs\\'
+            if not os.path.exists(path):
+                os.makedirs(path)
+            path += strftime('%Y_%m_%d', time) + '\\'
+            if not os.path.exists(path):
+                os.makedirs(path)
+
+        with open((path+file_name), 'w') as f:
+            f.write(strftime('%a, %d %b %Y %H:%M:%S', time))
+            f.write("\n{} rep(s) of {} stim(s) generated. ". \
+                format(reps, len(stim_list)))
+            f.write("\n{}/{} frames displayed. ". \
+                format(rep_count * num_frames + frame_count, reps * num_frames))
+            f.write("Average fps: {0:.2f} hz.". \
+                format((rep_count * num_frames + frame_count) / elapsed_time_count))
+            f.write("\nElapsed time: {0:.3f} seconds.\n". \
+                format(elapsed_time_count))
+            for i in stim_list:
+                f.write(str(i))
+                f.write('\n')
 
 
 def do_break():
