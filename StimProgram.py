@@ -14,6 +14,7 @@ import re
 import sys
 import csv
 import os
+
 global has_u3
 try:
     import u3
@@ -21,7 +22,7 @@ try:
 except ImportError:
     has_u3 = False
 
-
+# to make scrolling through recursion errors easier
 sys.setrecursionlimit(100)
 
 __author__ = "Alexander Tomlinson"

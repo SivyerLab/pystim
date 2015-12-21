@@ -14,12 +14,16 @@ import wx
 import StimProgram
 import copy
 import json
+import ConfigParser
 
 __author__ = "Alexander Tomlinson"
 __license__ = "GPL"
 __version__ = "0.1"
 __email__ = "tomlinsa@ohsu.edu"
 __status__ = "Prototype"
+
+config = ConfigParser.ConfigParser()
+config.read('.\psychopy\config.ini')
 
 shape_param = OrderedDict([
     ('shape',
@@ -467,8 +471,7 @@ class DirPanel(wx.Panel):
                     './psychopy/stims/')
         elif _platform == "win32":
             self.browser = wx.FileCtrl(self, wildCard='*.txt', size=(200, -1),
-                defaultDirectory=
-                    '.\\psychopy\\stims\\')
+                defaultDirectory=config.get('GUI', 'savedStimDir'))
 
         # add to sizer
         panel_sizer.Add(self.browser, 1, wx.BOTTOM | wx.TOP | wx.EXPAND,
