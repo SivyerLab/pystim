@@ -144,7 +144,12 @@ fill_param = OrderedDict([
       'label'   : 'timing',
       'choices' : ['step', 'sine', 'square', 'sawtooth', 'linear'],
       'default' : 'step',
-      'is_child': False}
+      'is_child': False,
+      'children': {
+          'sine'    : ['period_mod'],
+          'square'  : ['period_mod'],
+          'sawtooth': ['period_mod'],
+      }}
      ),
 
     ('fill_mode',
@@ -219,7 +224,14 @@ fill_param = OrderedDict([
       'label'   : 'width (um)',
       'default' : 100,
       'is_child': True}
-     )
+     ),
+
+    ('period_mod',
+     {'type'    : 'text',
+      'label'   : 'period mod',
+      'default' : 1,
+      'is_child': True}
+     ),
 ])
 
 motion_param = OrderedDict([

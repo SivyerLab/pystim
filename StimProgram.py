@@ -474,8 +474,7 @@ class Shape(StimDefaults):
                                           time_fraction, duty=0.5) - 1) / 2 + 1
         elif self.timing == "sawtooth":
             color_factor = (scipy.signal.sawtooth(self.period_mod * 2 * scipy.pi *
-                                            time_fraction, width=1) - 1) / 2\
-                           + 1
+                                            time_fraction, width=1) - 1) / 2 + 1
         elif self.timing == "linear":
             color_factor = time_fraction
 
