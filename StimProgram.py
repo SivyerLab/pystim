@@ -14,8 +14,8 @@ import re
 import sys
 import csv
 import os
+import ConfigParser
 
-global has_u3
 try:
     import u3
     has_u3 = True
@@ -33,6 +33,9 @@ __status__ = "Prototype"
 
 # suppress extra warnings
 # logging.console.setLevel(logging.CRITICAL)
+
+config = ConfigParser.ConfigParser()
+config.read('.\psychopy\config.ini')
 
 
 class StimInfo(object):
@@ -64,6 +67,7 @@ class StimInfo(object):
 
 def input_parser(filename):
     """
+    ****Not currently used.****
     parses input string passed by Igor GUI. Objects separated by
     pound sign. String format predetermined by Igor
     :param filename: name where input string is stored
@@ -133,6 +137,7 @@ class GlobalDefaults(object):
     # use dictionary to simulate 'mutable static class variables'
     # better way to do this?
     defaults = {
+    # defaults in case not run from GUI
         'frame_rate': 60,
         'pix_per_micron': 1,
         'scale': 1,
@@ -1047,7 +1052,7 @@ def run_stim(stim_list, verbose=False):
         file_name = 'stimlog_' + time_string + '.txt'
 
         if sys.platform == 'darwin':
-            path = './psychopy/logs/'
+            path = config.get('StimProgram', 'logsDir')
             if not os.path.exists(path):
                 os.makedirs(path)
             path += strftime('%Y_%m_%d', time) + '/'
@@ -1055,7 +1060,7 @@ def run_stim(stim_list, verbose=False):
                 os.makedirs(path)
 
         elif sys.platform == 'win32':
-            path = '.\\psychopy\\logs\\'
+            path = config.get('StimProgram', 'logsDir')
             if not os.path.exists(path):
                 os.makedirs(path)
             path += strftime('%Y_%m_%d', time) + '\\'

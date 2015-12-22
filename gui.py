@@ -22,15 +22,64 @@ __version__ = "0.1"
 __email__ = "tomlinsa@ohsu.edu"
 __status__ = "Prototype"
 
-config = ConfigParser.ConfigParser()
-config.read('.\psychopy\config.ini')
+
+def get_config_dict(config_file):
+    config = ConfigParser.ConfigParser()
+    config.read(config_file)
+
+    default_config_dict = {}
+
+    options = config.options('Defaults')
+
+    # make dict of options
+    for option in options:
+        default_config_dict[option] = config.get('Defaults', option)
+
+    # add GUI specific settings
+    default_config_dict['savedStimDir'] = config.get('GUI', 'savedStimDir')
+
+    # stab at casting non-strings
+    for key, value in default_config_dict.iteritems():
+        # first look for lists
+        if default_config_dict[key][0] == '[':
+            try:
+                default_config_dict[key] = map(int, default_config_dict[
+                    key].strip('[]').split(','))
+            except ValueError:
+                try:
+                    default_config_dict[key] = map(float, default_config_dict[
+                        key].strip('[]').split(','))
+                except ValueError:
+                    pass
+        # # look for booleans
+        # elif default_config_dict[key] == 'True':
+        #     default_config_dict[key] = True
+        # elif default_config_dict[key] == 'False':
+        #     default_config_dict[key] = False
+        # # look for 'None'
+        # elif default_config_dict[key] == 'None':
+        #     default_config_dict[key] = None
+        # cast non lists
+        else:
+            try:
+                default_config_dict[key] = int(value)
+            except ValueError:
+                try:
+                    default_config_dict[key] = float(value)
+                except ValueError:
+                    pass
+
+    return default_config_dict
+
+config_file = '.\psychopy\config.ini'
+config_dict = get_config_dict(config_file)
 
 shape_param = OrderedDict([
     ('shape',
      {'type'    : 'choice',
       'label'   : 'shape',
       'choices' : ['circle', 'rectangle', 'annulus'],
-      'default' : 'circle',
+      'default' : config_dict['shape'],
       'is_child': False,
       'children': {
           'circle'   : ['outer_diameter'],
@@ -42,42 +91,42 @@ shape_param = OrderedDict([
     ('orientation',
      {'type'    : 'text',
       'label'   : 'orientation',
-      'default' : 0,
+      'default' : config_dict['orientation'],
       'is_child': False}
      ),
 
     ('location',
      {'type'    : 'list',
       'label'   : 'location (um)',
-      'default' : [0, 0],
+      'default' : config_dict['location'],
       'is_child': False}
      ),
 
     ('height',
      {'type'    : 'text',
       'label'   : 'height (um)',
-      'default' : 100,
+      'default' : config_dict['height'],
       'is_child': True}
      ),
 
     ('width',
      {'type'    : 'text',
       'label'   : 'width (um)',
-      'default' : 50,
+      'default' : config_dict['width'],
       'is_child': True}
      ),
 
     ('inner_diameter',
      {'type'    : 'text',
       'label'   : 'inner diameter (um)',
-      'default' : 50,
+      'default' : config_dict['inner_diameter'],
       'is_child': True}
      ),
 
     ('outer_diameter',
      {'type'    : 'text',
       'label'   : 'outer diameter (um)',
-      'default' : 100,
+      'default' : config_dict['outer_diameter'],
       'is_child': True}
      ),
 ])
@@ -93,14 +142,14 @@ timing_param = OrderedDict([
     ('delay',
      {'type'    : 'text',
       'label'   : 'delay',
-      'default' : 0,
+      'default' : config_dict['delay'],
       'is_child': False}
      ),
 
     ('duration',
      {'type'    : 'text',
       'label'   : 'duration',
-      'default' : 5,
+      'default' : config_dict['duration'],
       'is_child': False}
      ),
 
@@ -108,7 +157,7 @@ timing_param = OrderedDict([
      {'type'    : 'choice',
       'label'   : 'trigger',
       'choices' : ['True', 'False'],
-      'default' : 'False',
+      'default' : config_dict['trigger'],
       'is_child': False}
      ),
 
@@ -124,7 +173,7 @@ fill_param = OrderedDict([
     ('color',
      {'type'    : 'list',
       'label'   : 'color (RGB)',
-      'default' : [-1, 1, -1],
+      'default' : config_dict['color'],
       'is_child': False}
      ),
 
@@ -132,14 +181,14 @@ fill_param = OrderedDict([
      {'type'    : 'choice',
       'label'   : 'contrast channel',
       'choices' : ['green', 'red', 'blue', 'global'],
-      'default' : 'green',
+      'default' : config_dict['contrast_channel'],
       'is_child': False}
      ),
 
     ('intensity',
      {'type'    : 'text',
       'label'   : 'contrast',
-      'default' : 1,
+      'default' : config_dict['intensity'],
       'is_child': False}
      ),
 
@@ -147,7 +196,7 @@ fill_param = OrderedDict([
      {'type'    : 'choice',
       'label'   : 'timing',
       'choices' : ['step', 'sine', 'square', 'sawtooth', 'linear'],
-      'default' : 'step',
+      'default' : config_dict['timing'],
       'is_child': False,
       'children': {
           'sine'    : ['period_mod'],
@@ -161,7 +210,7 @@ fill_param = OrderedDict([
       'label'   : 'fill mode',
       'choices' : ['uniform', 'sine', 'square', 'concentric', 'checkerboard',
                    'random', 'image'],
-      'default' : 'uniform',
+      'default' : config_dict['fill_mode'],
       'is_child': False,
       'children': {
           'sine'        : ['sf'],
@@ -177,63 +226,63 @@ fill_param = OrderedDict([
     ('sf',
      {'type'    : 'text',
       'label'   : 'spatial frequency',
-      'default' : 1,
+      'default' : config_dict['sf'],
       'is_child': True}
      ),
 
     ('fill_seed',
      {'type'    : 'text',
       'label'   : 'fill seed',
-      'default' : 1,
+      'default' : config_dict['fill_seed'],
       'is_child': True}
      ),
 
     ('size_check_x',
      {'type'    : 'text',
       'label'   : 'size check x (um)',
-      'default' : 50,
+      'default' : config_dict['size_check_x'],
       'is_child': True}
      ),
 
     ('size_check_y',
      {'type'    : 'text',
       'label'   : 'size check y (um)',
-      'default' : 50,
+      'default' : config_dict['size_check_y'],
       'is_child': True}
      ),
 
     ('num_check',
      {'type'    : 'text',
       'label'   : 'number of checks',
-      'default' : 64,
+      'default' : config_dict['num_check'],
       'is_child': True}
      ),
 
     ('image_filename',
      {'type'    : 'path',
       'label'   : 'filename',
-      'default' : None,
+      'default' : config_dict['image_filename'],
       'is_child': True}
      ),
 
     ('image_height',
      {'type'    : 'text',
       'label'   : 'height (um)',
-      'default' : 100,
+      'default' : config_dict['image_height'],
       'is_child': True}
      ),
 
     ('image_width',
      {'type'    : 'text',
       'label'   : 'width (um)',
-      'default' : 100,
+      'default' : config_dict['image_width'],
       'is_child': True}
      ),
 
     ('period_mod',
      {'type'    : 'text',
       'label'   : 'period mod',
-      'default' : 1,
+      'default' : config_dict['period_mod'],
       'is_child': True}
      ),
 ])
@@ -243,7 +292,7 @@ motion_param = OrderedDict([
      {'type'    : 'choice',
       'label'   : 'move type',
       'choices' : ['static', 'moving', 'table', 'random', 'movie'],
-      'default' : 'static',
+      'default' : config_dict['move_type'],
       'is_child': False,
       'children': {
           'moving': ['speed', 'start_dir', 'num_dirs', 'start_radius'],
@@ -256,56 +305,56 @@ motion_param = OrderedDict([
     ('speed',
      {'type'    : 'text',
       'label'   : 'speed (um/hz)',
-      'default' : 10,
+      'default' : config_dict['speed'],
       'is_child': True}
      ),
 
     ('start_dir',
      {'type'    : 'text',
       'label'   : 'start direction',
-      'default' : 0,
+      'default' : config_dict['start_dir'],
       'is_child': True}
      ),
 
     ('num_dirs',
      {'type'    : 'text',
       'label'   : 'number of dirs',
-      'default' : 4,
+      'default' : config_dict['num_dirs'],
       'is_child': True}
      ),
 
     ('start_radius',
      {'type'    : 'text',
       'label'   : 'start radius (um)',
-      'default' : 300,
+      'default' : config_dict['start_radius'],
       'is_child': True}
      ),
 
     ('travel_distance',
      {'type'    : 'text',
       'label'   : 'travel distance (um)',
-      'default' : 50,
+      'default' : config_dict['travel_distance'],
       'is_child': True}
      ),
 
     ('move_seed',
      {'type'    : 'text',
       'label'   : 'move seed',
-      'default' : 1,
+      'default' : config_dict['move_seed'],
       'is_child': True}
      ),
 
     ('movie_filename',
      {'type'    : 'path',
       'label'   : 'filename',
-      'default' : None,
+      'default' : config_dict['movie_filename'],
       'is_child': True}
      ),
 
     ('table_filename',
      {'type'    : 'path',
       'label'   : 'filename',
-      'default' : None,
+      'default' : config_dict['table_filename'],
       'is_child': True}
      )
 ])
@@ -314,63 +363,63 @@ global_default_param = OrderedDict([
     ('display_size',
      {'type'    : 'list',
       'label'   : 'display size (pixels)',
-      'default' : [400, 400],
+      'default' : config_dict['display_size'],
       'is_child': False}
      ),
 
     ('position',
      {'type'    : 'list',
       'label'   : 'win position (xy)',
-      'default' : [0, 0],
+      'default' : config_dict['position'],
       'is_child': False}
      ),
 
     ('offset',
      {'type'    : 'list',
       'label'   : 'offset (um)',
-      'default' : [0, 0],
+      'default' : config_dict['offset'],
       'is_child': False}
      ),
 
     ('scale',
      {'type'    : 'list',
       'label'   : 'scale (xy)',
-      'default' : [1, 1],
+      'default' : config_dict['scale'],
       'is_child': False}
      ),
 
     ('pix_per_micron',
      {'type'    : 'text',
       'label'   : 'pix per micron',
-      'default' : 1,
+      'default' : config_dict['pix_per_micron'],
       'is_child': False}
      ),
 
     ('frame_rate',
      {'type'    : 'text',
       'label'   : 'frame rate',
-      'default' : 60,
+      'default' : config_dict['frame_rate'],
       'is_child': False}
      ),
 
     ('protocol_reps',
      {'type'    : 'text',
       'label'   : 'protocol reps',
-      'default' : 1,
+      'default' : config_dict['protocol_reps'],
       'is_child': False}
      ),
 
     ('trigger_wait',
      {'type'    : 'text',
       'label'   : 'trigger wait',
-      'default' : 0.5,
+      'default' : config_dict['trigger_wait'],
       'is_child': False}
      ),
 
     ('background',
      {'type'    : 'list',
       'label'   : 'background (RGB)',
-      'default' : [-1, 0, -1],
+      'default' : config_dict['background'],
       'is_child': False}
      ),
 
@@ -378,7 +427,8 @@ global_default_param = OrderedDict([
      {'type'    : 'choice',
       'label'   : 'screen number',
       'choices' : ['1', '2'],
-      'default' : '1',
+      'default' : str(config_dict['screen_num']),  # to select default,
+      # need to be strings
       'is_child': False}
      ),
 
@@ -386,7 +436,7 @@ global_default_param = OrderedDict([
      {'type'    : 'choice',
       'label'   : 'fullscreen',
       'choices' : ['True', 'False'],
-      'default' : 'False',
+      'default' : config_dict['fullscreen'],
       'is_child': False}
      ),
 
@@ -394,7 +444,7 @@ global_default_param = OrderedDict([
      {'type'    : 'choice',
       'label'   : 'log',
       'choices' : ['True', 'False'],
-      'default' : 'False',
+      'default' : config_dict['log'],
       'is_child': False}
      )
     # ('object_list', 1)
@@ -471,7 +521,7 @@ class DirPanel(wx.Panel):
                     './psychopy/stims/')
         elif _platform == "win32":
             self.browser = wx.FileCtrl(self, wildCard='*.txt', size=(200, -1),
-                defaultDirectory=config.get('GUI', 'savedStimDir'))
+                defaultDirectory=config_dict['savedStimDir'])
 
         # add to sizer
         panel_sizer.Add(self.browser, 1, wx.BOTTOM | wx.TOP | wx.EXPAND,
