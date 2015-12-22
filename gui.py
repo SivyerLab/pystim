@@ -597,13 +597,24 @@ class DirPanel(wx.Panel):
         # get path of settings file from browser
         path = self.browser.GetPath()
 
-        # temp open and load settings
+        # open and read settings
         try:
             with open(path, 'r') as f:
                 to_load = json.load(f)
         except ValueError:
-            print "\nERROR: file not a properly formatted parameter file"
-            return
+            # see if log file with JSON at end
+            try:
+                with open(path, 'r') as f:
+                    next_is_json = False
+                    for line in f:
+                        if next_is_json:
+                            to_load = json.loads(line)
+                        line = line.rstrip()
+                        if line == '#BEGIN JSON#':
+                            next_is_json = True
+            except ValueError:
+                print "\nERROR: file not a properly formatted parameter file"
+                return
 
         # load list
         for stim_param in to_load:

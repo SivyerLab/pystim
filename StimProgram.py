@@ -15,6 +15,7 @@ import sys
 import csv
 import os
 import json
+import copy
 import ConfigParser
 
 try:
@@ -1085,11 +1086,12 @@ def run_stim(stim_list, verbose=False):
             f.write('\n\n\n#BEGIN JSON#\n')
             to_write = []
             for i in stim_list:
-                i.parameters['move_type'] = i.stim_type
-                to_write.append(i.parameters)
+                para_copy = copy.deepcopy(i.parameters)
+                para_copy['move_type'] = i.stim_type
+                to_write.append(para_copy)
 
             f.write(json.dumps(to_write))
-            f.write('\n#END JSON#')
+            # f.write('\n#END JSON#')
 
 
 def do_break():
