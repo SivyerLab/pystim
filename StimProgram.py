@@ -5,6 +5,7 @@ Program for presenting visual stimuli to patch clamped retinal neurons"
 """
 
 from psychopy import visual, logging, core, event, filters
+from psychopy.tools.coordinatetools import pol2cart
 from random import Random
 from time import strftime, localtime
 import scipy
@@ -12,7 +13,6 @@ import numpy
 import pprint
 import re
 import sys
-import csv
 import os
 import json
 import copy
@@ -25,7 +25,7 @@ except ImportError:
     has_u3 = False
 
 # to make scrolling through recursion errors easier
-sys.setrecursionlimit(100)
+# sys.setrecursionlimit(100)
 
 __author__ = "Alexander Tomlinson"
 __license__ = "GPL"
@@ -749,24 +749,19 @@ class TableStim(MovingShape):
         return self.end_stim
 
     def get_move_array(self, *args):
-        f = self.table_filename
+        table = self.table_filename
 
-        x_cord = []
-        y_cord = []
+        with open(table, 'r') as f:
+            line = f.read()
+            radius = line.split('\r')
 
-        with open(f, 'rU') as csv_file:
-            rows = csv.reader(csv_file, delimiter='\t')
-            for row in rows:
-                try:
-                    x = float(row[0])* GlobalDefaults.defaults['pix_per_micron']
-                    y = float(row[1]) * GlobalDefaults.defaults['pix_per_micron']
-                    x_cord.append(x)
-                    y_cord.append(y)
-                except ValueError:
-                    pass
+        radius = map(float, radius)
+        radius = [r * GlobalDefaults.defaults[
+            'pix_per_micron'] for r in radius]
 
-        x = scipy.array(x_cord)
-        y = scipy.array(y_cord)
+        theta = self.start_dir * -1 + 90 # conversion for rad to cart
+
+        x,y = map(list, zip(*[pol2cart(theta, r) for r in radius]))
 
         return x, y
 

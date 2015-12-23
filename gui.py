@@ -298,7 +298,7 @@ motion_param = OrderedDict([
           'moving': ['speed', 'start_dir', 'num_dirs', 'start_radius'],
           'random': ['speed', 'travel_distance', 'move_seed'],
           'movie' : ['movie_filename'],
-          'table' : ['table_filename']
+          'table' : ['table_filename', 'start_dir']
       }}
      ),
 
