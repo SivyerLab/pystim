@@ -8,6 +8,7 @@ from psychopy import visual, logging, core, event, filters
 from psychopy.tools.coordinatetools import pol2cart
 from random import Random
 from time import strftime, localtime
+from igor import binarywave, packed
 import scipy
 import numpy
 import pprint
@@ -751,16 +752,27 @@ class TableStim(MovingShape):
     def get_move_array(self, *args):
         table = self.table_filename
 
-        with open(table, 'r') as f:
-            line = f.read()
-            radius = line.split('\r')
+        # if text table get radius array
+        if os.path.splitext(table)[1] == '.txt':
+            with open(table, 'r') as f:
+                line = f.read()
+                radius = line.split('\r')
+
+        # if igor binary wave format
+        elif os.path.splitext(table)[1] == '.ibw':
+            radius = binarywave.load(table)['wave']['wData']
+
+        # if igor packed experiment format
+        elif os.path.splitext(table)[1] == '.pxp':
+            radius = packed.load(table)[1]['root']['wave0'].wave['wave'][
+                'wData']
 
         radius = map(float, radius)
         radius = [r * GlobalDefaults.defaults[
             'pix_per_micron'] for r in radius]
 
+        # make coordinate array
         theta = self.start_dir * -1 + 90 # conversion for rad to cart
-
         x,y = map(list, zip(*[pol2cart(theta, r) for r in radius]))
 
         return x, y
