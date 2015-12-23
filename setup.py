@@ -4,6 +4,7 @@ import numpy, scipy
 if sys.platform=='win32':
     from distutils.core import setup
     import py2exe
+    import ctypes
 
     pref_files = []
     app_files = []
@@ -42,9 +43,14 @@ if sys.platform=='win32':
               }
           })
 
+    ctypes.windll.user32.MessageBoxA(0, "Copy \psychopy\data\ folder into "
+                                        "dist\psychopy\ or exe will not "
+                                        "launch", "DON'T FORGET!", 1)
+
 elif sys.platform=='darwin':
     from setuptools import setup
     import py2app
+    import EasyDialogs
 
     pref_files = []
     app_files = []
@@ -56,8 +62,10 @@ elif sys.platform=='darwin':
         f1 = "./psychopy/stims/" + files
         stim_files.append(f1)
 
-    for files in os.listdir('/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/site-packages/psychopy/preferences/'):
-        f1 = '/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/site-packages/psychopy/preferences/' + files
+    for files in os.listdir('/Library/Frameworks/Python.framework/Versions/2.7/'
+                            'lib/python2.7/site-packages/psychopy/preferences/'):
+        f1 = '/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7' \
+             '/site-packages/psychopy/preferences/' + files
         pref_files.append(f1)
 
     all_files = [("psychopy/preferences", pref_files),
@@ -76,3 +84,6 @@ elif sys.platform=='darwin':
                                 'psychopy.visual.*']
               }
           })
+
+    EasyDialogs.Message('Copy \psychopy\data\ folder into dist\psychopy\ or '
+                        'app will not launch')
