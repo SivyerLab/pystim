@@ -284,9 +284,8 @@ class StaticStim(StimDefaults):
         # gen size
         # gen mask
         # gen texture
-        # gen location
-        # gen orientation
-        # filename?
+        # set location
+        # set orientation
         pass
 
     def draw_times(self):
@@ -297,14 +296,29 @@ class StaticStim(StimDefaults):
         # set rgb
         pass
 
-    def set_rgb(self):
-        # gen rgb
-        pass
-
     def gen_rgb(self):
         # rgb with contrast correction
         # gen timing
         pass
 
     def gen_timing(self):
-        self
+        pass
+
+    def gen_size(self):
+        pass
+
+    def gen_mask(self):
+        pass
+
+    def gen_texture(self):
+        pass
+
+    def set_rgb(self):
+        # gen rgb
+        pass
+
+    def set_pos(self):
+        pass
+
+    def set_ori(self):
+        pass
