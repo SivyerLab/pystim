@@ -251,3 +251,60 @@ class StimDefaults(object):
 
         self.speed = speed * GlobalDefaults.defaults['pix_per_micron'] / \
                      GlobalDefaults.defaults['frame_rate']
+
+
+class StaticStim(StimDefaults):
+    """
+    class for generic non moving stim object
+    """
+    def __init__(self, **kwargs):
+        """
+        Passes parameters up to super class. Seeds randoms.
+        """
+        # pass parameters up to super
+        super(StaticStim, self).__init__(**kwargs)
+
+        # non parameter instance attributes
+        self.start_stim = None
+        self.end_stim = None
+        self.draw_time = None
+        self.stim = None
+        self.grating_size = None
+        self.desired_RGB = None
+
+        # seed randoms
+        self.fill_random = Random()
+        self.fill_random.seed(self.fill_seed)
+
+        self.move_random = Random()
+        self.move_random.seed(self.move_seed)
+
+    def make_stim(self):
+        # gen rgb
+        # gen size
+        # gen mask
+        # gen texture
+        # gen location
+        # gen orientation
+        # filename?
+        pass
+
+    def draw_times(self):
+        pass
+
+    def animate(self):
+        # draw times
+        # set rgb
+        pass
+
+    def set_rgb(self):
+        # gen rgb
+        pass
+
+    def gen_rgb(self):
+        # rgb with contrast correction
+        # gen timing
+        pass
+
+    def gen_timing(self):
+        self
