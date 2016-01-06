@@ -31,9 +31,10 @@ __version__ = "1.0"
 __email__ =   "tomlinsa@ohsu.edu"
 __status__ =  "Beta"
 
-# suppress extra warnings
+# to suppress extra warnings, uncomment next line
 # logging.console.setLevel(logging.CRITICAL)
 
+# read ini file
 config = ConfigParser.ConfigParser()
 config.read('.\psychopy\config.ini')
 
@@ -65,26 +66,23 @@ class StimInfo(object):
 
 class GlobalDefaults(object):
     """
-    class with global constants, such as window information
+    Class with global constants, such as window information. Use dictionary
+    to simulate 'mutable static class variables' (need better, more pythonic, way to do this)
     """
-    # use dictionary to simulate 'mutable static class variables'
-    # need better, more pythonic, way to do this
 
     # default defaults
-    defaults = {
-        'frame_rate': 60,
-        'pix_per_micron': 1,
-        'scale': 1,
-        'offset': [0, 0],
-        'display_size': [400, 400],
-        'position': [0, 0],
-        'protocol_reps': 1,
-        'background': [-1, 0, -1],
-        'fullscreen': False,
-        'log': False,
-        'screen_num': 1,
-        'trigger_wait': 0.1
-    }
+    defaults = dict(frame_rate=60,
+                    pix_per_micron=1,
+                    scale=1,
+                    offset=[0, 0],
+                    display_size=[400, 400],
+                    position=[0, 0],
+                    protocol_reps=1,
+                    background=[-1, 0, -1],
+                    fullscreen=False,
+                    log=False,
+                    screen_num=1,
+                    trigger_wait=0.1)
 
     def __init__(self,
                  frame_rate=None,
@@ -100,7 +98,7 @@ class GlobalDefaults(object):
                  log=None,
                  offset=None):
         """
-        Constructor
+        Populate defaults; units converted as necessary
         """
         if frame_rate is not None:
             self.defaults['frame_rate'] = frame_rate
@@ -141,7 +139,7 @@ class GlobalDefaults(object):
 
     def __str__(self):
         """
-        for displaying info about all stim parameters
+        for pretty printing dictionary of global defaults
         """
         return '\n{} (all parameters):\n{}\n'.format(
             self.__class__.__name__, str(PrettyPrinter(indent=2,
@@ -218,7 +216,7 @@ class StimDefaults(object):
         else:
             self.color = color
 
-        # unit conversion
+        # unit conversions
         self.size_check_x = size_check_x * GlobalDefaults.defaults[
             'pix_per_micron']
         self.size_check_y = size_check_y * GlobalDefaults.defaults[
@@ -272,14 +270,33 @@ class StaticStim(StimDefaults):
         self.grating_size = None
         self.desired_RGB = None
 
-        # seed randoms
+        # seed fill and move randoms
         self.fill_random = Random()
         self.fill_random.seed(self.fill_seed)
-
         self.move_random = Random()
         self.move_random.seed(self.move_seed)
 
     def make_stim(self):
+        """
+        Creates instance of psychopy stim object
+        """
+        if self.fill_mode == 'image':
+            self.stim = visual.ImageStim(win=my_window,
+                                         size=self.gen_size(),
+                                         color=self.gen_rgb(),
+                                         pos=self.location,
+                                         ori=self.orientation,
+                                         image=self.image_filename
+                                         )
+        else:
+            self.stim = visual.GratingStim(win=my_window,
+                                           size=self.gen_size(),
+                                           color=self.gen_rgb(),
+                                           mask=self.gen_mask(),
+                                           tex=self.gen_texture(),
+                                           pos=self.location,
+                                           ori=self.orientation
+                                           )
         # gen rgb
         # gen size
         # gen mask
@@ -305,7 +322,27 @@ class StaticStim(StimDefaults):
         pass
 
     def gen_size(self):
-        pass
+        """
+        calculates sizes for various sims
+        :return: size of stim, as float for circles/annuli and height width
+        tuple for other shapes
+        """
+        if self.fill_mode == 'image':
+            stim_size = (self.image_width, self.image_height)
+
+        elif self.shape == 'circle' or self.shape == 'annulus':
+            stim_size = self.outer_diameter
+
+        elif self.shape == 'rectangle':
+            if self.fill_mode == ('random' or 'checkerboard'):
+                stim_size = (self.size_check_x * self.num_check,
+                             self.size_check_y * self.num_check)
+
+            else:
+                stim_size = (self.width, self.height)
+
+        else:
+            stim_size = (self.width, self.height)
 
     def gen_mask(self):
         pass
