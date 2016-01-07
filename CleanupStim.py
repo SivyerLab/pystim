@@ -4,7 +4,7 @@
 Program for presenting visual stimuli to patch clamped retinal neurons"
 """
 
-from psychopy import visual, logging, core, event, filters
+from psychopy import visual, logging, core, event, filters, monitors
 from psychopy.tools.coordinatetools import pol2cart
 from random import Random
 from time import strftime, localtime
@@ -66,7 +66,7 @@ class StimInfo(object):
 
 class GlobalDefaults(object):
     """
-    Class with global constants, such as window information. Use dictionary
+    Class with global constants, such as window information. Uses dictionary
     to simulate 'mutable static class variables' (need better, more pythonic, way to do this)
     """
 
@@ -253,7 +253,9 @@ class StimDefaults(object):
 
 class StaticStim(StimDefaults):
     """
-    class for generic non moving stim object
+    Class for generic non moving stims. Super class for other stim
+    types. Stim object instantiated in make_stim(), and drawn with calls to
+    animate().
     """
     def __init__(self, **kwargs):
         """
@@ -268,7 +270,7 @@ class StaticStim(StimDefaults):
         self.draw_time = None
         self.stim = None
         self.grating_size = None
-        self.desired_RGB = None
+        # self.desired_RGB = None
 
         # seed fill and move randoms
         self.fill_random = Random()
@@ -298,9 +300,6 @@ class StaticStim(StimDefaults):
                                            ori=self.orientation
                                            )
         # gen rgb
-        # gen size
-        # gen mask
-        # gen texture
         # set location
         # set orientation
         pass
@@ -314,9 +313,28 @@ class StaticStim(StimDefaults):
         pass
 
     def gen_rgb(self):
-        # rgb with contrast correction
-        # gen timing
-        pass
+        """
+        Adjusts initial rgb values for contrast in specified channel.
+        :return: list of rgb values as floats
+        """
+        if self.contrast_channel == 'red':
+            adjusted_rgb = [self.color[0] * self.intensity,
+                       self.color[1],
+                       self.color[2]]
+        if self.contrast_channel == 'green':
+            adjusted_rgb = [self.color[0],
+                       self.color[1] * self.intensity,
+                       self.color[2]]
+        if self.contrast_channel == 'blue':
+            adjusted_rgb = [self.color[0],
+                       self.color[1],
+                       self.color[2] * self.intensity]
+        if self.contrast_channel == 'global':
+            adjusted_rgb = [self.color[0] * self.intensity,
+                       self.color[1] * self.intensity,
+                       self.color[2] * self.intensity]
+
+        return adjusted_rgb
 
     def gen_timing(self):
         pass
@@ -344,11 +362,63 @@ class StaticStim(StimDefaults):
         else:
             stim_size = (self.width, self.height)
 
+        return stim_size
+
     def gen_mask(self):
-        pass
+        """
+        Determines the mask of the stim object. The mask determines the shape of
+        the stim. See psychopy documentation for more details.
+        :return: mask of the stim object, as a string
+        """
+        if self.shape == ('circle' or 'annulus'):
+            stim_mask = 'circle'
+
+        elif self.shape == 'rectangle':
+            stim_mask = 'rectangle'
+
+        return stim_mask
 
     def gen_texture(self):
-        pass
+        """
+        Generates texture for stim object. If not none, textures are 3D numpy
+        arrays, where the 3rd element is 4 values. The first 3 values are
+        contrast values applied to the rgb value, and the fourth is an alpha
+        value (transparency mask). Textures are created by modulating the alpha
+        value while contrast values are left as one.
+
+        :return: texture, either None or a numpy array
+        """
+        if self.fill_mode == 'uniform':
+            stim_texture = None
+
+        elif self.fill_mode == ('checkerboard' or 'random'):
+            pass
+
+        elif self.fill_mode == ('sine' or 'square' or 'concentric'):
+            # grating size depends on shape
+            if self.shape == 'rectangle':
+                self.grating_size = self.width
+            elif self.shape == ('circle' or 'annulus'):
+                self.grating_size = self.outer_diameter
+
+            # populate numpy array with ones as floats
+            stim_texture = numpy.ones((self.grating_size, self.grating_size,
+                                       4), 'f')
+
+            # change alpha values. Alpha values are assigned by using
+            # psychopy helper functions to create appropriate gratings
+            if self.fill_mode == 'sine':
+                stim_texture[:, :, 3] = (filters.makeGrating(
+                        self.grating_size, gratType='sin', cycles=1)) ** 2
+
+            elif self.fill_mode == 'square':
+                stim_texture[:, :, 3] = (filters.makeGrating(
+                        self.grating_size, gratType='sqr', cycles=1) - 1) / 2\
+                                        + 1
+
+            elif self.fill_mode == 'concentric':
+                stim_texture[:, :, 3] = scipy.sin(filters.makeRadialMatrix(
+                        self.grating_size))
 
     def set_rgb(self):
         # gen rgb
