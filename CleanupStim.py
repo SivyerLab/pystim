@@ -316,9 +316,18 @@ class StaticStim(StimDefaults):
         return self.end_stim
 
     def animate(self, frame):
-        # draw times
-        # set rgb
-        pass
+        """
+        Method for drawing stim objects to back buffer. Checks if object
+        should be drawn. Back buffer is
+        brought to front with calls to flip() on the window.
+        :param frame: current frame number
+        :return: nothing
+        """
+        if self.start_stim <= frame < self.end_stim:
+            # adjust colors based on timing
+            self.set_rgb(self.gen_timing(frame))
+            # draw to back buffer
+            self.stim.draw()
 
     def gen_size(self):
         """
@@ -459,6 +468,26 @@ class StaticStim(StimDefaults):
 
         elif self.timing == 'step':
             color_factor = 1
+
+        # multiply rgbs by color factor, in proper contrast channel
+        if self.contrast_channel == 'red':
+            self.adjusted_rgb = [self.adjusted_rgb[0] * self.intensity,
+                                 self.adjusted_rgb[1],
+                                 self.adjusted_rgb[2]]
+        if self.contrast_channel == 'green':
+            self.adjusted_rgb = [self.adjusted_rgb[0],
+                                 self.adjusted_rgb[1] * self.intensity,
+                                 self.adjusted_rgb[2]]
+        if self.contrast_channel == 'blue':
+            self.adjusted_rgb = [self.adjusted_rgb[0],
+                                 self.adjusted_rgb[1],
+                                 self.adjusted_rgb[2] * self.intensity]
+        if self.contrast_channel == 'global':
+            self.adjusted_rgb = [self.adjusted_rgb[0] * self.intensity,
+                                 self.adjusted_rgb[1] * self.intensity,
+                                 self.adjusted_rgb[2] * self.intensity]
+
+        return self.adjusted_rgb
 
     def set_rgb(self, rgb):
         self.stim.setColor(rgb)
