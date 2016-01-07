@@ -37,16 +37,19 @@ def get_config_dict(config_file):
 
     # add GUI specific settings
     default_config_dict['savedStimDir'] = config.get('GUI', 'savedStimDir')
+    default_config_dict['windowPos'] = config.get('GUI', 'windowPos')
 
     # stab at casting non-strings
     for key, value in default_config_dict.iteritems():
         # first look for lists
         if default_config_dict[key][0] == '[':
             try:
+                # map to int
                 default_config_dict[key] = map(int, default_config_dict[
                     key].strip('[]').split(','))
             except ValueError:
                 try:
+                    # map to float if int mapping fails
                     default_config_dict[key] = map(float, default_config_dict[
                         key].strip('[]').split(','))
                 except ValueError:
@@ -1319,8 +1322,9 @@ class MyFrame(wx.Frame):
                            wx.BOTTOM, border=5)
         self.win_sizer.Add(panel_button_sizer)
 
-        # place on monitor (arbitrary)
-        self.SetPosition((500, 500))
+        # place on monitor (arbitrary, from ini)
+        pos = config_dict['windowPos'][0], config_dict['windowPos'][0]
+        self.SetPosition(pos)
 
         # HACK FOR PROPER SIZING
         # TODO: better sizing
