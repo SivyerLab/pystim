@@ -4,7 +4,7 @@
 Program for presenting visual stimuli to patch clamped retinal neurons"
 """
 
-from psychopy import visual, logging, core, event, filters
+from psychopy import visual, logging, core, event, filters, monitors
 from psychopy.tools.coordinatetools import pol2cart
 from random import Random
 from time import strftime, localtime
@@ -49,7 +49,6 @@ class StimInfo(object):
         """
         Constructor
         :param stim_type: stim type_input pulled from parameter
-        list (objectX=object_type)
         :param parameters: dictionary of parameters
         :param number: stim number order
         :return:
@@ -161,10 +160,6 @@ class GlobalDefaults(object):
                  screen_num=None, trigger_wait=None, log=None):
         """
         Constructor
-        :param frame_rate:
-        :param pix_per_micron:
-        :param scale:
-        :return:
         """
         if frame_rate is not None:
             self.defaults['frame_rate'] = frame_rate
@@ -191,10 +186,10 @@ class GlobalDefaults(object):
             self.defaults['trigger_wait'] = trigger_wait
         if log is not None:
             self.defaults['log'] = log
+
     def __str__(self):
         """
         for displaying info about all stim parameters
-        :return:
         """
         pp = pprint.PrettyPrinter(indent=2, width=1)
         return '\n{} (all parameters):\n{}\n'.format(
@@ -222,7 +217,7 @@ class StimDefaults(object):
                  movie_y_loc=0, period_mod=1, image_width=100, image_height=100,
                  image_filename=None, table_filename=None, trigger=False):
         """
-        default variable constructors
+        default variable constructors, distance units converted appropriately
         """
         # parameter defaults
         self.shape = shape
@@ -272,28 +267,11 @@ class StimDefaults(object):
 
 class Shape(StimDefaults):
     """
-    Stim object super class, contains general defaults
+    Class for generic stim object
     """
     def __init__(self, **kwargs):
         """
         Constructor
-        :param shape: Circle, Rectangle, Annulus
-        :param fill_mode: Uniform, Grating, Checkerboard, Random (type_input
-         of checkerboard), Movie, or Concentric (not implemented yet)
-        :param orientation:
-        :param rand_seed:
-        :param size_check_x: for shapes with checkerboard fill, this
-        :param size_check_y: determines size rather than height and width
-        :param num_check: number of squares per side for checkerboards
-        :param height:
-        :param width:
-        :param outer_diameter: circle size
-        :param inner_diameter: for annulus
-        :param delay:
-        :param color: stimulus color, in RGB normalized from -1 to 1
-        :param intensity: contrast, normalized from -1 to 1
-        :param kwargs: extra keyword arguments, passed to super
-        :return:
         """
         # non parameter instance attributes
         self.start_stim = None
@@ -306,7 +284,7 @@ class Shape(StimDefaults):
         # pass attributes up to super
         super(Shape, self).__init__(**kwargs)
 
-        # seed random
+        # seed randoms
         self.fill_random = Random()
         self.fill_random.seed(self.fill_seed)
         self.move_random = Random()
@@ -333,12 +311,7 @@ class Shape(StimDefaults):
         """
         Determines texture, creates checkerboard array if necessary.
         ***RGB values in numpy textures are contrast values***
-
-        Checkerboard fill adapted from code by David L Morton, used under MIT
-        License. Source: https://code.google.com/p/computational-neuroscience/
-        source/browse/trunk/projects/electrophysiology/stimuli/
-        randomly_moving_checkerboard_search.py
-        :return: texture array
+        :return: texture
         """
         # checkerboard texture
         if self.fill_mode == "checkerboard" or self.fill_mode == "random":
@@ -427,10 +400,10 @@ class Shape(StimDefaults):
 
     def get_color_contrast(self):
         """
-        determines color of stim
+        determines color and contrast of stim
         :return: nothing
         """
-        # see if color is passed
+        # see if color is passed as string
         try:
             stim_color = self.color.split(" ")
             # cast as ints
@@ -528,8 +501,6 @@ class Shape(StimDefaults):
             self.__class__ = TestBoard
             self.make_stim()
         elif self.fill_mode == 'image':
-            # self.__class__ = ImageStim
-            # self.make_stim()
             self.stim = visual.ImageStim(win=my_window,
                                      size=self.get_size(),
                                      pos=self.location,
@@ -712,7 +683,7 @@ class MovingShape(Shape):
                 # self.get_phase()
             except (AttributeError, IndexError, TypeError):
                 self.generate_movement()
-                # trigger labjack to start recording
+                # send trigger on each new movement direction
                 if self.trigger and self.__class__ == MovingShape:
                     send_trigger()
                 self.animate(frame)
@@ -722,7 +693,7 @@ class MovingShape(Shape):
 
 class TableStim(MovingShape):
     """
-    class where object motion is determined by table of x,y coordinates
+    class where object motion is determined by table of radial coordinates
     """
     def __init__(self, **kwargs):
         """
@@ -752,7 +723,7 @@ class TableStim(MovingShape):
     def get_move_array(self, *args):
         table = self.table_filename
 
-        # if text table get radius array
+        # if text file
         if os.path.splitext(table)[1] == '.txt':
             with open(table, 'r') as f:
                 line = f.read()
@@ -772,15 +743,14 @@ class TableStim(MovingShape):
             'pix_per_micron'] for r in radius]
 
         # make coordinate array
-        theta = self.start_dir * -1 + 90 # conversion for rad to cart
-        x,y = map(list, zip(*[pol2cart(theta, r) for r in radius]))
+        theta = self.start_dir * -1 + 90  # origins are different
+        x, y = map(list, zip(*[pol2cart(theta, r) for r in radius]))
 
         return x, y
 
     def generate_movement(self):
         """
-        calls get_starting_pos() and get_move_array() with proper variables
-        to get new movement coordinates
+        Gets move array
         :return: nothing
         """
         self.frame_counter = 0
@@ -838,6 +808,18 @@ class RandomlyMovingShape(MovingShape):
         self.x_moves, self.y_moves = self.get_move_array(self.current_x,
                                                          self.current_y,
                                                          angle, num_frames)
+
+
+# class NewBoard(visual.ElementArrayStim):
+#     def __init__(self, **kwargs):
+#
+#         super(NewBoard, self).__init__(**kwargs)
+#
+#     def setPos(self, x, y):
+#         self.setField((x, y))
+#
+#     def setColor(self, rgb):
+#         pass
 
 
 class TestBoard(RandomlyMovingShape):
@@ -1113,8 +1095,9 @@ def main_wgui(params):
 
 def make_window():
     global my_window
-    my_window = visual.Window(size=GlobalDefaults.defaults['display_size'],
-                              monitor="testMonitor", units="pix",
+    print monitors.getAllMonitors()
+    my_window = visual.Window(monitor="newTest", units="pix",
+                              size=GlobalDefaults.defaults['display_size'],
                               colorSpace="rgb", winType='pyglet',
                               allowGUI=False,
                               pos=GlobalDefaults.defaults['position'],

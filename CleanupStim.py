@@ -303,7 +303,7 @@ class StaticStim(StimDefaults):
     def draw_times(self):
         """
         Determines during which frames stim should be drawn, based on desired
-        start and end times and delay
+        delay and duration times
         :return: last frame number as int
         """
         self.start_stim = self.delay * GlobalDefaults['frame_rate']
@@ -315,7 +315,7 @@ class StaticStim(StimDefaults):
 
         return self.end_stim
 
-    def animate(self):
+    def animate(self, frame):
         # draw times
         # set rgb
         pass
@@ -435,7 +435,30 @@ class StaticStim(StimDefaults):
         :param frame: current frame number
         :return: list of rgb values as floats
         """
-        pass
+        stim_frame_num = frame - self.start_stim
+        time_fraction = stim_frame_num * 1.0 / self.draw_duration
+
+        # calculate color factors, which are normalized to oscillate between 0
+        # and 1 to avoid negative contrast values
+        if self.timing == 'sine':
+            color_factor = scipy.sin(self.period_mod * scipy.pi *
+                                     time_fraction - scipy.pi/2) / 2 + 0.5
+
+        elif self.timing == 'square':
+            color_factor = (scipy.signal.square(self.period_mod * 2 *
+                                                scipy.pi * time_fraction,
+                                                duty=0.5) + 1) / 2
+
+        elif self.timing == 'sawtooth':
+            color_factor = (scipy.signal.sawtooth(self.period_mod * 2 *
+                                                  scipy.pi * time_fraction,
+                                                  width=1) + 1) / 2
+
+        elif self.timing == 'linear':
+            color_factor = time_fraction
+
+        elif self.timing == 'step':
+            color_factor = 1
 
     def set_rgb(self, rgb):
         self.stim.setColor(rgb)

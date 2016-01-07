@@ -1323,7 +1323,7 @@ class MyFrame(wx.Frame):
         self.win_sizer.Add(panel_button_sizer)
 
         # place on monitor (arbitrary, from ini)
-        pos = config_dict['windowPos'][0], config_dict['windowPos'][0]
+        pos = config_dict['windowPos'][0], config_dict['windowPos'][1]
         self.SetPosition(pos)
 
         # HACK FOR PROPER SIZING
