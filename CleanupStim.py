@@ -383,6 +383,7 @@ class StaticStim(StimDefaults):
             stim_texture = None
 
         elif self.fill_mode == ('checkerboard' or 'random'):
+            # not implemented
             pass
 
         elif self.fill_mode == ('sine' or 'square' or 'concentric'):
@@ -410,6 +411,8 @@ class StaticStim(StimDefaults):
             elif self.fill_mode == 'concentric':
                 stim_texture[:, :, 3] = scipy.sin(filters.makeRadialMatrix(
                         self.grating_size))
+
+        return stim_texture
 
     def gen_rgb(self):
         """
@@ -471,21 +474,21 @@ class StaticStim(StimDefaults):
 
         # multiply rgbs by color factor, in proper contrast channel
         if self.contrast_channel == 'red':
-            self.adjusted_rgb = [self.adjusted_rgb[0] * self.intensity,
+            self.adjusted_rgb = [self.adjusted_rgb[0] * color_factor,
                                  self.adjusted_rgb[1],
                                  self.adjusted_rgb[2]]
         if self.contrast_channel == 'green':
             self.adjusted_rgb = [self.adjusted_rgb[0],
-                                 self.adjusted_rgb[1] * self.intensity,
+                                 self.adjusted_rgb[1] * color_factor,
                                  self.adjusted_rgb[2]]
         if self.contrast_channel == 'blue':
             self.adjusted_rgb = [self.adjusted_rgb[0],
                                  self.adjusted_rgb[1],
-                                 self.adjusted_rgb[2] * self.intensity]
+                                 self.adjusted_rgb[2] * color_factor]
         if self.contrast_channel == 'global':
-            self.adjusted_rgb = [self.adjusted_rgb[0] * self.intensity,
-                                 self.adjusted_rgb[1] * self.intensity,
-                                 self.adjusted_rgb[2] * self.intensity]
+            self.adjusted_rgb = [self.adjusted_rgb[0] * color_factor,
+                                 self.adjusted_rgb[1] * color_factor,
+                                 self.adjusted_rgb[2] * color_factor]
 
         return self.adjusted_rgb
 
