@@ -267,10 +267,10 @@ class StaticStim(StimDefaults):
         # non parameter instance attributes
         self.start_stim = None
         self.end_stim = None
-        self.draw_time = None
+        self.draw_duration = None
         self.stim = None
         self.grating_size = None
-        # self.desired_RGB = None
+        self.adjusted_rgb = None
 
         # seed fill and move randoms
         self.fill_random = Random()
@@ -299,44 +299,25 @@ class StaticStim(StimDefaults):
                                            pos=self.location,
                                            ori=self.orientation
                                            )
-        # gen rgb
-        # set location
-        # set orientation
-        pass
 
     def draw_times(self):
-        pass
+        """
+        Determines during which frames stim should be drawn, based on desired
+        start and end times and delay
+        :return: last frame number as int
+        """
+        self.start_stim = self.delay * GlobalDefaults['frame_rate']
+
+        self.end_stim = self.duration * GlobalDefaults['frame_rate']
+        self.end_stim += self.start_stim
+
+        self.draw_duration = self.end_stim - self.start_stim
+
+        return self.end_stim
 
     def animate(self):
         # draw times
         # set rgb
-        pass
-
-    def gen_rgb(self):
-        """
-        Adjusts initial rgb values for contrast in specified channel.
-        :return: list of rgb values as floats
-        """
-        if self.contrast_channel == 'red':
-            adjusted_rgb = [self.color[0] * self.intensity,
-                       self.color[1],
-                       self.color[2]]
-        if self.contrast_channel == 'green':
-            adjusted_rgb = [self.color[0],
-                       self.color[1] * self.intensity,
-                       self.color[2]]
-        if self.contrast_channel == 'blue':
-            adjusted_rgb = [self.color[0],
-                       self.color[1],
-                       self.color[2] * self.intensity]
-        if self.contrast_channel == 'global':
-            adjusted_rgb = [self.color[0] * self.intensity,
-                       self.color[1] * self.intensity,
-                       self.color[2] * self.intensity]
-
-        return adjusted_rgb
-
-    def gen_timing(self):
         pass
 
     def gen_size(self):
@@ -384,7 +365,8 @@ class StaticStim(StimDefaults):
         arrays, where the 3rd element is 4 values. The first 3 values are
         contrast values applied to the rgb value, and the fourth is an alpha
         value (transparency mask). Textures are created by modulating the alpha
-        value while contrast values are left as one.
+        value while contrast values are left as one (preserve rgb color
+        selection).
 
         :return: texture, either None or a numpy array
         """
@@ -420,12 +402,40 @@ class StaticStim(StimDefaults):
                 stim_texture[:, :, 3] = scipy.sin(filters.makeRadialMatrix(
                         self.grating_size))
 
-    def set_rgb(self):
-        # gen rgb
+    def gen_rgb(self):
+        """
+        Adjusts initial rgb values for contrast in specified channel.
+        :return: list of rgb values as floats
+        """
+        if self.contrast_channel == 'red':
+            self.adjusted_rgb = [self.color[0] * self.intensity,
+                                 self.color[1],
+                                 self.color[2]]
+        if self.contrast_channel == 'green':
+            self.adjusted_rgb = [self.color[0],
+                                 self.color[1] * self.intensity,
+                                 self.color[2]]
+        if self.contrast_channel == 'blue':
+            self.adjusted_rgb = [self.color[0],
+                                 self.color[1],
+                                 self.color[2] * self.intensity]
+        if self.contrast_channel == 'global':
+            self.adjusted_rgb = [self.color[0] * self.intensity,
+                                 self.color[1] * self.intensity,
+                                 self.color[2] * self.intensity]
+
+        return self.adjusted_rgb
+
+    def gen_timing(self, frame):
+        """
+        Adjusts contrast values of stims based on desired timing (i.e. as a
+        function of current frame / draw time). Recalculated on every call to
+        animate().
+        TODO: precompute values
+        :param frame: current frame number
+        :return: list of rgb values as floats
+        """
         pass
 
-    def set_pos(self):
-        pass
-
-    def set_ori(self):
-        pass
+    def set_rgb(self, rgb):
+        self.stim.setColor(rgb)
