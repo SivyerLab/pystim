@@ -38,6 +38,7 @@ __status__ =  "Beta"
 config = ConfigParser.ConfigParser()
 config.read('.\psychopy\config.ini')
 
+
 class StimInfo(object):
     """
     class for storing type and parameters of a stim
@@ -186,7 +187,7 @@ class StimDefaults(object):
                  table_filename=None,
                  trigger=False):
         """
-        default variable constructors; distance units converted appropriately
+        Default variable constructors; distance units converted appropriately.
         """
         self.shape = shape
         self.fill_mode = fill_mode
@@ -280,7 +281,7 @@ class StaticStim(StimDefaults):
 
     def make_stim(self):
         """
-        Creates instance of psychopy stim object
+        Creates instance of psychopy stim object.
         """
         if self.fill_mode == 'image':
             self.stim = visual.ImageStim(win=my_window,
@@ -331,7 +332,7 @@ class StaticStim(StimDefaults):
 
     def gen_size(self):
         """
-        calculates sizes for various sims
+        Calculates sizes of various sims
         :return: size of stim, as float for circles/annuli and height width
         tuple for other shapes
         """
@@ -494,3 +495,137 @@ class StaticStim(StimDefaults):
 
     def set_rgb(self, rgb):
         self.stim.setColor(rgb)
+
+
+def run_stims(stim_list, verbose=False):
+    """
+    Function to animate stims. Creates instances of stim types, and makes
+    necessary calls to animate stims and flip window.
+    :param stim_list: list of StimInfo classes
+    :param verbose: whether or not to print stim info to console
+    :return: nothing
+    """
+
+    reps = GlobalDefaults.defaults['protocol_reps']
+
+    # print stim info if requested
+    if verbose:
+        for stim in stim_list:
+            print stim
+
+    # counter for stat tracking
+    count_reps = 0
+    count_frames = 0
+    count_elapsed_time = 0
+
+    # to exit out of nested loops
+    should_break = False
+
+    # outer loop for number of reps
+    for x in range(reps):
+        # prep stims
+        to_animate = []
+
+        for stim in stim_list:
+            # instantiate stim by looking up class in globals(), and pass
+            # dictionary of paramters
+            to_animate.append(globals()[stim.stim_type](**stim.parameters))
+
+            # annuli are handled by creating a duplicate smaller nested
+            # circle within the larger circle, and setting its color to
+            # background and its timing to instant
+            if stim.shape == 'annulus':
+                # make necessary changes
+                stim.parameters['outer_diamater'] = stim.parameters[
+                    'inner_diameter']
+                stim.parameters['timing'] = 'step'
+                stim.parameters['color'] = GlobalDefaults.defaults['background']
+
+                # add
+                to_animate.append(globals()[stim.stim_type](**stim.parameters))
+
+        # generate stims
+        for stim in to_animate:
+            stim.make_stim()
+
+        # determine end time of last stim
+        num_frames = max(stim.get_draw_times() for stim in to_animate)
+        # round up, then subtract 1 because index starts at 0
+        num_frames = int(num_frames + 0.99) - 1
+
+        # clock for timing
+        elapsed_time = core.monotonicClock()
+
+        # draw stims and flip window
+        for frame in xrange(num_frames):
+            for stim in to_animate:
+                stim.animate(frame)
+            my_window.flip()
+
+            # inner break
+            if should_break:
+                count_frames = frame
+                break
+
+        # outer break
+        if should_break:
+            print '\n Interrupt!'
+            break
+
+        count_reps += 1
+        count_elapsed_time += elapsed_time.getTime()
+
+    if GlobalDefaults.defaults['log']:
+        log_stats(count_reps, reps, count_frames, num_frames,
+                  count_elapsed_time, stim_list)
+
+
+def log_stats(count_reps, reps, count_frames, num_frames, elapsed_time,
+              stim_list):
+    current_time = localtime()
+    current_time_string = strftime('%Y_%m_%d_%H%M%S', current_time)
+
+    if sys.platform == 'win32':
+        # log folder
+        path = config.get('StimProgram', 'logsDir')
+        if not os.path.exists(path):
+            os.makedirs(path)
+        # day folder
+        path += strftime('%Y_%m_%d', current_time) + '\\'
+        if not os.path.exists(path):
+            os.makedirs(path)
+
+    elif sys.platform == 'darwin':
+        # log folder
+        path = config.get('StimProgram', 'logsDir')
+        if not os.path.exists(path):
+            os.makedirs(path)
+        # day folder
+        path += strftime('%Y_%m_%d', current_time) + '/'
+        if not os.path.exists(path):
+            os.makedirs(path)
+
+    file_name = 'stimlog_' + current_time_string + '.txt'
+
+    with open((path+file_name), 'w') as f:
+        f.write(strftime('%a, %d %b %Y %H:%M:%S', current_time))
+        f.write("\n{} rep(s) of {} stim(s) generated. ". \
+            format(reps, len(stim_list)))
+        f.write("\n{}/{} frames displayed. ". \
+            format(count_reps * num_frames + count_frames, reps * num_frames))
+        f.write("Average fps: {0:.2f} hz.". \
+            format((count_reps * num_frames + count_frames) / elapsed_time))
+        f.write("\nElapsed time: {0:.3f} seconds.\n".format(elapsed_time))
+        for i in stim_list:
+            f.write(str(i))
+            f.write('\n')
+
+        # JSON dump to be able to load parameters from log file of stim
+        f.write('\n\n\n#BEGIN JSON#\n')
+        to_write = []
+        for i in stim_list:
+            para_copy = copy.deepcopy(i.parameters)
+            para_copy['move_type'] = i.stim_type
+            to_write.append(para_copy)
+
+        f.write(json.dumps(to_write))
