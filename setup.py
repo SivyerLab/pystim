@@ -43,9 +43,9 @@ if sys.platform=='win32':
               }
           })
 
-    ctypes.windll.user32.MessageBoxA(0, "Copy \psychopy\data\ folder into "
+    ctypes.windll.user32.MessageBoxA(0, "Copy \psychopy\\app\ folder into "
                                         "dist\psychopy\ or exe will not "
-                                        "launch", "DON'T FORGET!", 1)
+                                        "launch", "DON'T FORGET!", 0)
 
 elif sys.platform=='darwin':
     from setuptools import setup
@@ -85,5 +85,5 @@ elif sys.platform=='darwin':
               }
           })
 
-    EasyDialogs.Message('Copy \psychopy\data\ folder into dist\psychopy\ or '
+    EasyDialogs.Message('Copy \psychopy\\app\ folder into dist\psychopy\ or '
                         'app will not launch')
