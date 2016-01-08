@@ -147,6 +147,34 @@ class GlobalDefaults(object):
                 width=1).pformat(vars(self))))
 
 
+class MyWindow:
+    """
+    Class with static methods for window management.
+    """
+    @staticmethod
+    def make_win():
+        """
+        Static method to create window from global parameters.
+        """
+        MyWindow.win = visual.Window(monitor=config.get('StimProgram', 'monitor'),
+                                     units='pix',
+                                     colorSpace='rgb',
+                                     winType='pyglet',
+                                     allowGUI=False,
+                                     size=GlobalDefaults.defaults['display_size'],
+                                     pos=GlobalDefaults.defaults['position'],
+                                     color=GlobalDefaults.defaults['background'],
+                                     fullscr=GlobalDefaults.defaults['fullscreen'],
+                                     viewPos=GlobalDefaults.defaults['offset'],
+                                     viewScale=GlobalDefaults.defaults['scale'],
+                                     screen=GlobalDefaults.defaults['screen_num']
+                                     )
+
+    @staticmethod
+    def close_win():
+        MyWindow.win.close()
+
+
 class StimDefaults(object):
     """
     Super class to hold parameter defaults
@@ -284,7 +312,7 @@ class StaticStim(StimDefaults):
         Creates instance of psychopy stim object.
         """
         if self.fill_mode == 'image':
-            self.stim = visual.ImageStim(win=my_window,
+            self.stim = visual.ImageStim(win=MyWindow.win,
                                          size=self.gen_size(),
                                          color=self.gen_rgb(),
                                          pos=self.location,
@@ -292,7 +320,7 @@ class StaticStim(StimDefaults):
                                          image=self.image_filename
                                          )
         else:
-            self.stim = visual.GratingStim(win=my_window,
+            self.stim = visual.GratingStim(win=MyWindow.win,
                                            size=self.gen_size(),
                                            color=self.gen_rgb(),
                                            mask=self.gen_mask(),
@@ -513,7 +541,7 @@ def run_stims(stim_list, verbose=False):
         for stim in stim_list:
             print stim
 
-    # counter for stat tracking
+    # counters for stat tracking
     count_reps = 0
     count_frames = 0
     count_elapsed_time = 0
@@ -528,7 +556,7 @@ def run_stims(stim_list, verbose=False):
 
         for stim in stim_list:
             # instantiate stim by looking up class in globals(), and pass
-            # dictionary of paramters
+            # dictionary of parameters
             to_animate.append(globals()[stim.stim_type](**stim.parameters))
 
             # annuli are handled by creating a duplicate smaller nested
@@ -560,7 +588,7 @@ def run_stims(stim_list, verbose=False):
         for frame in xrange(num_frames):
             for stim in to_animate:
                 stim.animate(frame)
-            my_window.flip()
+            MyWindow.win.flip()
 
             # inner break
             if should_break:
