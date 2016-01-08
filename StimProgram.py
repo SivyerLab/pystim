@@ -911,6 +911,7 @@ class Movie(Shape):
             if self.end_stim == frame:
                 self.mov.stop()
 
+
 def send_trigger():
     """
     Triggers recording device by sending short voltage spike
@@ -942,8 +943,6 @@ def run_stim(stim_list, verbose=False):
     Function to run StimProgram. Generates stim objects and makes calls to
     animate.
     :param stim_list: list of StimInfo classes
-    :param background: background color of window
-    :param rep: number of stim repetitions
     :param verbose: whether or not to print stim info
     :return:
     """
@@ -1095,8 +1094,9 @@ def main_wgui(params):
 
 def make_window():
     global my_window
-    print monitors.getAllMonitors()
-    my_window = visual.Window(monitor="newTest", units="pix",
+    mon = config.get('StimProgram', 'monitor')
+    # print monitors.getAllMonitors()
+    my_window = visual.Window(monitor=mon, units="pix",
                               size=GlobalDefaults.defaults['display_size'],
                               colorSpace="rgb", winType='pyglet',
                               allowGUI=False,
