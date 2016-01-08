@@ -12,9 +12,12 @@ from collections import OrderedDict
 from sys import platform as _platform
 import wx
 import StimProgram
+import GammaCorrection
 import copy
 import json
 import ConfigParser
+import subprocess
+from os import system
 
 __author__ = "Alexander Tomlinson"
 __license__ = "GPL"
@@ -1294,6 +1297,10 @@ class MyFrame(wx.Frame):
         stim_buttons_sizer.Add(self.stop_button, 1, border=5,
                                flag=wx.LEFT | wx.RIGHT)
 
+        self.calib_button = wx.Button(self, label="Calib")
+        stim_buttons_sizer.Add(self.calib_button, 1, border=5,
+                               flag=wx.LEFT | wx.RIGHT)
+
         self.exit_button = wx.Button(self, label="Exit")
         stim_buttons_sizer.Add(self.exit_button, 1, border=5,
                                flag=wx.LEFT | wx.RIGHT)
@@ -1302,6 +1309,7 @@ class MyFrame(wx.Frame):
         self.Bind(wx.EVT_BUTTON, self.on_run_button, self.run_button)
         self.Bind(wx.EVT_BUTTON, self.on_win_button, self.win_button)
         self.Bind(wx.EVT_BUTTON, self.on_stop_button, self.stop_button)
+        self.Bind(wx.EVT_BUTTON, self.on_calib_button, self.calib_button)
         self.Bind(wx.EVT_BUTTON, self.on_exit_button, self.exit_button)
 
         # sizer for panel and buttons
@@ -1418,7 +1426,7 @@ class MyFrame(wx.Frame):
             #     defaults['fullscreen'] = True
             # else:
             #     defaults['fullscreen'] = False
-            defaults['screen_num'] = int(defaults['screen_num'])
+            defaults['screen_num'] = int(defaults['screen_num']) - 1
 
             self.win_open = True
             StimProgram.GlobalDefaults(**defaults)
@@ -1430,6 +1438,15 @@ class MyFrame(wx.Frame):
         :param event: event passed by binder
         """
         StimProgram.do_break()
+
+    def on_calib_button(self, event):
+        """
+        Method for calling gamma correction script
+        :param event: event passed by binder
+        :return:
+        """
+        system('start /WAIT /D "C:\Users\Alex\PycharmProjects\StimProgram" python GammaCorrection.py')
+
 
     def on_exit_button(self, event):
         """
