@@ -149,8 +149,13 @@ class GlobalDefaults(object):
 
 class MyWindow:
     """
-    Class with static methods for window management.
+    Class with static methods for window management, to avoid using global
+    variables for the window.
     """
+
+    # to interrupt stim animations
+    should_break = False
+
     @staticmethod
     def make_win():
         """
@@ -172,6 +177,9 @@ class MyWindow:
 
     @staticmethod
     def close_win():
+        """
+        Static method to close window.
+        """
         MyWindow.win.close()
 
 
@@ -547,7 +555,7 @@ def run_stims(stim_list, verbose=False):
     count_elapsed_time = 0
 
     # to exit out of nested loops
-    should_break = False
+    MyWindow.should_break = False
 
     # outer loop for number of reps
     for x in range(reps):
@@ -591,12 +599,12 @@ def run_stims(stim_list, verbose=False):
             MyWindow.win.flip()
 
             # inner break
-            if should_break:
+            if MyWindow.should_break:
                 count_frames = frame
                 break
 
         # outer break
-        if should_break:
+        if MyWindow.should_break:
             print '\n Interrupt!'
             break
 
@@ -657,3 +665,6 @@ def log_stats(count_reps, reps, count_frames, num_frames, elapsed_time,
             to_write.append(para_copy)
 
         f.write(json.dumps(to_write))
+
+if __name__ == '__main__':
+    pass

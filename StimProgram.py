@@ -1079,7 +1079,6 @@ def run_stim(stim_list, verbose=False):
                 to_write.append(para_copy)
 
             f.write(json.dumps(to_write))
-            # f.write('\n#END JSON#')
 
 
 def do_break():

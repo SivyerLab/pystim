@@ -1445,7 +1445,12 @@ class MyFrame(wx.Frame):
         :param event: event passed by binder
         :return:
         """
-        system('start /WAIT /D "C:\Users\Alex\PycharmProjects\StimProgram" python GammaCorrection.py')
+        if _platform == 'win32':
+            subprocess.call(['start', 'python', 'GammaCorrection.py'],
+                            shell=True)
+
+        elif _platform == 'darwin':
+            subprocess.call(['open', '-W', '-a', 'Terminal.app', 'python', '--args', 'GammaCorrection.py'])
 
 
     def on_exit_button(self, event):
@@ -1453,7 +1458,9 @@ class MyFrame(wx.Frame):
         Closes application.
         :param event: event passed by binder
         """
-        self.on_stop_button(event)
+        if self.win_open:
+            self.on_stop_button(event)
+            StimProgram.close_window()
         self.Close()
 
 
