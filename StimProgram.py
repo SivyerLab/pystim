@@ -38,7 +38,7 @@ __status__ = "Prototype"
 # logging.console.setLevel(logging.CRITICAL)
 
 config = ConfigParser.ConfigParser()
-config.read('.\psychopy\config.ini')
+config.read('./psychopy/config.ini')
 
 
 class StimInfo(object):

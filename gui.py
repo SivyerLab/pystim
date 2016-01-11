@@ -18,6 +18,7 @@ import json
 import ConfigParser
 import subprocess
 from os import system
+import os
 
 __author__ = "Alexander Tomlinson"
 __license__ = "GPL"
@@ -77,7 +78,7 @@ def get_config_dict(config_file):
 
     return default_config_dict
 
-config_file = '.\psychopy\config.ini'
+config_file = './psychopy/config.ini'
 config_dict = get_config_dict(config_file)
 
 shape_param = OrderedDict([
@@ -1449,8 +1450,8 @@ class MyFrame(wx.Frame):
             system('start python GammaCorrection.pyc')
 
         elif _platform == 'darwin':
-            subprocess.call(['open', '-W', '-a', 'Terminal.app', 'python',
-                             '--args', 'GammaCorrection.pyc'])
+            current_dir = os.getcwd()
+            system('open -n -a Terminal.app {}'.format(current_dir))
 
 
     def on_exit_button(self, event):

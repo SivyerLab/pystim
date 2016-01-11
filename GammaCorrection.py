@@ -1,6 +1,6 @@
+from psychopy import visual, core, event, logging
 from psychopy.monitors import Monitor
 from psychopy.monitors.calibTools import GammaCalculator
-from psychopy import visual, core, event, logging
 import numpy as np
 
 # suppress extra warnings
@@ -31,7 +31,7 @@ def gammaCorrect():
             print 'Enter Y or N.'
 
     if should_step:
-        win = visual.Window(monitor='testMonitor', fullscr=True,
+        win = visual.Window(monitor='testMonitor', fullscr=False,
                             screen=screen_num, winType='pyglet',
                             units='norm')
         rect = visual.Rect(win, width=2.1, height=2.1, fillColorSpace='rgb',

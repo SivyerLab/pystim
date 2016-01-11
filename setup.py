@@ -51,7 +51,6 @@ if sys.platform=='win32':
 elif sys.platform=='darwin':
     from setuptools import setup
     import py2app
-    import EasyDialogs
 
     pref_files = []
     app_files = []
@@ -78,6 +77,7 @@ elif sys.platform=='darwin':
           options={
               'py2app': {
                   'packages' : ['PIL'],
+                  'iconfile' : 'icon1.ico',
                   'includes' : ['scipy.*', 'scipy.integrate', 'scipy.special.*',
                                 'scipy.linalg.*', 'scipy.integrate',
                                 'scipy.sparse.csgraph._validation',
@@ -85,7 +85,6 @@ elif sys.platform=='darwin':
                                 'psychopy.visual.*']
               }
           })
-    # os.system('cp -r ')
-    # py_compile.compile('GammCorrection.py', cfile='.\dist')
-    EasyDialogs.Message('Copy \psychopy\\app\ folder into dist\psychopy\ or '
-                        'app will not launch')
+
+    os.system('cp -r /Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/site-packages/psychopy/app ./psychopy/app')
+    py_compile.compile('GammaCorrection.py', cfile='./dist/gui.app/Contents/Resources/GammaCorrection.pyc')
