@@ -1,4 +1,4 @@
-import os, sys
+import os, sys, py_compile
 import numpy, scipy
 
 if sys.platform=='win32':
@@ -46,11 +46,7 @@ if sys.platform=='win32':
 
     os.system('start robocopy "C:\Python27\Lib\site-packages\psychopy\\app" '
               '".\dist\psychopy\\app" /E')
-    os.system('start copy ".\GammaCorrection.pyc" '
-              '".\dist\GammaCorrection.pyc"')
-    # ctypes.windll.user32.MessageBoxA(0, "Copy \psychopy\\app\ folder into "
-    #                                     "dist\psychopy\ or exe will not "
-    #                                     "launch", "DON'T FORGET!", 0)
+    py_compile.compile('GammCorrection.py', cfile='.\dist')
 
 elif sys.platform=='darwin':
     from setuptools import setup
@@ -90,5 +86,6 @@ elif sys.platform=='darwin':
               }
           })
     # os.system('cp -r ')
+    # py_compile.compile('GammCorrection.py', cfile='.\dist')
     EasyDialogs.Message('Copy \psychopy\\app\ folder into dist\psychopy\ or '
                         'app will not launch')
