@@ -46,7 +46,7 @@ if sys.platform=='win32':
 
     os.system('start robocopy "C:\Python27\Lib\site-packages\psychopy\\app" '
               '".\dist\psychopy\\app" /E')
-    py_compile.compile('GammCorrection.py', cfile='.\dist')
+    py_compile.compile('GammaCorrection.py', cfile='.\dist')
 
 elif sys.platform=='darwin':
     from setuptools import setup
