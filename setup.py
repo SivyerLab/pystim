@@ -22,7 +22,8 @@ if sys.platform=='win32':
         pref_files.append(f1)
 
     all_files = [("psychopy\\preferences", pref_files),
-                 ("psychopy\\stims", stim_files), ('psychopy', ini_file)]
+                 ("psychopy\\stims", stim_files),
+                 ('psychopy', ini_file)]
 
     setup(console=['gui.py'],
           data_files=all_files,
@@ -43,9 +44,13 @@ if sys.platform=='win32':
               }
           })
 
-    ctypes.windll.user32.MessageBoxA(0, "Copy \psychopy\\app\ folder into "
-                                        "dist\psychopy\ or exe will not "
-                                        "launch", "DON'T FORGET!", 0)
+    os.system('start robocopy "C:\Python27\Lib\site-packages\psychopy\\app" '
+              '".\dist\psychopy\\app" /E')
+    os.system('start copy ".\GammaCorrection.pyc" '
+              '".\dist\GammaCorrection.pyc"')
+    # ctypes.windll.user32.MessageBoxA(0, "Copy \psychopy\\app\ folder into "
+    #                                     "dist\psychopy\ or exe will not "
+    #                                     "launch", "DON'T FORGET!", 0)
 
 elif sys.platform=='darwin':
     from setuptools import setup
@@ -84,6 +89,6 @@ elif sys.platform=='darwin':
                                 'psychopy.visual.*']
               }
           })
-
+    # os.system('cp -r ')
     EasyDialogs.Message('Copy \psychopy\\app\ folder into dist\psychopy\ or '
                         'app will not launch')

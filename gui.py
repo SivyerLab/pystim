@@ -12,7 +12,7 @@ from collections import OrderedDict
 from sys import platform as _platform
 import wx
 import StimProgram
-import GammaCorrection
+# import GammaCorrection
 import copy
 import json
 import ConfigParser
@@ -1446,11 +1446,11 @@ class MyFrame(wx.Frame):
         :return:
         """
         if _platform == 'win32':
-            subprocess.call(['start', 'python', 'GammaCorrection.py'],
-                            shell=True)
+            system('start python GammaCorrection.pyc')
 
         elif _platform == 'darwin':
-            subprocess.call(['open', '-W', '-a', 'Terminal.app', 'python', '--args', 'GammaCorrection.py'])
+            subprocess.call(['open', '-W', '-a', 'Terminal.app', 'python',
+                             '--args', 'GammaCorrection.pyc'])
 
 
     def on_exit_button(self, event):
