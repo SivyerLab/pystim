@@ -8,7 +8,6 @@ from psychopy import visual, logging, core, event, filters, monitors
 from psychopy.tools.coordinatetools import pol2cart
 from random import Random
 from time import strftime, localtime
-from igor import binarywave, packed
 import scipy
 import numpy
 import pprint
@@ -18,6 +17,12 @@ import os
 import json
 import copy
 import ConfigParser
+
+try:
+    from igor import binarywave, packed
+    has_igor = True
+except ImportError:
+    has_igor = False
 
 try:
     import u3
@@ -729,14 +734,19 @@ class TableStim(MovingShape):
                 line = f.read()
                 radius = line.split('\r')
 
-        # if igor binary wave format
-        elif os.path.splitext(table)[1] == '.ibw':
-            radius = binarywave.load(table)['wave']['wData']
+        # if igor binary wave format or packed experiment format
+        elif os.path.splitext(table)[1] == ('.ibw' or '.pxp'):
+            if has_igor:
+                if os.path.splitext(table)[1] == '.ibw':
+                    radius = binarywave.load(table)['wave']['wData']
 
-        # if igor packed experiment format
-        elif os.path.splitext(table)[1] == '.pxp':
-            radius = packed.load(table)[1]['root']['wave0'].wave['wave'][
-                'wData']
+                elif os.path.splitext(table)[1] == '.pxp':
+                    radius = packed.load(table)[1]['root']['wave0'].wave['wave'][
+                        'wData']
+            elif not has_igor:
+                raise ImportError, 'Need igor python module to load \'.ibw\' ' \
+                                   'or \'.pxp\' formats. Install module with ' \
+                                   '\'pip install igor\'.'
 
         radius = map(float, radius)
         radius = [r * GlobalDefaults.defaults[
