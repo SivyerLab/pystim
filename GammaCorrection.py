@@ -138,13 +138,13 @@ def gammaCorrect():
 
     power = 10
 
-    r = [float(i) + 0.5 for i in r]
-    g = [float(i) + 0.5 for i in g]
-    b = [float(i) + 0.5 for i in b]
+    # r = [float(i) + 0.5 for i in r]
+    # g = [float(i) + 0.5 for i in g]
+    # b = [float(i) + 0.5 for i in b]
 
-    r = [i * power for i in r]
-    g = [i * power for i in g]
-    b = [i * power for i in b]
+    r = [float(i) * power for i in r]
+    g = [float(i) * power for i in g]
+    b = [float(i) * power for i in b]
 
     r = GammaCalculator(inputs, r, eq=4).gammaModel
     g = GammaCalculator(inputs, g, eq=4).gammaModel
