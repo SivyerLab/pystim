@@ -1,7 +1,7 @@
 #!/Library/Frameworks/Python.framework/Versions/2.7/bin/python
 
 """
-Program for presenting visual stimuli to patch clamped retinal neurons"
+Program for presenting visual stimuli to patch clamped retinal neurons.
 """
 
 from psychopy import visual, logging, core, event, filters, monitors
@@ -41,15 +41,17 @@ config.read('.\psychopy\config.ini')
 
 class StimInfo(object):
     """
-    class for storing type and parameters of a stim
+    Class for storing type and parameters of a stim.
+
+    :param stim_type: The move type of the stim, such as static, random, \
+    table, etc.
+    :param parameters: Dictionary of parameters passed from GUI.
+    :param number: For order of stims.
+
     """
     def __init__(self, stim_type, parameters, number):
         """
-        constructor
-        :param stim_type: the move type of the stim, such as static, random,
-        table, etc.
-        :param parameters: dictionary of parameters passed from GUI
-        :param number: for order of stims
+        Constructor.
         """
         self.stim_type = stim_type
         self.parameters = parameters
@@ -68,7 +70,24 @@ class StimInfo(object):
 class GlobalDefaults(object):
     """
     Class with global constants, such as window information. Uses dictionary
-    to simulate 'mutable static class variables' (need better, more pythonic, way to do this)
+    to simulate 'mutable static class variables' (need better, more pythonic,
+    way to do this).
+
+    :param int frame_rate: Frame rate of monitor.
+    :param float pix_per_micron: Number of pixels per micron. Used for unit \
+    conversion.
+    :param float scale: The factor by which to scale the size of the stimuli.
+    :param float display_size: List of height and width of the monitor.
+    :param list position: List of xy coordinates of stim window location.
+    :param int protocol_reps: Number of repitions to cycle through of all stims.
+    :param list background: RGB list of window background.
+    :param bool fullscreen: Boolean, whether or not window should be fullscreen.
+    :param int screen_num: On which monitor to display the window.
+    :param float trigger_wait: The wait time between the labjack sending a \
+    pulse and the start of the stims.
+    :param bool log: Whether or not to write to a log file.
+    :param list offset: List of microns in xy coordinates of how much to \
+    offset the center of the window.
     """
 
     # default defaults
@@ -99,7 +118,7 @@ class GlobalDefaults(object):
                  log=None,
                  offset=None):
         """
-        Populate defaults; units converted as necessary
+        Populate defaults; units converted as necessary.
         """
         if frame_rate is not None:
             self.defaults['frame_rate'] = frame_rate
@@ -140,7 +159,7 @@ class GlobalDefaults(object):
 
     def __str__(self):
         """
-        for pretty printing dictionary of global defaults
+        For pretty printing dictionary of global defaults
         """
         return '\n{} (all parameters):\n{}\n'.format(
             self.__class__.__name__, str(PrettyPrinter(indent=2,
@@ -340,7 +359,8 @@ class StaticStim(StimDefaults):
     def draw_times(self):
         """
         Determines during which frames stim should be drawn, based on desired
-        delay and duration times
+        delay and duration times.
+
         :return: last frame number as int
         """
         self.start_stim = self.delay * GlobalDefaults['frame_rate']
@@ -355,10 +375,10 @@ class StaticStim(StimDefaults):
     def animate(self, frame):
         """
         Method for drawing stim objects to back buffer. Checks if object
-        should be drawn. Back buffer is
-        brought to front with calls to flip() on the window.
+        should be drawn. Back buffer is brought to front with calls to flip()
+        on the window.
+
         :param frame: current frame number
-        :return: nothing
         """
         if self.start_stim <= frame < self.end_stim:
             # adjust colors based on timing
@@ -369,6 +389,7 @@ class StaticStim(StimDefaults):
     def gen_size(self):
         """
         Calculates sizes of various sims
+
         :return: size of stim, as float for circles/annuli and height width
         tuple for other shapes
         """
@@ -395,6 +416,7 @@ class StaticStim(StimDefaults):
         """
         Determines the mask of the stim object. The mask determines the shape of
         the stim. See psychopy documentation for more details.
+
         :return: mask of the stim object, as a string
         """
         if self.shape == ('circle' or 'annulus'):
@@ -537,9 +559,9 @@ def run_stims(stim_list, verbose=False):
     """
     Function to animate stims. Creates instances of stim types, and makes
     necessary calls to animate stims and flip window.
-    :param stim_list: list of StimInfo classes
-    :param verbose: whether or not to print stim info to console
-    :return: nothing
+
+    :param stim_list: List of StimInfo classes.
+    :param verbose: Whether or not to print stim info to console.
     """
 
     reps = GlobalDefaults.defaults['protocol_reps']
@@ -618,6 +640,16 @@ def run_stims(stim_list, verbose=False):
 
 def log_stats(count_reps, reps, count_frames, num_frames, elapsed_time,
               stim_list):
+    """
+    Function to write information about stims to file.
+
+    :param count_reps: Elapsed reps.
+    :param reps: Total possible reps.
+    :param count_frames: Elapsed frames.
+    :param num_frames: Total possible frames.
+    :param elapsed_time: Elapsed time
+    :param stim_list: List of stims that ran.
+    """
     current_time = localtime()
     current_time_string = strftime('%Y_%m_%d_%H%M%S', current_time)
 

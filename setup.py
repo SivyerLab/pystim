@@ -1,3 +1,16 @@
+"""
+py2exe/py2app setup script. Depending on the OS, the executables fail to
+build without the modules added to 'includes'. This clutters the folder in
+the dist for windows, but at least it works. Icon inclusion seems buggy as well.
+
+Script uses py2exe/py2app to include the psychopy/preferences folder,
+but cannot include the psychopy/app folder because it contains subfolders.
+Console commands are used to copy those. User should still check that those
+are included, or else the GUI will fail to start (psychopy checks that folder
+for user preferences, and throws an error if it can't find all the values for
+it's default dictionary.
+"""
+
 import os, sys, py_compile
 import numpy, scipy
 
@@ -86,5 +99,7 @@ elif sys.platform=='darwin':
               }
           })
 
-    os.system('cp -r /Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/site-packages/psychopy/app ./psychopy/app')
+    os.system('cp -r /Library/Frameworks/Python.framework/Versions/2.7/lib'
+              '/python2.7/site-packages/psychopy/app '
+              '.dist/gui.app/Contents/Resources/psychopy/app')
     py_compile.compile('GammaCorrection.py', cfile='./dist/gui.app/Contents/Resources/GammaCorrection.pyc')

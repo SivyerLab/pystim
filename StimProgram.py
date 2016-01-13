@@ -241,7 +241,8 @@ class StimDefaults(object):
         self.intensity = intensity
         self.fill_seed = fill_seed
         self.move_seed = move_seed
-        self.speed = speed * GlobalDefaults.defaults['pix_per_micron'] / GlobalDefaults.defaults['frame_rate']
+        self.speed = 1.0 * speed * GlobalDefaults.defaults['pix_per_micron'] / \
+                      GlobalDefaults.defaults['frame_rate']
         self.num_dirs = num_dirs
         self.start_dir = start_dir
         self.start_radius = start_radius * GlobalDefaults.defaults['pix_per_micron']
@@ -643,6 +644,9 @@ class MovingShape(Shape):
         # (+0.99 so int() rounds up)
         travel_distance = 2 * (
             (self.current_x ** 2 + self.current_y ** 2) ** 0.5)
+        print travel_distance
+        print self.speed
+
         self.num_frames = int(travel_distance / self.speed + 0.99)
         self.x_moves, self.y_moves = self.get_move_array(self.current_x,
                                                          self.current_y,

@@ -1,3 +1,38 @@
+#!/Library/Frameworks/Python.framework/Versions/2.7/bin/python
+
+"""
+Script for setting the gamma correction table for psychopy. Steps through
+luminosity intervals while user records values, then prompts for table. Table is
+text file, with newline seperated values, and each color (in RGB order),
+seperated by 2 new lines.
+
+Example:
+::
+    0.22
+    0.23
+    0.23
+    0.25
+    0.26
+
+    0.22
+    0.23
+    0.24
+    0.26
+    0.27
+
+    0.22
+    0.23
+    0.23
+    0.24
+    0.25
+
+Currently, in OSX, the calibrate button in the GUI is unable to invoke the
+script, but instead brings up a terminal window in the correct location,
+and the script can be started by entering (note .pyc, not .py):
+::
+    python GammaCorrection.pyc
+"""
+
 from psychopy import visual, core, event, logging
 from psychopy.monitors import Monitor
 from psychopy.monitors.calibTools import GammaCalculator
@@ -7,6 +42,11 @@ import numpy as np
 logging.console.setLevel(logging.CRITICAL)
 
 def gammaCorrect():
+    """
+    Main function.
+
+    :return: Nothing.
+    """
     prompt = True
 
     while prompt:
@@ -73,9 +113,11 @@ def gammaCorrect():
         mon_name = raw_input('\nMonitor to edit: ')
         mon = Monitor(mon_name)
 
-        r = [float(i) * 10 for i in r]
-        g = [float(i) * 10 for i in g]
-        b = [float(i) * 10 for i in b]
+        power = 1
+
+        r = [float(i) * power for i in r]
+        g = [float(i) * power for i in g]
+        b = [float(i) * power for i in b]
 
         r = GammaCalculator(inputs, r, eq=4).gammaModel
         g = GammaCalculator(inputs, g, eq=4).gammaModel
