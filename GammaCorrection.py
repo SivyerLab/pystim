@@ -35,8 +35,8 @@ and the script can be started by entering (note .pyc, not .py):
 
 from psychopy import visual, core, event, logging
 from psychopy.monitors import Monitor
-from psychopy.monitors.calibTools import GammaCalculator
-import numpy as np
+from scipy import stats, interpolate
+import matplotlib.pyplot as plt
 
 # suppress extra warnings
 logging.console.setLevel(logging.CRITICAL)
@@ -133,63 +133,46 @@ def gammaCorrect():
     g = rgbs[1].split('\n')
     b = rgbs[2].split('\n')
 
+    r = map(float, r)
+    g = map(float, g)
+    b = map(float, b)
+
     mon_name = raw_input('\nMonitor to edit: ')
     mon = Monitor(mon_name)
 
-    power = 10
+    make_correction(r)
+    make_correction(g)
+    make_correction(b)
 
-    # r = [float(i) + 0.5 for i in r]
-    # g = [float(i) + 0.5 for i in g]
-    # b = [float(i) + 0.5 for i in b]
+def make_correction(measured):
+    min = measured[0]
+    max = measured[-1]
 
-    r = [float(i) * power for i in r]
-    g = [float(i) * power for i in g]
-    b = [float(i) * power for i in b]
+    measured_at = [i * 1.0 / (len(measured) - 1) * 2 - 1 for i in range(len(measured))]
 
-    r = GammaCalculator(inputs, r, eq=4).gammaModel
-    g = GammaCalculator(inputs, g, eq=4).gammaModel
-    b = GammaCalculator(inputs, b, eq=4).gammaModel
+    slope, intercept, _, _, _ = stats.linregress([-1.0, 1.0], [min, max])
 
-    grid = np.empty((4,6))
+    spline = interpolate.InterpolatedUnivariateSpline(measured_at, measured)
+    inverse_spline = interpolate.InterpolatedUnivariateSpline(measured,
+                                                              measured_at)
 
-    for x in np.nditer(grid, op_flags=['readwrite']):
-        x[...] = np.nan
+    # GRAPHING STUFF TO TEST
+    spline_values = [spline(i) for i in measured_at]
+    corrected_values = [inverse_spline(i * slope + intercept) for i in measured_at]
+    graph_corrected = [spline(i) for i in corrected_values]
 
-    grid[0][0] = 0; grid[1][0] = 0; grid[2][0] = 0; grid[3][0] = 0
-    grid[0][1] = 1; grid[1][1] = 1; grid[2][1] = 1; grid[3][1] = 1
-    grid[0][2]=1
+    # points
+    plt.plot(measured_at, measured, 'ro', label='measured')
+    # fit
+    plt.plot(measured_at, spline_values, label='interpolated')
+    # corrected
+    plt.plot(measured_at, graph_corrected, label='corrected')
 
-    grid[1][2] = r[0]
-    grid[1][3] = r[1]
-    grid[1][5] = r[2]
+    plt.legend(loc=0)
+    plt.show()
 
-    grid[2][2] = g[0]
-    grid[2][3] = g[1]
-    grid[2][5] = g[2]
+    return (inverse_spline, slope, intercept)
 
-    grid[3][2] = b[0]
-    grid[3][3] = b[1]
-    grid[3][5] = b[2]
-
-    print '\nGamma correction model: a+kx^g'
-    print 'Red:   g = {}'.format(r[0])
-    print '       a = {}'.format(r[1])
-    print '       k = {}'.format(r[2])
-    print 'Green: g = {}'.format(g[0])
-    print '       a = {}'.format(g[1])
-    print '       k = {}'.format(g[2])
-    print 'Blue : g = {}'.format(b[0])
-    print '       a = {}'.format(b[1])
-    print '       k = {}'.format(b[2])
-
-    should_save = raw_input('\nSave? Y or N: ').rstrip()
-
-    if should_save == 'Y':
-        mon.setGammaGrid(grid)
-        mon.saveMon()
-        print '\ngamma grid set'
-    #
-    # print mon.getGammaGrid()
 
 if __name__ == "__main__":
     gammaCorrect()
