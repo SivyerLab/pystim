@@ -10,13 +10,12 @@ import pyglet
 pyglet.options['shadow_window'] = False
 from collections import OrderedDict
 from sys import platform as _platform
+from GammaCorrection import GammaValues
 import wx
 import StimProgram
-# import GammaCorrection
 import copy
-import json
+import cPickle
 import ConfigParser
-import subprocess
 from os import system
 import os
 
@@ -80,6 +79,12 @@ def get_config_dict(config_file):
 
 config_file = './psychopy/config.ini'
 config_dict = get_config_dict(config_file)
+
+gamma_file = './psychopy/gammaTables.txt'
+if os.path.exists(gamma_file):
+    with open(gamma_file, 'rb') as f:
+        gamma_dict = cPickle.load(f)
+    gamma_mons = gamma_dict.keys()
 
 shape_param = OrderedDict([
     ('shape',
@@ -439,6 +444,15 @@ global_default_param = OrderedDict([
       'is_child': False}
      ),
 
+    ('gamma_correction',
+     {'type'    : 'choice',
+      'label'   : 'gamma monitor',
+      'choices' : ['default'] + gamma_mons,
+      'default' : str(config_dict['gamma_correction']),  # to select default,
+      # need to be strings
+      'is_child': False}
+     ),
+
     ('fullscreen',
      {'type'    : 'choice',
       'label'   : 'fullscreen',
@@ -585,8 +599,8 @@ class DirPanel(wx.Panel):
         # get path and open file to write
         path = save_dialog.GetPath()
 
-        with open(path, 'w') as f:
-            json.dump(to_save, f)
+        with open(path, 'wb') as f:
+            cPickle.dump(to_save, f)
 
         # refresh display
         self.browser.ShowHidden(True)
@@ -606,20 +620,26 @@ class DirPanel(wx.Panel):
 
         # open and read settings
         try:
-            with open(path, 'r') as f:
-                to_load = json.load(f)
-        except ValueError:
-            # see if log file with JSON at end
+            with open(path, 'rb') as f:
+                to_load = cPickle.load(f)
+        except (ValueError, EOFError):
+            # see if log file with PICKLE at end
             try:
-                with open(path, 'r') as f:
-                    next_is_json = False
+                with open(path, 'rb') as f:
+                    next_is_pickle = False
+                    to_load = ""
+
                     for line in f:
-                        if next_is_json:
-                            to_load = json.loads(line)
+                        if next_is_pickle:
+                            to_load += line
+
                         line = line.rstrip()
-                        if line == '#BEGIN JSON#':
-                            next_is_json = True
-            except ValueError:
+                        if line == '#BEGIN PICKLE#':
+                            next_is_pickle = True
+
+                    to_load = cPickle.loads(to_load)
+
+            except (ValueError):
                 print "\nERROR: file not a properly formatted parameter file"
                 return
 
@@ -1290,12 +1310,12 @@ class MyFrame(wx.Frame):
         stim_buttons_sizer.Add(self.run_button, 1, border=5,
                                flag=wx.LEFT | wx.RIGHT)
 
-        self.win_button = wx.Button(self, label="Win")
-        stim_buttons_sizer.Add(self.win_button, 1, border=5,
-                               flag=wx.LEFT | wx.RIGHT)
-
         self.stop_button = wx.Button(self, label="Stop")
         stim_buttons_sizer.Add(self.stop_button, 1, border=5,
+                               flag=wx.LEFT | wx.RIGHT)
+
+        self.win_button = wx.Button(self, label="Window")
+        stim_buttons_sizer.Add(self.win_button, 1, border=5,
                                flag=wx.LEFT | wx.RIGHT)
 
         self.calib_button = wx.Button(self, label="Calib")
@@ -1415,7 +1435,6 @@ class MyFrame(wx.Frame):
             self.on_stop_button(event)
             StimProgram.close_window()
             self.win_open = False
-            self.on_win_button(event)
         else:
             defaults = self.g1.get_param_dict()
             # change scale from pix to 0-1
@@ -1447,7 +1466,7 @@ class MyFrame(wx.Frame):
         :return:
         """
         if _platform == 'win32':
-            system('start python GammaCorrection.pyc')
+            system('start python GammaCorrection.py')
 
         elif _platform == 'darwin':
             current_dir = os.getcwd()

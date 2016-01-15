@@ -8,13 +8,14 @@ from psychopy import visual, logging, core, event, filters, monitors
 from psychopy.tools.coordinatetools import pol2cart
 from random import Random
 from time import strftime, localtime
+from GammaCorrection import GammaValues
 import scipy
 import numpy
 import pprint
 import re
 import sys
 import os
-import json
+import cPickle
 import copy
 import ConfigParser
 
@@ -53,6 +54,7 @@ class StimInfo(object):
     def __init__(self, stim_type, parameters, number):
         """
         Constructor
+
         :param stim_type: stim type_input pulled from parameter
         :param parameters: dictionary of parameters
         :param number: stim number order
@@ -74,11 +76,13 @@ class StimInfo(object):
 
 def input_parser(filename):
     """
-    ****Not currently used.****
-    parses input string passed by Igor GUI. Objects separated by
+    **Not currently used.**
+
+    Parses input string passed by Igor GUI. Objects separated by
     pound sign. String format predetermined by Igor
+
     :param filename: name where input string is stored
-    :return: returns list of StimInfo classes
+    :return: Returns list of StimInfo classes.
     """
     # temp open file and read contents
     with open(filename, 'r') as f:
@@ -144,7 +148,7 @@ class GlobalDefaults(object):
     # use dictionary to simulate 'mutable static class variables'
     # better way to do this?
     defaults = {
-    # defaults in case not run from GUI
+        #: Default defaults in case not run from GUI
         'frame_rate': 60,
         'pix_per_micron': 1,
         'scale': 1,
@@ -156,15 +160,17 @@ class GlobalDefaults(object):
         'fullscreen': False,
         'log': False,
         'screen_num': 1,
+        'gamma_correction': 'default',
         'trigger_wait': 0.1
     }
 
     def __init__(self, frame_rate=None, pix_per_micron=None, scale=None,
                  offset=None, display_size=None, position=None,
                  protocol_reps=None, background=None, fullscreen=None,
-                 screen_num=None, trigger_wait=None, log=None):
+                 screen_num=None, gamma_correction='default',
+                 trigger_wait=None, log=None):
         """
-        Constructor
+        Constructor.
         """
         if frame_rate is not None:
             self.defaults['frame_rate'] = frame_rate
@@ -191,6 +197,8 @@ class GlobalDefaults(object):
             self.defaults['trigger_wait'] = trigger_wait
         if log is not None:
             self.defaults['log'] = log
+        if gamma_correction is not None:
+            self.defaults['gamma_correction'] = gamma_correction
 
     def __str__(self):
         """
@@ -437,6 +445,11 @@ class Shape(StimDefaults):
                                 stim_color[1] * self.intensity,
                                 stim_color[2] * self.intensity]
 
+        # gamma adjust
+        if GlobalDefaults.defaults['gamma_correction'] != 'default':
+            self.desired_RGB = self.gamma_mon(self.desired_RGB)
+        print self.desired_RGB
+
         return self.desired_RGB
 
     def set_rgb(self, rgb):
@@ -500,9 +513,13 @@ class Shape(StimDefaults):
 
     def make_stim(self):
         """
-        instantiates PsychoPy stimulus object
+        Instantiates PsychoPy stimulus object, and gets gamma correction if
+        it exists.
         :return: nothing
         """
+        if GlobalDefaults.defaults['gamma_correction'] != 'default':
+            self.gamma_mon = gamma_mon
+
         if self.fill_mode == 'random' or self.fill_mode == 'checkerboard':
             self.__class__ = TestBoard
             self.make_stim()
@@ -1085,14 +1102,16 @@ def run_stim(stim_list, verbose=False):
                 f.write(str(i))
                 f.write('\n')
 
-            f.write('\n\n\n#BEGIN JSON#\n')
+            f.write('\n\n\n#BEGIN PICKLE#\n')
+
+        with open((path+file_name), 'ab') as f:
             to_write = []
             for i in stim_list:
                 para_copy = copy.deepcopy(i.parameters)
                 para_copy['move_type'] = i.stim_type
                 to_write.append(para_copy)
 
-            f.write(json.dumps(to_write))
+            f.write(cPickle.dumps(to_write))
 
 
 def do_break():
@@ -1120,6 +1139,13 @@ def make_window():
                               viewScale=GlobalDefaults.defaults['scale'],
                               screen=GlobalDefaults.defaults['screen_num']
                               )
+    if GlobalDefaults.defaults['gamma_correction'] != 'default':
+        gamma_file = './psychopy/gammaTables.txt'
+        if os.path.exists(gamma_file):
+            with open(gamma_file, 'rb') as f:
+                global gamma_mon
+                gamma_mon = cPickle.load(f)[GlobalDefaults.defaults[
+                    'gamma_correction']]
 
 
 def close_window():
