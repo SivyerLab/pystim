@@ -85,6 +85,8 @@ if os.path.exists(gamma_file):
     with open(gamma_file, 'rb') as f:
         gamma_dict = cPickle.load(f)
     gamma_mons = gamma_dict.keys()
+else:
+    gamma_mons = []
 
 shape_param = OrderedDict([
     ('shape',
@@ -1466,7 +1468,7 @@ class MyFrame(wx.Frame):
         :return:
         """
         if _platform == 'win32':
-            system('start python GammaCorrection.py')
+            system('start python GammaCorrection.pyc')
 
         elif _platform == 'darwin':
             current_dir = os.getcwd()

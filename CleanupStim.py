@@ -90,7 +90,7 @@ class GlobalDefaults(object):
     offset the center of the window.
     """
 
-    # default defaults
+    #: Dictionary of default defaults.
     defaults = dict(frame_rate=60,
                     pix_per_micron=1,
                     scale=1,
@@ -172,7 +172,7 @@ class MyWindow:
     variables for the window.
     """
 
-    # to interrupt stim animations
+    #: Class attribute to interrupt stim animations
     should_break = False
 
     @staticmethod

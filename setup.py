@@ -56,12 +56,13 @@ def setup():
                                     'scipy.linalg.*', 'scipy.integrate',
                                     'scipy.sparse.csgraph._validation',
                                     'multiprocessing', 'PIL.*',
-                                    'psychopy.visual.*']
+                                    'psychopy.visual.*', 'matplotlib.afm']
                   }
               })
 
         os.system('start robocopy "C:\Python27\Lib\site-packages\psychopy\\app" '
                   '".\dist\psychopy\\app" /E')
+        py_compile.compile('GammaCorrection.py', cfile='.\dist\GammaCorrection.pyc')
 
     elif sys.platform=='darwin':
         from setuptools import setup
@@ -93,17 +94,19 @@ def setup():
                   'py2app': {
                       'packages' : ['PIL'],
                       'iconfile' : 'icon1.ico',
-                      'includes' : ['scipy.*', 'scipy.integrate', 'scipy.special.*',
-                                    'scipy.linalg.*', 'scipy.integrate',
+                      'includes' : ['scipy.*', 'scipy.integrate',
+                                    'scipy.special.*', 'scipy.linalg.*',
+                                    'scipy.integrate',
                                     'scipy.sparse.csgraph._validation',
-                                    'multiprocessing',
-                                    'psychopy.visual.*']
+                                    'multiprocessing', 'psychopy.visual.*',
+                                    'matplotlib.afm']
                   }
               })
 
         os.system('cp -r /Library/Frameworks/Python.framework/Versions/2.7/lib'
                   '/python2.7/site-packages/psychopy/app '
                   '.dist/gui.app/Contents/Resources/psychopy/app')
+        py_compile.compile('GammaCorrection.py', cfile='./dist/gui.app/Contents/Resources/GammaCorrection.pyc')
 
 
 if __name__ == '__main__':

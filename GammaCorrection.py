@@ -36,7 +36,7 @@ and the script can be started by entering (note .pyc, not .py)::
 from psychopy import visual, core, event, logging
 from psychopy.monitors import Monitor
 from scipy import stats, interpolate, array, ndarray
-import matplotlib.pyplot as plt
+# import matplotlib.pyplot as plt
 import cPickle
 import os.path
 import sys
@@ -53,12 +53,12 @@ def gammaCorrect():
     prompt = True
 
     while prompt:
-        num_steps = '30'# num_steps = raw_input('\nNumber of steps per gun?').rstrip()
+        num_steps = raw_input('\nNumber of steps per gun?').rstrip()
 
         if num_steps.isdigit():
             num_steps = int(num_steps)
-            should_step = 'N' #should_step = raw_input('Run through RGB steps
-            #  for each gun? Y, N: ').rstrip()
+            should_step = raw_input('Run through RGB steps for each gun? Y, '
+                                    'N: ').rstrip()
 
             if should_step == 'Y':
                 should_step = True
@@ -87,8 +87,6 @@ def gammaCorrect():
             print '\nAnswer correctly.'
 
     colors = [i * 1.0 / num_steps * 2 - 1 for i in range(num_steps+1)]
-    # print len(colors)
-    # print colors
 
     if should_step:
         win = visual.Window(monitor='testMonitor', fullscr=False,
@@ -119,11 +117,9 @@ def gammaCorrect():
 
     inputs = [(i+1)/2 for i in colors]
 
-    # print '\nEnter lums into a text file. Each entry separated by new line, ' \
-    #       'colors seperated by 2 new lines, in RGB order.'
-    # lums = raw_input('Enter file location: ').rstrip()
-    lums = 'C:\\Users\\Alex\\PycharmProjects\\StimProgram\\psychopy' \
-           '\\gammaTable.txt'
+    print '\nEnter lums into a text file. Each entry separated by new line, ' \
+          'colors seperated by 2 new lines, in RGB order.'
+    lums = raw_input('Enter file location: ').rstrip()
     try:
         with open(lums, 'r') as f:
             rgbs = f.read()
@@ -149,26 +145,26 @@ def gammaCorrect():
 
     # show_plot = raw_input('\nShow plots? Y, N: ')
     # if show_plot == 'Y':
-    plt.legend(loc=0)
-    # plt.show()
+    #     plt.legend(loc=0)
+    #     plt.show()
 
     gamma_correction = GammaValues(r_tuple, g_tuple, b_tuple)
 
     ## GRAPHING STUFF TO TEST ##
-    vals = [i * 1.0 / (51 - 1) * 2 - 1 for i in range(51)]
-    corrected = [[], [], []]
-    for i in range(len(vals)):
-        rgb = [vals[i]] * 3
-        rgb = gamma_correction(rgb)
-        corrected[0].append(rgb[0])
-        corrected[1].append(rgb[1])
-        corrected[2].append(rgb[2])
-
-    plt.plot(vals, vals, 'k--', label='linear')
-    plt.plot(vals, corrected[0], 'r', label='red')
-    plt.plot(vals, corrected[1], 'g', label='green')
-    plt.plot(vals, corrected[2], 'b', label='blue')
-    plt.legend(loc=0)
+    # vals = [i * 1.0 / (51 - 1) * 2 - 1 for i in range(51)]
+    # corrected = [[], [], []]
+    # for i in range(len(vals)):
+    #     rgb = [vals[i]] * 3
+    #     rgb = gamma_correction(rgb)
+    #     corrected[0].append(rgb[0])
+    #     corrected[1].append(rgb[1])
+    #     corrected[2].append(rgb[2])
+    #
+    # plt.plot(vals, vals, 'k--', label='linear')
+    # plt.plot(vals, corrected[0], 'r', label='red')
+    # plt.plot(vals, corrected[1], 'g', label='green')
+    # plt.plot(vals, corrected[2], 'b', label='blue')
+    # plt.legend(loc=0)
     # plt.show()
 
     should_save = raw_input('\nSave? Y, N: ')
@@ -241,11 +237,11 @@ def make_correction(measured):
 
     to_plot = []
     # points
-    to_plot.append(plt.plot(measured_at, measured, 'ro', label='measured'))
+    # to_plot.append(plt.plot(measured_at, measured, 'ro', label='measured'))
     # fit
-    to_plot.append(plt.plot(measured_at, spline_values, label='interpolated'))
+    # to_plot.append(plt.plot(measured_at, spline_values, label='interpolated'))
     # corrected
-    to_plot.append(plt.plot(measured_at, graph_corrected, label='corrected'))
+    # to_plot.append(plt.plot(measured_at, graph_corrected, label='corrected'))
     # check against linear
     # to_plot.append(plt.plot(measured_at, linear, label='linear'))
     # plt.legend(loc=0)
