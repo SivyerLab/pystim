@@ -500,7 +500,6 @@ class Shape(StimDefaults):
         # gamma adjust
         if GlobalDefaults.defaults['gamma_correction'] != 'default':
             timing_rgb = self.gamma_mon(timing_rgb)
-        print timing_rgb
 
         return timing_rgb
 
