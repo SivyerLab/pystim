@@ -3,8 +3,8 @@
 """
 Script for setting the gamma correction table for psychopy. Steps through
 luminosity intervals while user records values, then prompts for table. Table is
-text file, with newline seperated values, and each color (in RGB order),
-seperated by 2 new lines.
+text file, with newline separated values, and each color (in RGB order)
+separated by 2 new lines.
 
 Example::
 
@@ -53,23 +53,30 @@ def gammaCorrect():
     prompt = True
 
     while prompt:
-        num_steps = raw_input('\nNumber of steps per gun?').rstrip()
+        should_step = raw_input('Run through RGB steps for each gun? Y, '
+                                'N: ').rstrip()
 
-        if num_steps.isdigit():
-            num_steps = int(num_steps)
-            should_step = raw_input('Run through RGB steps for each gun? Y, '
-                                    'N: ').rstrip()
+        if should_step == 'Y':
+            should_step = True
+            mon_name = raw_input('Gamma profile to use? None or name: ')
 
-            if should_step == 'Y':
-                should_step = True
+            num_steps = raw_input('\nNumber of steps per gun? ').rstrip()
+
+            if num_steps.isdigit():
+                num_steps = int(num_steps)
+                colors = [i * 1.0 / num_steps * 2 - 1 for i in range(num_steps+1)]
+                inputs = [(i+1)/2 for i in colors]
+
                 step_time = raw_input('Time between steps (ms)? ').rstrip()
 
                 if step_time.isdigit():
                     step_time = int(step_time)
+
                     screen_num = raw_input('Screen number? ').rstrip()
 
                     if screen_num.isdigit():
                         screen_num = int(screen_num)
+
                         should_flash = raw_input('Flash black? Y, N: ')
 
                         if should_flash == 'Y':
@@ -80,13 +87,11 @@ def gammaCorrect():
                             should_flash = False
                             prompt = False
 
-            elif should_step == 'N':
-                should_step = False
-                prompt = False
+        elif should_step == 'N':
+            should_step = False
+            prompt = False
         else:
             print '\nAnswer correctly.'
-
-    colors = [i * 1.0 / num_steps * 2 - 1 for i in range(num_steps+1)]
 
     if should_step:
         win = visual.Window(monitor='testMonitor', fullscr=False,
@@ -114,8 +119,6 @@ def gammaCorrect():
                 core.wait(step_time * 1.0 /1000)
 
         win.close()
-
-    inputs = [(i+1)/2 for i in colors]
 
     print '\nEnter lums into a text file. Each entry separated by new line, ' \
           'colors seperated by 2 new lines, in RGB order.'
