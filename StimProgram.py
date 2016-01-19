@@ -8,8 +8,9 @@ from psychopy import visual, logging, core, event, filters, monitors
 from psychopy.tools.coordinatetools import pol2cart
 from random import Random
 from time import strftime, localtime
-from GammaCorrection import GammaValues
+from GammaCorrection import GammaValues  # necessary for pickling
 import scipy
+import scipy.signal
 import numpy
 import pprint
 import re
@@ -445,11 +446,6 @@ class Shape(StimDefaults):
                                 stim_color[1] * self.intensity,
                                 stim_color[2] * self.intensity]
 
-        # gamma adjust
-        if GlobalDefaults.defaults['gamma_correction'] != 'default':
-            self.desired_RGB = self.gamma_mon(self.desired_RGB)
-        print self.desired_RGB
-
         return self.desired_RGB
 
     def set_rgb(self, rgb):
@@ -474,7 +470,8 @@ class Shape(StimDefaults):
             color_factor = (scipy.signal.square(self.period_mod * 2 * scipy.pi *
                                           time_fraction, duty=0.5) - 1) / 2 + 1
         elif self.timing == "sawtooth":
-            color_factor = (scipy.signal.sawtooth(self.period_mod * 2 * scipy.pi *
+            color_factor = (scipy.signal.sawtooth(self.period_mod * 2 *
+                                                 scipy.pi *
                                             time_fraction, width=1) - 1) / 2 + 1
         elif self.timing == "linear":
             color_factor = time_fraction
@@ -499,6 +496,11 @@ class Shape(StimDefaults):
             timing_rgb = [self.desired_RGB[0] * color_factor,
                           self.desired_RGB[1] * color_factor,
                           self.desired_RGB[2] * color_factor]
+
+        # gamma adjust
+        if GlobalDefaults.defaults['gamma_correction'] != 'default':
+            timing_rgb = self.gamma_mon(timing_rgb)
+        print timing_rgb
 
         return timing_rgb
 
@@ -655,7 +657,8 @@ class MovingShape(Shape):
             angle = self.start_dir - 180
 
         # orient shape
-        self.stim.ori = self.start_dir + 90
+        if self.fill_mode != 'image':
+            self.stim.ori = self.start_dir + 90
 
         # get movements and store for next_coordinate()
         # (+0.99 so int() rounds up)
@@ -1125,6 +1128,17 @@ def main_wgui(params):
 
 
 def make_window():
+    if GlobalDefaults.defaults['gamma_correction'] != 'default':
+        gamma_file = './psychopy/gammaTables.txt'
+        if os.path.exists(gamma_file):
+            with open(gamma_file, 'rb') as f:
+                global gamma_mon
+                gamma_mon = cPickle.load(f)[GlobalDefaults.defaults[
+                    'gamma_correction']]
+        color = gamma_mon(GlobalDefaults.defaults['background'])
+    else:
+        color = GlobalDefaults.defaults['background']
+
     global my_window
     mon = config.get('StimProgram', 'monitor')
     # print monitors.getAllMonitors()
@@ -1133,19 +1147,12 @@ def make_window():
                               colorSpace="rgb", winType='pyglet',
                               allowGUI=False,
                               pos=GlobalDefaults.defaults['position'],
-                              color=GlobalDefaults.defaults['background'],
+                              color=color,
                               fullscr=GlobalDefaults.defaults['fullscreen'],
                               viewPos=GlobalDefaults.defaults['offset'],
                               viewScale=GlobalDefaults.defaults['scale'],
                               screen=GlobalDefaults.defaults['screen_num']
                               )
-    if GlobalDefaults.defaults['gamma_correction'] != 'default':
-        gamma_file = './psychopy/gammaTables.txt'
-        if os.path.exists(gamma_file):
-            with open(gamma_file, 'rb') as f:
-                global gamma_mon
-                gamma_mon = cPickle.load(f)[GlobalDefaults.defaults[
-                    'gamma_correction']]
 
 
 def close_window():
