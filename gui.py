@@ -627,11 +627,11 @@ class DirPanel(wx.Panel):
         path = self.browser.GetPath()
 
         # open and read settings
-        try:
+        if os.path.dirname(path).split('\\')[-2] != 'logs':
             with open(path, 'rb') as f:
                 to_load = cPickle.load(f)
-        except (ValueError, EOFError):
-            # see if log file with PICKLE at end
+        else:
+            # search file for PICKLE at end
             try:
                 with open(path, 'rb') as f:
                     next_is_pickle = False

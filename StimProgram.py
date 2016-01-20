@@ -206,7 +206,7 @@ class GlobalDefaults(object):
         """
         pp = pprint.PrettyPrinter(indent=2, width=1)
         return '\n{} (all parameters):\n{}\n'.format(
-            self.__class__.__name__, str(pp.pformat(vars(self))))
+            self.__class__.__name__, str(pp.pformat(self.defaults)))
 
     def get_params(self):
         """
@@ -1100,6 +1100,9 @@ def run_stim(stim_list, verbose=False):
                 format((rep_count * num_frames + frame_count) / elapsed_time_count))
             f.write("\nElapsed time: {0:.3f} seconds.\n". \
                 format(elapsed_time_count))
+
+            f.write(str(GlobalDefaults()))
+
             for i in stim_list:
                 f.write(str(i))
                 f.write('\n')
