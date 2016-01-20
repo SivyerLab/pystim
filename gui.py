@@ -309,7 +309,7 @@ motion_param = OrderedDict([
       'default' : config_dict['move_type'],
       'is_child': False,
       'children': {
-          'moving': ['speed', 'start_dir', 'num_dirs', 'start_radius'],
+          'moving': ['speed', 'start_dir', 'num_dirs', 'start_radius', 'move_delay'],
           'random': ['speed', 'travel_distance', 'move_seed'],
           'movie' : ['movie_filename'],
           'table' : ['table_filename', 'start_dir']
@@ -341,6 +341,13 @@ motion_param = OrderedDict([
      {'type'    : 'text',
       'label'   : 'start radius (um)',
       'default' : config_dict['start_radius'],
+      'is_child': True}
+     ),
+
+    ('move_delay',
+     {'type'    : 'text',
+      'label'   : 'move delay (s)',
+      'default' : config_dict['move_delay'],
       'is_child': True}
      ),
 
@@ -390,7 +397,7 @@ global_default_param = OrderedDict([
 
     ('offset',
      {'type'    : 'list',
-      'label'   : 'offset (um)',
+      'label'   : 'offset (pix)',
       'default' : config_dict['offset'],
       'is_child': False}
      ),
@@ -540,8 +547,7 @@ class DirPanel(wx.Panel):
         # file browser
         if _platform == "darwin":
             self.browser = wx.FileCtrl(self, wildCard='*.txt', size=(200, -1),
-                defaultDirectory=
-                    './psychopy/stims/')
+                defaultDirectory=config_dict['savedStimDir'])
         elif _platform == "win32":
             self.browser = wx.FileCtrl(self, wildCard='*.txt', size=(200, -1),
                 defaultDirectory=config_dict['savedStimDir'])
@@ -693,6 +699,7 @@ class ListPanel(wx.Panel):
         self.list_control.InsertColumn(0, 'Shape')
         self.list_control.InsertColumn(1, 'Type')
         self.list_control.InsertColumn(2, 'Fill')
+        self.list_control.InsertColumn(3, 'Trigger')
 
         # add to sizer
         panel_sizer.Add(self.list_control, 1, wx.BOTTOM | wx.TOP | wx.EXPAND,
@@ -748,15 +755,18 @@ class ListPanel(wx.Panel):
         """
         shape = param_dict['shape']
         fill = param_dict['fill_mode']
+        trigger = str(param_dict['trigger'])
 
         # add info to list
         self.list_control.InsertStringItem(self.index, shape)
         self.list_control.SetStringItem(self.index, 1, stim_type)
         self.list_control.SetStringItem(self.index, 2, fill)
+        self.list_control.SetStringItem(self.index, 3, trigger)
         # resize columns to fit
         self.list_control.SetColumnWidth(0, wx.LIST_AUTOSIZE)
         self.list_control.SetColumnWidth(1, wx.LIST_AUTOSIZE)
         self.list_control.SetColumnWidth(2, wx.LIST_AUTOSIZE)
+        self.list_control.SetColumnWidth(3, wx.LIST_AUTOSIZE)
 
         if stim_type == 'static':
             stim_type = 'Shape'
