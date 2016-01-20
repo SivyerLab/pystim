@@ -10,7 +10,7 @@ import pyglet
 pyglet.options['shadow_window'] = False
 from collections import OrderedDict
 from sys import platform as _platform
-from GammaCorrection import GammaValues
+from GammaCorrection import GammaValues  # necessary for unpickling
 import wx
 import StimProgram
 import copy
