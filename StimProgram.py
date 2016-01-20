@@ -180,8 +180,7 @@ class GlobalDefaults(object):
         if scale is not None:
             self.defaults['scale'] = scale
         if offset is not None:
-            self.defaults['offset'] = [offset[0] * pix_per_micron,
-                                       offset[1] * pix_per_micron]
+            self.defaults['offset'] = offset
         if display_size is not None:
             self.defaults['display_size'] = display_size
         if position is not None:
@@ -229,7 +228,7 @@ class StimDefaults(object):
                  num_dirs=4, start_dir=0, start_radius=300, travel_distance=50,
                  sf=1, contrast_channel="Green", movie_filename=None, movie_x_loc=0,
                  movie_y_loc=0, period_mod=1, image_width=100, image_height=100,
-                 image_filename=None, table_filename=None, trigger=False):
+                 image_filename=None, table_filename=None, trigger=False, move_delay=0):
         """
         default variable constructors, distance units converted appropriately
         """
@@ -267,6 +266,7 @@ class StimDefaults(object):
         self.image_width = image_width
         self.table_filename = table_filename
         self.trigger = trigger
+        self.move_delay = move_delay
         if location is None:
             self.location = [0, 0]
         else:
@@ -663,8 +663,6 @@ class MovingShape(Shape):
         # (+0.99 so int() rounds up)
         travel_distance = 2 * (
             (self.current_x ** 2 + self.current_y ** 2) ** 0.5)
-        print travel_distance
-        print self.speed
 
         self.num_frames = int(travel_distance / self.speed + 0.99)
         self.x_moves, self.y_moves = self.get_move_array(self.current_x,
@@ -755,7 +753,7 @@ class TableStim(MovingShape):
         if os.path.splitext(table)[1] == '.txt':
             with open(table, 'r') as f:
                 line = f.read()
-                radius = line.split('\r')
+                radius = line.split('\n')
 
         # if igor binary wave format or packed experiment format
         elif os.path.splitext(table)[1] == ('.ibw' or '.pxp'):
@@ -953,6 +951,8 @@ def send_trigger():
     :return: nothing
     """
     if has_u3:
+        # flip window
+        my_window.flip()
         # initialize
         d = u3.U3()
         # voltage spike for 0.1 seconds with LED off flash
