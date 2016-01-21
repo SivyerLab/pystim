@@ -725,7 +725,8 @@ class MovingShape(Shape):
             except (AttributeError, IndexError, TypeError):
                 self.generate_movement()
                 # send trigger on each new movement direction
-                if self.trigger and self.__class__ == MovingShape:
+                # if self.trigger and self.__class__ == MovingShape:
+                if self.trigger:
                     send_trigger()
                 self.animate(frame)
         else:
@@ -1042,21 +1043,19 @@ def send_trigger():
         # flip window
         my_window.flip()
         # initialize
-        d = u3.U3()
+        # d = u3.U3()
         # voltage spike for 0.1 seconds with LED off flash
         # 0 low, 1 high, on flexible IO #4
         d.setFIOState(4, 1)
         # LED off
-        d.getFeedback(u3.LED(State=False))
-        core.wait(0.1)
+        # d.getFeedback(u3.LED(State=False))
+        # core.wait(0.1)
         # reset
         d.setFIOState(4, 0)
-        d.getFeedback(u3.LED(State=True))
+        # d.getFeedback(u3.LED(State=True))
         # wait x seconds
         core.wait(GlobalDefaults.defaults['trigger_wait'])
-        d.close()
-    elif not has_u3:
-        print 'no labjack module/driver'
+        # d.close()
 
 
 def run_stim(stim_list, verbose=False):
@@ -1231,6 +1230,12 @@ def main_wgui(params):
 
 
 def make_window():
+    # init labjack u3
+    if has_u3:
+        global d
+        d = u3.U3()
+
+    # gamma stuff
     if GlobalDefaults.defaults['gamma_correction'] != 'default':
         gamma_file = './psychopy/gammaTables.txt'
         if os.path.exists(gamma_file):
@@ -1261,6 +1266,8 @@ def make_window():
 def close_window():
     global my_window
     my_window.close()
+    if has_u3:
+        d.close()
 
 if __name__ == "__main__":
     pass
