@@ -596,6 +596,9 @@ class MovingShape(Shape):
         self.y_moves = None
         self.num_frames = None
 
+        # to track random motion positions
+        self.log = [[], []]  # angle, frame num
+
         # pass parameters to super
         super(MovingShape, self).__init__(**kwargs)
 
@@ -728,6 +731,7 @@ class MovingShape(Shape):
                 # if self.trigger and self.__class__ == MovingShape:
                 if self.trigger:
                     send_trigger()
+                self.log[1].append(frame)
                 self.animate(frame)
         else:
             pass
@@ -852,7 +856,8 @@ class RandomlyMovingShape(MovingShape):
         self.frame_counter = 0
 
         # random angle between 0 and 360
-        angle = self.move_random.random() * 360
+        angle = int(self.move_random.random() * 360)
+        self.log[0].append(angle)
 
         # get movements array
         # +0.99 so int() rounds up
@@ -861,17 +866,6 @@ class RandomlyMovingShape(MovingShape):
                                                          self.current_y,
                                                          angle, num_frames)
 
-
-# class NewBoard(visual.ElementArrayStim):
-#     def __init__(self, **kwargs):
-#
-#         super(NewBoard, self).__init__(**kwargs)
-#
-#     def setPos(self, x, y):
-#         self.setField((x, y))
-#
-#     def setColor(self, rgb):
-#         pass
 
 def TestBoard_class(bases, **kwargs):
 
@@ -1087,6 +1081,7 @@ def run_stim(stim_list, verbose=False):
         # prep stims
         to_animate = []
         for i in range(len(stim_list)):
+            # check if element array stim
             if stim_list[i].parameters['fill_mode'] == 'checkerboard' or \
                             stim_list[i].parameters['fill_mode'] == 'random':
                 if stim_list[i].stim_type == 'MovingShape':
@@ -1171,8 +1166,7 @@ def run_stim(stim_list, verbose=False):
         time = localtime()
         time_string = strftime('%Y_%m_%d_%H%M%S', time)
         file_name = 'stimlog_' + time_string + '_' + stim_list[
-            0].stim_type.lower() + \
-                    '.txt'
+            0].stim_type.lower() + '.txt'
 
         if sys.platform == 'darwin':
             path = config.get('StimProgram', 'logsDir')
@@ -1218,6 +1212,31 @@ def run_stim(stim_list, verbose=False):
 
             f.write(cPickle.dumps(to_write))
 
+        for i in range(len(stim_list)):
+            if stim_list[i].stim_type == 'RandomlyMovingShape' and stim_list[
+                i].parameters['shape'] != 'annulus':
+
+                file_name = 'Randomlog_' + time_string + '_' + '.txt'
+                with open((path+file_name), 'w') as f:
+
+                    for j in range(len(to_animate[i].log[0])):
+                        f.write('angle: ')
+                        f.write(str(to_animate[i].log[0][j]))
+                        f.write(' frame: ')
+                        f.write(str(to_animate[i].log[1][j]))
+                        f.write('\n')
+
+                    f.write('\nangle list:\n')
+
+                    for j in range(len(to_animate[i].log[0])):
+                        f.write(str(to_animate[i].log[0][j]))
+                        f.write('\n')
+
+                    f.write('\nframe list:\n')
+
+                    for j in range(len(to_animate[i].log[0])):
+                        f.write(str(to_animate[i].log[1][j]))
+                        f.write('\n')
 
 def do_break():
     global should_break
