@@ -228,7 +228,8 @@ class StimDefaults(object):
                  num_dirs=4, start_dir=0, start_radius=300, travel_distance=50,
                  sf=1, contrast_channel="Green", movie_filename=None, movie_x_loc=0,
                  movie_y_loc=0, period_mod=1, image_width=100, image_height=100,
-                 image_filename=None, table_filename=None, trigger=False, move_delay=0):
+                 image_filename=None, table_filename=None, trigger=False,
+                 move_delay=0, num_jumps=5):
         """
         default variable constructors, distance units converted appropriately
         """
@@ -267,6 +268,8 @@ class StimDefaults(object):
         self.table_filename = table_filename
         self.trigger = trigger
         self.move_delay = move_delay
+        self.num_jumps = num_jumps
+
         if location is None:
             self.location = [0, 0]
         else:
@@ -274,6 +277,7 @@ class StimDefaults(object):
                 'pix_per_micron'],
                              location[1] * GlobalDefaults.defaults[
                 'pix_per_micron']]
+
         if color is None:
             self.color = [-1, 1, -1]
         else:
@@ -521,9 +525,6 @@ class Shape(StimDefaults):
         if GlobalDefaults.defaults['gamma_correction'] != 'default':
             self.gamma_mon = gamma_mon
 
-        if self.fill_mode == 'random' or self.fill_mode == 'checkerboard':
-            self.__class__ = TestBoard
-            self.make_stim()
         elif self.fill_mode == 'image':
             self.stim = visual.ImageStim(win=my_window,
                                      size=self.get_size(),
@@ -852,56 +853,63 @@ class RandomlyMovingShape(MovingShape):
 #     def setColor(self, rgb):
 #         pass
 
+def TestBoard_class(bases, **kwargs):
 
-class TestBoard(RandomlyMovingShape):
-    def __init__(self):
-        # instance attributes
-        self.colors = None
+    class TestBoard(bases):
+        def __init__(self):
+            # instance attributes
+            self.colors = None
 
-    def make_stim(self):
-        xys = []
-        for y in range(self.num_check/-2, self.num_check/2):
-            for x in range(self.num_check/-2, self.num_check/2):
-                xys.append((self.size_check_x*x, self.size_check_y*y))
+            # pass parameters to super
+            super(TestBoard, self).__init__(**kwargs)
 
-        self.colors = numpy.ndarray((self.num_check**2, 3))
-        self.colors[::] = GlobalDefaults.defaults['background']
+        def make_stim(self):
+            xys = []
+            for y in range(self.num_check/-2, self.num_check/2):
+                for x in range(self.num_check/-2, self.num_check/2):
+                    xys.append((self.size_check_x*x, self.size_check_y*y))
 
-        self.index = numpy.zeros((self.num_check, self.num_check))
-        if self.fill_mode == 'checkerboard':
-            self.index[0::2, 0::2] = 1
-            self.index[1::2, 1::2] = 1
-            self.index = numpy.concatenate(self.index[:])
-        elif self.fill_mode == 'random':
-            self.index = numpy.concatenate(self.index[:])
-            for i in range(len(self.index)):
-                self.index[i] = self.fill_random.randint(0,1)
+            self.colors = numpy.ndarray((self.num_check**2, 3))
+            self.colors[::] = GlobalDefaults.defaults['background']
 
-        self.colors[numpy.where(self.index)] = self.get_color_contrast()
+            self.index = numpy.zeros((self.num_check, self.num_check))
+            if self.fill_mode == 'checkerboard':
+                self.index[0::2, 0::2] = 1
+                self.index[1::2, 1::2] = 1
+                self.index = numpy.concatenate(self.index[:])
+            elif self.fill_mode == 'random':
+                self.index = numpy.concatenate(self.index[:])
+                for i in range(len(self.index)):
+                    self.index[i] = self.fill_random.randint(0,1)
 
-        self.stim = visual.ElementArrayStim(my_window,
-                                            nElements=self.num_check**2,
-                                            sizes=(self.size_check_x,
-                                                   self.size_check_y),
-                                            xys=xys, elementTex=None,
-                                            colors=self.colors,
-                                            elementMask=None)
+            self.colors[numpy.where(self.index)] = self.get_color_contrast()
 
-    def set_position(self, x, y):
-        self.stim.setFieldPos((x, y))
+            self.stim = visual.ElementArrayStim(my_window,
+                                                nElements=self.num_check**2,
+                                                sizes=(self.size_check_x,
+                                                       self.size_check_y),
+                                                xys=xys, elementTex=None,
+                                                colors=self.colors,
+                                                elementMask=None)
 
-    def get_position(self):
-        return self.stim.fieldPos
+            # return stim
 
-    def get_timing(self, frame):
-        rgb = self.rgb_timing(frame)
-        self.colors[numpy.where(self.index)] = rgb
-        return self.colors
+        def set_position(self, x, y):
+            self.stim.setFieldPos((x, y))
 
-    def set_rgb(self, colors):
-        # pass
-        self.stim.setColors(colors)
+        def get_position(self):
+            return self.stim.fieldPos
 
+        def get_timing(self, frame):
+            rgb = self.rgb_timing(frame)
+            self.colors[numpy.where(self.index)] = rgb
+            return self.colors
+
+        def set_rgb(self, colors):
+            # pass
+            self.stim.setColors(colors)
+
+    return TestBoard()
 
 class Movie(Shape):
     """
@@ -1000,11 +1008,22 @@ def run_stim(stim_list, verbose=False):
         # prep stims
         to_animate = []
         for i in range(len(stim_list)):
-            # if stim_list[i].parameters['fill_mode'] == 'checkerboard' or \
-            #                 stim_list[i].parameters['fill_mode'] == 'random':
-            #     to_animate.append(TestBoard(**stim_list[i].parameters))
-            if not True:
-                pass
+            if stim_list[i].parameters['fill_mode'] == 'checkerboard' or \
+                            stim_list[i].parameters['fill_mode'] == 'random':
+                if stim_list[i].stim_type == 'MovingShape':
+                    to_animate.append(TestBoard_class(MovingShape,
+                                                      **stim_list[
+                                                          i].parameters))
+                if stim_list[i].stim_type == 'RandomlyMovingShape':
+                    to_animate.append(TestBoard_class(RandomlyMovingShape,
+                                                      **stim_list[
+                                                          i].parameters))
+                if stim_list[i].stim_type == 'Shape':
+                    to_animate.append(TestBoard_class(Shape, **stim_list[i].parameters))
+                if stim_list[i].stim_type == 'TableStim':
+                    to_animate.append(TestBoard_class(TableStim,
+                                                      **stim_list[
+                                                          i].parameters))
             else:
                 # instantiate stim objects by looking up string in globals()
                 to_animate.append(globals()[stim_list[i].stim_type](
