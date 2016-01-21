@@ -8,6 +8,7 @@ from psychopy import visual, logging, core, event, filters, monitors
 from psychopy.tools.coordinatetools import pol2cart
 from random import Random
 from time import strftime, localtime
+from PIL import Image
 from GammaCorrection import GammaValues  # necessary for pickling
 import scipy
 import scipy.signal
@@ -70,9 +71,15 @@ class StimInfo(object):
         for displaying info about the stim's passed parameters
         :return:
         """
-        pp = pprint.PrettyPrinter(indent=2, width=1)
-        return '\nStim #{}:\n{}:\n{}\n'.format(
-            self.number, self.stim_type, str(pp.pformat(self.parameters)))
+        to_print = '\nStim #{} ({}):\n'.format(self.number, self.stim_type)
+        for k, v in sorted(self.parameters.items()):
+            to_print += '   '
+            to_print += str(k)
+            to_print += ': '
+            to_print += str(v)
+            to_print += '\n'
+
+        return to_print
 
 
 def input_parser(filename):
@@ -204,9 +211,15 @@ class GlobalDefaults(object):
         """
         for displaying info about all stim parameters
         """
-        pp = pprint.PrettyPrinter(indent=2, width=1)
-        return '\n{} (all parameters):\n{}\n'.format(
-            self.__class__.__name__, str(pp.pformat(self.defaults)))
+        to_print = '\nGlobal Parameters: \n'
+        for k, v in sorted(GlobalDefaults.defaults.items()):
+            to_print += '   '
+            to_print += str(k)
+            to_print += ': '
+            to_print += str(v)
+            to_print += '\n'
+
+        return to_print
 
     def get_params(self):
         """
@@ -229,7 +242,7 @@ class StimDefaults(object):
                  sf=1, contrast_channel="Green", movie_filename=None, movie_x_loc=0,
                  movie_y_loc=0, period_mod=1, image_width=100, image_height=100,
                  image_filename=None, table_filename=None, trigger=False,
-                 move_delay=0, num_jumps=5):
+                 move_delay=0, num_jumps=5, jump_delay = 100):
         """
         default variable constructors, distance units converted appropriately
         """
@@ -269,6 +282,7 @@ class StimDefaults(object):
         self.trigger = trigger
         self.move_delay = move_delay
         self.num_jumps = num_jumps
+        self.jump_delay = jump_delay
 
         if location is None:
             self.location = [0, 0]
@@ -749,6 +763,7 @@ class TableStim(MovingShape):
 
     def get_move_array(self, *args):
         table = self.table_filename
+        radius = None
 
         # if text file
         if os.path.splitext(table)[1] == '.txt':
@@ -770,7 +785,11 @@ class TableStim(MovingShape):
                                    'or \'.pxp\' formats. Install module with ' \
                                    '\'pip install igor\'.'
 
-        radius = map(float, radius)
+        if radius is not None:
+            radius = map(float, radius)
+        else:
+            raise IOError
+
         radius = [r * GlobalDefaults.defaults[
             'pix_per_micron'] for r in radius]
 
@@ -951,6 +970,67 @@ class Movie(Shape):
                 self.mov.stop()
 
 
+class Jump(Shape):
+    """
+    Class to jump through to random areas on a larger image.
+    """
+    def __init__(self, **kwargs):
+
+        # pass parameters to super
+        super(Jump, self).__init__(**kwargs)
+
+    def make_stim(self):
+        image = Image.open(self.image_filename)
+        cropped_list = []
+        self.stim = []
+
+        for i in range(self.num_jumps):
+            x = self.move_random.randint(0, image.size[0] -
+                                         GlobalDefaults.defaults[
+                                             'display_size'][0])
+            y = self.move_random.randint(0, image.size[1] -
+                                         GlobalDefaults.defaults[
+                                             'display_size'][1])
+            cropped = image.crop((x,
+                                       y,
+                                       x+GlobalDefaults.defaults[
+                                             'display_size'][0],
+                                       y+GlobalDefaults.defaults[
+                                             'display_size'][1]))
+            cropped_list.append(cropped)
+            pic = visual.SimpleImageStim(my_window, image=cropped)
+            pic.draw()
+            for i in range(self.jump_delay):
+                self.stim.append(visual.BufferImageStim(my_window))
+
+    def get_draw_times(self):
+        """
+        determines frames during which to draw stimulus
+        :return: last frame number as int
+        """
+        self.start_stim = self.delay * GlobalDefaults.defaults['frame_rate']
+        self.end_stim = len(self.stim) + self.start_stim
+        self.draw_time = self.end_stim - self.start_stim
+
+        # return end stim time for calculating max frame time
+        return self.end_stim
+
+    def animate(self, frame):
+        """
+        Method for drawing stim objects to back buffer. Checks if object
+        should be drawn. Back buffer is brought to front with calls to flip()
+        on the window.
+
+        :param frame: current frame number
+        """
+        if self.start_stim <= frame < self.end_stim:
+            # send trigger at just before first frame that stim object is drawn
+            if self.trigger and self.start_stim == frame:
+                send_trigger()
+            # draw to back buffer
+            i = frame - self.delay * GlobalDefaults.defaults['frame_rate']
+            self.stim[i].draw()
+
 def send_trigger():
     """
     Triggers recording device by sending short voltage spike
@@ -1091,7 +1171,9 @@ def run_stim(stim_list, verbose=False):
     if GlobalDefaults.defaults['log']:
         time = localtime()
         time_string = strftime('%Y_%m_%d_%H%M%S', time)
-        file_name = 'stimlog_' + time_string + '.txt'
+        file_name = 'stimlog_' + time_string + '_' + stim_list[
+            0].stim_type.lower() + \
+                    '.txt'
 
         if sys.platform == 'darwin':
             path = config.get('StimProgram', 'logsDir')
