@@ -305,14 +305,15 @@ motion_param = OrderedDict([
     ('move_type',
      {'type'    : 'choice',
       'label'   : 'move type',
-      'choices' : ['static', 'moving', 'table', 'random', 'movie'],
+      'choices' : ['static', 'moving', 'table', 'random', 'movie', 'jump'],
       'default' : config_dict['move_type'],
       'is_child': False,
       'children': {
           'moving': ['speed', 'start_dir', 'num_dirs', 'start_radius', 'move_delay'],
           'random': ['speed', 'travel_distance', 'move_seed'],
           'movie' : ['movie_filename'],
-          'table' : ['table_filename', 'start_dir']
+          'table' : ['table_filename', 'start_dir'],
+          'jump'  : ['num_jumps', 'jump_delay', 'move_seed'],
       }}
      ),
 
@@ -376,6 +377,20 @@ motion_param = OrderedDict([
      {'type'    : 'path',
       'label'   : 'filename',
       'default' : config_dict['table_filename'],
+      'is_child': True}
+     ),
+
+    ('num_jumps',
+     {'type'    : 'text',
+      'label'   : 'number of jumps',
+      'default' : config_dict['num_jumps'],
+      'is_child': True}
+     ),
+
+    ('jump_delay',
+     {'type'    : 'text',
+      'label'   : 'jump delay (frames)',
+      'default' : config_dict['jump_delay'],
       'is_child': True}
      )
 ])
@@ -665,6 +680,8 @@ class DirPanel(wx.Panel):
                 stim_type = 'movie'
             elif stim_type == 'TableStim':
                 stim_type = 'table'
+            elif stim_type == 'Jump':
+                stim_type = 'jump'
 
             my_frame.l1.add_stim(stim_type, stim_param)
 
@@ -778,6 +795,8 @@ class ListPanel(wx.Panel):
             stim_type = 'Movie'
         elif stim_type == 'table':
             stim_type = 'TableStim'
+        elif stim_type == 'jump':
+            stim_type = 'Jump'
 
         stim_info = StimProgram.StimInfo(stim_type, param_dict,
                                          self.index + 1)
@@ -832,6 +851,9 @@ class ListPanel(wx.Panel):
             stim_type = 'movie'
         elif stim_type == 'TableStim':
             stim_type = 'table'
+        elif stim_type == 'Jump':
+            stim_type = 'jump'
+
         param_dict['move_type'] = stim_type
 
         # load in panels and subpanels
@@ -1111,6 +1133,9 @@ class InputPanel(wx.Panel):
                 self.type = 'Movie'
             elif stim_type == 'table':
                 self.type = 'TableStim'
+            elif stim_type == 'jump':
+                self.type = 'Jump'
+
         return params
 
     def set_value(self, param, value):
