@@ -105,7 +105,7 @@ def setup():
 
         os.system('cp -r /Library/Frameworks/Python.framework/Versions/2.7/lib'
                   '/python2.7/site-packages/psychopy/app '
-                  '.dist/gui.app/Contents/Resources/psychopy/app')
+                  './dist/gui.app/Contents/Resources/psychopy/app/')
         py_compile.compile('GammaCorrection.py', cfile='./dist/gui.app/Contents/Resources/GammaCorrection.pyc')
 
 
