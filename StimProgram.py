@@ -1225,8 +1225,10 @@ def run_stim(stim_list, verbose=False):
                         f.write(str(to_animate[i].log[0][j]))
                         f.write(' frame: ')
                         f.write(str(to_animate[i].log[1][j]))
-                        # f.write(' position: ')
-                        # f.write(str(to_animate[i].log[2][j]))
+                        f.write(' position: ')
+                        f.write(str(to_animate[i].log[2][j][0]))
+                        f.write(', ')
+                        f.write(str(to_animate[i].log[2][j][1]))
                         f.write('\n')
 
                     f.write('\nangle list:\n')
@@ -1241,11 +1243,17 @@ def run_stim(stim_list, verbose=False):
                         f.write(str(to_animate[i].log[1][j]))
                         f.write('\n')
 
-                    # f.write('\nposition list:\n')
+                    f.write('\nx position list:\n')
 
-                    # for j in range(len(to_animate[i].log[0])):
-                        # f.write(str(to_animate[i].log[2][j]))
-                        # f.write('\n')
+                    for j in range(len(to_animate[i].log[0])):
+                        f.write(str(to_animate[i].log[2][j][0]))
+                        f.write('\n')
+
+                    f.write('\ny position list:\n')
+
+                    for j in range(len(to_animate[i].log[0])):
+                        f.write(str(to_animate[i].log[2][j][1]))
+                        f.write('\n')
 
 def do_break():
     global should_break
