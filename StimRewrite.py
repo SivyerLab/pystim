@@ -154,8 +154,8 @@ class GlobalDefaults(object):
             self.defaults['log'] = log
 
         if offset is not None:
-            self.defaults['offset'] = [offset[0] * pix_per_micron,
-                                       offset[1] * pix_per_micron]
+            self.defaults['offset'] = [offset[0],
+                                       offset[1]]
 
     def __str__(self):
         """
@@ -163,7 +163,7 @@ class GlobalDefaults(object):
         """
         return '\n{} (all parameters):\n{}\n'.format(
             self.__class__.__name__, str(PrettyPrinter(indent=2,
-                width=1).pformat(vars(self))))
+                width=1).pformat(GlobalDefaults.defaults)))
 
 
 class MyWindow:
@@ -207,8 +207,8 @@ class StimDefaults(object):
     Super class to hold parameter defaults
     """
     def __init__(self,
-                 shape="circle",
-                 fill_mode="uniform",
+                 shape='circle',
+                 fill_mode='uniform',
                  orientation=0,
                  height=100,
                  width=50,
@@ -220,7 +220,7 @@ class StimDefaults(object):
                  delay=0,
                  duration=0.5,
                  location=None,
-                 timing="step",
+                 timing='step',
                  intensity=1,
                  color=None,
                  fill_seed=1,
@@ -231,7 +231,7 @@ class StimDefaults(object):
                  start_radius=300,
                  travel_distance=50,
                  sf=1,
-                 contrast_channel="Green",
+                 contrast_channel='Green',
                  movie_filename=None,
                  movie_x_loc=0,
                  movie_y_loc=0,
