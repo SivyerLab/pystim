@@ -589,7 +589,7 @@ class DirPanel(wx.Panel):
         # load and save button binders
         self.Bind(wx.EVT_BUTTON, self.on_save_button, self.save_button)
         self.Bind(wx.EVT_BUTTON, self.on_load_button, self.load_button)
-        self.Bind(wx.EVT_FILECTRL_FILEACTIVATED, self.on_load_button,
+        self.Bind(wx.EVT_FILECTRL_FILEACTIVATED, self.on_double_click,
                   self.browser)
 
         self.SetSizer(panel_sizer)
@@ -686,6 +686,29 @@ class DirPanel(wx.Panel):
             my_frame.l1.add_stim(stim_type, stim_param)
 
         print '\nSTIMS LOADED'
+
+    def on_double_click(self, event):
+        """
+        opens file for user to inspect if log file, else loads
+        :param event:
+        :return:
+        """
+        my_frame = event.GetEventObject().GetParent().GetParent()
+
+        # get path of settings file from browser
+        path = self.browser.GetPath()
+
+        # open and read settings
+        if os.path.dirname(path).split('\\')[-2] == 'logs':
+            if _platform == 'win32':
+                # os.system('start' + path)
+                os.startfile(path)
+
+            elif _platform == 'darwin':
+                os.system('open' + path)
+
+        else:
+            self.on_load_button(event)
 
 
 class ListPanel(wx.Panel):
