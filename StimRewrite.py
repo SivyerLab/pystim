@@ -8,14 +8,16 @@ from psychopy import visual, logging, core, event, filters, monitors
 from psychopy.tools.coordinatetools import pol2cart
 from random import Random
 from time import strftime, localtime
-from igor import binarywave, packed
-from pprint import PrettyPrinter
+from PIL import Image
+from GammaCorrection import GammaValues  # necessary for pickling
 import scipy
+import scipy.signal
 import numpy
+import pprint
 import re
 import sys
 import os
-import json
+import cPickle
 import copy
 import ConfigParser
 
@@ -62,9 +64,15 @@ class StimInfo(object):
         for printing information about the stim's parameters
         :return: formatted string of parameter dictionary
         """
-        return '\nStim #{}:\n{}:\n{}\n'.format(
-            self.number, self.stim_type, str(PrettyPrinter(indent=2,
-                width=1).pformat(self.parameters)))
+        to_print = '\nStim #{} ({}):\n'.format(self.number, self.stim_type)
+        for k, v in sorted(self.parameters.items()):
+            to_print += '   '
+            to_print += str(k)
+            to_print += ': '
+            to_print += str(v)
+            to_print += '\n'
+
+        return to_print
 
 
 class GlobalDefaults(object):
@@ -161,9 +169,15 @@ class GlobalDefaults(object):
         """
         For pretty printing dictionary of global defaults
         """
-        return '\n{} (all parameters):\n{}\n'.format(
-            self.__class__.__name__, str(PrettyPrinter(indent=2,
-                width=1).pformat(GlobalDefaults.defaults)))
+        to_print = '\nGlobal Parameters: \n'
+        for k, v in sorted(GlobalDefaults.defaults.items()):
+            to_print += '   '
+            to_print += str(k)
+            to_print += ': '
+            to_print += str(v)
+            to_print += '\n'
+
+        return to_print
 
 
 class MyWindow:
@@ -673,7 +687,9 @@ def log_stats(count_reps, reps, count_frames, num_frames, elapsed_time,
         if not os.path.exists(path):
             os.makedirs(path)
 
-    file_name = 'stimlog_' + current_time_string + '.txt'
+    # filename format: stimlog_[time]_[stimtype].txt
+    file_name = 'stimlog_' + current_time_string + '_' + stim_list[
+        0].stim_type.lower() + '.txt'
 
     with open((path+file_name), 'w') as f:
         f.write(strftime('%a, %d %b %Y %H:%M:%S', current_time))
@@ -684,19 +700,22 @@ def log_stats(count_reps, reps, count_frames, num_frames, elapsed_time,
         f.write("Average fps: {0:.2f} hz.". \
             format((count_reps * num_frames + count_frames) / elapsed_time))
         f.write("\nElapsed time: {0:.3f} seconds.\n".format(elapsed_time))
+
         for i in stim_list:
             f.write(str(i))
             f.write('\n')
 
+        f.write('\n\n\n#BEGIN PICKLE#\n')
+
+    with open((path+file_name), 'ab') as f:
         # JSON dump to be able to load parameters from log file of stim
-        f.write('\n\n\n#BEGIN JSON#\n')
         to_write = []
         for i in stim_list:
             para_copy = copy.deepcopy(i.parameters)
             para_copy['move_type'] = i.stim_type
             to_write.append(para_copy)
 
-        f.write(json.dumps(to_write))
+        f.write(cPickle.dumps(to_write))
 
 if __name__ == '__main__':
     pass
