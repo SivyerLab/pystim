@@ -72,7 +72,7 @@ def setup():
         app_files = []
         stim_files = []
 
-        ini_file = ["./psychopy/config.ini"]
+        helper_files = ["./psychopy/config.ini", "./psychopy/gammaTables.txt"]
 
         for files in os.listdir("./psychopy/stims/"):
             f1 = "./psychopy/stims/" + files
@@ -85,7 +85,7 @@ def setup():
             pref_files.append(f1)
 
         all_files = [("psychopy/preferences", pref_files),
-                     ("psychopy/stims", stim_files), ('psychopy', ini_file)]
+                     ("psychopy/stims", stim_files), ('psychopy', helper_files)]
 
         setup(app=['gui.py'],
               setup_requires=['py2app'],
