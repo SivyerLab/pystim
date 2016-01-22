@@ -539,7 +539,7 @@ class Shape(StimDefaults):
         if GlobalDefaults.defaults['gamma_correction'] != 'default':
             self.gamma_mon = gamma_mon
 
-        elif self.fill_mode == 'image':
+        if self.fill_mode == 'image':
             self.stim = visual.ImageStim(win=my_window,
                                      size=self.get_size(),
                                      pos=self.location,
@@ -597,7 +597,7 @@ class MovingShape(Shape):
         self.num_frames = None
 
         # to track random motion positions
-        self.log = [[], []]  # angle, frame num
+        self.log = [[], [], []]  # angle, frame num, position
 
         # pass parameters to super
         super(MovingShape, self).__init__(**kwargs)
@@ -858,6 +858,7 @@ class RandomlyMovingShape(MovingShape):
         # random angle between 0 and 360
         angle = int(self.move_random.random() * 360)
         self.log[0].append(angle)
+        self.log[2].append(self.get_position())
 
         # get movements array
         # +0.99 so int() rounds up
@@ -1035,9 +1036,10 @@ def send_trigger():
     """
     if has_u3:
         # flip window
-        my_window.flip()
+        if GlobalDefaults.defaults['trigger_wait'] != 0:
+            my_window.flip()
         # initialize
-        # d = u3.U3()
+        #d = u3.U3()
         # voltage spike for 0.1 seconds with LED off flash
         # 0 low, 1 high, on flexible IO #4
         d.setFIOState(4, 1)
@@ -1048,9 +1050,8 @@ def send_trigger():
         d.setFIOState(4, 0)
         # d.getFeedback(u3.LED(State=True))
         # wait x seconds
+        #d.close()
         core.wait(GlobalDefaults.defaults['trigger_wait'])
-        # d.close()
-
 
 def run_stim(stim_list, verbose=False):
     """
@@ -1224,6 +1225,8 @@ def run_stim(stim_list, verbose=False):
                         f.write(str(to_animate[i].log[0][j]))
                         f.write(' frame: ')
                         f.write(str(to_animate[i].log[1][j]))
+                        # f.write(' position: ')
+                        # f.write(str(to_animate[i].log[2][j]))
                         f.write('\n')
 
                     f.write('\nangle list:\n')
@@ -1238,6 +1241,12 @@ def run_stim(stim_list, verbose=False):
                         f.write(str(to_animate[i].log[1][j]))
                         f.write('\n')
 
+                    # f.write('\nposition list:\n')
+
+                    # for j in range(len(to_animate[i].log[0])):
+                        # f.write(str(to_animate[i].log[2][j]))
+                        # f.write('\n')
+
 def do_break():
     global should_break
     should_break = True
@@ -1249,7 +1258,7 @@ def main_wgui(params):
 
 
 def make_window():
-    # init labjack u3
+     #  init labjack u3
     if has_u3:
         global d
         d = u3.U3()
