@@ -539,7 +539,7 @@ class Shape(StimDefaults):
         if GlobalDefaults.defaults['gamma_correction'] != 'default':
             self.gamma_mon = gamma_mon
 
-        elif self.fill_mode == 'image':
+        if self.fill_mode == 'image':
             self.stim = visual.ImageStim(win=my_window,
                                      size=self.get_size(),
                                      pos=self.location,
@@ -1048,9 +1048,8 @@ def send_trigger():
         d.setFIOState(4, 0)
         # d.getFeedback(u3.LED(State=True))
         # wait x seconds
-        core.wait(GlobalDefaults.defaults['trigger_wait'])
         # d.close()
-
+        core.wait(GlobalDefaults.defaults['trigger_wait'])
 
 def run_stim(stim_list, verbose=False):
     """
