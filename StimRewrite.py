@@ -22,6 +22,12 @@ import copy
 import ConfigParser
 
 try:
+    from igor import binarywave, packed
+    has_igor = True
+except ImportError:
+    has_igor = False
+
+try:
     import u3
     has_u3 = True
 except ImportError:
@@ -187,7 +193,7 @@ class GlobalDefaults(object):
         return to_print
 
 
-class MyWindow:
+class MyWindow(object):
     """
     Class with static methods for window management, to avoid using global
     variables for the window.
@@ -245,7 +251,25 @@ class MyWindow:
         """
         Static method to close window.
         """
+        MyWindow.d.close()
         MyWindow.win.close()
+
+    @staticmethod
+    def send_trigger():
+        """
+        Triggers recording device by sending short voltage spike from LabJack
+        U3-HV. Spike last approximately 400 us.
+        """
+        # flip window to clear stims if wait time
+        if GlobalDefaults.defaults['trigger_wait'] != 0:
+            MyWindow.win.flip()
+
+        # voltage spike; 0 is low, 1 is high, on flexible IO #4
+        MyWindow.d.setFIOState(4, 1)
+        #reset
+        MyWindow.d.setFIOState(4, 0)
+        # wait
+        core.wait(GlobalDefaults.defaults['trigger_wait'])
 
 
 class StimDefaults(object):
@@ -443,7 +467,7 @@ class StaticStim(StimDefaults):
             self.stim.draw()
             # trigger just before window flip
             if self.trigger and self.start_stim == frame:
-                send_trigger()
+                MyWindow.send_trigger()
 
     def gen_size(self):
         """
@@ -682,7 +706,7 @@ class MovingStim(StaticStim):
                     self.log[1].append(frame)
 
                 if self.trigger:
-                    send_trigger()
+                    MyWindow.send_trigger()
 
     def gen_pos(self):
         """
@@ -783,10 +807,6 @@ class MovingStim(StaticStim):
 
 
 class RandomlyMovingStim(MovingStim):
-    pass
-
-
-def send_trigger():
     raise NotImplementedError
 
 
@@ -929,7 +949,8 @@ def log_stats(count_reps, reps, count_frames, num_frames, elapsed_time,
         f.write('\n\n\n#BEGIN PICKLE#\n')
 
     with open((path+file_name), 'ab') as f:
-        # JSON dump to be able to load parameters from log file of stim
+        # Pickle dump to be able to load parameters from log file of stim,
+        # opened as binary, hence opening twice
         to_write = []
         for i in stim_list:
             para_copy = copy.deepcopy(i.parameters)
