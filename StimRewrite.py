@@ -805,9 +805,62 @@ class MovingStim(StaticStim):
         """
         self.stim.setPos((x, y))
 
+    def get_pos(self):
+        """
+        Position getter.
+        """
+        return self.stim.pos
+
 
 class RandomlyMovingStim(MovingStim):
-    raise NotImplementedError
+    """
+    Class for stims moving randomly. Overrides several classes.
+    """
+    def __init__(self, **kwargs):
+        """
+        Passes parameters up to super class.
+        """
+        # pass parameters up to super
+        super(RandomlyMovingStim, self).__init__(**kwargs)
+
+    def draw_times(self):
+        """
+        Determines during which frames stim should be drawn, based on desired
+        delay and duration times. Uses StaticStim's method.
+
+        :return: last frame number as int
+        """
+        return super(super(RandomlyMovingStim, self), self).draw_times()
+
+    def gen_pos(self):
+        """
+        Makes calls to gen_start_pos() and gen_pos_array() with proper
+        variables to get new array of position coordinates. Overrides super.
+        """
+        # update current position
+        self.current_x, self.current_y = self.get_pos()
+
+        # reset frame count
+        self.frame_counter = 0
+
+        # random angle between 0 and 360
+        angle = self.move_random.randint(0, 360)
+
+        # add to log
+        self.log[0].append(angle)
+        self.log[2].append(self.get_pos())
+
+        # calculate variables
+        self.num_frames = int(self.travel_distance / self.speed + 0.99)  #round up
+
+        # generate position array
+        self.x_array, self.y_array = self.gen_pos_array(self.current_x,
+                                                        self.current_y,
+                                                        self.num_frames,
+                                                        angle)
+
+
+
 
 
 def run_stims(stim_list, verbose=False):
