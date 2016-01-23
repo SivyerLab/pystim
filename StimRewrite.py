@@ -38,17 +38,17 @@ __status__ =  "Beta"
 
 # read ini file
 config = ConfigParser.ConfigParser()
-config.read('.\psychopy\config.ini')
+config.read('./psychopy/config.ini')
 
 
 class StimInfo(object):
     """
     Class for storing type and parameters of a stim.
 
-    :param stim_type: The move type of the stim, such as static, random, \
-    table, etc.
-    :param parameters: Dictionary of parameters passed from GUI.
-    :param number: For order of stims.
+    :param string stim_type: The move type of the stim, such as static,
+    random, table, etc.
+    :param dict parameters: Dictionary of parameters passed from GUI.
+    :param int number: For order of stims.
 
     """
     def __init__(self, stim_type, parameters, number):
@@ -61,7 +61,7 @@ class StimInfo(object):
 
     def __str__(self):
         """
-        for printing information about the stim's parameters
+        For printing information about the stim's parameters.
         :return: formatted string of parameter dictionary
         """
         to_print = '\nStim #{} ({}):\n'.format(self.number, self.stim_type)
@@ -91,6 +91,8 @@ class GlobalDefaults(object):
     :param list background: RGB list of window background.
     :param bool fullscreen: Boolean, whether or not window should be fullscreen.
     :param int screen_num: On which monitor to display the window.
+    :param gamma_correction: Spline to use for gamma correction. See \
+    :mod:'GammaCorrection' documentation.
     :param float trigger_wait: The wait time between the labjack sending a \
     pulse and the start of the stims.
     :param bool log: Whether or not to write to a log file.
@@ -99,7 +101,7 @@ class GlobalDefaults(object):
     """
 
     #: Dictionary of default defaults.
-    defaults = dict(frame_rate=60,
+    defaults = dict(frame_rate=75,
                     pix_per_micron=1,
                     scale=1,
                     offset=[0, 0],
@@ -110,6 +112,7 @@ class GlobalDefaults(object):
                     fullscreen=False,
                     log=False,
                     screen_num=1,
+                    gamma_correction='default',
                     trigger_wait=0.1)
 
     def __init__(self,
@@ -124,9 +127,10 @@ class GlobalDefaults(object):
                  screen_num=None,
                  trigger_wait=None,
                  log=None,
+                 gamma_correction=None,
                  offset=None):
         """
-        Populate defaults; units converted as necessary.
+        Populate defaults if passed; units converted as necessary.
         """
         if frame_rate is not None:
             self.defaults['frame_rate'] = frame_rate
@@ -161,6 +165,9 @@ class GlobalDefaults(object):
         if log is not None:
             self.defaults['log'] = log
 
+        if gamma_correction is not None:
+            self.defaults['gamma_correction'] = gamma_correction
+
         if offset is not None:
             self.defaults['offset'] = [offset[0],
                                        offset[1]]
@@ -186,22 +193,47 @@ class MyWindow:
     variables for the window.
     """
 
-    #: Class attribute to interrupt stim animations
+    #: Class attributes
+    win = None
     should_break = False
+    d = None
+    gamma_mon = None
 
     @staticmethod
     def make_win():
         """
-        Static method to create window from global parameters.
+        Static method to create window from global parameters. Checks if
+        gamma correction splines are present. Also instantiates labjack if
+        present.
         """
+        # create labjack instance
+        if has_u3:
+            MyWindow.d = u3.U3()
+
+        # check if gamma splines present
+        gamma = GlobalDefaults.defaults['gamma_correction']
+
+        if gamma != 'default':
+            gamma_file = './psychopy/gammaTables.txt'
+
+            if os.path.exists(gamma_file):
+                with open(gamma_file, 'rb') as f:
+                    MyWindow.gamma_mon = cPickle.load(f)[gamma]
+
+        # gamma correction necessary
+        if MyWindow.gamma_mon is not None:
+            color = MyWindow.gamma_mon(GlobalDefaults.defaults['background'])
+        else:
+            color = GlobalDefaults.defaults['background']
+
         MyWindow.win = visual.Window(monitor=config.get('StimProgram', 'monitor'),
                                      units='pix',
                                      colorSpace='rgb',
                                      winType='pyglet',
                                      allowGUI=False,
+                                     color=color,
                                      size=GlobalDefaults.defaults['display_size'],
                                      pos=GlobalDefaults.defaults['position'],
-                                     color=GlobalDefaults.defaults['background'],
                                      fullscr=GlobalDefaults.defaults['fullscreen'],
                                      viewPos=GlobalDefaults.defaults['offset'],
                                      viewScale=GlobalDefaults.defaults['scale'],
@@ -254,7 +286,10 @@ class StimDefaults(object):
                  image_height=100,
                  image_filename=None,
                  table_filename=None,
-                 trigger=False):
+                 trigger=False,
+                 move_delay=0,
+                 num_jumps=5,
+                 jump_delay=100):
         """
         Default variable constructors; distance units converted appropriately.
         """
@@ -279,6 +314,9 @@ class StimDefaults(object):
         self.image_filename = image_filename
         self.table_filename = table_filename
         self.trigger = trigger
+        self.move_delay = move_delay
+        self.num_jumps = num_jumps
+        self.jump_delay = jump_delay
 
         # list variable
         if color is None:
@@ -341,6 +379,7 @@ class StaticStim(StimDefaults):
         self.stim = None
         self.grating_size = None
         self.adjusted_rgb = None
+        self.gamma_mon = None
 
         # seed fill and move randoms
         self.fill_random = Random()
@@ -350,16 +389,19 @@ class StaticStim(StimDefaults):
 
     def make_stim(self):
         """
-        Creates instance of psychopy stim object.
+        Creates instance of psychopy stim object. Gets gamma correction
+        spline if it exists.
         """
+        if MyWindow.gamma_mon is not None:
+            self.gamma_mon = MyWindow.gamma_mon
+
         if self.fill_mode == 'image':
             self.stim = visual.ImageStim(win=MyWindow.win,
                                          size=self.gen_size(),
                                          color=self.gen_rgb(),
                                          pos=self.location,
                                          ori=self.orientation,
-                                         image=self.image_filename
-                                         )
+                                         image=self.image_filename)
         else:
             self.stim = visual.GratingStim(win=MyWindow.win,
                                            size=self.gen_size(),
@@ -367,8 +409,7 @@ class StaticStim(StimDefaults):
                                            mask=self.gen_mask(),
                                            tex=self.gen_texture(),
                                            pos=self.location,
-                                           ori=self.orientation
-                                           )
+                                           ori=self.orientation)
 
     def draw_times(self):
         """
@@ -390,15 +431,19 @@ class StaticStim(StimDefaults):
         """
         Method for drawing stim objects to back buffer. Checks if object
         should be drawn. Back buffer is brought to front with calls to flip()
-        on the window.
+        on the window. Sends trigger at beginning of animation.
 
         :param frame: current frame number
         """
+        # check if within animation range
         if self.start_stim <= frame < self.end_stim:
             # adjust colors based on timing
             self.set_rgb(self.gen_timing(frame))
             # draw to back buffer
             self.stim.draw()
+            # trigger just before window flip
+            if self.trigger and self.start_stim == frame:
+                send_trigger()
 
     def gen_size(self):
         """
@@ -443,12 +488,11 @@ class StaticStim(StimDefaults):
 
     def gen_texture(self):
         """
-        Generates texture for stim object. If not none, textures are 3D numpy
-        arrays, where the 3rd element is 4 values. The first 3 values are
-        contrast values applied to the rgb value, and the fourth is an alpha
-        value (transparency mask). Textures are created by modulating the alpha
-        value while contrast values are left as one (preserve rgb color
-        selection).
+        Generates texture for stim object. If not none, textures are 4D numpy
+        arrays. The first 3 values are contrast values applied to the rgb
+        value, and the fourth is an alpha value (transparency mask). Textures
+        are created by modulating the alpha value while contrast values are
+        left as one (preserve rgb color selection).
 
         :return: texture, either None or a numpy array
         """
@@ -456,8 +500,7 @@ class StaticStim(StimDefaults):
             stim_texture = None
 
         elif self.fill_mode == ('checkerboard' or 'random'):
-            # not implemented
-            pass
+            raise NotImplementedError
 
         elif self.fill_mode == ('sine' or 'square' or 'concentric'):
             # grating size depends on shape
@@ -516,6 +559,7 @@ class StaticStim(StimDefaults):
         Adjusts contrast values of stims based on desired timing (i.e. as a
         function of current frame / draw time). Recalculated on every call to
         animate().
+
         TODO: precompute values
         :param frame: current frame number
         :return: list of rgb values as floats
@@ -563,10 +607,187 @@ class StaticStim(StimDefaults):
                                  self.adjusted_rgb[1] * color_factor,
                                  self.adjusted_rgb[2] * color_factor]
 
+        if self.gamma_mon is not None:
+            self.adjusted_rgb = self.gamma_mon(self.adjusted_rgb)
+
         return self.adjusted_rgb
 
     def set_rgb(self, rgb):
         self.stim.setColor(rgb)
+
+
+class MovingStim(StaticStim):
+    """
+    Class for stims moving radially inwards. Overrides several classes.
+    """
+    def __init__(self, **kwargs):
+        """
+        Passes parameters up to super class.
+        """
+        # pass parameters up to super
+        super(MovingStim, self).__init__(**kwargs)
+
+        # non parameter instance attributes
+        self.current_x = None
+        self.current_y = None
+        self.frame_counter = None
+        self.x_array = None
+        self.y_array = None
+        self.num_frames = None
+
+        # to track random motion positions
+        self.log = [[], [], []]  # angle, frame num, position
+
+    def draw_times(self):
+        """
+        Determines during which frames stim should be drawn, based on desired
+        delay and duration times. Overrides super method.
+
+        :return: last frame number as int
+        """
+        self.start_stim = self.delay * GlobalDefaults['frame_rate']
+
+        # need to generate movement to get number of frames
+        self.gen_pos()
+
+        self.end_stim = self.num_frames * self.num_dirs
+        self.end_stim += self.start_stim
+
+        self.draw_duration = self.end_stim - self.start_stim
+
+        return self.end_stim
+
+    def animate(self, frame):
+        """
+        Method for animating moving stims. Moves stims appropriately,
+        then makes call to animate of super. Sends trigger on each
+        recalculation of movements.
+
+        :param frame: current frame number
+        """
+        # check if within animation range
+        if self.start_stim <= frame < self.end_stim:
+            # if next coordinate is calculated, moves stim, else calls
+            # gen_movement() and retries
+            try:
+                x, y = self.get_next_pos()
+                self.set_pos(x, y)
+                super(MovingStim, self).animate(frame)
+
+            except (AttributeError, IndexError, TypeError):
+                self.gen_pos()
+
+                # if RandomlyMovingStim, need to log frame number
+                if self.__class__ == RandomlyMovingStim:
+                    self.log[1].append(frame)
+
+                if self.trigger:
+                    send_trigger()
+
+    def gen_pos(self):
+        """
+        Makes calls to gen_start_pos() and gen_pos_array() with proper
+        variables to get new array of position coordinates.
+        """
+        # update current position trackers
+        self.current_x, self.current_y = self.gen_start_pos(self.start_dir)
+
+        # reset frame counter
+        self.frame_counter = 0
+
+        # set movement direction (opposite of origin direction)
+        angle = self.start_dir + 180
+        if angle >= 360:
+            angle -= 360
+
+        # orient shape if not an image
+        if self.fill_mode != 'image':
+            self.stim.ori = self.start_dir
+
+        # calculate variables
+        travel_distance = ((self.current_x**2 + self.current_y**2) ** 0.5) * 2
+        self.num_frames = int(travel_distance / self.speed + 0.99)  # round up
+
+        # generate position array
+        self.x_array, self.y_array = self.gen_pos_array(self.current_x,
+                                                        self.current_y,
+                                                        self.num_frames,
+                                                        angle)
+
+        # set start_dir for next call of gen_pos()
+        self.start_dir += 360 / self.num_dirs
+
+        # start_dir cannot be more than 360
+        if self.start_dir >= 360:
+            self.start_dir -= 360
+
+    def gen_start_pos(self, direction):
+        """
+        Calculates starting position in x, y coordinates on the starting
+        radius based on travel direction.
+
+        :param direction: starting position on border of frame based on travel
+        :return: starting position on border of fraem based on travel angle
+        origin
+        """
+        start_x = self.start_radius * scipy.sin(direction * scipy.pi / 180)
+        start_y = self.start_radius * scipy.cos(direction * scipy.pi / 180)
+
+        return start_x, start_y
+
+    def gen_pos_array(self, start_x, start_y, num_frames, angle):
+        """
+        Creates 2 arrays for x, y coordinates of stims for each frame.
+
+        Adapted from code By David L. Morton, used under MIT License:.
+        Source: https://code.google.com/p/computational-neuroscience/
+                source/browse/trunk/projects/electrophysiology/stimuli/
+                randomly_moving_checkerboard_search.py
+
+        :param start_x: starting x coordinate
+        :param start_y: starting y coordinate
+        :param num_frames: number of frames stim will travel for
+        :param angle: travel direction
+        :return: the x, y coordinates of the stim for every frame as 2 arrays
+        """
+        dx = self.speed * scipy.sin(angle * scipy.pi / 180.0)
+        dy = self.speed * scipy.cos(angle * scipy.pi / 180.0)
+
+        x = scipy.array([start_x + i * dx for i in xrange(num_frames)])
+        y = scipy.array([start_y + i * dy for i in xrange(num_frames)])
+
+        return x, y
+
+    def get_next_pos(self):
+        """
+        Returns the next coordinate from x, y_array for animate to set the
+        position of the stim for the next frame.
+        :return: x, y coordinate as tuple
+        """
+        x = self.x_array[self.frame_counter]
+        y = self.y_array[self.frame_counter]
+
+        # increment frame counter
+        self.frame_counter += 1
+
+        return x, y
+
+    def set_pos(self, x, y):
+        """
+        Position setter. Necessary for alternate position setting in subclasses.
+
+        :param x: x coordinate
+        :param y: y coordinate
+        """
+        self.stim.setPos((x, y))
+
+
+class RandomlyMovingStim(MovingStim):
+    pass
+
+
+def send_trigger():
+    raise NotImplementedError
 
 
 def run_stims(stim_list, verbose=False):
