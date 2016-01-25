@@ -1,7 +1,7 @@
 #!/Library/Frameworks/Python.framework/Versions/2.7/bin/python
 
 """
-Program for presenting visual stimuli to patch clamped retinal neurons"
+Program for presenting visual stimuli to patch clamped retinal neurons.
 """
 
 from psychopy import visual, logging, core, event, filters, monitors
@@ -42,9 +42,10 @@ __version__ = "1.0"
 __email__ = "tomlinsa@ohsu.edu"
 __status__ = "Prototype"
 
-# suppress extra warnings
+# to suppress extra warnings, uncomment next line
 # logging.console.setLevel(logging.CRITICAL)
 
+# read ini file
 config = ConfigParser.ConfigParser()
 config.read('./psychopy/config.ini')
 
@@ -242,7 +243,7 @@ class StimDefaults(object):
                  sf=1, contrast_channel="Green", movie_filename=None, movie_x_loc=0,
                  movie_y_loc=0, period_mod=1, image_width=100, image_height=100,
                  image_filename=None, table_filename=None, trigger=False,
-                 move_delay=0, num_jumps=5, jump_delay = 100):
+                 move_delay=0, num_jumps=5, jump_delay=100):
         """
         default variable constructors, distance units converted appropriately
         """
@@ -300,11 +301,13 @@ class StimDefaults(object):
 
 class Shape(StimDefaults):
     """
-    Class for generic stim object
+    Class for generic non moving stims. Super class for other stim
+    types. Stim object instantiated in make_stim(), and drawn with calls to
+    animate().
     """
     def __init__(self, **kwargs):
         """
-        Constructor
+        Passes parameters up to super class. Seeds randoms.
         """
         # non parameter instance attributes
         self.start_stim = None
@@ -317,7 +320,7 @@ class Shape(StimDefaults):
         # pass attributes up to super
         super(Shape, self).__init__(**kwargs)
 
-        # seed randoms
+        # seed fill and move randoms
         self.fill_random = Random()
         self.fill_random.seed(self.fill_seed)
         self.move_random = Random()
@@ -888,6 +891,7 @@ def TestBoard_class(bases, **kwargs):
             self.colors[::] = GlobalDefaults.defaults['background']
 
             self.index = numpy.zeros((self.num_check, self.num_check))
+
             if self.fill_mode == 'checkerboard':
                 self.index[0::2, 0::2] = 1
                 self.index[1::2, 1::2] = 1
@@ -907,8 +911,6 @@ def TestBoard_class(bases, **kwargs):
                                                 colors=self.colors,
                                                 elementMask=None)
 
-            # return stim
-
         def set_position(self, x, y):
             self.stim.setFieldPos((x, y))
 
@@ -921,7 +923,6 @@ def TestBoard_class(bases, **kwargs):
             return self.colors
 
         def set_rgb(self, colors):
-            # pass
             self.stim.setColors(colors)
 
     return TestBoard()
@@ -968,6 +969,7 @@ class Movie(Shape):
 
 class Jump(Shape):
     """
+    Broken.
     Class to jump through to random areas on a larger image.
     """
     def __init__(self, **kwargs):
@@ -980,24 +982,24 @@ class Jump(Shape):
         cropped_list = []
         self.stim = []
 
+        mon_x = GlobalDefaults.defaults['display_size'][0]
+        mon_y = GlobalDefaults.defaults['display_size'][1]
+
         for i in range(self.num_jumps):
-            x = self.move_random.randint(0, image.size[0] -
-                                         GlobalDefaults.defaults[
-                                             'display_size'][0])
-            y = self.move_random.randint(0, image.size[1] -
-                                         GlobalDefaults.defaults[
-                                             'display_size'][1])
-            cropped = image.crop((x,
-                                       y,
-                                       x+GlobalDefaults.defaults[
-                                             'display_size'][0],
-                                       y+GlobalDefaults.defaults[
-                                             'display_size'][1]))
+            x = self.move_random.randint(0, image.size[0] - mon_x)
+            y = self.move_random.randint(0, image.size[1] - mon_y)
+
+            cropped = image.crop((x, y, x + mon_x, y + mon_y))
             cropped_list.append(cropped)
-            pic = visual.SimpleImageStim(my_window, image=cropped)
+            cropped.show()
+
+            pic = visual.SimpleImageStim(win=my_window, image=cropped)
             pic.draw()
-            for i in range(self.jump_delay):
+
+            for j in range(self.jump_delay):
                 self.stim.append(visual.BufferImageStim(my_window))
+
+            my_window.clearBuffer()
 
     def get_draw_times(self):
         """
@@ -1023,34 +1025,25 @@ class Jump(Shape):
             # send trigger at just before first frame that stim object is drawn
             if self.trigger and self.start_stim == frame:
                 send_trigger()
-            # draw to back buffer
             i = frame - self.delay * GlobalDefaults.defaults['frame_rate']
+            # draw to back buffer
             self.stim[i].draw()
 
 def send_trigger():
     """
     Triggers recording device by sending short voltage spike
     from a LabJack U3-HV
-    :param wait: amount of time to pause after voltage spike
-    :return: nothing
+    :return: Nothing
     """
     if has_u3:
         # flip window
         if GlobalDefaults.defaults['trigger_wait'] != 0:
             my_window.flip()
-        # initialize
-        #d = u3.U3()
-        # voltage spike for 0.1 seconds with LED off flash
         # 0 low, 1 high, on flexible IO #4
         d.setFIOState(4, 1)
-        # LED off
-        # d.getFeedback(u3.LED(State=False))
-        # core.wait(0.1)
         # reset
         d.setFIOState(4, 0)
-        # d.getFeedback(u3.LED(State=True))
         # wait x seconds
-        #d.close()
         core.wait(GlobalDefaults.defaults['trigger_wait'])
 
 def run_stim(stim_list, verbose=False):
@@ -1266,7 +1259,7 @@ def main_wgui(params):
 
 
 def make_window():
-     #  init labjack u3
+    # init labjack u3
     if has_u3:
         global d
         d = u3.U3()
