@@ -194,15 +194,14 @@ class GlobalDefaults(object):
 
 class MyWindow(object):
     """
-    Class with static methods for window management, to avoid using global
-    variables for the window.
+    Class with static methods for window management and triggering.
     """
 
-    #: Class attributes
+    # Class attributes
     win = None
+    gamma_mon = None
     should_break = False
     d = None
-    gamma_mon = None
 
     @staticmethod
     def make_win():
@@ -225,7 +224,7 @@ class MyWindow(object):
                 with open(gamma_file, 'rb') as f:
                     MyWindow.gamma_mon = cPickle.load(f)[gamma]
 
-        # gamma correction necessary
+        # gamma correction as necessary
         if MyWindow.gamma_mon is not None:
             color = MyWindow.gamma_mon(GlobalDefaults.defaults['background'])
         else:
@@ -242,24 +241,25 @@ class MyWindow(object):
                                      fullscr=GlobalDefaults.defaults['fullscreen'],
                                      viewPos=GlobalDefaults.defaults['offset'],
                                      viewScale=GlobalDefaults.defaults['scale'],
-                                     screen=GlobalDefaults.defaults['screen_num']
-                                     )
+                                     screen=GlobalDefaults.defaults['screen_num'])
 
     @staticmethod
     def close_win():
         """
         Static method to close window.
         """
-        MyWindow.d.close()
+        if has_u3:
+            MyWindow.d.close()
         MyWindow.win.close()
 
     @staticmethod
     def send_trigger():
         """
         Triggers recording device by sending short voltage spike from LabJack
-        U3-HV. Spike last approximately 400 us.
+        U3-HV. Spike last approximately 0.4 ms. Ensure high enough sampling
+        rate to reliably detect triggers.
         """
-        # flip window to clear stims if wait time
+        # flip window to clear stims if wait time after trigger/between triggers
         if GlobalDefaults.defaults['trigger_wait'] != 0:
             MyWindow.win.flip()
 
@@ -402,7 +402,6 @@ class StaticStim(StimDefaults):
         self.stim = None
         self.grating_size = None
         self.adjusted_rgb = None
-        self.gamma_mon = None
 
         # seed fill and move randoms
         self.fill_random = Random()
@@ -412,12 +411,8 @@ class StaticStim(StimDefaults):
 
     def make_stim(self):
         """
-        Creates instance of psychopy stim object. Gets gamma correction
-        spline if it exists.
+        Creates instance of psychopy stim object.
         """
-        if MyWindow.gamma_mon is not None:
-            self.gamma_mon = MyWindow.gamma_mon
-
         if self.fill_mode == 'image':
             self.stim = visual.ImageStim(win=MyWindow.win,
                                          size=self.gen_size(),
@@ -581,7 +576,7 @@ class StaticStim(StimDefaults):
         """
         Adjusts contrast values of stims based on desired timing (i.e. as a
         function of current frame / draw time). Recalculated on every call to
-        animate().
+        animate(). Also adjusts for gamma correction if necessary.
 
         TODO: precompute values
         :param frame: current frame number
@@ -630,12 +625,15 @@ class StaticStim(StimDefaults):
                                  self.adjusted_rgb[1] * color_factor,
                                  self.adjusted_rgb[2] * color_factor]
 
-        if self.gamma_mon is not None:
-            self.adjusted_rgb = self.gamma_mon(self.adjusted_rgb)
+        if MyWindow.gamma_mon is not None:
+            self.adjusted_rgb = MyWindow.gamma_mon(self.adjusted_rgb)
 
         return self.adjusted_rgb
 
     def set_rgb(self, rgb):
+        """
+        Color setter.
+        """
         self.stim.setColor(rgb)
 
 
@@ -858,10 +856,102 @@ class RandomlyMovingStim(MovingStim):
 
 
 def BoardTexture_class(bases, **kwargs):
-    raise NotImplementedError
+
+    class BoardTexture(bases):
+        """
+        Class for checkerboard or random board textures. Rather than grating
+        stims, stims are ElementArrayStims and thus need to override several
+        methods related to stim creation and positioning, but otherwise
+        implement parent methods.
+        """
+        def __init__(self, **kwargs):
+            """
+            Passes parameters up to super class.
+            """
+            # pass parameters up to super
+            super(BoardTexture, self).__init__(**kwargs)
+
+            # instance attributes
+            self.index = None
+            self.colors = None
+
+        def make_stim(self):
+            """
+            Creates instance of psychopy stim object.
+            """
+            # array of coordinates for each element
+            xys = []
+            # populate xys
+            for y in range(self.num_check/-2, self.num_check/2):
+                for x in range(self.num_check/-2, self.num_check/2):
+                    xys.append((self.size_check_x*x, self.size_check_y*y))
+
+            # array of rgbs for each element
+            self.colors = numpy.ndarray((self.num_check ** 2, 3))
+            self.colors[::] = GlobalDefaults.defaults['background']
+
+            # index to know how to color elements in array
+            self.index = numpy.zeros((self.num_check, self.num_check))
+
+            # populate every other for a checkerboard
+            if self.fill_mode == 'checkerboard':
+                self.index[0::2, 0::2] = 1
+                self.index[1::2, 1::2] = 1
+                self.index = numpy.concatenate(self.index[:])
+
+            # randomly populate for a random checkerboard
+            elif self.fill_mode == 'random':
+                index = numpy.concatenate(self.index[:])
+                for i in range(len(self.index)):
+                    self.index[i] = self.fill_random.randint(0, 1)
+
+            # use index to assign colors
+            self.colors[numpy.where(self.index)] = self.gen_rgb()
+
+            self.stim = visual.ElementArrayStim(MyWindow.win,
+                                                xys=xys,
+                                                colors=self.colors,
+                                                nElements=self.num_check**2,
+                                                elementMask=None,
+                                                elementTex=None,
+                                                sizes=(self.size_check_x,
+                                                       self.size_check_y))
+
+        def gen_timing(self, frame):
+            """
+            Calls super method to get adjusted rgbs then properly assigns
+            values to stim array.
+
+            :param frame: current frame number
+            :return: array of adjusted rgbs
+            """
+            self.colors[numpy.where(self.index)] = self.rgb_timing(frame)
+
+            return self.colors
+
+        def set_rgb(self, colors):
+            """
+            Colors setter.
+            """
+            self.stim.setColors(colors)
+
+        def set_pos(self, x, y):
+            """
+            Position setter. Moves entire array of elements
+
+            :param x: x coordinate
+            :param y: y coordinate
+            """
+            self.stim.setFieldPos((x, y))
+
+        def get_pos(self):
+            """
+            Position getter.
+            """
+            return self.stim.fieldPos
 
 
-def run_stims(stim_list, verbose=False):
+def main(stim_list, verbose=False):
     """
     Function to animate stims. Creates instances of stim types, and makes
     necessary calls to animate stims and flip window.
