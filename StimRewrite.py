@@ -52,10 +52,9 @@ class StimInfo(object):
     Class for storing type and parameters of a stim.
 
     :param string stim_type: The move type of the stim, such as static,
-    random, table, etc.
+     random, table, etc.
     :param dict parameters: Dictionary of parameters passed from GUI.
     :param int number: For order of stims.
-
     """
     def __init__(self, stim_type, parameters, number):
         """
@@ -89,7 +88,7 @@ class GlobalDefaults(object):
 
     :param int frame_rate: Frame rate of monitor.
     :param float pix_per_micron: Number of pixels per micron. Used for unit \
-    conversion.
+     conversion.
     :param float scale: The factor by which to scale the size of the stimuli.
     :param float display_size: List of height and width of the monitor.
     :param list position: List of xy coordinates of stim window location.
@@ -97,13 +96,13 @@ class GlobalDefaults(object):
     :param list background: RGB list of window background.
     :param bool fullscreen: Boolean, whether or not window should be fullscreen.
     :param int screen_num: On which monitor to display the window.
-    :param gamma_correction: Spline to use for gamma correction. See \
-    :mod:'GammaCorrection' documentation.
+    :param string gamma_correction: Spline to use for gamma correction. See \
+     :doc:'GammaCorrection' documentation.
     :param float trigger_wait: The wait time between the labjack sending a \
-    pulse and the start of the stims.
+     pulse and the start of the stims.
     :param bool log: Whether or not to write to a log file.
     :param list offset: List of microns in xy coordinates of how much to \
-    offset the center of the window.
+     offset the center of the window.
     """
 
     #: Dictionary of default defaults.
@@ -474,7 +473,7 @@ class StaticStim(StimDefaults):
         Calculates sizes of various sims
 
         :return: size of stim, as float for circles/annuli and height width
-        tuple for other shapes
+         tuple for other shapes
         """
         if self.fill_mode == 'image':
             stim_size = (self.image_width, self.image_height)
@@ -752,7 +751,7 @@ class MovingStim(StaticStim):
 
         :param direction: starting position on border of frame based on travel
         :return: starting position on border of fraem based on travel angle
-        origin
+         origin
         """
         start_x = self.start_radius * scipy.sin(direction * scipy.pi / 180)
         start_y = self.start_radius * scipy.cos(direction * scipy.pi / 180)
@@ -763,10 +762,8 @@ class MovingStim(StaticStim):
         """
         Creates 2 arrays for x, y coordinates of stims for each frame.
 
-        Adapted from code By David L. Morton, used under MIT License:.
-        Source: https://code.google.com/p/computational-neuroscience/
-                source/browse/trunk/projects/electrophysiology/stimuli/
-                randomly_moving_checkerboard_search.py
+        Adapted from code By David L. Morton, used under MIT License. Source:
+        https://code.google.com/p/computational-neuroscience/source/browse/trunk/projects/electrophysiology/stimuli/randomly_moving_checkerboard_search.py/#40
 
         :param start_x: starting x coordinate
         :param start_y: starting y coordinate
@@ -860,7 +857,8 @@ class RandomlyMovingStim(MovingStim):
                                                         angle)
 
 
-
+def BoardTexture_class(bases, **kwargs):
+    raise NotImplementedError
 
 
 def run_stims(stim_list, verbose=False):
