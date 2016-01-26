@@ -83,7 +83,7 @@ class GlobalDefaultsMeta(type):
     Metaclass to redefine get item for GlobalDefaults
     """
     def __getitem__(self, item):
-        return self.dic[item]
+        return self.defaults[item]
 
 
 class GlobalDefaults(object):
@@ -270,15 +270,16 @@ class MyWindow(object):
         rate to reliably detect triggers.
         """
         # flip window to clear stims if wait time after trigger/between triggers
-        if GlobalDefaults['trigger_wait'] != 0:
-            MyWindow.win.flip()
+        if has_u3:
+            if GlobalDefaults['trigger_wait'] != 0:
+                MyWindow.win.flip()
 
-        # voltage spike; 0 is low, 1 is high, on flexible IO #4
-        MyWindow.d.setFIOState(4, 1)
-        # reset
-        MyWindow.d.setFIOState(4, 0)
-        # wait
-        core.wait(GlobalDefaults['trigger_wait'])
+            # voltage spike; 0 is low, 1 is high, on flexible IO #4
+            MyWindow.d.setFIOState(4, 1)
+            # reset
+            MyWindow.d.setFIOState(4, 0)
+            # wait
+            core.wait(GlobalDefaults['trigger_wait'])
 
 
 class StimDefaults(object):
@@ -388,7 +389,7 @@ class StimDefaults(object):
                              location[1] * GlobalDefaults[
                 'pix_per_micron']]
 
-        self.speed = speed * GlobalDefaults['pix_per_micron'] / \
+        self.speed = 1.0 * speed * GlobalDefaults['pix_per_micron'] / \
                              GlobalDefaults['frame_rate']
 
 
@@ -488,11 +489,11 @@ class StaticStim(StimDefaults):
         if self.fill_mode == 'image':
             stim_size = (self.image_width, self.image_height)
 
-        elif self.shape == 'circle' or self.shape == 'annulus':
+        elif self.shape in ['circle', 'annulus']:
             stim_size = self.outer_diameter
 
         elif self.shape == 'rectangle':
-            if self.fill_mode == ('random' or 'checkerboard'):
+            if self.fill_mode in ['random', 'checkerboard']:
                 stim_size = (self.size_check_x * self.num_check,
                              self.size_check_y * self.num_check)
 
@@ -511,11 +512,11 @@ class StaticStim(StimDefaults):
 
         :return: mask of the stim object, as a string
         """
-        if self.shape == ('circle' or 'annulus'):
+        if self.shape in ['circle', 'annulus']:
             stim_mask = 'circle'
 
         elif self.shape == 'rectangle':
-            stim_mask = 'rectangle'
+            stim_mask = None
 
         return stim_mask
 
@@ -532,14 +533,14 @@ class StaticStim(StimDefaults):
         if self.fill_mode == 'uniform':
             stim_texture = None
 
-        elif self.fill_mode == ('checkerboard' or 'random'):
+        elif self.fill_mode in ['checkerboard', 'random']:
             raise NotImplementedError
 
-        elif self.fill_mode == ('sine' or 'square' or 'concentric'):
+        elif self.fill_mode in ['sine', 'square', 'concentric']:
             # grating size depends on shape
             if self.shape == 'rectangle':
                 self.grating_size = self.width
-            elif self.shape == ('circle' or 'annulus'):
+            elif self.shape in ['circle', 'annulus']:
                 self.grating_size = self.outer_diameter
 
             # populate numpy array with ones as floats
@@ -728,6 +729,9 @@ class MovingStim(StaticStim):
                 if self.trigger:
                     MyWindow.send_trigger()
 
+                # retry
+                self.animate(frame)
+
     def gen_pos(self):
         """
         Makes calls to gen_start_pos() and gen_pos_array() with proper
@@ -848,7 +852,7 @@ class RandomlyMovingStim(MovingStim):
 
         :return: last frame number as int
         """
-        return super(super(RandomlyMovingStim, self), self).draw_times()
+        return super(MovingStim, self).draw_times()
 
     def gen_pos(self):
         """
@@ -946,7 +950,7 @@ class TableStim(MovingStim):
             self.trigger_frames[0] = 0
 
         # if igor binary wave format or packed experiment format
-        elif os.path.splitext(table)[1] == ('.ibw' or '.pxp'):
+        elif os.path.splitext(table)[1] in ['.ibw', '.pxp']:
             if has_igor:
                 if os.path.splitext(table)[1] == '.ibw':
                     radii = binarywave.load(table)['wave']['wData']
@@ -1121,7 +1125,8 @@ def board_texture_class(bases, **kwargs):
             :param frame: current frame number
             :return: array of adjusted rgbs
             """
-            self.colors[numpy.where(self.index)] = self.rgb_timing(frame)
+            rgb = super(BoardTexture, self).gen_timing(frame)
+            self.colors[numpy.where(self.index)] = rgb
 
             return self.colors
 
@@ -1147,6 +1152,8 @@ def board_texture_class(bases, **kwargs):
             Position getter.
             """
             return self.stim.fieldPos
+
+    return BoardTexture()
 
 
 def log_stats(count_reps, reps, count_frames, num_frames, elapsed_time,
@@ -1254,19 +1261,27 @@ def main(stim_list, verbose=False):
         to_animate = []
 
         for stim in stim_list:
-            # instantiate stim by looking up class in globals(), and pass
-            # dictionary of parameters
-            to_animate.append(globals()[stim.stim_type](**stim.parameters))
+            # checkerboard inheritance depends on motion type, so instantiate
+            # accordingly
+            if stim.parameters['fill_mode'] in ['checkerboard', 'random']:
+                to_animate.append(board_texture_class(globals()[
+                                                          stim.stim_type],
+                                  **stim.parameters))
+
+            # all other stims, instantiate by looking up class in globals(), and
+            # pass dictionary of parameters
+            else:
+                to_animate.append(globals()[stim.stim_type](**stim.parameters))
 
             # annuli are handled by creating a duplicate smaller nested
             # circle within the larger circle, and setting its color to
             # background and its timing to instant
-            if stim.shape == 'annulus':
+            if stim.parameters['shape'] == 'annulus':
                 # make necessary changes
-                stim.parameters['outer_diameter'] = stim.parameters[
-                    'inner_diameter']
                 stim.parameters['timing'] = 'step'
                 stim.parameters['color'] = GlobalDefaults['background']
+                stim.parameters['outer_diameter'] = stim.parameters[
+                    'inner_diameter']
 
                 # add
                 to_animate.append(globals()[stim.stim_type](**stim.parameters))
@@ -1276,12 +1291,12 @@ def main(stim_list, verbose=False):
             stim.make_stim()
 
         # determine end time of last stim
-        num_frames = max(stim.get_draw_times() for stim in to_animate)
+        num_frames = max(stim.draw_times() for stim in to_animate)
         # round up, then subtract 1 because index starts at 0
         num_frames = int(num_frames + 0.99) - 1
 
         # clock for timing
-        elapsed_time = core.monotonicClock()
+        elapsed_time = core.MonotonicClock()
 
         # draw stims and flip window
         for frame in xrange(num_frames):
@@ -1297,6 +1312,7 @@ def main(stim_list, verbose=False):
             # inner break
             if MyWindow.should_break:
                 count_frames = frame
+                count_elapsed_time += elapsed_time.getTime()
                 break
 
         # outer break
