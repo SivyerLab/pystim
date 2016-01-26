@@ -763,6 +763,7 @@ class TableStim(MovingShape):
 
         # need to generate movement once to calculate num_frames
         frames = len(self.get_move_array()[0])
+
         self.end_stim = frames + self.start_stim
         self.draw_time = self.end_stim - self.start_stim
 
@@ -927,6 +928,7 @@ def TestBoard_class(bases, **kwargs):
 
     return TestBoard()
 
+
 class Movie(Shape):
     """
     Class for movie stimuli. Not currently functional.
@@ -1029,6 +1031,7 @@ class Jump(Shape):
             # draw to back buffer
             self.stim[i].draw()
 
+
 def send_trigger():
     """
     Triggers recording device by sending short voltage spike
@@ -1045,6 +1048,7 @@ def send_trigger():
         d.setFIOState(4, 0)
         # wait x seconds
         core.wait(GlobalDefaults.defaults['trigger_wait'])
+
 
 def run_stim(stim_list, verbose=False):
     """
@@ -1247,6 +1251,7 @@ def run_stim(stim_list, verbose=False):
                     for j in range(len(to_animate[i].log[0])):
                         f.write(str(to_animate[i].log[2][j][1]))
                         f.write('\n')
+
 
 def do_break():
     global should_break
