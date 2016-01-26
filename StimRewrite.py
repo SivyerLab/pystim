@@ -8,7 +8,7 @@ from psychopy import visual, logging, core, event, filters
 from psychopy.tools.coordinatetools import pol2cart
 from random import Random
 from time import strftime, localtime
-# from PIL import Image
+from PIL import Image
 from GammaCorrection import GammaValues  # necessary for pickling
 import scipy
 import scipy.signal
@@ -430,6 +430,11 @@ class StaticStim(StimDefaults):
                                          pos=self.location,
                                          ori=self.orientation,
                                          image=self.image_filename)
+
+        elif self.fill_mode == 'movie':
+            self.stim = visual.MovieStim(win=MyWindow.win,
+                                         filename=self.movie_filename)
+
         else:
             self.stim = visual.GratingStim(win=MyWindow.win,
                                            size=self.gen_size(),
@@ -974,6 +979,76 @@ class TableStim(MovingStim):
         x, y = map(list, zip(*[pol2cart(theta, r) for r in radii]))
 
         return x, y
+
+
+class ImageJumpStim(StaticStim):
+    """
+    Class to jump through random areas on a larger image.
+
+    Currently broken.
+    """
+    def __init__(self, **kwargs):
+        # pass parameters up to super
+        super(ImageJumpStim, self).__init__(**kwargs)
+
+    def make_stim(self):
+        """
+        Creates buffer with rendered images. Images are sampled to size of
+        window.
+        """
+        image = Image.open(self.image_filename)
+        cropped_list = []
+        self.stim = []
+
+        mon_x = GlobalDefaults.defaults['display_size'][0]
+        mon_y = GlobalDefaults.defaults['display_size'][1]
+
+        for i in range(self.num_jumps):
+            x = self.move_random.randint(0, image.size[0] - mon_x)
+            y = self.move_random.randint(0, image.size[1] - mon_y)
+
+            cropped = image.crop((x, y, x + mon_x, y + mon_y))
+            cropped_list.append(cropped)
+            cropped.show()
+
+            pic = visual.SimpleImageStim(win=MyWindow.win,
+                                         image=cropped)
+            pic.draw()
+
+            for j in range(self.jump_delay):
+                self.stim.append(visual.BufferImageStim(MyWindow.win))
+
+            MyWindow.win.clearBuffer()
+
+    def get_draw_times(self):
+        """
+        Determines frames during which to draw stimulus.
+        :return: last frame number as int
+        """
+        self.start_stim = self.delay * GlobalDefaults.defaults['frame_rate']
+
+        self.end_stim = len(self.stim) + self.start_stim
+
+        self.draw_duration = self.end_stim - self.start_stim
+
+        # return end stim time for calculating max frame time
+        return self.end_stim
+
+    def animate(self, frame):
+        """
+        Method for drawing stim objects to back buffer. Checks if object
+        should be drawn. Back buffer is brought to front with calls to flip()
+        on the window.
+
+        :param frame: current frame number
+        """
+        if self.start_stim <= frame < self.end_stim:
+            # send trigger at just before first frame that stim object is drawn
+            if self.trigger and self.start_stim == frame:
+                MyWindow.send_trigger()
+            i = frame - self.delay * GlobalDefaults.defaults['frame_rate']
+            # draw to back buffer
+            self.stim[i].draw()
 
 
 def board_texture_class(bases, **kwargs):
