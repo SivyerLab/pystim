@@ -967,6 +967,7 @@ class InputPanel(wx.Panel):
                     # on each wx.EVT_TEXT event.
                     self.Bind(wx.EVT_TEXT, self.input_update,
                               input_dict[k])
+                    # input_dict[k].Bind(wx.EVT_SET_FOCUS, self.on_focus)
 
                 elif v['type'] == 'choice':
                     input_dict[k] = (ChoiceTag(self, tag=k,
@@ -980,7 +981,7 @@ class InputPanel(wx.Panel):
 
                 elif v['type'] == 'path':
                     input_dict[k] = (FilePickerCtrlTag(self, tag=k,
-                                     message='Path to movie file',
+                                     message='Path to file',
                                      style=wx.FLP_USE_TEXTCTRL | wx.FLP_SMALL))
                     self.Bind(wx.EVT_FILEPICKER_CHANGED,
                               self.input_update, input_dict[k])
@@ -1075,6 +1076,23 @@ class InputPanel(wx.Panel):
                 self.grid.Add(sub_sizer, pos=(self.j, 0), span=(1, 2))
                 # increment sizer counter
                 self.j += 1
+
+    # def on_focus(self, event):
+    #     """
+    #     Method to call highlight_all when focused. Required to due needing to
+    #     use wx.CallAfter, since on_focus does its own set_selection which
+    #     overrides highlight_all's.
+    #     :param event: wxPython event, passed by binder
+    #     """
+    #     textctrl = event.GetEventObject()
+    #     wx.CallAfter(self.select_all, textctrl)
+
+    def select_all(self, textctrl):
+        """
+        Method to highlight all on focus, for easier replacing, especially
+        when tabbing on OSX where default behavior is not to highlight.
+        """
+        textctrl.SelectAll()
 
     def input_update(self, event):
         """
