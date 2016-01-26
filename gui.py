@@ -627,7 +627,14 @@ class DirPanel(wx.Panel):
         path = self.browser.GetPath()
 
         # open and read settings
-        if os.path.dirname(path).split('\\')[-2] != 'logs':
+        if _platform == 'win32':
+            is_log = os.path.dirname(path).split('\\')[-2] != 'logs'
+            
+        if _platform == 'darwin':
+            is_log = os.path.dirname(path).split('/')[-2] != 'logs'
+            
+        
+        if is_log:
             with open(path, 'rb') as f:
                 to_load = cPickle.load(f)
         else:
@@ -682,16 +689,19 @@ class DirPanel(wx.Panel):
         path = self.browser.GetPath()
 
         # open and read settings
-        if os.path.dirname(path).split('\\')[-2] == 'logs':
-            if _platform == 'win32':
-                # os.system('start' + path)
+        print os.path.dirname(path)
+        
+        if _platform == 'win32':
+            if os.path.dirname(path).split('\\')[-2] == 'logs':
                 os.startfile(path)
+            else:
+                self.on_load_button(event)
 
-            elif _platform == 'darwin':
-                os.system('open' + path)
-
-        else:
-            self.on_load_button(event)
+        elif _platform == 'darwin':
+            if os.path.dirname(path).split('/')[-2] == 'logs':
+                os.system('open ' + path)
+            else:
+                self.on_load_button(event)
 
 
 class ListPanel(wx.Panel):
