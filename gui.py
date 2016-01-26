@@ -311,7 +311,7 @@ motion_param = OrderedDict([
 
     ('speed',
      {'type'    : 'text',
-      'label'   : 'speed (um/hz)',
+      'label'   : 'speed (um/s)',
       'default' : config_dict['speed'],
       'is_child': True}
      ),
@@ -689,8 +689,6 @@ class DirPanel(wx.Panel):
         path = self.browser.GetPath()
 
         # open and read settings
-        print os.path.dirname(path)
-        
         if _platform == 'win32':
             if os.path.dirname(path).split('\\')[-2] == 'logs':
                 os.startfile(path)
