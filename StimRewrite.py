@@ -291,12 +291,10 @@ class StimDefaults(object):
                  shape='circle',
                  fill_mode='uniform',
                  orientation=0,
-                 height=100,
-                 width=50,
+                 size=None,
                  outer_diameter=75,
                  inner_diameter=40,
-                 size_check_x=50,
-                 size_check_y=50,
+                 check_size=None,
                  num_check=64,
                  delay=0,
                  duration=0.5,
@@ -314,11 +312,9 @@ class StimDefaults(object):
                  sf=1,
                  contrast_channel='Green',
                  movie_filename=None,
-                 movie_x_loc=0,
-                 movie_y_loc=0,
+                 movie_size=None,
                  period_mod=1,
-                 image_width=100,
-                 image_height=100,
+                 image_size=None,
                  image_filename=None,
                  table_filename=None,
                  trigger=False,
@@ -343,8 +339,6 @@ class StimDefaults(object):
         self.contrast_channel = contrast_channel
         self.movie_filename = movie_filename
         self.period_mod = period_mod
-        self.image_width = image_width
-        self.image_height = image_height
         self.image_filename = image_filename
         self.table_filename = table_filename
         self.trigger = trigger
@@ -356,17 +350,16 @@ class StimDefaults(object):
         else:
             self.color = [-1, 1, -1]
 
+        if movie_size is not None:
+            self.movie_size = color
+        else:
+            self.movie_size = [100, 100]
+
         # size conversions
-        self.size_check_x = size_check_x * GlobalDefaults['pix_per_micron']
-        self.size_check_y = size_check_y * GlobalDefaults['pix_per_micron']
-        self.height = height * GlobalDefaults['pix_per_micron']
-        self.width = width * GlobalDefaults['pix_per_micron']
         self.outer_diameter = outer_diameter * GlobalDefaults['pix_per_micron']
         self.inner_diameter = inner_diameter * GlobalDefaults['pix_per_micron']
         self.start_radius = start_radius * GlobalDefaults['pix_per_micron']
         self.travel_distance = travel_distance * GlobalDefaults['pix_per_micron']
-        self.movie_x_loc = movie_x_loc * GlobalDefaults['pix_per_micron']
-        self.movie_y_loc = movie_y_loc * GlobalDefaults['pix_per_micron']
 
         # time conversions
         self.delay = delay * GlobalDefaults['frame_rate']
@@ -384,6 +377,30 @@ class StimDefaults(object):
                              location[1] * GlobalDefaults['pix_per_micron']]
         else:
             self.location = [0, 0]
+
+        if size is not None:
+            self.size = [size[0] * GlobalDefaults['pix_per_micron'],
+                         size[1] * GlobalDefaults['pix_per_micron']]
+        else:
+            self.size = [100, 100]
+
+        if movie_size is not None:
+            self.movie_size = [movie_size[0] * GlobalDefaults['pix_per_micron'],
+                               movie_size[1] * GlobalDefaults['pix_per_micron']]
+        else:
+            self.movie_size = [100, 100]
+
+        if image_size is not None:
+            self.image_size = [image_size[0] * GlobalDefaults['pix_per_micron'],
+                               image_size[1] * GlobalDefaults['pix_per_micron']]
+        else:
+            self.movie_size = [100, 100]
+
+        if check_size is not None:
+            self.check_size = [check_size[0] * GlobalDefaults['pix_per_micron'],
+                               check_size[1] * GlobalDefaults['pix_per_micron']]
+        else:
+            self.check_size = [100, 100]
 
 
 class StaticStim(StimDefaults):
@@ -452,7 +469,6 @@ class StaticStim(StimDefaults):
 
         self.draw_duration = self.end_stim - self.start_stim
 
-        print self.end_stim
         return self.end_stim
 
     def animate(self, frame):
@@ -466,7 +482,7 @@ class StaticStim(StimDefaults):
         # check if within animation range
         if self.start_stim <= frame < self.end_stim:
             # adjust colors based on timing
-            if self.contrast_adj_rgb is not None:
+            if self.fill_mode != 'movie':
                 self.set_rgb(self.gen_timing(frame))
             # draw to back buffer
             self.stim.draw()
@@ -482,21 +498,21 @@ class StaticStim(StimDefaults):
          tuple for other shapes
         """
         if self.fill_mode == 'image':
-            stim_size = (self.image_width, self.image_height)
+            stim_size = (self.image_size[0], self.image_size[1])
 
         elif self.shape in ['circle', 'annulus']:
             stim_size = self.outer_diameter
 
         elif self.shape == 'rectangle':
             if self.fill_mode in ['random', 'checkerboard']:
-                stim_size = (self.size_check_x * self.num_check,
-                             self.size_check_y * self.num_check)
+                stim_size = (self.check_size[0] * self.num_check,
+                             self.check_size[1] * self.num_check)
 
             else:
-                stim_size = (self.width, self.height)
+                stim_size = (self.size[0], self.size[1])
 
         else:
-            stim_size = (self.width, self.height)
+            stim_size = (self.size[0], self.size[1])
 
         return stim_size
 
@@ -1096,7 +1112,7 @@ def board_texture_class(bases, **kwargs):
             # populate xys
             for y in range(self.num_check/-2, self.num_check/2):
                 for x in range(self.num_check/-2, self.num_check/2):
-                    xys.append((self.size_check_x*x, self.size_check_y*y))
+                    xys.append((self.check_size[0]*x, self.check_size[1]*y))
 
             # array of rgbs for each element
             self.colors = numpy.ndarray((self.num_check ** 2, 3))
@@ -1126,8 +1142,8 @@ def board_texture_class(bases, **kwargs):
                                                 nElements=self.num_check**2,
                                                 elementMask=None,
                                                 elementTex=None,
-                                                sizes=(self.size_check_x,
-                                                       self.size_check_y))
+                                                sizes=(self.check_size[0],
+                                                       self.check_size[1]))
 
         def gen_timing(self, frame):
             """
@@ -1188,8 +1204,9 @@ def movie_stim_class(bases, **kwargs):
             """
             self.stim = visual.MovieStim(win=MyWindow.win,
                                          filename=self.movie_filename,
-                                         loop=True,
-                                         pos=self.location)
+                                         pos=self.location,
+                                         size=self.movie_size,
+                                         loop=True)
 
         def animate(self, frame):
             """
@@ -1281,7 +1298,7 @@ def log_stats(count_reps, reps, count_frames, num_frames, elapsed_time,
         f.write(cPickle.dumps(to_write))
 
 
-def main(stim_list, verbose=True):
+def main(stim_list, verbose=False):
     """
     Function to animate stims. Creates instances of stim types, and makes
     necessary calls to animate stims and flip window.
