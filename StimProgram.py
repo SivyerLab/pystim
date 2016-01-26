@@ -1226,7 +1226,7 @@ def movie_stim_class(bases, **kwargs):
 
 
 def log_stats(count_reps, reps, count_frames, num_frames, elapsed_time,
-              stim_list, time_at_run):
+              stim_list, to_animate, time_at_run):
     """
     Function to write information about stims to file.
 
@@ -1296,6 +1296,49 @@ def log_stats(count_reps, reps, count_frames, num_frames, elapsed_time,
             to_write.append(para_copy)
 
         f.write(cPickle.dumps(to_write))
+
+    for i in range(len(stim_list)):
+        if stim_list[i].stim_type == 'RandomlyMovingStim' and stim_list[
+            i].parameters['shape'] != 'annulus':
+
+            file_name = 'Randomlog_' + current_time_string + '_' + '.txt'
+            print path+file_name
+            with open((path+file_name), 'w') as f:
+
+                for j in range(len(to_animate[i].log[0])):
+                    f.write('angle: ')
+                    f.write(str(to_animate[i].log[0][j]))
+                    f.write(' frame: ')
+                    f.write(str(to_animate[i].log[1][j]))
+                    f.write(' position: ')
+                    f.write(str(to_animate[i].log[2][j][0]))
+                    f.write(', ')
+                    f.write(str(to_animate[i].log[2][j][1]))
+                    f.write('\n')
+
+                f.write('\nangle list:\n')
+
+                for j in range(len(to_animate[i].log[0])):
+                    f.write(str(to_animate[i].log[0][j]))
+                    f.write('\n')
+
+                f.write('\nframe list:\n')
+
+                for j in range(len(to_animate[i].log[0])):
+                    f.write(str(to_animate[i].log[1][j]))
+                    f.write('\n')
+
+                f.write('\nx position list:\n')
+
+                for j in range(len(to_animate[i].log[0])):
+                    f.write(str(to_animate[i].log[2][j][0]))
+                    f.write('\n')
+
+                f.write('\ny position list:\n')
+
+                for j in range(len(to_animate[i].log[0])):
+                    f.write(str(to_animate[i].log[2][j][1]))
+                    f.write('\n')
 
 
 def main(stim_list, verbose=True):
@@ -1424,7 +1467,7 @@ def main(stim_list, verbose=True):
 
     if GlobalDefaults['log']:
         log_stats(count_reps, reps, count_frames, num_frames,
-                  count_elapsed_time, stim_list, current_time)
+                  count_elapsed_time, stim_list, to_animate, current_time)
 
 if __name__ == '__main__':
     pass
