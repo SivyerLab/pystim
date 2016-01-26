@@ -80,7 +80,7 @@ class StimInfo(object):
 
 class GlobalDefaultsMeta(type):
     """
-    Metaclass to redefine get item for GlobalDefaults
+    Metaclass to redefine get item for GlobalDefaults.
     """
     def __getitem__(self, item):
         return self.defaults[item]
@@ -284,7 +284,8 @@ class MyWindow(object):
 
 class StimDefaults(object):
     """
-    Super class to hold parameter defaults
+    Super class to hold parameter defaults. GUI passes dictionary of all
+    parameters, whether used to make stim or not.
     """
     def __init__(self,
                  shape='circle',
@@ -325,7 +326,8 @@ class StimDefaults(object):
                  num_jumps=5,
                  jump_delay=100):
         """
-        Default variable constructors; distance units converted appropriately.
+        Default variable constructors; distance and time units converted
+        appropriately.
         """
         self.shape = shape
         self.fill_mode = fill_mode
@@ -423,10 +425,6 @@ class StaticStim(StimDefaults):
                                          ori=self.orientation,
                                          image=self.image_filename)
 
-        elif self.fill_mode == 'movie':
-            self.stim = visual.MovieStim(win=MyWindow.win,
-                                         filename=self.movie_filename)
-
         else:
             self.stim = visual.GratingStim(win=MyWindow.win,
                                            size=self.gen_size(),
@@ -434,9 +432,10 @@ class StaticStim(StimDefaults):
                                            mask=self.gen_mask(),
                                            tex=self.gen_texture(),
                                            pos=self.location,
+                                           # sf=self.sf,
                                            ori=self.orientation)
 
-        self.stim.sf *= self.sf
+            self.stim.sf *= self.sf
 
     def draw_times(self):
         """
@@ -449,9 +448,11 @@ class StaticStim(StimDefaults):
 
         self.end_stim = self.duration
         self.end_stim += self.start_stim
+        self.end_stim = int(self.end_stim + 0.99) - 1
 
         self.draw_duration = self.end_stim - self.start_stim
 
+        print self.end_stim
         return self.end_stim
 
     def animate(self, frame):
@@ -465,7 +466,8 @@ class StaticStim(StimDefaults):
         # check if within animation range
         if self.start_stim <= frame < self.end_stim:
             # adjust colors based on timing
-            self.set_rgb(self.gen_timing(frame))
+            if self.contrast_adj_rgb is not None:
+                self.set_rgb(self.gen_timing(frame))
             # draw to back buffer
             self.stim.draw()
             # trigger just before window flip
@@ -742,7 +744,7 @@ class MovingStim(StaticStim):
             angle -= 360
 
         # orient shape if not an image
-        if self.fill_mode != 'image':
+        if self.fill_mode not in ['image', 'movie']:
             self.stim.ori = self.start_dir
 
         # calculate variables
@@ -1166,6 +1168,46 @@ def board_texture_class(bases, **kwargs):
     return BoardTexture()
 
 
+def movie_stim_class(bases, **kwargs):
+
+    class MovieStim(bases):
+        """
+        Movie stims require a unique animate() method, but are otherwise
+        similar to other stims.
+        """
+        def __init__(self):
+            """
+            Passes parameters up to super class.
+            """
+            # pass parameters up to super
+            super(MovieStim, self).__init__(**kwargs)
+
+        def make_stim(self):
+            """
+            Creates instance of psychopy stim object.
+            """
+            self.stim = visual.MovieStim(win=MyWindow.win,
+                                         filename=self.movie_filename,
+                                         loop=True,
+                                         pos=self.location)
+
+        def animate(self, frame):
+            """
+            Method for drawing stim objects to back buffer. Checks if object
+            should be drawn. Back buffer is brought to front with calls to
+            flip() on the window. Sends trigger at beginning of animation.
+
+            :param frame: current frame number
+            """
+            # check if within animation range
+            if self.end_stim == (frame + 1):
+                self.stim.pause()
+
+            super(MovieStim, self).animate(frame)
+
+    return MovieStim()
+
+
 def log_stats(count_reps, reps, count_frames, num_frames, elapsed_time,
               stim_list, time_at_run):
     """
@@ -1239,7 +1281,7 @@ def log_stats(count_reps, reps, count_frames, num_frames, elapsed_time,
         f.write(cPickle.dumps(to_write))
 
 
-def main(stim_list, verbose=False):
+def main(stim_list, verbose=True):
     """
     Function to animate stims. Creates instances of stim types, and makes
     necessary calls to animate stims and flip window.
@@ -1247,7 +1289,6 @@ def main(stim_list, verbose=False):
     :param stim_list: List of StimInfo classes.
     :param verbose: Whether or not to print stim info to console.
     """
-
     current_time = localtime()
 
     reps = GlobalDefaults['protocol_reps']
@@ -1271,11 +1312,14 @@ def main(stim_list, verbose=False):
         to_animate = []
 
         for stim in stim_list:
-            # checkerboard inheritance depends on motion type, so instantiate
-            # accordingly
+            # checkerboard and movie inheritance depends on motion type,
+            # so instantiate accordingly
             if stim.parameters['fill_mode'] in ['checkerboard', 'random']:
                 to_animate.append(board_texture_class(globals()[
                                                           stim.stim_type],
+                                  **stim.parameters))
+            elif stim.parameters['fill_mode'] == 'movie':
+                to_animate.append(movie_stim_class(globals()[stim.stim_type],
                                   **stim.parameters))
 
             # all other stims, instantiate by looking up class in globals(), and
@@ -1303,7 +1347,7 @@ def main(stim_list, verbose=False):
         # determine end time of last stim
         num_frames = max(stim.draw_times() for stim in to_animate)
         # round up, then subtract 1 because index starts at 0
-        num_frames = int(num_frames + 0.99) - 1
+        # num_frames = int(num_frames + 0.99) - 1
 
         # clock for timing
         elapsed_time = core.MonotonicClock()
@@ -1314,16 +1358,24 @@ def main(stim_list, verbose=False):
                 stim.animate(frame)
             MyWindow.win.flip()
 
-            # escape key breaks
+            # escape key breaks if focus on window
             for key in event.getKeys(keyList=['escape']):
                 if key in ['escape']:
                     MyWindow.should_break = True
 
             # inner break
             if MyWindow.should_break:
-                count_frames = frame
-                count_elapsed_time += elapsed_time.getTime()
+                count_frames = frame + 1
+                # count_elapsed_time += elapsed_time.getTime()
                 break
+
+        # get elapsed time for fps
+        count_elapsed_time += elapsed_time.getTime()
+
+        # stop movies from continuing in background
+        for stim in to_animate:
+            if stim.fill_mode == 'movie':
+                stim.stim.pause()
 
         # outer break
         if MyWindow.should_break:
@@ -1331,10 +1383,27 @@ def main(stim_list, verbose=False):
             break
 
         count_reps += 1
-        count_elapsed_time += elapsed_time.getTime()
 
     # one last flip to clear window
     MyWindow.win.flip()
+
+    # print some stats
+    if verbose:
+        """
+        x rep(s) of x stim(s) generated.
+        x/x frames displayed. Average fps: x hz.
+        Elapsed time: x seconds.
+        """
+        print "\n{} rep(s) of {} stim(s) generated.". \
+            format(reps, len(stim_list))
+        print "{}/{} frames displayed.". \
+            format(count_reps * (num_frames+1) + count_frames, reps *
+                   (num_frames+1)),
+        print "Average fps: {0:.2f} hz.". \
+            format((count_reps * (num_frames+1) + count_frames) / count_elapsed_time)
+        print "Elapsed time: {0:.3f} seconds.\n". \
+            format(count_elapsed_time)
+
 
     if GlobalDefaults['log']:
         log_stats(count_reps, reps, count_frames, num_frames,
