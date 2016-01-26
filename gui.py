@@ -97,7 +97,7 @@ shape_param = OrderedDict([
       'is_child': False,
       'children': {
           'circle'   : ['outer_diameter'],
-          'rectangle': ['height', 'width'],
+          'rectangle': ['size'],
           'annulus'  : ['inner_diameter', 'outer_diameter']
       }}
      ),
@@ -116,17 +116,10 @@ shape_param = OrderedDict([
       'is_child': False}
      ),
 
-    ('height',
-     {'type'    : 'text',
-      'label'   : 'height (um)',
-      'default' : config_dict['height'],
-      'is_child': True}
-     ),
-
-    ('width',
-     {'type'    : 'text',
-      'label'   : 'width (um)',
-      'default' : config_dict['width'],
+    ('size',
+     {'type'    : 'list',
+      'label'   : 'size (um)',
+      'default' : config_dict['size'],
       'is_child': True}
      ),
 
@@ -223,17 +216,17 @@ fill_param = OrderedDict([
      {'type'    : 'choice',
       'label'   : 'fill mode',
       'choices' : ['uniform', 'sine', 'square', 'concentric', 'checkerboard',
-                   'random', 'image'],
+                   'random', 'image', 'movie'],
       'default' : config_dict['fill_mode'],
       'is_child': False,
       'children': {
           'sine'        : ['sf'],
           'square'      : ['sf'],
           'concentric'  : ['sf'],
-          'checkerboard': ['size_check_x', 'size_check_y', 'num_check'],
-          'random'      : ['size_check_x', 'size_check_y', 'num_check',
-                           'fill_seed'],
-          'image'      : ['image_filename', 'image_height', 'image_width'],
+          'checkerboard': ['check_size', 'num_check'],
+          'random'      : ['check_size', 'num_check', 'fill_seed'],
+          'movie'       : ['movie_filename', 'movie_size'],
+          'image'       : ['image_filename', 'image_size'],
       }}
      ),
 
@@ -251,17 +244,10 @@ fill_param = OrderedDict([
       'is_child': True}
      ),
 
-    ('size_check_x',
-     {'type'    : 'text',
-      'label'   : 'size check x (um)',
-      'default' : config_dict['size_check_x'],
-      'is_child': True}
-     ),
-
-    ('size_check_y',
-     {'type'    : 'text',
-      'label'   : 'size check y (um)',
-      'default' : config_dict['size_check_y'],
+    ('check_size',
+     {'type'    : 'list',
+      'label'   : 'check size (xy um)',
+      'default' : config_dict['check_size'],
       'is_child': True}
      ),
 
@@ -279,17 +265,24 @@ fill_param = OrderedDict([
       'is_child': True}
      ),
 
-    ('image_height',
-     {'type'    : 'text',
-      'label'   : 'height (um)',
-      'default' : config_dict['image_height'],
+    ('image_size',
+     {'type'    : 'list',
+      'label'   : 'size (xy um)',
+      'default' : config_dict['image_size'],
       'is_child': True}
      ),
 
-    ('image_width',
-     {'type'    : 'text',
-      'label'   : 'width (um)',
-      'default' : config_dict['image_width'],
+    ('movie_filename',
+     {'type'    : 'path',
+      'label'   : 'filename',
+      'default' : config_dict['movie_filename'],
+      'is_child': True}
+     ),
+
+    ('movie_size',
+     {'type'    : 'list',
+      'label'   : 'movie size (xy)',
+      'default' : config_dict['movie_size'],
       'is_child': True}
      ),
 
@@ -305,13 +298,12 @@ motion_param = OrderedDict([
     ('move_type',
      {'type'    : 'choice',
       'label'   : 'move type',
-      'choices' : ['static', 'moving', 'table', 'random', 'movie', 'jump'],
+      'choices' : ['static', 'moving', 'table', 'random', 'jump'],
       'default' : config_dict['move_type'],
       'is_child': False,
       'children': {
           'moving': ['speed', 'start_dir', 'num_dirs', 'start_radius', 'move_delay'],
           'random': ['speed', 'travel_distance', 'move_seed'],
-          'movie' : ['movie_filename'],
           'table' : ['table_filename', 'start_dir'],
           'jump'  : ['num_jumps', 'jump_delay', 'move_seed'],
       }}
@@ -363,13 +355,6 @@ motion_param = OrderedDict([
      {'type'    : 'text',
       'label'   : 'move seed',
       'default' : config_dict['move_seed'],
-      'is_child': True}
-     ),
-
-    ('movie_filename',
-     {'type'    : 'path',
-      'label'   : 'filename',
-      'default' : config_dict['movie_filename'],
       'is_child': True}
      ),
 
@@ -670,17 +655,15 @@ class DirPanel(wx.Panel):
         for stim_param in to_load:
             stim_type = stim_param.pop('move_type')
 
-            if stim_type == 'Shape':
+            if stim_type == 'StaticStim':
                 stim_type = 'static'
-            elif stim_type == 'MovingShape':
+            elif stim_type == 'MovingStim':
                 stim_type = 'moving'
-            elif stim_type == 'RandomlyMovingShape':
+            elif stim_type == 'RandomlyMovingStim':
                 stim_type = 'random'
-            elif stim_type == 'Movie':
-                stim_type = 'movie'
             elif stim_type == 'TableStim':
                 stim_type = 'table'
-            elif stim_type == 'Jump':
+            elif stim_type == 'ImageJumpStim':
                 stim_type = 'jump'
 
             my_frame.l1.add_stim(stim_type, stim_param)
@@ -809,17 +792,15 @@ class ListPanel(wx.Panel):
         self.list_control.SetColumnWidth(3, wx.LIST_AUTOSIZE)
 
         if stim_type == 'static':
-            stim_type = 'Shape'
+            stim_type = 'StaticStim'
         elif stim_type == 'moving':
-            stim_type = 'MovingShape'
+            stim_type = 'MovingStim'
         elif stim_type == 'random':
-            stim_type = 'RandomlyMovingShape'
-        elif stim_type == 'movie':
-            stim_type = 'Movie'
+            stim_type = 'RandomlyMovingStim'
         elif stim_type == 'table':
             stim_type = 'TableStim'
         elif stim_type == 'jump':
-            stim_type = 'Jump'
+            stim_type = 'ImageJumpStim'
 
         stim_info = StimProgram.StimInfo(stim_type, param_dict,
                                          self.index + 1)
@@ -864,17 +845,15 @@ class ListPanel(wx.Panel):
 
         # re-add stim type
         stim_type = copy.deepcopy(self.stim_info_list[selected].stim_type)
-        if stim_type == 'Shape':
+        if stim_type == 'StaticStim':
             stim_type = 'static'
-        elif stim_type == 'MovingShape':
+        elif stim_type == 'MovingStim':
             stim_type = 'moving'
-        elif stim_type == 'RandomlyMovingShape':
+        elif stim_type == 'RandomlyMovingStim':
             stim_type = 'random'
-        elif stim_type == 'Movie':
-            stim_type = 'movie'
         elif stim_type == 'TableStim':
             stim_type = 'table'
-        elif stim_type == 'Jump':
+        elif stim_type == 'ImageJumpStim':
             stim_type = 'jump'
 
         param_dict['move_type'] = stim_type
@@ -1165,17 +1144,15 @@ class InputPanel(wx.Panel):
         if 'move_type' in params:
             stim_type = params.pop('move_type')
             if stim_type == 'static':
-                self.type = 'Shape'
+                self.type = 'StaticStim'
             elif stim_type == 'moving':
-                self.type = 'MovingShape'
+                self.type = 'MovingStim'
             elif stim_type == 'random':
-                self.type = 'RandomlyMovingShape'
-            elif stim_type == 'movie':
-                self.type = 'Movie'
+                self.type = 'RandomlyMovingStim'
             elif stim_type == 'table':
                 self.type = 'TableStim'
             elif stim_type == 'jump':
-                self.type = 'Jump'
+                self.type = 'ImageJumpStim'
 
         return params
 
@@ -1493,7 +1470,7 @@ class MyFrame(wx.Frame):
                 # caught and thrown to avoid hanging.
                 self.on_stop_button(event)
                 try:
-                    StimProgram.main_wgui(self.l1.stim_info_list)
+                    StimProgram.main(self.l1.stim_info_list)
                 except:
                     raise
             else:
@@ -1511,7 +1488,7 @@ class MyFrame(wx.Frame):
         """
         if self.win_open:
             self.on_stop_button(event)
-            StimProgram.close_window()
+            StimProgram.MyWindow.close_win()
             self.win_open = False
         else:
             defaults = self.g1.get_param_dict()
@@ -1528,14 +1505,14 @@ class MyFrame(wx.Frame):
 
             self.win_open = True
             StimProgram.GlobalDefaults(**defaults)
-            StimProgram.make_window()
+            StimProgram.MyWindow.make_win()
 
     def on_stop_button(self, event):
         """
         Method for stopping stim. Makes call to StimProgram.
         :param event: event passed by binder
         """
-        StimProgram.do_break()
+        StimProgram.MyWindow.should_break = True
 
     def on_calib_button(self, event):
         """
@@ -1558,7 +1535,7 @@ class MyFrame(wx.Frame):
         """
         if self.win_open:
             self.on_stop_button(event)
-            StimProgram.close_window()
+            StimProgram.MyWindow.close_win()
         self.Close()
 
 
