@@ -4,17 +4,15 @@
 Program for presenting visual stimuli to patch clamped retinal neurons.
 """
 
-from psychopy import visual, logging, core, event, filters, monitors
+from psychopy import visual, logging, core, event, filters
 from psychopy.tools.coordinatetools import pol2cart
 from random import Random
 from time import strftime, localtime
-from PIL import Image
+# from PIL import Image
 from GammaCorrection import GammaValues  # necessary for pickling
 import scipy
 import scipy.signal
 import numpy
-import pprint
-import re
 import sys
 import os
 import cPickle
@@ -80,6 +78,14 @@ class StimInfo(object):
         return to_print
 
 
+class GlobalDefaultsMeta(type):
+    """
+    Metaclass to redefine get item for GlobalDefaults
+    """
+    def __getitem__(self, item):
+        return self.dic[item]
+
+
 class GlobalDefaults(object):
     """
     Class with global constants, such as window information. Uses dictionary
@@ -87,23 +93,26 @@ class GlobalDefaults(object):
     way to do this).
 
     :param int frame_rate: Frame rate of monitor.
-    :param float pix_per_micron: Number of pixels per micron. Used for unit \
+    :param float pix_per_micron: Number of pixels per micron. Used for unit
      conversion.
     :param float scale: The factor by which to scale the size of the stimuli.
     :param float display_size: List of height and width of the monitor.
     :param list position: List of xy coordinates of stim window location.
-    :param int protocol_reps: Number of repitions to cycle through of all stims.
+    :param int protocol_reps: Number of repetitions to cycle through of all
+     stims.
     :param list background: RGB list of window background.
     :param bool fullscreen: Boolean, whether or not window should be fullscreen.
     :param int screen_num: On which monitor to display the window.
-    :param string gamma_correction: Spline to use for gamma correction. See \
+    :param string gamma_correction: Spline to use for gamma correction. See
      :doc:'GammaCorrection' documentation.
-    :param float trigger_wait: The wait time between the labjack sending a \
+    :param float trigger_wait: The wait time between the labjack sending a
      pulse and the start of the stims.
     :param bool log: Whether or not to write to a log file.
-    :param list offset: List of microns in xy coordinates of how much to \
+    :param list offset: List of microns in xy coordinates of how much to
      offset the center of the window.
     """
+
+    __metaclass__ = GlobalDefaultsMeta
 
     #: Dictionary of default defaults.
     defaults = dict(frame_rate=75,
@@ -215,7 +224,7 @@ class MyWindow(object):
             MyWindow.d = u3.U3()
 
         # check if gamma splines present
-        gamma = GlobalDefaults.defaults['gamma_correction']
+        gamma = GlobalDefaults['gamma_correction']
 
         if gamma != 'default':
             gamma_file = './psychopy/gammaTables.txt'
@@ -226,22 +235,23 @@ class MyWindow(object):
 
         # gamma correction as necessary
         if MyWindow.gamma_mon is not None:
-            color = MyWindow.gamma_mon(GlobalDefaults.defaults['background'])
+            color = MyWindow.gamma_mon(GlobalDefaults['background'])
         else:
-            color = GlobalDefaults.defaults['background']
+            color = GlobalDefaults['background']
 
-        MyWindow.win = visual.Window(monitor=config.get('StimProgram', 'monitor'),
-                                     units='pix',
+        MyWindow.win = visual.Window(units='pix',
                                      colorSpace='rgb',
                                      winType='pyglet',
                                      allowGUI=False,
                                      color=color,
-                                     size=GlobalDefaults.defaults['display_size'],
-                                     pos=GlobalDefaults.defaults['position'],
-                                     fullscr=GlobalDefaults.defaults['fullscreen'],
-                                     viewPos=GlobalDefaults.defaults['offset'],
-                                     viewScale=GlobalDefaults.defaults['scale'],
-                                     screen=GlobalDefaults.defaults['screen_num'])
+                                     size=GlobalDefaults['display_size'],
+                                     pos=GlobalDefaults['position'],
+                                     fullscr=GlobalDefaults['fullscreen'],
+                                     viewPos=GlobalDefaults['offset'],
+                                     viewScale=GlobalDefaults['scale'],
+                                     screen=GlobalDefaults['screen_num'],
+                                     monitor=config.get('StimProgram',
+                                                        'monitor'))
 
     @staticmethod
     def close_win():
@@ -260,15 +270,15 @@ class MyWindow(object):
         rate to reliably detect triggers.
         """
         # flip window to clear stims if wait time after trigger/between triggers
-        if GlobalDefaults.defaults['trigger_wait'] != 0:
+        if GlobalDefaults['trigger_wait'] != 0:
             MyWindow.win.flip()
 
         # voltage spike; 0 is low, 1 is high, on flexible IO #4
         MyWindow.d.setFIOState(4, 1)
-        #reset
+        # reset
         MyWindow.d.setFIOState(4, 0)
         # wait
-        core.wait(GlobalDefaults.defaults['trigger_wait'])
+        core.wait(GlobalDefaults['trigger_wait'])
 
 
 class StimDefaults(object):
@@ -348,38 +358,38 @@ class StimDefaults(object):
             self.color = color
 
         # unit conversions
-        self.size_check_x = size_check_x * GlobalDefaults.defaults[
+        self.size_check_x = size_check_x * GlobalDefaults[
             'pix_per_micron']
-        self.size_check_y = size_check_y * GlobalDefaults.defaults[
+        self.size_check_y = size_check_y * GlobalDefaults[
             'pix_per_micron']
-        self.height = height * GlobalDefaults.defaults[
+        self.height = height * GlobalDefaults[
             'pix_per_micron']
-        self.width = width * GlobalDefaults.defaults[
+        self.width = width * GlobalDefaults[
             'pix_per_micron']
-        self.outer_diameter = outer_diameter * GlobalDefaults.defaults[
+        self.outer_diameter = outer_diameter * GlobalDefaults[
             'pix_per_micron']
-        self.inner_diameter = inner_diameter * GlobalDefaults.defaults[
+        self.inner_diameter = inner_diameter * GlobalDefaults[
             'pix_per_micron']
-        self.start_radius = start_radius * GlobalDefaults.defaults[
+        self.start_radius = start_radius * GlobalDefaults[
             'pix_per_micron']
-        self.travel_distance = travel_distance * GlobalDefaults.defaults[
+        self.travel_distance = travel_distance * GlobalDefaults[
             'pix_per_micron']
-        self.movie_x_loc = movie_x_loc * GlobalDefaults.defaults[
+        self.movie_x_loc = movie_x_loc * GlobalDefaults[
             'pix_per_micron']
-        self.movie_y_loc = movie_y_loc * GlobalDefaults.defaults[
+        self.movie_y_loc = movie_y_loc * GlobalDefaults[
             'pix_per_micron']
 
         # list variable with unit conversion
         if location is None:
             self.location = [0, 0]
         else:
-            self.location = [location[0] * GlobalDefaults.defaults[
+            self.location = [location[0] * GlobalDefaults[
                 'pix_per_micron'],
-                             location[1] * GlobalDefaults.defaults[
+                             location[1] * GlobalDefaults[
                 'pix_per_micron']]
 
-        self.speed = speed * GlobalDefaults.defaults['pix_per_micron'] / \
-                     GlobalDefaults.defaults['frame_rate']
+        self.speed = speed * GlobalDefaults['pix_per_micron'] / \
+                             GlobalDefaults['frame_rate']
 
 
 class StaticStim(StimDefaults):
@@ -633,6 +643,8 @@ class StaticStim(StimDefaults):
     def set_rgb(self, rgb):
         """
         Color setter.
+
+        :param rgb: tuple or list of rgb values
         """
         self.stim.setColor(rgb)
 
@@ -655,6 +667,7 @@ class MovingStim(StaticStim):
         self.x_array = None
         self.y_array = None
         self.num_frames = None
+        self.trigger_frames = None
 
         # to track random motion positions
         self.log = [[], [], []]  # angle, frame num, position
@@ -693,6 +706,11 @@ class MovingStim(StaticStim):
             try:
                 x, y = self.get_next_pos()
                 self.set_pos(x, y)
+
+                if self.trigger_frames is not None and \
+                        self.trigger_frames[frame]:
+                    MyWindow.send_trigger()
+
                 super(MovingStim, self).animate(frame)
 
             except (AttributeError, IndexError, TypeError):
@@ -748,7 +766,7 @@ class MovingStim(StaticStim):
         radius based on travel direction.
 
         :param direction: starting position on border of frame based on travel
-        :return: starting position on border of fraem based on travel angle
+        :return: starting position on border of frame based on travel angle
          origin
         """
         start_x = self.start_radius * scipy.sin(direction * scipy.pi / 180)
@@ -845,8 +863,8 @@ class RandomlyMovingStim(MovingStim):
         self.log[0].append(angle)
         self.log[2].append(self.get_pos())
 
-        # calculate variables
-        self.num_frames = int(self.travel_distance / self.speed + 0.99)  #round up
+        # calculate variables, round up
+        self.num_frames = int(self.travel_distance / self.speed + 0.99)
 
         # generate position array
         self.x_array, self.y_array = self.gen_pos_array(self.current_x,
@@ -855,7 +873,110 @@ class RandomlyMovingStim(MovingStim):
                                                         angle)
 
 
-def BoardTexture_class(bases, **kwargs):
+class TableStim(MovingStim):
+    """
+    Class where stim motion is determined by a table of radial coordinates.
+
+    Table can be a text file with new line separated values, or an Igor file
+    in binary wave or packed experiment format. First column is distance from
+    center of window in micrometers, and second column either 0 or 1,
+    for whether or not to trigger. Trigger will occur right before frame with
+    indicated position is flipped. First coordinate will always trigger (if
+    stim is set to trigger).
+
+    For a binary wave file, values must be for coordinates, and triggering
+    will only happen on first coordinate. For packed experiment files,
+    leave wave names as 'wave0' and 'wave1', where 'wave0' is coordinates and
+    'wave1' is whether or not to trigger.
+    """
+    def __init__(self, **kwargs):
+        """
+        Passes parameters up to super.
+        """
+        super(TableStim, self).__init__(**kwargs)
+
+    def draw_times(self):
+        """
+        Determines during which frames stim should be drawn, based on desired
+        delay and duration times. Overrides super method.
+
+        :return: last frame number as int
+        """
+        self.start_stim = self.delay * GlobalDefaults['frame_rate']
+
+        # need to generate movement to get number of frames
+        self.gen_pos()
+
+        self.end_stim = self.num_frames + self.start_stim
+
+        self.draw_duration = self.end_stim - self.start_stim
+
+        return self.end_stim
+
+    def gen_pos(self):
+        """
+        Overrides super method. Calls gen_pos_array() and resets frame counter.
+        """
+        self.frame_counter = 0
+        self.x_array, self.y_array = self.gen_pos_array()
+
+    def gen_pos_array(self, *args):
+        """
+        Creates 2 arrays for x, y coordinates of stims for each frame.
+
+        :return: the x, y coordinates of the stim for every frame as 2 arrays
+        :raises ImportError: if attempts to load from an Igor file without
+        having the igor module
+        """
+        table = self.table_filename
+        radii = None
+
+        # if text file
+        if os.path.splitext(table)[1] == '.txt':
+            with open(table, 'r') as f:
+                lines = [line.strip() for line in f]
+
+            radii = lines[::2]
+            self.trigger_frames = lines[1::2]
+            self.trigger_frames[0] = 0
+
+        # if igor binary wave format or packed experiment format
+        elif os.path.splitext(table)[1] == ('.ibw' or '.pxp'):
+            if has_igor:
+                if os.path.splitext(table)[1] == '.ibw':
+                    radii = binarywave.load(table)['wave']['wData']
+
+                elif os.path.splitext(table)[1] == '.pxp':
+                    radii = packed.load(table)[1]['root']['wave0'].wave[
+                        'wave']['wData']
+                    self.trigger_frames = packed.load(table)[1]['root'][
+                        'wave1'].wave['wave']['wData']
+
+            elif not has_igor:
+                raise ImportError('Need igor python module to load \'.ibw\' '
+                                  'or \'.pxp\' formats. Install module with '
+                                  '\'pip install igor\'.')
+
+        # convert strings to floats
+        if radii is not None:
+            radii = map(float, radii)
+        else:
+            raise IOError('File not a supported format. See docs for '
+                          'reference.')
+
+        self.num_frames = len(radii[0])
+
+        # convert pix to micrometers
+        radii = [r * GlobalDefaults['pix_per_micron'] for r in radii]
+
+        # make arrays
+        theta = self.start_dir * -1 + 90  # origins are different in pol/cart
+        x, y = map(list, zip(*[pol2cart(theta, r) for r in radii]))
+
+        return x, y
+
+
+def board_texture_class(bases, **kwargs):
 
     class BoardTexture(bases):
         """
@@ -888,7 +1009,7 @@ def BoardTexture_class(bases, **kwargs):
 
             # array of rgbs for each element
             self.colors = numpy.ndarray((self.num_check ** 2, 3))
-            self.colors[::] = GlobalDefaults.defaults['background']
+            self.colors[::] = GlobalDefaults['background']
 
             # index to know how to color elements in array
             self.index = numpy.zeros((self.num_check, self.num_check))
@@ -901,7 +1022,7 @@ def BoardTexture_class(bases, **kwargs):
 
             # randomly populate for a random checkerboard
             elif self.fill_mode == 'random':
-                index = numpy.concatenate(self.index[:])
+                self.index = numpy.concatenate(self.index[:])
                 for i in range(len(self.index)):
                     self.index[i] = self.fill_random.randint(0, 1)
 
@@ -932,6 +1053,8 @@ def BoardTexture_class(bases, **kwargs):
         def set_rgb(self, colors):
             """
             Colors setter.
+
+            :param colors: array of rgb values for each element
             """
             self.stim.setColors(colors)
 
@@ -951,6 +1074,79 @@ def BoardTexture_class(bases, **kwargs):
             return self.stim.fieldPos
 
 
+def log_stats(count_reps, reps, count_frames, num_frames, elapsed_time,
+              stim_list, time_at_run):
+    """
+    Function to write information about stims to file.
+
+    :param count_reps: Elapsed reps.
+    :param reps: Total possible reps.
+    :param count_frames: Elapsed frames.
+    :param num_frames: Total possible frames.
+    :param elapsed_time: Elapsed time
+    :param stim_list: List of stims that ran.
+    :param time_at_run: Time at which stims were run
+    """
+    current_time = time_at_run
+    current_time_string = strftime('%Y_%m_%d_%H%M%S', current_time)
+
+    if sys.platform == 'win32':
+        # log folder
+        path = config.get('StimProgram', 'logsDir')
+        if not os.path.exists(path):
+            os.makedirs(path)
+        # day folder
+        path += strftime('%Y_%m_%d', current_time) + '\\'
+        if not os.path.exists(path):
+            os.makedirs(path)
+
+    elif sys.platform == 'darwin':
+        # log folder
+        path = config.get('StimProgram', 'logsDir')
+        if not os.path.exists(path):
+            os.makedirs(path)
+        # day folder
+        path += strftime('%Y_%m_%d', current_time) + '/'
+        if not os.path.exists(path):
+            os.makedirs(path)
+
+    # filename format: stimlog_[time]_[stimtype].txt
+    file_name = 'stimlog_' + current_time_string + '_' + stim_list[
+        0].stim_type.lower() + '.txt'
+
+    with open((path+file_name), 'w') as f:
+        f.write(strftime('%a, %d %b %Y %H:%M:%S', current_time))
+
+        f.write("\n{} rep(s) of {} stim(s) generated. ".
+                format(reps, len(stim_list)))
+
+        f.write("\n{}/{} frames displayed. ".
+                format(count_reps * num_frames + count_frames, reps *
+                       num_frames))
+
+        f.write("Average fps: {0:.2f} hz.".
+                format((count_reps * num_frames + count_frames) / elapsed_time))
+
+        f.write("\nElapsed time: {0:.3f} seconds.\n".format(elapsed_time))
+
+        for i in stim_list:
+            f.write(str(i))
+            f.write('\n')
+
+        f.write('\n\n\n#BEGIN PICKLE#\n')
+
+    with open((path+file_name), 'ab') as f:
+        # Pickle dump to be able to load parameters from log file of stim,
+        # opened as binary, hence opening twice
+        to_write = []
+        for i in stim_list:
+            para_copy = copy.deepcopy(i.parameters)
+            para_copy['move_type'] = i.stim_type
+            to_write.append(para_copy)
+
+        f.write(cPickle.dumps(to_write))
+
+
 def main(stim_list, verbose=False):
     """
     Function to animate stims. Creates instances of stim types, and makes
@@ -960,7 +1156,9 @@ def main(stim_list, verbose=False):
     :param verbose: Whether or not to print stim info to console.
     """
 
-    reps = GlobalDefaults.defaults['protocol_reps']
+    current_time = localtime()
+
+    reps = GlobalDefaults['protocol_reps']
 
     # print stim info if requested
     if verbose:
@@ -990,10 +1188,10 @@ def main(stim_list, verbose=False):
             # background and its timing to instant
             if stim.shape == 'annulus':
                 # make necessary changes
-                stim.parameters['outer_diamater'] = stim.parameters[
+                stim.parameters['outer_diameter'] = stim.parameters[
                     'inner_diameter']
                 stim.parameters['timing'] = 'step'
-                stim.parameters['color'] = GlobalDefaults.defaults['background']
+                stim.parameters['color'] = GlobalDefaults['background']
 
                 # add
                 to_animate.append(globals()[stim.stim_type](**stim.parameters))
@@ -1016,6 +1214,11 @@ def main(stim_list, verbose=False):
                 stim.animate(frame)
             MyWindow.win.flip()
 
+            # escape key breaks
+            for key in event.getKeys(keyList=['escape']):
+                if key in ['escape']:
+                    MyWindow.should_break = True
+
             # inner break
             if MyWindow.should_break:
                 count_frames = frame
@@ -1029,76 +1232,12 @@ def main(stim_list, verbose=False):
         count_reps += 1
         count_elapsed_time += elapsed_time.getTime()
 
-    if GlobalDefaults.defaults['log']:
+    # one last flip to clear window
+    MyWindow.win.flip()
+
+    if GlobalDefaults['log']:
         log_stats(count_reps, reps, count_frames, num_frames,
-                  count_elapsed_time, stim_list)
-
-
-def log_stats(count_reps, reps, count_frames, num_frames, elapsed_time,
-              stim_list):
-    """
-    Function to write information about stims to file.
-
-    :param count_reps: Elapsed reps.
-    :param reps: Total possible reps.
-    :param count_frames: Elapsed frames.
-    :param num_frames: Total possible frames.
-    :param elapsed_time: Elapsed time
-    :param stim_list: List of stims that ran.
-    """
-    current_time = localtime()
-    current_time_string = strftime('%Y_%m_%d_%H%M%S', current_time)
-
-    if sys.platform == 'win32':
-        # log folder
-        path = config.get('StimProgram', 'logsDir')
-        if not os.path.exists(path):
-            os.makedirs(path)
-        # day folder
-        path += strftime('%Y_%m_%d', current_time) + '\\'
-        if not os.path.exists(path):
-            os.makedirs(path)
-
-    elif sys.platform == 'darwin':
-        # log folder
-        path = config.get('StimProgram', 'logsDir')
-        if not os.path.exists(path):
-            os.makedirs(path)
-        # day folder
-        path += strftime('%Y_%m_%d', current_time) + '/'
-        if not os.path.exists(path):
-            os.makedirs(path)
-
-    # filename format: stimlog_[time]_[stimtype].txt
-    file_name = 'stimlog_' + current_time_string + '_' + stim_list[
-        0].stim_type.lower() + '.txt'
-
-    with open((path+file_name), 'w') as f:
-        f.write(strftime('%a, %d %b %Y %H:%M:%S', current_time))
-        f.write("\n{} rep(s) of {} stim(s) generated. ". \
-            format(reps, len(stim_list)))
-        f.write("\n{}/{} frames displayed. ". \
-            format(count_reps * num_frames + count_frames, reps * num_frames))
-        f.write("Average fps: {0:.2f} hz.". \
-            format((count_reps * num_frames + count_frames) / elapsed_time))
-        f.write("\nElapsed time: {0:.3f} seconds.\n".format(elapsed_time))
-
-        for i in stim_list:
-            f.write(str(i))
-            f.write('\n')
-
-        f.write('\n\n\n#BEGIN PICKLE#\n')
-
-    with open((path+file_name), 'ab') as f:
-        # Pickle dump to be able to load parameters from log file of stim,
-        # opened as binary, hence opening twice
-        to_write = []
-        for i in stim_list:
-            para_copy = copy.deepcopy(i.parameters)
-            para_copy['move_type'] = i.stim_type
-            to_write.append(para_copy)
-
-        f.write(cPickle.dumps(to_write))
+                  count_elapsed_time, stim_list, current_time)
 
 if __name__ == '__main__':
     pass
