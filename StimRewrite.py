@@ -412,7 +412,7 @@ class StaticStim(StimDefaults):
         self.draw_duration = None
         self.stim = None
         self.grating_size = None
-        self.adjusted_rgb = None
+        self.contrast_adj_rgb = None
 
         # seed fill and move randoms
         self.fill_random = Random()
@@ -444,6 +444,8 @@ class StaticStim(StimDefaults):
                                            tex=self.gen_texture(),
                                            pos=self.location,
                                            ori=self.orientation)
+
+        self.stim.sf *= self.sf
 
     def draw_times(self):
         """
@@ -533,8 +535,8 @@ class StaticStim(StimDefaults):
         if self.fill_mode == 'uniform':
             stim_texture = None
 
-        elif self.fill_mode in ['checkerboard', 'random']:
-            raise NotImplementedError
+        # elif self.fill_mode in ['checkerboard', 'random']:
+        #     raise NotImplementedError
 
         elif self.fill_mode in ['sine', 'square', 'concentric']:
             # grating size depends on shape
@@ -570,23 +572,23 @@ class StaticStim(StimDefaults):
         :return: list of rgb values as floats
         """
         if self.contrast_channel == 'red':
-            self.adjusted_rgb = [self.color[0] * self.intensity,
-                                 self.color[1],
-                                 self.color[2]]
+            self.contrast_adj_rgb = [self.color[0] * self.intensity,
+                                     self.color[1],
+                                     self.color[2]]
         if self.contrast_channel == 'green':
-            self.adjusted_rgb = [self.color[0],
-                                 self.color[1] * self.intensity,
-                                 self.color[2]]
+            self.contrast_adj_rgb = [self.color[0],
+                                     self.color[1] * self.intensity,
+                                     self.color[2]]
         if self.contrast_channel == 'blue':
-            self.adjusted_rgb = [self.color[0],
-                                 self.color[1],
-                                 self.color[2] * self.intensity]
+            self.contrast_adj_rgb = [self.color[0],
+                                     self.color[1],
+                                     self.color[2] * self.intensity]
         if self.contrast_channel == 'global':
-            self.adjusted_rgb = [self.color[0] * self.intensity,
-                                 self.color[1] * self.intensity,
-                                 self.color[2] * self.intensity]
+            self.contrast_adj_rgb = [self.color[0] * self.intensity,
+                                     self.color[1] * self.intensity,
+                                     self.color[2] * self.intensity]
 
-        return self.adjusted_rgb
+        return self.contrast_adj_rgb
 
     def gen_timing(self, frame):
         """
@@ -605,7 +607,7 @@ class StaticStim(StimDefaults):
         # and 1 to avoid negative contrast values
         if self.timing == 'sine':
             color_factor = scipy.sin(self.period_mod * scipy.pi *
-                                     time_fraction - scipy.pi/2) / 2 + 0.5
+                                     time_fraction - scipy.pi / 2) / 2 + 0.5
 
         elif self.timing == 'square':
             color_factor = (scipy.signal.square(self.period_mod * 2 *
@@ -625,26 +627,26 @@ class StaticStim(StimDefaults):
 
         # multiply rgbs by color factor, in proper contrast channel
         if self.contrast_channel == 'red':
-            self.adjusted_rgb = [self.adjusted_rgb[0] * color_factor,
-                                 self.adjusted_rgb[1],
-                                 self.adjusted_rgb[2]]
+            timing_adj_rgb = [self.contrast_adj_rgb[0] * color_factor,
+                              self.contrast_adj_rgb[1],
+                              self.contrast_adj_rgb[2]]
         if self.contrast_channel == 'green':
-            self.adjusted_rgb = [self.adjusted_rgb[0],
-                                 self.adjusted_rgb[1] * color_factor,
-                                 self.adjusted_rgb[2]]
+            timing_adj_rgb = [self.contrast_adj_rgb[0],
+                              self.contrast_adj_rgb[1] * color_factor,
+                              self.contrast_adj_rgb[2]]
         if self.contrast_channel == 'blue':
-            self.adjusted_rgb = [self.adjusted_rgb[0],
-                                 self.adjusted_rgb[1],
-                                 self.adjusted_rgb[2] * color_factor]
+            timing_adj_rgb = [self.contrast_adj_rgb[0],
+                              self.contrast_adj_rgb[1],
+                              self.contrast_adj_rgb[2] * color_factor]
         if self.contrast_channel == 'global':
-            self.adjusted_rgb = [self.adjusted_rgb[0] * color_factor,
-                                 self.adjusted_rgb[1] * color_factor,
-                                 self.adjusted_rgb[2] * color_factor]
+            timing_adj_rgb = [self.contrast_adj_rgb[0] * color_factor,
+                              self.contrast_adj_rgb[1] * color_factor,
+                              self.contrast_adj_rgb[2] * color_factor]
 
         if MyWindow.gamma_mon is not None:
-            self.adjusted_rgb = MyWindow.gamma_mon(self.adjusted_rgb)
+            self.contrast_adj_rgb = MyWindow.gamma_mon(self.contrast_adj_rgb)
 
-        return self.adjusted_rgb
+        return timing_adj_rgb
 
     def set_rgb(self, rgb):
         """
@@ -945,8 +947,8 @@ class TableStim(MovingStim):
             with open(table, 'r') as f:
                 lines = [line.strip() for line in f]
 
-            radii = lines[::2]
-            self.trigger_frames = lines[1::2]
+            radii = [i.split()[0] for i in lines]
+            self.trigger_frames = [i.split()[1] for i in lines]
             self.trigger_frames[0] = 0
 
         # if igor binary wave format or packed experiment format
@@ -972,8 +974,10 @@ class TableStim(MovingStim):
         else:
             raise IOError('File not a supported format. See docs for '
                           'reference.')
+        if self.trigger_frames is not None:
+            self.trigger_frames = map(int, self.trigger_frames)
 
-        self.num_frames = len(radii[0])
+        self.num_frames = len(radii)
 
         # convert pix to micrometers
         radii = [r * GlobalDefaults['pix_per_micron'] for r in radii]
@@ -1064,7 +1068,7 @@ def board_texture_class(bases, **kwargs):
         methods related to stim creation and positioning, but otherwise
         implement parent methods.
         """
-        def __init__(self, **kwargs):
+        def __init__(self):
             """
             Passes parameters up to super class.
             """
