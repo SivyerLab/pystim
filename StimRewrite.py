@@ -331,8 +331,6 @@ class StimDefaults(object):
         self.fill_mode = fill_mode
         self.orientation = orientation
         self.num_check = num_check
-        self.delay = delay
-        self.duration = duration
         self.timing = timing
         self.intensity = intensity
         self.fill_seed = fill_seed
@@ -348,49 +346,42 @@ class StimDefaults(object):
         self.image_filename = image_filename
         self.table_filename = table_filename
         self.trigger = trigger
-        self.move_delay = move_delay
         self.num_jumps = num_jumps
-        self.jump_delay = jump_delay
 
-        # list variable
-        if color is None:
-            self.color = [-1, 1, -1]
-        else:
+        # list variables
+        if color is not None:
             self.color = color
+        else:
+            self.color = [-1, 1, -1]
 
-        # unit conversions
-        self.size_check_x = size_check_x * GlobalDefaults[
-            'pix_per_micron']
-        self.size_check_y = size_check_y * GlobalDefaults[
-            'pix_per_micron']
-        self.height = height * GlobalDefaults[
-            'pix_per_micron']
-        self.width = width * GlobalDefaults[
-            'pix_per_micron']
-        self.outer_diameter = outer_diameter * GlobalDefaults[
-            'pix_per_micron']
-        self.inner_diameter = inner_diameter * GlobalDefaults[
-            'pix_per_micron']
-        self.start_radius = start_radius * GlobalDefaults[
-            'pix_per_micron']
-        self.travel_distance = travel_distance * GlobalDefaults[
-            'pix_per_micron']
-        self.movie_x_loc = movie_x_loc * GlobalDefaults[
-            'pix_per_micron']
-        self.movie_y_loc = movie_y_loc * GlobalDefaults[
-            'pix_per_micron']
+        # size conversions
+        self.size_check_x = size_check_x * GlobalDefaults['pix_per_micron']
+        self.size_check_y = size_check_y * GlobalDefaults['pix_per_micron']
+        self.height = height * GlobalDefaults['pix_per_micron']
+        self.width = width * GlobalDefaults['pix_per_micron']
+        self.outer_diameter = outer_diameter * GlobalDefaults['pix_per_micron']
+        self.inner_diameter = inner_diameter * GlobalDefaults['pix_per_micron']
+        self.start_radius = start_radius * GlobalDefaults['pix_per_micron']
+        self.travel_distance = travel_distance * GlobalDefaults['pix_per_micron']
+        self.movie_x_loc = movie_x_loc * GlobalDefaults['pix_per_micron']
+        self.movie_y_loc = movie_y_loc * GlobalDefaults['pix_per_micron']
+
+        # time conversions
+        self.delay = delay * GlobalDefaults['frame_rate']
+        self.duration = duration * GlobalDefaults['frame_rate']
+        self.move_delay = move_delay * GlobalDefaults['frame_rate']
+        self.jump_delay = jump_delay * GlobalDefaults['frame_rate']
+
+        # speed conversion
+        self.speed = speed * (1.0 * GlobalDefaults['pix_per_micron'] /
+                                    GlobalDefaults['frame_rate'])
 
         # list variable with unit conversion
-        if location is None:
-            self.location = [0, 0]
+        if location is not None:
+            self.location = [location[0] * GlobalDefaults['pix_per_micron'],
+                             location[1] * GlobalDefaults['pix_per_micron']]
         else:
-            self.location = [location[0] * GlobalDefaults[
-                'pix_per_micron'],
-                             location[1] * GlobalDefaults[
-                'pix_per_micron']]
-
-        self.speed = 1.0 * speed * GlobalDefaults['pix_per_micron'] / \
-                             GlobalDefaults['frame_rate']
+            self.location = [0, 0]
 
 
 class StaticStim(StimDefaults):
@@ -454,9 +445,9 @@ class StaticStim(StimDefaults):
 
         :return: last frame number as int
         """
-        self.start_stim = self.delay * GlobalDefaults['frame_rate']
+        self.start_stim = self.delay
 
-        self.end_stim = self.duration * GlobalDefaults['frame_rate']
+        self.end_stim = self.duration
         self.end_stim += self.start_stim
 
         self.draw_duration = self.end_stim - self.start_stim
@@ -483,7 +474,7 @@ class StaticStim(StimDefaults):
 
     def gen_size(self):
         """
-        Calculates sizes of various sims
+        Calculates sizes of various sims.
 
         :return: size of stim, as float for circles/annuli and height width
          tuple for other shapes
@@ -687,7 +678,7 @@ class MovingStim(StaticStim):
 
         :return: last frame number as int
         """
-        self.start_stim = self.delay * GlobalDefaults['frame_rate']
+        self.start_stim = self.delay
 
         # need to generate movement to get number of frames
         self.gen_pos()
@@ -763,6 +754,21 @@ class MovingStim(StaticStim):
                                                         self.current_y,
                                                         self.num_frames,
                                                         angle)
+
+        # add in move delay by placing stim off screen
+        if len(self.stim.size) > 1:
+            max_size = max(self.stim.size)
+        else:
+            max_size = self.stim.size
+
+        off_x = (GlobalDefaults['display_size'][0] + max_size) / 2
+        off_y = (GlobalDefaults['display_size'][1] + max_size) / 2
+
+        for i in range(self.move_delay):
+            self.x_array = scipy.append(self.x_array, off_x)
+            self.y_array = scipy.append(self.y_array, off_y)
+
+        self.num_frames += self.move_delay
 
         # set start_dir for next call of gen_pos()
         self.start_dir += 360 / self.num_dirs
@@ -913,7 +919,7 @@ class TableStim(MovingStim):
 
         :return: last frame number as int
         """
-        self.start_stim = self.delay * GlobalDefaults['frame_rate']
+        self.start_stim = self.delay
 
         # need to generate movement to get number of frames
         self.gen_pos()
