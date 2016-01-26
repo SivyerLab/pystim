@@ -1298,7 +1298,7 @@ def log_stats(count_reps, reps, count_frames, num_frames, elapsed_time,
         f.write(cPickle.dumps(to_write))
 
 
-def main(stim_list, verbose=False):
+def main(stim_list, verbose=True):
     """
     Function to animate stims. Creates instances of stim types, and makes
     necessary calls to animate stims and flip window.
@@ -1311,9 +1311,9 @@ def main(stim_list, verbose=False):
     reps = GlobalDefaults['protocol_reps']
 
     # print stim info if requested
-    if verbose:
-        for stim in stim_list:
-            print stim
+    #if verbose:
+    #    for stim in stim_list:
+    #        print stim
 
     # counters for stat tracking
     count_reps = 0
