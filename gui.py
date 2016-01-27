@@ -220,11 +220,11 @@ fill_param = OrderedDict([
       'default' : config_dict['fill_mode'],
       'is_child': False,
       'children': {
-          'sine'        : ['sf'],
-          'square'      : ['sf'],
-          'concentric'  : ['sf'],
-          'checkerboard': ['check_size', 'num_check'],
-          'random'      : ['check_size', 'num_check', 'fill_seed'],
+          'sine'        : ['sf', 'phase'],
+          'square'      : ['sf', 'phase'],
+          'concentric'  : ['sf', 'phase'],
+          'checkerboard': ['check_size', 'num_check', 'phase'],
+          'random'      : ['check_size', 'num_check', 'fill_seed', 'phase'],
           'movie'       : ['movie_filename', 'movie_size'],
           'image'       : ['image_filename', 'image_size'],
       }}
@@ -234,6 +234,13 @@ fill_param = OrderedDict([
      {'type'    : 'text',
       'label'   : 'spatial frequency',
       'default' : config_dict['sf'],
+      'is_child': True}
+     ),
+
+    ('phase',
+     {'type'    : 'list',
+      'label'   : 'phase',
+      'default' : config_dict['phase'],
       'is_child': True}
      ),
 

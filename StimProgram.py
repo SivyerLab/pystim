@@ -310,6 +310,7 @@ class StimDefaults(object):
                  start_radius=300,
                  travel_distance=50,
                  sf=1,
+                 phase=None,
                  contrast_channel='Green',
                  movie_filename=None,
                  movie_size=None,
@@ -351,9 +352,14 @@ class StimDefaults(object):
             self.color = [-1, 1, -1]
 
         if movie_size is not None:
-            self.movie_size = color
+            self.movie_size = movie_size
         else:
             self.movie_size = [100, 100]
+
+        if phase is not None:
+            self.phase = phase
+        else:
+            self.phase = [1, 1]
 
         # size conversions
         self.outer_diameter = outer_diameter * GlobalDefaults['pix_per_micron']
@@ -443,16 +449,18 @@ class StaticStim(StimDefaults):
                                          image=self.image_filename)
 
         else:
+            print self.phase
             self.stim = visual.GratingStim(win=MyWindow.win,
                                            size=self.gen_size(),
                                            color=self.gen_rgb(),
                                            mask=self.gen_mask(),
                                            tex=self.gen_texture(),
                                            pos=self.location,
-                                           # sf=self.sf,
+                                           # phase=self.gen_phase(),
                                            ori=self.orientation)
 
             self.stim.sf *= self.sf
+            self.stim.phase = self.gen_phase()
 
     def draw_times(self):
         """
@@ -468,6 +476,8 @@ class StaticStim(StimDefaults):
         self.end_stim = int(self.end_stim + 0.99) - 1
 
         self.draw_duration = self.end_stim - self.start_stim
+
+        print self.start_stim, self.end_stim
 
         return self.end_stim
 
@@ -531,6 +541,21 @@ class StaticStim(StimDefaults):
 
         return stim_mask
 
+    def gen_phase(self):
+        """
+        Determines the phase of the stim object. Converts from scalar values
+        to xy values
+
+        :return: the phase of the stim, as an xy list pair
+        """
+        if self.shape in ['circle', 'annulus']:
+            stim_mask = 'circle'
+
+        elif self.shape == 'rectangle':
+            stim_mask = None
+
+        return self.phase
+
     def gen_texture(self):
         """
         Generates texture for stim object. If not none, textures are 4D numpy
@@ -551,6 +576,7 @@ class StaticStim(StimDefaults):
             # grating size depends on shape
             if self.shape == 'rectangle':
                 self.grating_size = self.width
+
             elif self.shape in ['circle', 'annulus']:
                 self.grating_size = self.outer_diameter
 
