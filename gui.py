@@ -177,26 +177,38 @@ timing_param = OrderedDict([
 ])
 
 fill_param = OrderedDict([
+    ('color_mode',
+     {'type'    : 'choice',
+      'label'   : 'color mode',
+      'choices' : ['intensity', 'rgb'],
+      'default' : config_dict['color_mode'],
+      'is_child': False,
+      'children': {
+          'rgb'        : ['color'],
+          'intensity'  : ['intensity', 'contrast_channel'],
+      }}
+     ),
+
     ('color',
      {'type'    : 'list',
       'label'   : 'color (RGB)',
       'default' : config_dict['color'],
-      'is_child': False}
+      'is_child': True}
      ),
 
     ('contrast_channel',
      {'type'    : 'choice',
-      'label'   : 'contrast channel',
+      'label'   : 'channel',
       'choices' : ['green', 'red', 'blue', 'global'],
       'default' : config_dict['contrast_channel'],
-      'is_child': False}
+      'is_child': True}
      ),
 
     ('intensity',
      {'type'    : 'text',
       'label'   : 'contrast',
       'default' : config_dict['intensity'],
-      'is_child': False}
+      'is_child': True}
      ),
 
     ('timing',
