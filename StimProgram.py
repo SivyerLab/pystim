@@ -18,6 +18,7 @@ import os
 import cPickle
 import copy
 import ConfigParser
+from tabulate import tabulate
 
 try:
     from igor import binarywave, packed
@@ -449,7 +450,6 @@ class StaticStim(StimDefaults):
                                          image=self.image_filename)
 
         else:
-            print self.phase
             self.stim = visual.GratingStim(win=MyWindow.win,
                                            size=self.gen_size(),
                                            color=self.gen_rgb(),
@@ -476,8 +476,6 @@ class StaticStim(StimDefaults):
         self.end_stim = int(self.end_stim + 0.99) - 1
 
         self.draw_duration = self.end_stim - self.start_stim
-
-        print self.start_stim, self.end_stim
 
         return self.end_stim
 
@@ -713,7 +711,7 @@ class MovingStim(StaticStim):
         self.trigger_frames = None
 
         # to track random motion positions
-        self.log = [[], [], []]  # angle, frame num, position
+        self.log = [[], [0], []]  # angle, frame num, position
 
     def draw_times(self):
         """
@@ -759,9 +757,8 @@ class MovingStim(StaticStim):
             except (AttributeError, IndexError, TypeError):
                 self.gen_pos()
 
-                # if RandomlyMovingStim, need to log frame number
-                if self.__class__ == RandomlyMovingStim:
-                    self.log[1].append(frame)
+                # log frame number for RandomlyMovingStim
+                self.log[1].append(frame)
 
                 if self.trigger:
                     MyWindow.send_trigger()
@@ -904,6 +901,7 @@ class RandomlyMovingStim(MovingStim):
 
         :return: last frame number as int
         """
+        self.gen_pos()
         return super(MovingStim, self).draw_times()
 
     def gen_pos(self):
@@ -1328,21 +1326,20 @@ def log_stats(count_reps, reps, count_frames, num_frames, elapsed_time,
             i].parameters['shape'] != 'annulus':
 
             file_name = 'Randomlog_' + current_time_string + '_' + '.txt'
-            print path+file_name
             with open((path+file_name), 'w') as f:
 
+                temp = []
                 for j in range(len(to_animate[i].log[0])):
-                    f.write('angle: ')
-                    f.write(str(to_animate[i].log[0][j]))
-                    f.write(' frame: ')
-                    f.write(str(to_animate[i].log[1][j]))
-                    f.write(' position: ')
-                    f.write(str(to_animate[i].log[2][j][0]))
-                    f.write(', ')
-                    f.write(str(to_animate[i].log[2][j][1]))
-                    f.write('\n')
+                    temp.append([to_animate[i].log[0][j],
+                                 to_animate[i].log[1][j],
+                                 scipy.around(to_animate[i].log[2][j][0], 2),
+                                 scipy.around(to_animate[i].log[2][j][1], 2)])
 
-                f.write('\nangle list:\n')
+                f.write(tabulate(temp,
+                                 headers=['angle', 'frame', 'pos x', 'pos y'],
+                                 tablefmt="orgtbl"))
+
+                f.write('\n\nangle list:\n')
 
                 for j in range(len(to_animate[i].log[0])):
                     f.write(str(to_animate[i].log[0][j]))
