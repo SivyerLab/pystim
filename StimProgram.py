@@ -498,6 +498,21 @@ class StaticStim(StimDefaults):
             if self.trigger and self.start_stim == frame:
                 MyWindow.send_trigger()
 
+    def gen_phase(self):
+        """
+        Determines the phase of the stim object. Converts from scalar values
+        to xy values
+
+        :return: the phase of the stim, as an xy list pair
+        """
+        if self.shape in ['circle', 'annulus']:
+            stim_mask = 'circle'
+
+        elif self.shape == 'rectangle':
+            stim_mask = None
+
+        return self.phase
+
     def gen_size(self):
         """
         Calculates sizes of various sims.
@@ -539,21 +554,6 @@ class StaticStim(StimDefaults):
 
         return stim_mask
 
-    def gen_phase(self):
-        """
-        Determines the phase of the stim object. Converts from scalar values
-        to xy values
-
-        :return: the phase of the stim, as an xy list pair
-        """
-        if self.shape in ['circle', 'annulus']:
-            stim_mask = 'circle'
-
-        elif self.shape == 'rectangle':
-            stim_mask = None
-
-        return self.phase
-
     def gen_texture(self):
         """
         Generates texture for stim object. If not none, textures are 4D numpy
@@ -567,13 +567,10 @@ class StaticStim(StimDefaults):
         if self.fill_mode == 'uniform':
             stim_texture = None
 
-        # elif self.fill_mode in ['checkerboard', 'random']:
-        #     raise NotImplementedError
-
         elif self.fill_mode in ['sine', 'square', 'concentric']:
             # grating size depends on shape
             if self.shape == 'rectangle':
-                self.grating_size = self.width
+                self.grating_size = self.size[0]
 
             elif self.shape in ['circle', 'annulus']:
                 self.grating_size = self.outer_diameter
