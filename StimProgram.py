@@ -34,7 +34,7 @@ except ImportError:
 
 __author__ =  "Alexander Tomlinson"
 __license__ = "GPL"
-__version__ = "1.0"
+__version__ = "1.1"
 __email__ =   "tomlinsa@ohsu.edu"
 __status__ =  "Beta"
 
