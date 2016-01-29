@@ -460,8 +460,8 @@ class StaticStim(StimDefaults):
                                            # phase=self.gen_phase(),
                                            ori=self.orientation)
 
-            # self.stim.sf *= self.sf
-            # self.stim.phase = self.gen_phase()
+            self.stim.sf *= self.sf
+            self.stim.phase = self.gen_phase()
 
     def draw_times(self):
         """
@@ -559,7 +559,8 @@ class StaticStim(StimDefaults):
 
         # make array with all guns off
         off = [-1, -1, -1, 1]
-        texture = numpy.zeros(self.gen_size()+(4,))
+        size = self.gen_size()
+        texture = numpy.zeros(size+(4,))
         texture[:, :,] = off
 
         if self.color_mode == 'rgb':
@@ -573,18 +574,23 @@ class StaticStim(StimDefaults):
 
             # scale from (-1, 1) to (0, 1) for math reasons
             background = (background[channel] + 1) / 2
-
             # get change relative to background
-            change = background * abs(intensity)
+            delta = background * abs(intensity)
 
-            # combine
-            color = background + copysign(change, intensity)
+            if self.fill_mode == 'uniform':
+                # combine
+                color = background + copysign(delta, intensity)
+                # unscale
+                color = color * 2 - 1
+                # color array
+                texture[:, :, channel] = color
 
-            # unscale
-            color = color * 2 - 1
-
-            # color array
-            texture[:, :, channel] = color
+            if self.fill_mode == 'sine':
+                # adjust color
+                color = (filters.makeGrating(size[0], gratType='sin',
+                                             cycles=1)) * delta + background
+                color = color * 2 - 1
+                texture[:, :, channel] = color
 
         return texture
 
