@@ -199,14 +199,14 @@ fill_param = OrderedDict([
     ('contrast_channel',
      {'type'    : 'choice',
       'label'   : 'channel',
-      'choices' : ['green', 'red', 'blue', 'global'],
+      'choices' : ['green', 'red', 'blue'],
       'default' : config_dict['contrast_channel'],
       'is_child': True}
      ),
 
     ('intensity',
      {'type'    : 'text',
-      'label'   : 'contrast',
+      'label'   : 'intensity',
       'default' : config_dict['intensity'],
       'is_child': True}
      ),
