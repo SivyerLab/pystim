@@ -447,7 +447,6 @@ class StaticStim(StimDefaults):
         if self.fill_mode == 'image':
             self.stim = visual.ImageStim(win=MyWindow.win,
                                          size=self.gen_size(),
-                                         color=self.gen_rgb(),
                                          pos=self.location,
                                          ori=self.orientation,
                                          image=self.image_filename)
@@ -461,8 +460,8 @@ class StaticStim(StimDefaults):
                                            # phase=self.gen_phase(),
                                            ori=self.orientation)
 
-            self.stim.sf *= self.sf
-            self.stim.phase = self.gen_phase()
+            # self.stim.sf *= self.sf
+            # self.stim.phase = self.gen_phase()
 
     def draw_times(self):
         """
@@ -550,6 +549,50 @@ class StaticStim(StimDefaults):
 
     def gen_texture(self):
         """
+        Generates texture for stim object. Textures are 3D numpy arrays (
+        size*size*4). The 3rd dimension is RGB and Alpha (transparency)
+        values. Texture color is either relative to background by specifying
+        intensity in a certain channel, or passed as RGB values by the user.
+
+        :return: texture as numpy array
+        """
+
+        # make array with all guns off
+        off = [-1, -1, -1, 1]
+        texture = numpy.zeros(self.gen_size()+(4,))
+        texture[:, :,] = off
+
+        if self.color_mode == 'rgb':
+            texture[:, :,] = self.color.append(1)
+
+        elif self.color_mode == 'intensity':
+            intensity = self.intensity
+            background = map(float, GlobalDefaults['background'])
+
+            channel = ['red', 'green', 'blue'].index(self.contrast_channel)
+
+            # scale from (-1, 1) to (0, 1) for math reasons
+            background = (background[channel] + 1) / 2
+
+            # get change relative to background
+            change = background * abs(intensity)
+
+            # combine
+            color = background + copysign(change, intensity)
+
+            # unscale
+            color = color * 2 - 1
+
+            # color array
+            texture[:, :, channel] = color
+
+        return texture
+
+    def gen_fill(self):
+        """
+        Determines alpha values of stim texture based on fill mode. Fill
+        modes are created by modulating the transparency
+
         Generates texture for stim object. If not none, textures are 3D numpy
         arrays. The first 3 values are contrast values applied to the rgb
         value, and the fourth is an alpha value (transparency mask). Textures
@@ -589,61 +632,6 @@ class StaticStim(StimDefaults):
                         self.grating_size))
 
         return stim_texture"""
-
-        # make array with all guns off
-        off = [-1, -1, -1]
-        texture = numpy.zeros(self.gen_size()+(3,))
-        texture[:, :,] = off
-
-        if self.color_mode == 'rgb':
-            texture[:, :,] = self.color
-
-        elif self.color_mode == 'intensity':
-            intensity = self.intensity
-            background = map(float, GlobalDefaults['background'])
-
-            channel = ['red', 'green', 'blue'].index(self.contrast_channel)
-
-            # scale from (-1, 1) to (0, 1) for math reasons
-            background = (background[channel] + 1) / 2
-
-            # get change relative to background
-            change = background * abs(intensity)
-
-            # combine
-            color = background + copysign(change, intensity)
-
-            # unscale
-            color = color * 2 - 1
-
-            # color array
-            texture[:, :, channel] = color
-
-        return texture
-
-    def gen_rgb(self):
-        """
-        Adjusts initial rgb values for contrast in specified channel.
-        :return: list of rgb values as floats
-        """
-        if self.contrast_channel == 'red':
-            self.contrast_adj_rgb = [self.color[0] * self.intensity,
-                                     self.color[1],
-                                     self.color[2]]
-        if self.contrast_channel == 'green':
-            self.contrast_adj_rgb = [self.color[0],
-                                     self.color[1] * self.intensity,
-                                     self.color[2]]
-        if self.contrast_channel == 'blue':
-            self.contrast_adj_rgb = [self.color[0],
-                                     self.color[1],
-                                     self.color[2] * self.intensity]
-        if self.contrast_channel == 'global':
-            self.contrast_adj_rgb = [self.color[0] * self.intensity,
-                                     self.color[1] * self.intensity,
-                                     self.color[2] * self.intensity]
-
-        return self.contrast_adj_rgb
 
     def gen_timing(self, frame):
         """
@@ -1180,9 +1168,7 @@ def board_texture_class(bases, **kwargs):
                     self.index[i] = self.fill_random.randint(0, 1)
 
             # use index to assign colors
-            print self.colors
-            print self.index
-            self.colors[numpy.where(self.index)] = self.gen_rgb()
+            self.colors[numpy.where(self.index)] = self.color
 
             self.stim = visual.ElementArrayStim(MyWindow.win,
                                                 xys=xys,
