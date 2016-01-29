@@ -9,6 +9,7 @@ from psychopy.tools.coordinatetools import pol2cart
 from random import Random
 from time import strftime, localtime
 from PIL import Image
+from math import copysign
 from GammaCorrection import GammaValues  # necessary for pickling
 import scipy
 import scipy.signal
@@ -34,7 +35,7 @@ except ImportError:
 
 __author__ =  "Alexander Tomlinson"
 __license__ = "GPL"
-__version__ = "1.0"
+__version__ = "1.1"
 __email__ =   "tomlinsa@ohsu.edu"
 __status__ =  "Beta"
 
@@ -303,6 +304,7 @@ class StimDefaults(object):
                  timing='step',
                  intensity=1,
                  color=None,
+                 color_mode='intensity',
                  fill_seed=1,
                  move_seed=1,
                  speed=10,
@@ -338,13 +340,14 @@ class StimDefaults(object):
         self.num_dirs = num_dirs
         self.start_dir = start_dir
         self.sf = sf
-        self.contrast_channel = contrast_channel
+        self.contrast_channel = ['red', 'green', 'blue'].index(contrast_channel)
         self.movie_filename = movie_filename
         self.period_mod = period_mod
         self.image_filename = image_filename
         self.table_filename = table_filename
         self.trigger = trigger
         self.num_jumps = num_jumps
+        self.color_mode = color_mode
 
         # list variables
         if color is not None:
@@ -360,7 +363,7 @@ class StimDefaults(object):
         if phase is not None:
             self.phase = phase
         else:
-            self.phase = [1, 1]
+            self.phase = [0, 0]
 
         # size conversions
         self.outer_diameter = outer_diameter * GlobalDefaults['pix_per_micron']
@@ -444,7 +447,6 @@ class StaticStim(StimDefaults):
         if self.fill_mode == 'image':
             self.stim = visual.ImageStim(win=MyWindow.win,
                                          size=self.gen_size(),
-                                         color=self.gen_rgb(),
                                          pos=self.location,
                                          ori=self.orientation,
                                          image=self.image_filename)
@@ -452,15 +454,13 @@ class StaticStim(StimDefaults):
         else:
             self.stim = visual.GratingStim(win=MyWindow.win,
                                            size=self.gen_size(),
-                                           color=self.gen_rgb(),
                                            mask=self.gen_mask(),
                                            tex=self.gen_texture(),
                                            pos=self.location,
-                                           # phase=self.gen_phase(),
+                                           phase=self.phase,
                                            ori=self.orientation)
 
             self.stim.sf *= self.sf
-            self.stim.phase = self.gen_phase()
 
     def draw_times(self):
         """
@@ -490,28 +490,55 @@ class StaticStim(StimDefaults):
         # check if within animation range
         if self.start_stim <= frame < self.end_stim:
             # adjust colors based on timing
-            if self.fill_mode != 'movie':
-                self.set_rgb(self.gen_timing(frame))
+            # if self.fill_mode != 'movie':
+            #     self.set_rgb(self.gen_timing(frame))
             # draw to back buffer
             self.stim.draw()
             # trigger just before window flip
             if self.trigger and self.start_stim == frame:
                 MyWindow.send_trigger()
 
-    def gen_phase(self):
+    def gen_rgb(self):
         """
-        Determines the phase of the stim object. Converts from scalar values
-        to xy values
+        Depending on color mode, calculates necessary values. Texture color is
+        either relative to background by specifying intensity in a certain
+        channel, or passed as RGB values by the user.
 
-        :return: the phase of the stim, as an xy list pair
+        :return: tuple of high, low, delta, and background
         """
-        if self.shape in ['circle', 'annulus']:
-            stim_mask = 'circle'
 
-        elif self.shape == 'rectangle':
-            stim_mask = None
+        background = GlobalDefaults['background']
+        # scale from (-1, 1) to (0, 1), for math reasons
+        background = (numpy.array(background, dtype='float') + 1) / 2
+        background = background[self.contrast_channel]
 
-        return self.phase
+        if self.color_mode == 'rgb':
+            # scale
+            high = (numpy.array(self.color, dtype='float') + 1) / 2
+            low = (numpy.array(GlobalDefaults['background'], dtype='float') +
+                   1) / 2
+
+            # add alpha
+            high = numpy.append(high, 1)
+            low = numpy.append(low, 1)
+
+            delta = (high[self.contrast_channel] - low[
+                self.contrast_channel])
+
+            color = high, low, delta, background
+
+        elif self.color_mode == 'intensity':
+
+            # get change relative to background
+            delta = background * self.intensity
+
+            # unscale high/low
+            high = ((background + abs(delta)) + 1) / 2
+            low = ((background - abs(delta)) + 1) / 2
+
+            color = high, low, delta, background
+
+        return color
 
     def gen_size(self):
         """
@@ -524,17 +551,9 @@ class StaticStim(StimDefaults):
             stim_size = (self.image_size[0], self.image_size[1])
 
         elif self.shape in ['circle', 'annulus']:
-            stim_size = self.outer_diameter
+            stim_size = (self.outer_diameter, self.outer_diameter)
 
         elif self.shape == 'rectangle':
-            if self.fill_mode in ['random', 'checkerboard']:
-                stim_size = (self.check_size[0] * self.num_check,
-                             self.check_size[1] * self.num_check)
-
-            else:
-                stim_size = (self.size[0], self.size[1])
-
-        else:
             stim_size = (self.size[0], self.size[1])
 
         return stim_size
@@ -556,69 +575,63 @@ class StaticStim(StimDefaults):
 
     def gen_texture(self):
         """
-        Generates texture for stim object. If not none, textures are 4D numpy
-        arrays. The first 3 values are contrast values applied to the rgb
-        value, and the fourth is an alpha value (transparency mask). Textures
-        are created by modulating the alpha value while contrast values are
-        left as one (preserve rgb color selection).
+        Generates texture for stim object. Textures are 3D numpy arrays (
+        size*size*4). The 3rd dimension is RGB and Alpha (transparency)
+        values.
 
-        :return: texture, either None or a numpy array
+        :return: texture as numpy array
         """
+
+        # make array
+        size = (max(self.gen_size()),) * 2  # make square, largest size
+        texture = numpy.zeros(size+(4,))    # add rgba
+        # turn rgb guns off, set opaque
+        texture[:, :, ] = [-1, -1, -1, 1]
+
+        high, low, delta, background = self.gen_rgb()
+
         if self.fill_mode == 'uniform':
-            stim_texture = None
+            if self.color_mode == 'rgb':
+                # unscale
+                color = high * 2 - 1
+                # color array
+                texture[:, :, ] = color
+            elif self.color_mode == 'intensity':
+                # adjust
+                color = background + delta
+                # unscale
+                color = color * 2 - 1
+                # color array
+                texture[:, :, self.contrast_channel] = color
 
-        elif self.fill_mode in ['sine', 'square', 'concentric']:
-            # grating size depends on shape
-            if self.shape == 'rectangle':
-                self.grating_size = self.size[0]
+        elif self.fill_mode == 'sine':
+            # adjust color
+            color = (filters.makeGrating(size[0], gratType='sin',
+                                         cycles=1)) * delta + background
+            # unscale
+            color = color * 2 - 1
+            # color array
+            texture[:, :, self.contrast_channel] = color
 
-            elif self.shape in ['circle', 'annulus']:
-                self.grating_size = self.outer_diameter
+        elif self.fill_mode == 'square':
+            # adjust color
+            color = (filters.makeGrating(size[0], gratType='sqr',
+                                         cycles=1)) * delta + background
+            # unscale
+            color = color * 2 - 1
+            # color array
+            texture[:, :, self.contrast_channel] = color
 
-            # populate numpy array with ones as floats
-            stim_texture = numpy.ones((self.grating_size, self.grating_size,
-                                       4), 'f')
+        elif self.fill_mode == 'concentric':
+            # adjust color
+            color = scipy.sin(filters.makeRadialMatrix(size[0]) * 2 - 1) * \
+                    delta + background
+            # unscale
+            color = color * 2 - 1
+            # color array
+            texture[:, :, self.contrast_channel] = color
 
-            # change alpha values. Alpha values are assigned by using
-            # psychopy helper functions to create appropriate gratings
-            if self.fill_mode == 'sine':
-                stim_texture[:, :, 3] = (filters.makeGrating(
-                        self.grating_size, gratType='sin', cycles=1)) ** 2
-
-            elif self.fill_mode == 'square':
-                stim_texture[:, :, 3] = (filters.makeGrating(
-                        self.grating_size, gratType='sqr', cycles=1) - 1) / 2\
-                                        + 1
-
-            elif self.fill_mode == 'concentric':
-                stim_texture[:, :, 3] = scipy.sin(filters.makeRadialMatrix(
-                        self.grating_size))
-
-        return stim_texture
-
-    def gen_rgb(self):
-        """
-        Adjusts initial rgb values for contrast in specified channel.
-        :return: list of rgb values as floats
-        """
-        if self.contrast_channel == 'red':
-            self.contrast_adj_rgb = [self.color[0] * self.intensity,
-                                     self.color[1],
-                                     self.color[2]]
-        if self.contrast_channel == 'green':
-            self.contrast_adj_rgb = [self.color[0],
-                                     self.color[1] * self.intensity,
-                                     self.color[2]]
-        if self.contrast_channel == 'blue':
-            self.contrast_adj_rgb = [self.color[0],
-                                     self.color[1],
-                                     self.color[2] * self.intensity]
-        if self.contrast_channel == 'global':
-            self.contrast_adj_rgb = [self.color[0] * self.intensity,
-                                     self.color[1] * self.intensity,
-                                     self.color[2] * self.intensity]
-
-        return self.contrast_adj_rgb
+        return texture
 
     def gen_timing(self, frame):
         """
@@ -1155,7 +1168,7 @@ def board_texture_class(bases, **kwargs):
                     self.index[i] = self.fill_random.randint(0, 1)
 
             # use index to assign colors
-            self.colors[numpy.where(self.index)] = self.gen_rgb()
+            self.colors[numpy.where(self.index)] = self.gen_color()[0]
 
             self.stim = visual.ElementArrayStim(MyWindow.win,
                                                 xys=xys,
