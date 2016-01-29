@@ -184,7 +184,7 @@ fill_param = OrderedDict([
       'default' : config_dict['color_mode'],
       'is_child': False,
       'children': {
-          'rgb'        : ['color'],
+          'rgb'        : ['color', 'contrast_channel'],
           'intensity'  : ['intensity', 'contrast_channel'],
       }}
      ),

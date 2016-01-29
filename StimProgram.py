@@ -504,12 +504,13 @@ class StaticStim(StimDefaults):
         either relative to background by specifying intensity in a certain
         channel, or passed as RGB values by the user.
 
-        :return: rgba list, or tuple of high, low, and delta
+        :return: tuple of high, low, delta, and background
         """
 
         background = GlobalDefaults['background']
         # scale from (-1, 1) to (0, 1), for math reasons
         background = (numpy.array(background, dtype='float') + 1) / 2
+        background = background[self.contrast_channel]
 
         if self.color_mode == 'rgb':
             # scale
@@ -521,14 +522,14 @@ class StaticStim(StimDefaults):
             high = numpy.append(high, 1)
             low = numpy.append(low, 1)
 
-            delta = None
+            delta = (high[self.contrast_channel] - low[
+                self.contrast_channel])
 
             color = high, low, delta, background
 
         elif self.color_mode == 'intensity':
 
             # get change relative to background
-            background = background[self.contrast_channel]
             delta = background * self.intensity
 
             # unscale high/low
@@ -537,7 +538,6 @@ class StaticStim(StimDefaults):
 
             color = high, low, delta, background
 
-        print color
         return color
 
     def gen_size(self):
@@ -595,10 +595,12 @@ class StaticStim(StimDefaults):
                 # unscale
                 color = high * 2 - 1
                 # color array
-                texture[:, :, self.contrast_channel] = color
+                texture[:, :, ] = color
             elif self.color_mode == 'intensity':
-                # unscale
+                # adjust
                 color = background + delta
+                # unscale
+                color = color * 2 - 1
                 # color array
                 texture[:, :, self.contrast_channel] = color
 
@@ -629,7 +631,6 @@ class StaticStim(StimDefaults):
             # color array
             texture[:, :, self.contrast_channel] = color
 
-        print texture
         return texture
 
     def gen_timing(self, frame):
@@ -1167,7 +1168,7 @@ def board_texture_class(bases, **kwargs):
                     self.index[i] = self.fill_random.randint(0, 1)
 
             # use index to assign colors
-            self.colors[numpy.where(self.index)] = self.color
+            self.colors[numpy.where(self.index)] = self.gen_color()[0]
 
             self.stim = visual.ElementArrayStim(MyWindow.win,
                                                 xys=xys,
