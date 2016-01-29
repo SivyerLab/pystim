@@ -590,23 +590,35 @@ class StaticStim(StimDefaults):
 
         return stim_texture"""
 
+        # make array with all guns off
         off = [-1, -1, -1]
-
         texture = numpy.zeros(self.gen_size()+(3,))
         texture[:, :,] = off
 
-        intensity = self.intensity
-        background = map(float,GlobalDefaults['background'])
+        if self.color_mode == 'rgb':
+            texture[:, :,] = self.color
 
-        channel = ['red', 'green', 'blue', 'global'].index(self.contrast_channel)
+        elif self.color_mode == 'intensity':
+            intensity = self.intensity
+            background = map(float, GlobalDefaults['background'])
 
-        color = ((background[channel]+1)/2 + copysign((background[
-                                                           channel]+1)/2 *
-                                                      abs(intensity),
-                                                      intensity)) * 2 - 1
+            channel = ['red', 'green', 'blue'].index(self.contrast_channel)
 
-        texture[:, :, channel] = color
-        print color
+            # scale from (-1, 1) to (0, 1) for math reasons
+            background = (background[channel] + 1) / 2
+
+            # get change relative to background
+            change = background * abs(intensity)
+
+            # combine
+            color = background + copysign(change, intensity)
+
+            # unscale
+            color = color * 2 - 1
+
+            # color array
+            texture[:, :, channel] = color
+
         return texture
 
     def gen_rgb(self):
