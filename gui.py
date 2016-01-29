@@ -177,26 +177,38 @@ timing_param = OrderedDict([
 ])
 
 fill_param = OrderedDict([
+    ('color_mode',
+     {'type'    : 'choice',
+      'label'   : 'color mode',
+      'choices' : ['intensity', 'rgb'],
+      'default' : config_dict['color_mode'],
+      'is_child': False,
+      'children': {
+          'rgb'        : ['color', 'contrast_channel'],
+          'intensity'  : ['intensity', 'contrast_channel'],
+      }}
+     ),
+
     ('color',
      {'type'    : 'list',
       'label'   : 'color (RGB)',
       'default' : config_dict['color'],
-      'is_child': False}
+      'is_child': True}
      ),
 
     ('contrast_channel',
      {'type'    : 'choice',
-      'label'   : 'contrast channel',
-      'choices' : ['green', 'red', 'blue', 'global'],
+      'label'   : 'channel',
+      'choices' : ['green', 'red', 'blue'],
       'default' : config_dict['contrast_channel'],
-      'is_child': False}
+      'is_child': True}
      ),
 
     ('intensity',
      {'type'    : 'text',
-      'label'   : 'contrast',
+      'label'   : 'intensity',
       'default' : config_dict['intensity'],
-      'is_child': False}
+      'is_child': True}
      ),
 
     ('timing',
@@ -1454,6 +1466,9 @@ class MyFrame(wx.Frame):
                         panel.Fit()
 
 
+        # key interrupts
+        self.Bind(wx.EVT_CHAR_HOOK, self.on_keypress)
+
         # draw frame
         self.Show()
 
@@ -1552,6 +1567,23 @@ class MyFrame(wx.Frame):
             self.on_stop_button(event)
             StimProgram.MyWindow.close_win()
         self.Close()
+
+    def on_keypress(self, event):
+        """
+        Interrupt stim if escape key is pressed.
+
+        :param event: event passed by binder
+        """
+        if event.GetKeyCode() == wx.WXK_ESCAPE:
+            print 'escaped'
+            self.on_stop_button(event)
+
+        elif event.GetKeyCode() == wx.WXK_DELETE:
+            if self.win_open:
+                print 'window closed'
+                self.on_win_button(event)
+
+        event.Skip()
 
 
 def main():
