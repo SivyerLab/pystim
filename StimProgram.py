@@ -9,6 +9,7 @@ from psychopy.tools.coordinatetools import pol2cart
 from random import Random
 from time import strftime, localtime
 from PIL import Image
+from math import copysign
 from GammaCorrection import GammaValues  # necessary for pickling
 import scipy
 import scipy.signal
@@ -303,6 +304,7 @@ class StimDefaults(object):
                  timing='step',
                  intensity=1,
                  color=None,
+                 color_mode='intensity',
                  fill_seed=1,
                  move_seed=1,
                  speed=10,
@@ -345,6 +347,7 @@ class StimDefaults(object):
         self.table_filename = table_filename
         self.trigger = trigger
         self.num_jumps = num_jumps
+        self.color_mode = color_mode
 
         # list variables
         if color is not None:
@@ -452,7 +455,6 @@ class StaticStim(StimDefaults):
         else:
             self.stim = visual.GratingStim(win=MyWindow.win,
                                            size=self.gen_size(),
-                                           color=self.gen_rgb(),
                                            mask=self.gen_mask(),
                                            tex=self.gen_texture(),
                                            pos=self.location,
@@ -490,8 +492,8 @@ class StaticStim(StimDefaults):
         # check if within animation range
         if self.start_stim <= frame < self.end_stim:
             # adjust colors based on timing
-            if self.fill_mode != 'movie':
-                self.set_rgb(self.gen_timing(frame))
+            # if self.fill_mode != 'movie':
+            #     self.set_rgb(self.gen_timing(frame))
             # draw to back buffer
             self.stim.draw()
             # trigger just before window flip
@@ -524,17 +526,9 @@ class StaticStim(StimDefaults):
             stim_size = (self.image_size[0], self.image_size[1])
 
         elif self.shape in ['circle', 'annulus']:
-            stim_size = self.outer_diameter
+            stim_size = (self.outer_diameter, self.outer_diameter)
 
         elif self.shape == 'rectangle':
-            if self.fill_mode in ['random', 'checkerboard']:
-                stim_size = (self.check_size[0] * self.num_check,
-                             self.check_size[1] * self.num_check)
-
-            else:
-                stim_size = (self.size[0], self.size[1])
-
-        else:
             stim_size = (self.size[0], self.size[1])
 
         return stim_size
@@ -556,14 +550,14 @@ class StaticStim(StimDefaults):
 
     def gen_texture(self):
         """
-        Generates texture for stim object. If not none, textures are 4D numpy
+        Generates texture for stim object. If not none, textures are 3D numpy
         arrays. The first 3 values are contrast values applied to the rgb
         value, and the fourth is an alpha value (transparency mask). Textures
         are created by modulating the alpha value while contrast values are
         left as one (preserve rgb color selection).
 
         :return: texture, either None or a numpy array
-        """
+
         if self.fill_mode == 'uniform':
             stim_texture = None
 
@@ -594,7 +588,26 @@ class StaticStim(StimDefaults):
                 stim_texture[:, :, 3] = scipy.sin(filters.makeRadialMatrix(
                         self.grating_size))
 
-        return stim_texture
+        return stim_texture"""
+
+        off = [-1, -1, -1]
+
+        texture = numpy.zeros(self.gen_size()+(3,))
+        texture[:, :,] = off
+
+        intensity = self.intensity
+        background = map(float,GlobalDefaults['background'])
+
+        channel = ['red', 'green', 'blue', 'global'].index(self.contrast_channel)
+
+        color = ((background[channel]+1)/2 + copysign((background[
+                                                           channel]+1)/2 *
+                                                      abs(intensity),
+                                                      intensity)) * 2 - 1
+
+        texture[:, :, channel] = color
+        print color
+        return texture
 
     def gen_rgb(self):
         """
@@ -1155,6 +1168,8 @@ def board_texture_class(bases, **kwargs):
                     self.index[i] = self.fill_random.randint(0, 1)
 
             # use index to assign colors
+            print self.colors
+            print self.index
             self.colors[numpy.where(self.index)] = self.gen_rgb()
 
             self.stim = visual.ElementArrayStim(MyWindow.win,
