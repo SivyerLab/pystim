@@ -56,14 +56,6 @@ def get_config_dict(config_file):
                         key].strip('[]').split(','))
                 except ValueError:
                     pass
-        # # look for booleans
-        # elif default_config_dict[key] == 'True':
-        #     default_config_dict[key] = True
-        # elif default_config_dict[key] == 'False':
-        #     default_config_dict[key] = False
-        # # look for 'None'
-        # elif default_config_dict[key] == 'None':
-        #     default_config_dict[key] = None
         # cast non lists
         else:
             try:
@@ -560,46 +552,46 @@ class DirPanel(wx.Panel):
         self.load_path = None
 
         # sizer
-        panel_sizer = wx.BoxSizer(wx.VERTICAL)
+        sizer_panel = wx.BoxSizer(wx.VERTICAL)
 
         # file browser
-        if _platform == "darwin":
-            self.browser = wx.FileCtrl(self, wildCard='*.txt', size=(200, -1),
-                defaultDirectory=config_dict['savedStimDir'])
-        elif _platform == "win32":
-            self.browser = wx.FileCtrl(self, wildCard='*.txt', size=(200, -1),
-                defaultDirectory=config_dict['savedStimDir'])
+        self.browser = wx.FileCtrl(self, wildCard='*.txt', size=(200, -1),
+            defaultDirectory=config_dict['savedStimDir'])
 
         # add to sizer
-        panel_sizer.Add(self.browser, 1, wx.BOTTOM | wx.TOP | wx.EXPAND,
+        sizer_panel.Add(self.browser, 1, wx.BOTTOM | wx.TOP | wx.EXPAND,
                         border=5)
 
-        # load and save buttons sizer
-        dir_buttons_sizer = wx.BoxSizer(wx.HORIZONTAL)
+        # sizer for load and save buttons
+        sizer_buttons = wx.BoxSizer(wx.HORIZONTAL)
 
+        # instantiate buttons and add to button sizer
         self.save_button = wx.Button(self, id=wx.ID_SAVE)
-        dir_buttons_sizer.Add(self.save_button, 1, border=5,
+        sizer_buttons.Add(self.save_button, 1, border=5,
                               flag=wx.LEFT | wx.RIGHT)
 
         self.load_button = wx.Button(self, label="Load")
-        dir_buttons_sizer.Add(self.load_button, 1, border=5,
+        sizer_buttons.Add(self.load_button, 1, border=5,
                               flag=wx.LEFT | wx.RIGHT)
 
-        panel_sizer.Add(dir_buttons_sizer, border=5,
+        # add button sizer to panel sizer
+        sizer_panel.Add(sizer_buttons, border=5,
                         flag=wx.BOTTOM | wx.ALIGN_CENTER_HORIZONTAL |
                         wx.ALIGN_CENTER_VERTICAL)
 
-        # load and save button binders
+        # event binders
         self.Bind(wx.EVT_BUTTON, self.on_save_button, self.save_button)
         self.Bind(wx.EVT_BUTTON, self.on_load_button, self.load_button)
         self.Bind(wx.EVT_FILECTRL_FILEACTIVATED, self.on_double_click,
                   self.browser)
 
-        self.SetSizer(panel_sizer)
+        # lays out sizer
+        self.SetSizer(sizer_panel)
 
     def on_save_button(self, event):
         """
         Saves current param settings to text file.
+
         :param event: event passed by binder
         """
         my_frame = event.GetEventObject().GetParent().GetParent()
@@ -609,13 +601,16 @@ class DirPanel(wx.Panel):
         elif _platform == 'win32':
             default_dir = '.\\psychopy\\stims\\'
 
+        # popup save dialog
         save_dialog = wx.FileDialog(my_frame, message='File path',
             defaultDir=default_dir,
             wildcard='*.txt', style=wx.FD_SAVE | wx.FD_OVERWRITE_PROMPT)
 
+        # to exit out of popup
         if save_dialog.ShowModal() == wx.ID_CANCEL:
             return
 
+        # make list of stims queued, rename move type
         to_save = []
         for stim in my_frame.l1.stim_info_list:
             params = copy.deepcopy(stim.parameters)
@@ -628,7 +623,7 @@ class DirPanel(wx.Panel):
         with open(path, 'wb') as f:
             cPickle.dump(to_save, f)
 
-        # refresh display
+        # refresh file browser to show new saved file
         self.browser.ShowHidden(True)
         self.browser.ShowHidden(False)
 
@@ -636,7 +631,8 @@ class DirPanel(wx.Panel):
 
     def on_load_button(self, event):
         """
-        Loads params from parameter file
+        Loads params from parameter file.
+
         :param event: event passed by binder
         """
         my_frame = event.GetEventObject().GetParent().GetParent()
@@ -644,21 +640,21 @@ class DirPanel(wx.Panel):
         # get path of settings file from browser
         path = self.browser.GetPath()
 
-        # open and read settings
+        # check if file is a log file
         if _platform == 'win32':
-            is_log = os.path.dirname(path).split('\\')[-2] != 'logs'
+            is_log = os.path.dirname(path).split('\\')[-2] == 'logs'
             
         if _platform == 'darwin':
-            is_log = os.path.dirname(path).split('/')[-2] != 'logs'
+            is_log = os.path.dirname(path).split('/')[-2] == 'logs'
             
-        
-        if is_log:
+        # if its a log file, need to go to end to find Pickle data
+        if not is_log:
             with open(path, 'rb') as f:
                 to_load = cPickle.load(f)
         else:
-            # search file for PICKLE at end
             try:
                 with open(path, 'rb') as f:
+                    # iterate through lines to look for Pickle
                     next_is_pickle = False
                     to_load = ""
 
@@ -676,7 +672,7 @@ class DirPanel(wx.Panel):
                 print "\nERROR: file not a properly formatted parameter file"
                 return
 
-        # load list
+        # load list, and assign stim stype
         for stim_param in to_load:
             stim_type = stim_param.pop('move_type')
 
@@ -697,9 +693,9 @@ class DirPanel(wx.Panel):
 
     def on_double_click(self, event):
         """
-        opens file for user to inspect if log file, else loads
-        :param event:
-        :return:
+        opens file for user to inspect if log file, else loads.
+
+        :param event:event passed by binder
         """
         my_frame = event.GetEventObject().GetParent().GetParent()
 
@@ -736,11 +732,11 @@ class ListPanel(wx.Panel):
         self.index = 0
 
         # sizer
-        panel_sizer = wx.BoxSizer(wx.VERTICAL)
+        sizer_panel = wx.BoxSizer(wx.VERTICAL)
 
         # title
         title = wx.StaticText(self, label="Stims to run")
-        panel_sizer.Add(title, flag=wx.TOP, border=10)
+        sizer_panel.Add(title, flag=wx.TOP, border=10)
 
         # list control widget
         self.list_control = wx.ListCtrl(self, size=(200, -1),
@@ -751,33 +747,32 @@ class ListPanel(wx.Panel):
         self.list_control.InsertColumn(3, 'Trigger')
 
         # add to sizer
-        panel_sizer.Add(self.list_control, 1, wx.BOTTOM | wx.TOP | wx.EXPAND,
+        sizer_panel.Add(self.list_control, 1, wx.BOTTOM | wx.TOP | wx.EXPAND,
                         border=10)
 
-        # add and remove buttons sizer
-        list_buttons_sizer = wx.BoxSizer(wx.HORIZONTAL)
+        # sizer for add and remove buttons
+        sizer_buttons = wx.BoxSizer(wx.HORIZONTAL)
 
         self.add_button = wx.Button(self, id=wx.ID_ADD)
-        list_buttons_sizer.Add(self.add_button, 1, border=5,
+        sizer_buttons.Add(self.add_button, 1, border=5,
                                flag=wx.LEFT | wx.RIGHT)
 
         self.remove_button = wx.Button(self, id=wx.ID_REMOVE)
-        list_buttons_sizer.Add(self.remove_button, 1, border=5,
+        sizer_buttons.Add(self.remove_button, 1, border=5,
                                flag=wx.LEFT | wx.RIGHT)
 
-        panel_sizer.Add(list_buttons_sizer, border=5,
+        sizer_panel.Add(sizer_buttons, border=5,
                         flag=wx.BOTTOM | wx.ALIGN_CENTER_HORIZONTAL |
                         wx.ALIGN_CENTER_VERTICAL)
 
         # load and save button binders
         self.Bind(wx.EVT_BUTTON, self.on_add_button, self.add_button)
         self.Bind(wx.EVT_BUTTON, self.on_remove_button, self.remove_button)
-        # self.Bind(wx.EVT_BUTTON, self.on_clear_button, self.clear_button)
         # double click to load binder
         self.Bind(wx.EVT_LIST_ITEM_ACTIVATED, self.on_double_click,
                   self.list_control)
 
-        self.SetSizer(panel_sizer)
+        self.SetSizer(sizer_panel)
 
     def on_add_button(self, event):
         """
@@ -1581,6 +1576,14 @@ class MyFrame(wx.Frame):
             if self.win_open:
                 print 'window closed'
                 self.on_win_button(event)
+
+        elif event.GetKeyCode() in [wx.WXK_RETURN, wx.WXK_NUMPAD_ENTER]:
+            evt = wx.CommandEvent(wx.EVT_BUTTON.typeId,
+                                      self.l1.add_button.Id)
+
+            evt.SetEventObject(self.l1.add_button)
+            evt.SetInt(1)
+            wx.PostEvent(self.l1, evt)
 
         event.Skip()
 
