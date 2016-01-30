@@ -4,7 +4,7 @@
 Program for GUI interface to StimProgram.py"
 """
 
-# must turn pyglet shadow windows off to avoid conflict with wxPython and
+# must first turn pyglet shadow windows off to avoid conflict with wxPython and
 # psychopy.visual
 import pyglet
 pyglet.options['shadow_window'] = False
@@ -16,7 +16,6 @@ import StimProgram
 import copy
 import cPickle
 import ConfigParser
-from os import system
 import os
 
 __author__ = "Alexander Tomlinson"
@@ -1551,11 +1550,11 @@ class MyFrame(wx.Frame):
         :return:
         """
         if _platform == 'win32':
-            system('start python GammaCorrection.pyc')
+            os.system('start python GammaCorrection.pyc')
 
         elif _platform == 'darwin':
             current_dir = os.getcwd()
-            system('open -n -a Terminal.app {}'.format(current_dir))
+            os.system('open -n -a Terminal.app {}'.format(current_dir))
 
 
     def on_exit_button(self, event):
