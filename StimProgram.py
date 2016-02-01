@@ -532,9 +532,9 @@ class StaticStim(StimDefaults):
             # get change relative to background
             delta = background * self.intensity
 
-            # unscale high/low
-            high = ((background + abs(delta)) + 1) / 2
-            low = ((background - abs(delta)) + 1) / 2
+            # unscale high/low (only used by board texture)
+            high = (background + abs(delta)) * 2 - 1
+            low = (background - abs(delta)) * 2 - 1
 
             color = high, low, delta, background
 
@@ -1148,9 +1148,14 @@ def board_texture_class(bases, **kwargs):
                 for x in range(self.num_check/-2, self.num_check/2):
                     xys.append((self.check_size[0]*x, self.check_size[1]*y))
 
+            # get colors
+            high, low, _, _ = self.gen_rgb()
+
             # array of rgbs for each element
             self.colors = numpy.ndarray((self.num_check ** 2, 3))
-            self.colors[::] = GlobalDefaults['background']
+            self.colors[::] = [-1, -1, -1]
+            self.colors[:, self.contrast_channel] = low
+            print self.colors[3]
 
             # index to know how to color elements in array
             self.index = numpy.zeros((self.num_check, self.num_check))
@@ -1168,7 +1173,7 @@ def board_texture_class(bases, **kwargs):
                     self.index[i] = self.fill_random.randint(0, 1)
 
             # use index to assign colors
-            self.colors[numpy.where(self.index)] = self.gen_color()[0]
+            self.colors[numpy.where(self.index), self.contrast_channel] = high
 
             self.stim = visual.ElementArrayStim(MyWindow.win,
                                                 xys=xys,
