@@ -18,11 +18,11 @@ import cPickle
 import ConfigParser
 import os
 
-__author__ = "Alexander Tomlinson"
+__author__  = "Alexander Tomlinson"
 __license__ = "GPL"
-__version__ = "0.1"
-__email__ = "tomlinsa@ohsu.edu"
-__status__ = "Prototype"
+__version__ = "1.0"
+__email__   = "tomlinsa@ohsu.edu"
+__status__  = "Beta"
 
 
 def get_config_dict(config_file):
@@ -1086,13 +1086,13 @@ class InputPanel(wx.Panel):
     #     """
     #     textctrl = event.GetEventObject()
     #     wx.CallAfter(self.select_all, textctrl)
-
-    def select_all(self, textctrl):
-        """
-        Method to highlight all on focus, for easier replacing, especially
-        when tabbing on OSX where default behavior is not to highlight.
-        """
-        textctrl.SelectAll()
+    #
+    # def select_all(self, textctrl):
+    #     """
+    #     Method to highlight all on focus, for easier replacing, especially
+    #     when tabbing on OSX where default behavior is not to highlight.
+    #     """
+    #     textctrl.SelectAll()
 
     def input_update(self, event):
         """
@@ -1202,9 +1202,8 @@ class InputPanel(wx.Panel):
             event.SetEventObject(self.input_dict[param])
             event.SetInt(1)
             event.SetString(value)
-            self.input_dict[param].Command(event)
-            global app
-            app.ProcessPendingEvents()
+            # send event to object
+            wx.PostEvent(self.input_dict[param], event)
 
             self.input_dict[param].SetStringSelection(str(value))
 
