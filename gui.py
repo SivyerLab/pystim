@@ -69,6 +69,9 @@ def get_config_dict(config_file):
     return default_config_dict
 
 config_file = './psychopy/config.ini'
+#config_file = "C:\Users\Alex\PycharmProjects\StimulusProgram\psychopy\config
+# .ini"
+
 config_dict = get_config_dict(config_file)
 
 gamma_file = './psychopy/gammaTables.txt'
@@ -233,6 +236,13 @@ fill_param = OrderedDict([
       }}
      ),
 
+    ('alpha',
+     {'type'    : 'text',
+      'label'   : 'alpha',
+      'default' : config_dict['alpha'],
+      'is_child': False}
+     ),
+
     ('sf',
      {'type'    : 'text',
       'label'   : 'spatial frequency',
@@ -312,7 +322,8 @@ motion_param = OrderedDict([
       'default' : config_dict['move_type'],
       'is_child': False,
       'children': {
-          'moving': ['speed', 'start_dir', 'num_dirs', 'start_radius', 'move_delay'],
+          'moving': ['speed', 'start_dir', 'num_dirs', 'start_radius',
+                     'move_delay', 'phase_mod'],
           'random': ['speed', 'travel_distance', 'move_seed'],
           'table' : ['table_filename', 'start_dir'],
           'jump'  : ['num_jumps', 'jump_delay', 'move_seed'],
@@ -351,6 +362,14 @@ motion_param = OrderedDict([
      {'type'    : 'text',
       'label'   : 'move delay (s)',
       'default' : config_dict['move_delay'],
+      'is_child': True}
+     ),
+
+    ('phase_mod',
+     {'type'    : 'choice',
+      'label'   : 'phase mod',
+      'choices' : ['True', 'False'],
+      'default' : config_dict['phase_mod'],
       'is_child': True}
      ),
 
@@ -487,7 +506,6 @@ global_default_param = OrderedDict([
       'default' : config_dict['log'],
       'is_child': False}
      )
-    # ('object_list', 1)
 ])
 
 
@@ -777,6 +795,7 @@ class ListPanel(wx.Panel):
     def on_add_button(self, event):
         """
         Gets stim params from event, to pass to add_stim.
+
         :param event: event passed by binder
         """
         my_frame = event.GetEventObject().GetParent().GetParent()
@@ -793,9 +812,9 @@ class ListPanel(wx.Panel):
     def add_stim(self, stim_type, param_dict):
         """
         Adds stim to list of stims to run
+
         :param stim_type:
         :param param_dict:
-        :return:
         """
         shape = param_dict['shape']
         fill = param_dict['fill_mode']
@@ -832,6 +851,7 @@ class ListPanel(wx.Panel):
     def on_remove_button(self, event):
         """
         Removes stims from stim list. If none selected, clears all
+
         :param event:
         """
         if self.list_control.GetSelectedItemCount() > 0:
@@ -849,6 +869,7 @@ class ListPanel(wx.Panel):
     def on_double_click(self, event):
         """
         Loads params from list on double click
+
         :param event:
         """
         my_frame = event.GetEventObject().GetParent().GetParent()
@@ -893,8 +914,8 @@ class ListPanel(wx.Panel):
 
 class InputPanel(wx.Panel):
     """
-    Class for generic panel with input widgets and labels.
-    Also superclass of SubPanel and GlobalPanel.
+    Class for generic panel with input widgets and labels. Also superclass of
+    SubPanel and GlobalPanel.
     """
     def __init__(self, params, parent):
         """
@@ -1097,6 +1118,7 @@ class InputPanel(wx.Panel):
     def input_update(self, event):
         """
         Method for updating param_dict on changes to input widgets
+
         :param event: wxPython event, passed by binder
         """
         self.Validate()
@@ -1182,6 +1204,7 @@ class InputPanel(wx.Panel):
         Method to change control values on load. SetValue() simulates user
         input and so generates an event, but SetStringSelection() does not,
         so it is necessary to simulate the choice event.
+
         :param value:
         :param param:
         """
@@ -1217,21 +1240,24 @@ class InputPanel(wx.Panel):
 class SubPanel(InputPanel):
     """
     Class for subpanels, in order to override input_update
+
+    :param params: dictionary of children parameters to be generated
+    :param parent: parent window
+    :param parent_params: dictionary where parameters of parent param
+     are stored, so that those are changed rather than in sub_param_dict
     """
     def __init__(self, params, parent, parent_params):
         """
-        :param params: dictionary of children parameters to be generated
-        :param parent: parent window
-        :param parent_params: dictionary where parameters of parent param
-        are stored, so that those are changed rather than in sub_param_dict
+        Constructor.
         """
         super(SubPanel, self).__init__(params, parent)
         self.parent_params = parent_params
 
     def input_update(self, event):
         """
-        same as super class input_update, except that changes are made to
-        param dict that parent belongs to
+        Same as super class input_update, except that changes are made to
+        param dict that parent belongs to.
+
         :param event:
         """
         param = event.GetEventObject().tag
@@ -1267,7 +1293,7 @@ class SubPanel(InputPanel):
 class GlobalPanel(InputPanel):
     """
     Subclass of InputPanel, contains a few aesthetic changes in its init
-    since not part of a notebook
+    since not part of a notebook.
     """
     def __init__(self, parent, params):
         # super initiation
@@ -1290,7 +1316,7 @@ class GlobalPanel(InputPanel):
 
 class TextCtrlValidator(wx.PyValidator):
     """
-    Validator class to ensure proper entry of parameters
+    Validator class to ensure proper entry of parameters.
     """
     def __init__(self):
         """
@@ -1300,14 +1326,15 @@ class TextCtrlValidator(wx.PyValidator):
 
     def Clone(self):
         """
-        Standard cloner.
-        All validators are required to implement the Clone() method.
+        Standard cloner. All validators are required to implement the Clone()
+        method.
         """
         return TextCtrlValidator()
 
     def Validate(self, win):
         """
         Validate contents of given TextCtrl.
+
         :param win:
         """
         text_box = self.GetWindow()
@@ -1481,9 +1508,9 @@ class MyFrame(wx.Frame):
     def on_run_button(self, event):
         """
         Method for running stimulus. Makes call to StimProgram.py. Gets
-        necessary params from global panel (g1)
+        necessary params from global panel (g1).
+
         :param event: event passed by binder
-        :return:
         """
         # checks if stim window is open or not, to determine if needs to open a
         # window by making call to on_win_button
@@ -1506,6 +1533,7 @@ class MyFrame(wx.Frame):
         """
         Method for regenerating stim window. Makes call to StimProgram. Gets
         size from global panel.
+
         :param event: event passed by binder
         :return:
         """
@@ -1533,15 +1561,16 @@ class MyFrame(wx.Frame):
     def on_stop_button(self, event):
         """
         Method for stopping stim. Makes call to StimProgram.
+
         :param event: event passed by binder
         """
         StimProgram.MyWindow.should_break = True
 
     def on_calib_button(self, event):
         """
-        Method for calling gamma correction script
+        Method for calling gamma correction script.
+
         :param event: event passed by binder
-        :return:
         """
         if _platform == 'win32':
             os.system('start python GammaCorrection.pyc')
@@ -1554,6 +1583,7 @@ class MyFrame(wx.Frame):
     def on_exit_button(self, event):
         """
         Closes application.
+
         :param event: event passed by binder
         """
         if self.win_open:
@@ -1588,6 +1618,9 @@ class MyFrame(wx.Frame):
 
 
 def main():
+    """
+    Main method to start GUI.
+    """
     # instantiate app
     global app
     app = wx.App(False)
