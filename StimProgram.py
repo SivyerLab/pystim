@@ -294,66 +294,101 @@ class StimDefaults(object):
     parameters, whether used to make stim or not.
 
     :param string shape: Shape of the stim, 'circle', 'rectangle, or 'annulus'.
+
     :param string fill_mode: How the stim is filled. Can be 'uniform',
      'sine', 'square', 'concentric', 'checkerboard', 'random', 'image',
      or 'movie'.
+
     :param float orientation: Orientation of the stim, in degrees.
+
     :param list size: Size of the stim, as an x, y list.
+
     :param float outer_diameter: Size of circle, or outer diameter of
      annulus, in micrometers.
+
     :param float inner_diameter: Inner diameter of annulus, in micrometers.
+
     :param list check_size: Size of each check in a checkerboard or randomly
      filled board, as an x, y list in micrometers.
+
     :param int num_check: The number of checks in each direction.
+
     :param float delay: The time to between the first frame and the stim
      appearing on screen. Rounds up to the nearest frame.
+
     :param float duration: The duration for which the stim will animated.
      Rounds up to the nearest frame.
+
     :param list location: Coordinates of the stim, as an x, y list.
+
     :param string timing: How the stim appears on screen over time. For
      'step', the stim appears immediately. Other options include 'sine',
      'sawtooth', 'square', and 'linear'.
+
     :param float period_mod: For cyclic timing modes, the number of cycles.
+
     :param float alpha: The transparency of the of the stim, between 0 and 1.
      Does not apply to checkerboard or random fill stims, or images and movies.
+
     :param string color_mode: The way in which the color of the stim is
      determined. Can be either 'intensity', or 'rgb'.
+
     :param string contrast_channel: The color channel in which color is
      displayed in intensity mode. For the RGB color mode, contrast channel is
      only used if a fill other than uniform is specified.
+
     :param float intensity: The color of the stim relative to background,
      between -1 and 1. For  fills, the color will fluctuate between high and
      low values of the  specified intensity relative to background, and thus
      background values on either extreme must use low intensities or risk
      hitting the color ceiling/floor of the monitor.
+
     :param list color: RGB color values of the stim, as a list of 3 values
      between -1 and 1.
+
     :param float fill_seed: The seed for the random number generator for
      random fills.
+
     :param float move_seed: The seed for the random number generator for
      random movement.
+
     :param float speed: The speed of moving stims, in micrometers per second.
+
     :param int num_dirs: The number of directions radially moving stims will
      travel in.
+
     :param float start_dir: The start direction for radially moving stims.
+
     :param float start_radius: The start radius for radially moving stims.
+
     :param float move_delay: The amount of wait time between each move
      direction.
+
     :param float travel_distance: The distance that randomly moving stims
      will travel before choosing a new direction.
+
     :param float sf: The spatial frequency of a stim texture.
+
     :param list phase: The offset of texture in the stim. Units are in
      cycles, so integer phases will result in no discernible change.
+
     :param string movie_filename: File path of the movie to be displayed.
+
     :param list movie_size: Size of the movie, as an x, y list, in micrometers.
      Keep aspect ratio or movie will be distorted.
+
     :param string image_filename: File path of the image to be displayed.
+
     :param list image_size: Size of the image, as an x, y list, in micrometers.
      Keep aspect ratio or movie will be distorted.
+
     :param string table_filename: File path of the table to be used for
      coordinates.
+
     :param bool trigger: Whether or not to send a trigger for the stim.
+
     :param int num_jumps:
+
     :param float jump_delay:
     """
     def __init__(self,
