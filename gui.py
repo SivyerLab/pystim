@@ -68,19 +68,19 @@ def get_config_dict(config_file):
 
     return default_config_dict
 
-config_file = './psychopy/config.ini'
-#config_file = "C:\Users\Alex\PycharmProjects\StimulusProgram\psychopy\config
-# .ini"
+# config_file = './psychopy/config.ini'
+config_file = "C:\Users\Alex\PycharmProjects\StimulusProgram\psychopy\config.ini"
 
 config_dict = get_config_dict(config_file)
 
-gamma_file = './psychopy/gammaTables.txt'
-if os.path.exists(gamma_file):
-    with open(gamma_file, 'rb') as f:
-        gamma_dict = cPickle.load(f)
-    gamma_mons = gamma_dict.keys()
-else:
-    gamma_mons = []
+# gamma_file = './psychopy/gammaTables.txt'
+# gamma_file = "C:\Users\Alex\PycharmProjects\StimulusProgram\psychopy\gammaTables.txt"
+# if os.path.exists(gamma_file):
+#     with open(gamma_file, 'rb') as f:
+#         gamma_dict = cPickle.load(f)
+#     gamma_mons = gamma_dict.keys()
+# else:
+gamma_mons = []
 
 shape_param = OrderedDict([
     ('shape',
@@ -226,11 +226,13 @@ fill_param = OrderedDict([
       'default' : config_dict['fill_mode'],
       'is_child': False,
       'children': {
-          'sine'        : ['sf', 'phase'],
-          'square'      : ['sf', 'phase'],
-          'concentric'  : ['sf', 'phase'],
-          'checkerboard': ['check_size', 'num_check', 'phase'],
-          'random'      : ['check_size', 'num_check', 'fill_seed', 'phase'],
+          'sine'        : ['intensity_dir', 'sf', 'phase', 'phase_speed'],
+          'square'      : ['intensity_dir', 'sf', 'phase', 'phase_speed'],
+          'concentric'  : ['intensity_dir', 'sf', 'phase', 'phase_speed'],
+          'checkerboard': ['check_size', 'num_check', 'phase', 'phase_speed',
+                           'intensity_dir'],
+          'random'      : ['check_size', 'num_check', 'fill_seed', 'phase',
+                           'phase_speed', 'intensity_dir'],
           'movie'       : ['movie_filename', 'movie_size'],
           'image'       : ['image_filename', 'image_size'],
       }}
@@ -241,6 +243,14 @@ fill_param = OrderedDict([
       'label'   : 'alpha',
       'default' : config_dict['alpha'],
       'is_child': False}
+     ),
+
+    ('intensity_dir',
+     {'type'    : 'choice',
+      'label'   : 'intensity dir',
+      'choices' : ['single', 'both'],
+      'default' : config_dict['intensity_dir'],
+      'is_child': True}
      ),
 
     ('sf',
@@ -254,6 +264,13 @@ fill_param = OrderedDict([
      {'type'    : 'list',
       'label'   : 'phase',
       'default' : config_dict['phase'],
+      'is_child': True}
+     ),
+
+    ('phase_speed',
+     {'type'    : 'text',
+      'label'   : 'phase speed (hz)',
+      'default' : config_dict['phase_speed'],
       'is_child': True}
      ),
 
@@ -1487,6 +1504,7 @@ class MyFrame(wx.Frame):
 
 
         # key interrupts
+        # self.Bind(wx.EVT_KEY_DOWN, self.on_keypress)
         self.Bind(wx.EVT_CHAR_HOOK, self.on_keypress)
 
         # draw frame
@@ -1593,28 +1611,51 @@ class MyFrame(wx.Frame):
 
     def on_keypress(self, event):
         """
-        Interrupt stim if escape key is pressed.
+        Various keypress actions. Requires focus on GUI. CMD is CTRL on
+        win32, 'Apple' key on darwin.
+        ::
+            ENTER  : add stim
+            CMD-R  : run stim
+            ESCAPE : stop stim
+            DELETE : close window
+            CMD-W  : exit
 
         :param event: event passed by binder
         """
         if event.GetKeyCode() == wx.WXK_ESCAPE:
             print 'escaped'
             self.on_stop_button(event)
+            event.Skip()
 
         elif event.GetKeyCode() == wx.WXK_DELETE:
             if self.win_open:
-                print 'window closed'
                 self.on_win_button(event)
+            else:
+                event.Skip()
 
         elif event.GetKeyCode() in [wx.WXK_RETURN, wx.WXK_NUMPAD_ENTER]:
             evt = wx.CommandEvent(wx.EVT_BUTTON.typeId,
-                                      self.l1.add_button.Id)
+                                  self.l1.add_button.Id)
 
             evt.SetEventObject(self.l1.add_button)
             evt.SetInt(1)
             wx.PostEvent(self.l1, evt)
+            event.Skip()
 
-        event.Skip()
+        elif event.GetKeyCode() == 82:  # letter 'r'
+            if event.CmdDown():
+                self.on_run_button(event)
+            else:
+                event.Skip()
+
+        elif event.GetKeyCode() == 87:  # letter 'w'
+            if event.CmdDown():
+                self.on_exit_button(event)
+            else:
+                event.Skip()
+
+        else:
+            event.Skip()
 
 
 def main():

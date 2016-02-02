@@ -416,8 +416,10 @@ class StimDefaults(object):
                  start_radius=300,
                  travel_distance=50,
                  phase_mod=False,
+                 intensity_dir='both',
                  sf=1,
                  phase=None,
+                 phase_speed=0,
                  contrast_channel='Green',
                  movie_filename=None,
                  movie_size=None,
@@ -443,6 +445,7 @@ class StimDefaults(object):
         self.move_seed = move_seed
         self.num_dirs = num_dirs
         self.start_dir = start_dir
+        self.intensity_dir = intensity_dir
         self.sf = sf
         self.contrast_channel = ['red', 'green', 'blue'].index(contrast_channel)
         self.movie_filename = movie_filename
@@ -482,6 +485,7 @@ class StimDefaults(object):
         self.duration = duration * GlobalDefaults['frame_rate']
         self.move_delay = move_delay * GlobalDefaults['frame_rate']
         self.jump_delay = jump_delay * GlobalDefaults['frame_rate']
+        self.phase_speed = 1.0 * phase_speed / GlobalDefaults['frame_rate']
 
         # speed conversion
         self.speed = speed * (1.0 * GlobalDefaults['pix_per_micron'] /
@@ -598,6 +602,10 @@ class StaticStim(StimDefaults):
             # adjust colors based on timing
             if self.fill_mode not in ['movie', 'image']:
                 self.gen_timing(frame)
+
+            # move phase
+            self.gen_phase()
+
             # draw to back buffer
             self.stim.draw()
             # trigger just before window flip
@@ -738,17 +746,18 @@ class StaticStim(StimDefaults):
             texture[:, :, self.contrast_channel] = color
 
         if MyWindow.gamma_mon is not None:
-            texture = MyWindow.gamma_mon(texture)
+           texture = MyWindow.gamma_mon(texture)
 
         return texture
 
     def gen_timing(self, frame):
         """
         Adjusts alpha values of stims based on desired timing (i.e. as a
-        function of current frame / draw time). Recalculated on every call to
+        function of current frame over draw time). Recalculated on every call to
         animate()
 
         TODO: precompute values
+
         :param frame: current frame number
         :return: list of rgb values as floats
         """
@@ -782,6 +791,10 @@ class StaticStim(StimDefaults):
         adj_texture[:, :, 3] = alpha_factor
 
         self.stim.tex = adj_texture
+
+    def gen_phase(self):
+        # self.stim.phase += float(self.speed) / max(self.gen_size()) * self.sf
+        self.stim.phase += self.phase_speed
 
     def set_rgb(self, rgb):
         """
@@ -850,9 +863,6 @@ class MovingStim(StaticStim):
                 x, y = self.get_next_pos()
                 self.set_pos(x, y)
 
-                if self.phase_mod:
-                    self.gen_phase()
-
                 if self.trigger_frames is not None and \
                         self.trigger_frames[frame]:
                     MyWindow.send_trigger()
@@ -870,12 +880,6 @@ class MovingStim(StaticStim):
 
                 # retry
                 self.animate(frame)
-
-    def gen_phase(self):
-        # pass
-        # print float(self.speed) / self.size[0]
-        self.stim.phase += float(self.speed) / max(self.gen_size()) * self.sf
-        # print self.stim.phase
 
     def gen_pos(self):
         """
