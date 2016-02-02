@@ -274,30 +274,54 @@ class GammaValues(object):
         self.b_slope = b[1]
         self.b_int = b[2]
 
-    def __call__(self, rgb):
+    def __call__(self, color, channel=None):
         """
         Calculates adjusted RGB value.
 
-        :param list rgb: List of RGB values, scaled from -1 to 1.
-        :return: Adjusted list of RGB values
+        :param list color: List of RGB values, scaled from -1 to 1, or color
+         from a single channel.
+        :param int channel: If color is passed as a single number, channel is
+         the color channel.
+        :return: Adjusted list of RGB values, or single adjusted color.
         """
-        r = rgb[0]
-        g = rgb[1]
-        b = rgb[2]
+        if channel is None:
+            # ignore alpha
+            r = color[0]
+            g = color[1]
+            b = color[2]
 
-        r_adj = float(self.r_spline(r * self.r_slope + self.r_int))
-        g_adj = float(self.g_spline(g * self.g_slope + self.g_int))
-        b_adj = float(self.b_spline(b * self.b_slope + self.b_int))
+            r_adj = float(self.r_spline(r * self.r_slope + self.r_int))
+            g_adj = float(self.g_spline(g * self.g_slope + self.g_int))
+            b_adj = float(self.b_spline(b * self.b_slope + self.b_int))
 
-        adj_rgb = [r_adj, g_adj, b_adj]
+            color[0] = r_adj
+            color[1] = g_adj
+            color[2] = b_adj
 
-        for i in range(3):
-            if adj_rgb[i] >= 1:
-                adj_rgb[i] = 1
-            elif adj_rgb[i] <= -1:
-                adj_rgb[i] = -1
+            # add ceiling/floor
+            for i in range(len(color)):
+                if color[i] >= 1:
+                     color[i] = 1.0
+                elif color[i] <= -1:
+                     color[i] = -1.0
 
-        return adj_rgb
+        elif channel is not None:
+            if channel == 0:
+                adj = float(self.r_spline(color * self.r_slope + self.r_int))
+            if channel == 1:
+                adj = float(self.g_spline(color * self.g_slope + self.g_int))
+            if channel == 2:
+                adj = float(self.b_spline(color * self.b_slope + self.b_int))
+
+            color = adj
+
+            # add ceiling/floor
+            if color >= 1:
+                color = 1.0
+            elif color <= -1:
+                color = -1.0
+
+        return color
 
 if __name__ == "__main__":
     gammaCorrect()
