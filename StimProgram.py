@@ -419,7 +419,7 @@ class StimDefaults(object):
                  intensity_dir='both',
                  sf=1,
                  phase=None,
-                 phase_speed=0,
+                 phase_speed=None,
                  contrast_channel='Green',
                  movie_filename=None,
                  movie_size=None,
@@ -485,7 +485,6 @@ class StimDefaults(object):
         self.duration = duration * GlobalDefaults['frame_rate']
         self.move_delay = move_delay * GlobalDefaults['frame_rate']
         self.jump_delay = jump_delay * GlobalDefaults['frame_rate']
-        self.phase_speed = 1.0 * phase_speed / GlobalDefaults['frame_rate']
 
         # speed conversion
         self.speed = speed * (1.0 * GlobalDefaults['pix_per_micron'] /
@@ -522,6 +521,14 @@ class StimDefaults(object):
         else:
             self.check_size = [100, 100]
 
+        if phase_speed is not None:
+            self.phase_speed = [phase_speed[0] * 1.0 / GlobalDefaults[
+                                    'frame_rate'],
+                                phase_speed[1] * 1.0 / GlobalDefaults[
+                                    'frame_rate']]
+        else:
+            self.phase_speed = [0, 0]
+
 
 class StaticStim(StimDefaults):
     """
@@ -554,23 +561,15 @@ class StaticStim(StimDefaults):
         """
         Creates instance of psychopy stim object.
         """
-        if self.fill_mode == 'image':
-            self.stim = visual.ImageStim(win=MyWindow.win,
-                                         size=self.gen_size(),
-                                         pos=self.location,
-                                         ori=self.orientation,
-                                         image=self.image_filename)
+        self.stim = visual.GratingStim(win=MyWindow.win,
+                                       size=self.gen_size(),
+                                       mask=self.gen_mask(),
+                                       tex=self.gen_texture(),
+                                       pos=self.location,
+                                       phase=self.phase,
+                                       ori=self.orientation)
 
-        else:
-            self.stim = visual.GratingStim(win=MyWindow.win,
-                                           size=self.gen_size(),
-                                           mask=self.gen_mask(),
-                                           tex=self.gen_texture(),
-                                           pos=self.location,
-                                           phase=self.phase,
-                                           ori=self.orientation)
-
-            self.stim.sf *= self.sf
+        self.stim.sf *= self.sf
 
     def draw_times(self):
         """
@@ -600,7 +599,7 @@ class StaticStim(StimDefaults):
         # check if within animation range
         if self.start_stim <= frame < self.end_stim:
             # adjust colors based on timing
-            if self.fill_mode not in ['movie', 'image']:
+            if self.fill_mode not in ['movie']:
                 self.gen_timing(frame)
 
             # move phase
@@ -608,7 +607,8 @@ class StaticStim(StimDefaults):
 
             # draw to back buffer
             self.stim.draw()
-            # trigger just before window flip
+
+            # trigger just before first window flip
             if self.trigger and self.start_stim == frame:
                 MyWindow.send_trigger()
 
@@ -756,6 +756,13 @@ class StaticStim(StimDefaults):
             # color array
             texture[:, :, self.contrast_channel] = color
 
+        elif self.fill_mode == 'image':
+            image = Image.open(self.image_filename)
+            image.thumbnail(self.gen_size(), Image.ANTIALIAS)
+            texture = numpy.asarray(image) / 255.0 * 2 - 1
+            texture = numpy.rot90(texture, 2)
+            texture = numpy.insert(texture, 3, 1, axis=2)
+
         if MyWindow.gamma_mon is not None:
             texture = MyWindow.gamma_mon(texture)
 
@@ -804,8 +811,10 @@ class StaticStim(StimDefaults):
         self.stim.tex = adj_texture
 
     def gen_phase(self):
-        # self.stim.phase += float(self.speed) / max(self.gen_size()) * self.sf
-        self.stim.phase += self.phase_speed
+        """
+        Changes phase of stim on each frame draw.
+        """
+        self.stim.phase += (self.phase_speed[0], self.phase_speed[1])
 
     def set_rgb(self, rgb):
         """
