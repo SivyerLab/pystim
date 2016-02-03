@@ -333,7 +333,6 @@ class GammaValues(object):
                 adj_color = numpy.copy(color)
 
                 adj_color[:, :, 0] = self.r_vect(adj_color[:, :, 0])
-                # adj_color[:, :, 1] = self.g_correct(color[:, :, 1])
                 adj_color[:, :, 1] = self.g_vect(adj_color[:, :, 1])
                 adj_color[:, :, 2] = self.b_vect(adj_color[:, :, 2])
 
