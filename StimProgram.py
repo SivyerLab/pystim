@@ -233,7 +233,7 @@ class MyWindow(object):
         gamma = GlobalDefaults['gamma_correction']
 
         if gamma != 'default':
-            gamma_file = './psychopy/gammaTables.txt'
+            gamma_file = './psychopy/data/gammaTables.txt'
 
             if os.path.exists(gamma_file):
                 with open(gamma_file, 'rb') as f:
@@ -757,15 +757,22 @@ class StaticStim(StimDefaults):
             texture[:, :, self.contrast_channel] = color
 
         elif self.fill_mode == 'image':
+            # open and resize to desired size (reduces number of pixels to
+            # gamma correct)
             image = Image.open(self.image_filename)
             image.thumbnail(self.gen_size(), Image.ANTIALIAS)
+
+            # turn to array and flip (different because of indexing styles
             texture = numpy.asarray(image) / 255.0 * 2 - 1
             texture = numpy.rot90(texture, 2)
-            texture = numpy.insert(texture, 3, 1, axis=2)
+
+            # add alpha values
+            texture = numpy.insert(texture, 3, self.alpha, axis=2)
 
         if MyWindow.gamma_mon is not None:
             texture = MyWindow.gamma_mon(texture)
 
+        print texture[0][0]
         return texture
 
     def gen_timing(self, frame):
@@ -806,7 +813,7 @@ class StaticStim(StimDefaults):
 
         # set alpha channel
         adj_texture = self.stim.tex
-        adj_texture[:, :, 3] = alpha_factor
+        adj_texture[:, :, 3] = alpha_factor * self.alpha
 
         self.stim.tex = adj_texture
 
