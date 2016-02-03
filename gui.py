@@ -233,7 +233,8 @@ fill_param = OrderedDict([
           'random'      : ['check_size', 'num_check', 'fill_seed', 'phase',
                            'intensity_dir'],
           'movie'       : ['movie_filename', 'movie_size'],
-          'image'       : ['image_filename', 'image_size'],
+          'image'       : ['image_filename', 'image_size', 'phase',
+                           'phase_speed'],
       }}
      ),
 
@@ -267,7 +268,7 @@ fill_param = OrderedDict([
      ),
 
     ('phase_speed',
-     {'type'    : 'text',
+     {'type'    : 'list',
       'label'   : 'phase speed (hz)',
       'default' : config_dict['phase_speed'],
       'is_child': True}
