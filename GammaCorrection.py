@@ -36,19 +36,26 @@ and the script can be started by entering (note .pyc, not .py)::
 from psychopy import visual, core, event, logging
 from psychopy.monitors import Monitor
 from scipy import stats, interpolate, array, ndarray
-# import matplotlib.pyplot as plt
+import matplotlib.pyplot as plt
 import cPickle
 import os.path
+import numpy
 import sys
+import copy_reg, types
 
 # suppress extra warnings
 logging.console.setLevel(logging.CRITICAL)
 
+
+def reduce_method(m):
+    return (getattr, (m.__self__, m.__func__.__name__))
+
+copy_reg.pickle(types.MethodType, reduce_method)
+
+
 def gammaCorrect():
     """
     Main function.
-
-    :return: Nothing.
     """
     prompt = True
 
@@ -146,29 +153,29 @@ def gammaCorrect():
     g_tuple = make_correction(g)
     b_tuple = make_correction(b)
 
-    # show_plot = raw_input('\nShow plots? Y, N: ')
-    # if show_plot == 'Y':
-    #     plt.legend(loc=0)
-    #     plt.show()
+    show_plot = raw_input('\nShow plots? Y, N: ')
+    if show_plot == 'Y':
+        plt.legend(loc=0)
+        plt.show()
 
     gamma_correction = GammaValues(r_tuple, g_tuple, b_tuple)
 
     ## GRAPHING STUFF TO TEST ##
-    # vals = [i * 1.0 / (51 - 1) * 2 - 1 for i in range(51)]
-    # corrected = [[], [], []]
-    # for i in range(len(vals)):
-    #     rgb = [vals[i]] * 3
-    #     rgb = gamma_correction(rgb)
-    #     corrected[0].append(rgb[0])
-    #     corrected[1].append(rgb[1])
-    #     corrected[2].append(rgb[2])
-    #
-    # plt.plot(vals, vals, 'k--', label='linear')
-    # plt.plot(vals, corrected[0], 'r', label='red')
-    # plt.plot(vals, corrected[1], 'g', label='green')
-    # plt.plot(vals, corrected[2], 'b', label='blue')
-    # plt.legend(loc=0)
-    # plt.show()
+    vals = [i * 1.0 / (51 - 1) * 2 - 1 for i in range(51)]
+    corrected = [[], [], []]
+    for i in range(len(vals)):
+        rgb = [vals[i]] * 3
+        rgb = gamma_correction(rgb)
+        corrected[0].append(rgb[0])
+        corrected[1].append(rgb[1])
+        corrected[2].append(rgb[2])
+
+    plt.plot(vals, vals, 'k--', label='linear')
+    plt.plot(vals, corrected[0], 'r', label='red')
+    plt.plot(vals, corrected[1], 'g', label='green')
+    plt.plot(vals, corrected[2], 'b', label='blue')
+    plt.legend(loc=0)
+    plt.show()
 
     should_save = raw_input('\nSave? Y, N: ')
 
@@ -197,11 +204,11 @@ def gammaCorrect():
 
 def make_correction(measured):
     """
-    Calculates a conversion of RGB values to appropriate values to linearize
-    screen luminosity.
+    Calculates a conversion spline of RGB values to corrected values to
+    linearize screen luminosity.
 
-    :param list measured: Recorded values of screen luminosity. Passed by \
-    gammaCorrect, pulled out of text file.
+    :param list measured: Recorded values of screen luminosity. Passed by
+     gammaCorrect, pulled out of text file.
     :return: Tuple of spline, slope, and intercept
     """
     # values where lum was measured, assuming even spacing and starting at
@@ -240,13 +247,13 @@ def make_correction(measured):
 
     to_plot = []
     # points
-    # to_plot.append(plt.plot(measured_at, measured, 'ro', label='measured'))
+    to_plot.append(plt.plot(measured_at, measured, 'ro', label='measured'))
     # fit
-    # to_plot.append(plt.plot(measured_at, spline_values, label='interpolated'))
+    to_plot.append(plt.plot(measured_at, spline_values, label='interpolated'))
     # corrected
-    # to_plot.append(plt.plot(measured_at, graph_corrected, label='corrected'))
+    to_plot.append(plt.plot(measured_at, graph_corrected, label='corrected'))
     # check against linear
-    # to_plot.append(plt.plot(measured_at, linear, label='linear'))
+    to_plot.append(plt.plot(measured_at, linear, label='linear'))
     # plt.legend(loc=0)
     # plt.show()
 
@@ -262,21 +269,57 @@ class GammaValues(object):
     """
     def __init__(self, r, g, b):
         """
-        Instantiates class, pulls values out of tuples.
+        Instantiates class, pulls values out of tuples. Vectorizes
+        correction functions.
         """
         self.r_spline = r[0]
         self.r_slope = r[1]
         self.r_int = r[2]
+
         self.g_spline = g[0]
         self.g_slope = g[1]
         self.g_int = g[2]
+
         self.b_spline = b[0]
         self.b_slope = b[1]
         self.b_int = b[2]
 
+        self.r_vect = numpy.vectorize(self.r_correct, otypes=[numpy.float])
+        self.g_vect = numpy.vectorize(self.g_correct, otypes=[numpy.float])
+        self.b_vect = numpy.vectorize(self.b_correct, otypes=[numpy.float])
+
+    def r_correct(self, r):
+        """
+        Function to gamma correct red channel
+
+        :return: corrected red color
+        """
+        r_adj = float(self.r_spline(r * self.r_slope + self.r_int))
+        return r_adj
+
+    def g_correct(self, g):
+        """
+        Function to gamma correct green channel
+
+        :return: corrected green color
+        """
+        # print g
+        # print type(g)
+        g_adj = float(self.g_spline(g * self.g_slope + self.g_int))
+        return g_adj
+
+    def b_correct(self, b):
+        """
+        Function to gamma correct blue channel
+
+        :return: corrected blue color
+        """
+        b_adj = float(self.b_spline(b * self.b_slope + self.b_int))
+        return b_adj
+
     def __call__(self, color, channel=None):
         """
-        Calculates adjusted RGB value.
+        Calculates adjusted color value.
 
         :param list color: List of RGB values, scaled from -1 to 1, or color
          from a single channel.
@@ -285,33 +328,43 @@ class GammaValues(object):
         :return: Adjusted list of RGB values, or single adjusted color.
         """
         if channel is None:
-            # ignore alpha
-            r = color[0]
-            g = color[1]
-            b = color[2]
+            # if entire texture
+            if len(numpy.shape(color)) == 3:
+                color[:, :, 0] = self.r_vect(color[:, :, 0])
+                # color[:, :, 1] = self.g_correct(color[:, :, 1])
+                color[:, :, 1] = self.g_vect(color[:, :, 1])
+                color[:, :, 2] = self.b_vect(color[:, :, 2])
 
-            r_adj = float(self.r_spline(r * self.r_slope + self.r_int))
-            g_adj = float(self.g_spline(g * self.g_slope + self.g_int))
-            b_adj = float(self.b_spline(b * self.b_slope + self.b_int))
+            # if single color
+            elif len(numpy.shape(color)) == 1:
+                # ignore alpha
+                r = color[0]
+                g = color[1]
+                b = color[2]
 
-            color[0] = r_adj
-            color[1] = g_adj
-            color[2] = b_adj
+                r_adj = self.r_correct(r)
+                g_adj = self.g_correct(g)
+                b_adj = self.b_correct(b)
 
-            # add ceiling/floor
-            for i in range(len(color)):
-                if color[i] >= 1:
-                     color[i] = 1.0
-                elif color[i] <= -1:
-                     color[i] = -1.0
+                color[0] = r_adj
+                color[1] = g_adj
+                color[2] = b_adj
 
+                # add ceiling/floor
+                for i in range(len(color)):
+                    if color[i] >= 1:
+                         color[i] = 1.0
+                    elif color[i] <= -1:
+                         color[i] = -1.0
+
+        # if single channel
         elif channel is not None:
             if channel == 0:
-                adj = float(self.r_spline(color * self.r_slope + self.r_int))
+                adj = self.r_correct(color)
             if channel == 1:
-                adj = float(self.g_spline(color * self.g_slope + self.g_int))
+                adj = self.g_correct(color)
             if channel == 2:
-                adj = float(self.b_spline(color * self.b_slope + self.b_int))
+                adj = self.b_correct(color)
 
             color = adj
 

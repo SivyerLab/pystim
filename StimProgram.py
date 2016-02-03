@@ -646,9 +646,20 @@ class StaticStim(StimDefaults):
             # get change relative to background
             delta = background * self.intensity
 
+            # get high and low
+            high = background + delta
+            low = background - delta
+
+            # if single direction, bring middle up to halfway between high
+            # and background
+            if self.intensity_dir == 'single':
+                low += delta
+                delta /= 2
+                background += delta
+
             # unscale high/low (only used by board texture)
-            high = (background + abs(delta)) * 2 - 1
-            low = (background - abs(delta)) * 2 - 1
+            high = high * 2.0 - 1
+            low = low * 2.0 - 1
 
             color = high, low, delta, background
 
@@ -745,9 +756,10 @@ class StaticStim(StimDefaults):
             # color array
             texture[:, :, self.contrast_channel] = color
 
-        if MyWindow.gamma_mon is not None:
-           texture = MyWindow.gamma_mon(texture)
+        print texture[0][0]
 
+        if MyWindow.gamma_mon is not None:
+            texture = MyWindow.gamma_mon(texture)
         return texture
 
     def gen_timing(self, frame):
@@ -1295,7 +1307,12 @@ def board_texture_class(bases, **kwargs):
             ElementArrayStim does not support assigning alpha values.
 
             :param frame: current frame number
-            :return: array of adjusted rgbs
+            """
+            pass
+
+        def gen_phase(self):
+            """
+            ElementArrayStim does not support texture phase.
             """
             pass
 

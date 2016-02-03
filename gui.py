@@ -73,14 +73,14 @@ config_file = "C:\Users\Alex\PycharmProjects\StimulusProgram\psychopy\config.ini
 
 config_dict = get_config_dict(config_file)
 
-# gamma_file = './psychopy/gammaTables.txt'
+gamma_file = './psychopy/gammaTables.txt'
 # gamma_file = "C:\Users\Alex\PycharmProjects\StimulusProgram\psychopy\gammaTables.txt"
-# if os.path.exists(gamma_file):
-#     with open(gamma_file, 'rb') as f:
-#         gamma_dict = cPickle.load(f)
-#     gamma_mons = gamma_dict.keys()
-# else:
-gamma_mons = []
+if os.path.exists(gamma_file):
+    with open(gamma_file, 'rb') as f:
+        gamma_dict = cPickle.load(f)
+    gamma_mons = gamma_dict.keys()
+else:
+    gamma_mons = []
 
 shape_param = OrderedDict([
     ('shape',
@@ -229,10 +229,9 @@ fill_param = OrderedDict([
           'sine'        : ['intensity_dir', 'sf', 'phase', 'phase_speed'],
           'square'      : ['intensity_dir', 'sf', 'phase', 'phase_speed'],
           'concentric'  : ['intensity_dir', 'sf', 'phase', 'phase_speed'],
-          'checkerboard': ['check_size', 'num_check', 'phase', 'phase_speed',
-                           'intensity_dir'],
+          'checkerboard': ['check_size', 'num_check', 'phase', 'intensity_dir'],
           'random'      : ['check_size', 'num_check', 'fill_seed', 'phase',
-                           'phase_speed', 'intensity_dir'],
+                           'intensity_dir'],
           'movie'       : ['movie_filename', 'movie_size'],
           'image'       : ['image_filename', 'image_size'],
       }}
