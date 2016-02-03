@@ -756,10 +756,9 @@ class StaticStim(StimDefaults):
             # color array
             texture[:, :, self.contrast_channel] = color
 
-        print texture[0][0]
-
         if MyWindow.gamma_mon is not None:
             texture = MyWindow.gamma_mon(texture)
+
         return texture
 
     def gen_timing(self, frame):

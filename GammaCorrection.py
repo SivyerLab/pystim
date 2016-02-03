@@ -330,10 +330,12 @@ class GammaValues(object):
         if channel is None:
             # if entire texture
             if len(numpy.shape(color)) == 3:
-                color[:, :, 0] = self.r_vect(color[:, :, 0])
-                # color[:, :, 1] = self.g_correct(color[:, :, 1])
-                color[:, :, 1] = self.g_vect(color[:, :, 1])
-                color[:, :, 2] = self.b_vect(color[:, :, 2])
+                adj_color = numpy.copy(color)
+
+                adj_color[:, :, 0] = self.r_vect(adj_color[:, :, 0])
+                # adj_color[:, :, 1] = self.g_correct(color[:, :, 1])
+                adj_color[:, :, 1] = self.g_vect(adj_color[:, :, 1])
+                adj_color[:, :, 2] = self.b_vect(adj_color[:, :, 2])
 
             # if single color
             elif len(numpy.shape(color)) == 1:
@@ -346,16 +348,18 @@ class GammaValues(object):
                 g_adj = self.g_correct(g)
                 b_adj = self.b_correct(b)
 
-                color[0] = r_adj
-                color[1] = g_adj
-                color[2] = b_adj
+                adj_color = color[:]
+
+                adj_color[0] = r_adj
+                adj_color[1] = g_adj
+                adj_color[2] = b_adj
 
                 # add ceiling/floor
                 for i in range(len(color)):
-                    if color[i] >= 1:
-                         color[i] = 1.0
-                    elif color[i] <= -1:
-                         color[i] = -1.0
+                    if adj_color[i] >= 1:
+                         adj_color[i] = 1.0
+                    elif adj_color[i] <= -1:
+                         adj_color[i] = -1.0
 
         # if single channel
         elif channel is not None:
@@ -366,15 +370,15 @@ class GammaValues(object):
             if channel == 2:
                 adj = self.b_correct(color)
 
-            color = adj
+            adj_color = adj
 
             # add ceiling/floor
-            if color >= 1:
-                color = 1.0
-            elif color <= -1:
-                color = -1.0
+            if adj_color >= 1:
+                adj_color = 1.0
+            elif adj_color <= -1:
+                adj_color = -1.0
 
-        return color
+        return adj_color
 
 if __name__ == "__main__":
     gammaCorrect()
