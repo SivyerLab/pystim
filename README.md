@@ -38,3 +38,12 @@ triggering from LabJack)
 
 Stimulus Program is licensed under GNU GPL v3.0. See [LICENSE](LICENSE.md)
 file for license rights and limitations.
+
+### Screen Shots
+
+Main screen:
+![main screen](/docs/screenshots/screen1.png)
+Stims to run:
+![stims added](/docs/screenshots/screen3.png)
+Example stimulus:
+![example](/docs/screenshots/screen4.png)
