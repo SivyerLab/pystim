@@ -1,0 +1,522 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>gui module &mdash; Stimulus Program 1.1 documentation</title>
+    
+    <link rel="stylesheet" href="_static/sphinxdoc.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '1.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="Stimulus Program 1.1 documentation" href="index.html" />
+    <link rel="next" title="GammaCorrection module" href="GammaCorrection.html" />
+    <link rel="prev" title="StimProgram module" href="StimProgram.html" /> 
+  </head>
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="GammaCorrection.html" title="GammaCorrection module"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="StimProgram.html" title="StimProgram module"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">Stimulus Program 1.1 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="StimProgram.html"
+                        title="previous chapter">StimProgram module</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="GammaCorrection.html"
+                        title="next chapter">GammaCorrection module</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/gui.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="module-gui">
+<span id="gui-module"></span><h1>gui module<a class="headerlink" href="#module-gui" title="Permalink to this headline">¶</a></h1>
+<p>Program for GUI interface to StimProgram.py&#8221;</p>
+<dl class="function">
+<dt id="gui.get_config_dict">
+<code class="descclassname">gui.</code><code class="descname">get_config_dict</code><span class="sig-paren">(</span><em>config_file</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gui.html#get_config_dict"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gui.get_config_dict" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="class">
+<dt id="gui.TextCtrlTag">
+<em class="property">class </em><code class="descclassname">gui.</code><code class="descname">TextCtrlTag</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gui.html#TextCtrlTag"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gui.TextCtrlTag" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">wx._controls.TextCtrl</span></code></p>
+<p>Simple subclass of wx.TextCtrl for assigning ID tag to class to keep
+track when passed back in list.</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="gui.ChoiceTag">
+<em class="property">class </em><code class="descclassname">gui.</code><code class="descname">ChoiceTag</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gui.html#ChoiceTag"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gui.ChoiceTag" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">wx._controls.Choice</span></code></p>
+<p>Simple subclass of wx.Choice for assigning ID tag to class to keep
+track when passed back in list.</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="gui.FilePickerCtrlTag">
+<em class="property">class </em><code class="descclassname">gui.</code><code class="descname">FilePickerCtrlTag</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gui.html#FilePickerCtrlTag"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gui.FilePickerCtrlTag" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">wx._controls.FilePickerCtrl</span></code></p>
+<p>Simple subclass of wx.GenericDirCtrl for assigning ID tag to class to keep
+track when passed back in list.</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="gui.RadioBoxTag">
+<em class="property">class </em><code class="descclassname">gui.</code><code class="descname">RadioBoxTag</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gui.html#RadioBoxTag"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gui.RadioBoxTag" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">wx._controls.RadioBox</span></code></p>
+<p>Simple subclass of wx.GenericDirCtrl for assigning ID tag to class to keep
+track when passed back in list.</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="gui.DirPanel">
+<em class="property">class </em><code class="descclassname">gui.</code><code class="descname">DirPanel</code><span class="sig-paren">(</span><em>parent</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gui.html#DirPanel"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gui.DirPanel" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">wx._windows.Panel</span></code></p>
+<p>Class for file browser panel.</p>
+<dl class="method">
+<dt id="gui.DirPanel.on_save_button">
+<code class="descname">on_save_button</code><span class="sig-paren">(</span><em>event</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gui.html#DirPanel.on_save_button"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gui.DirPanel.on_save_button" title="Permalink to this definition">¶</a></dt>
+<dd><p>Saves current param settings to text file.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>event</strong> &#8211; event passed by binder</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="gui.DirPanel.on_load_button">
+<code class="descname">on_load_button</code><span class="sig-paren">(</span><em>event</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gui.html#DirPanel.on_load_button"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gui.DirPanel.on_load_button" title="Permalink to this definition">¶</a></dt>
+<dd><p>Loads params from parameter file.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>event</strong> &#8211; event passed by binder</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="gui.DirPanel.on_double_click">
+<code class="descname">on_double_click</code><span class="sig-paren">(</span><em>event</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gui.html#DirPanel.on_double_click"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gui.DirPanel.on_double_click" title="Permalink to this definition">¶</a></dt>
+<dd><p>opens file for user to inspect if log file, else loads.</p>
+<p>:param event:event passed by binder</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="gui.ListPanel">
+<em class="property">class </em><code class="descclassname">gui.</code><code class="descname">ListPanel</code><span class="sig-paren">(</span><em>parent</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gui.html#ListPanel"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gui.ListPanel" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">wx._windows.Panel</span></code></p>
+<p>Class for panel with list of stims to be presented</p>
+<dl class="method">
+<dt id="gui.ListPanel.on_add_button">
+<code class="descname">on_add_button</code><span class="sig-paren">(</span><em>event</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gui.html#ListPanel.on_add_button"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gui.ListPanel.on_add_button" title="Permalink to this definition">¶</a></dt>
+<dd><p>Gets stim params from event, to pass to add_stim.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>event</strong> &#8211; event passed by binder</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="gui.ListPanel.add_stim">
+<code class="descname">add_stim</code><span class="sig-paren">(</span><em>stim_type</em>, <em>param_dict</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gui.html#ListPanel.add_stim"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gui.ListPanel.add_stim" title="Permalink to this definition">¶</a></dt>
+<dd><p>Adds stim to list of stims to run</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>stim_type</strong> &#8211; </li>
+<li><strong>param_dict</strong> &#8211; </li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="gui.ListPanel.on_remove_button">
+<code class="descname">on_remove_button</code><span class="sig-paren">(</span><em>event</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gui.html#ListPanel.on_remove_button"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gui.ListPanel.on_remove_button" title="Permalink to this definition">¶</a></dt>
+<dd><p>Removes stims from stim list. If none selected, clears all</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>event</strong> &#8211; </td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="gui.ListPanel.on_double_click">
+<code class="descname">on_double_click</code><span class="sig-paren">(</span><em>event</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gui.html#ListPanel.on_double_click"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gui.ListPanel.on_double_click" title="Permalink to this definition">¶</a></dt>
+<dd><p>Loads params from list on double click</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>event</strong> &#8211; </td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="gui.InputPanel">
+<em class="property">class </em><code class="descclassname">gui.</code><code class="descname">InputPanel</code><span class="sig-paren">(</span><em>params</em>, <em>parent</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gui.html#InputPanel"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gui.InputPanel" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">wx._windows.Panel</span></code></p>
+<p>Class for generic panel with input widgets and labels. Also superclass of
+SubPanel and GlobalPanel.</p>
+<dl class="method">
+<dt id="gui.InputPanel.create_inputs">
+<code class="descname">create_inputs</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/gui.html#InputPanel.create_inputs"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gui.InputPanel.create_inputs" title="Permalink to this definition">¶</a></dt>
+<dd><p>Method to recursively generate label and input widgets.
+Checks if param is child of another and only generates
+parent params, then generates subpanel with associated child
+params. Differentiates between input types (text, dropdown,
+list (i.e. multiple text fields).</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="gui.InputPanel.input_update">
+<code class="descname">input_update</code><span class="sig-paren">(</span><em>event</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gui.html#InputPanel.input_update"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gui.InputPanel.input_update" title="Permalink to this definition">¶</a></dt>
+<dd><p>Method for updating param_dict on changes to input widgets</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>event</strong> &#8211; wxPython event, passed by binder</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="gui.InputPanel.get_param_dict">
+<code class="descname">get_param_dict</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/gui.html#InputPanel.get_param_dict"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gui.InputPanel.get_param_dict" title="Permalink to this definition">¶</a></dt>
+<dd><p>Method for returning a dictionary with extra info stripped out,
+to eventually pass to StimProgram.py</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="gui.InputPanel.set_value">
+<code class="descname">set_value</code><span class="sig-paren">(</span><em>param</em>, <em>value</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gui.html#InputPanel.set_value"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gui.InputPanel.set_value" title="Permalink to this definition">¶</a></dt>
+<dd><p>Method to change control values on load. SetValue() simulates user
+input and so generates an event, but SetStringSelection() does not,
+so it is necessary to simulate the choice event.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>value</strong> &#8211; </li>
+<li><strong>param</strong> &#8211; </li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="gui.SubPanel">
+<em class="property">class </em><code class="descclassname">gui.</code><code class="descname">SubPanel</code><span class="sig-paren">(</span><em>params</em>, <em>parent</em>, <em>parent_params</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gui.html#SubPanel"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gui.SubPanel" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#gui.InputPanel" title="gui.InputPanel"><code class="xref py py-class docutils literal"><span class="pre">gui.InputPanel</span></code></a></p>
+<p>Class for subpanels, in order to override input_update</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>params</strong> &#8211; dictionary of children parameters to be generated</li>
+<li><strong>parent</strong> &#8211; parent window</li>
+<li><strong>parent_params</strong> &#8211; dictionary where parameters of parent param
+are stored, so that those are changed rather than in sub_param_dict</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="gui.SubPanel.input_update">
+<code class="descname">input_update</code><span class="sig-paren">(</span><em>event</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gui.html#SubPanel.input_update"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gui.SubPanel.input_update" title="Permalink to this definition">¶</a></dt>
+<dd><p>Same as super class input_update, except that changes are made to
+param dict that parent belongs to.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>event</strong> &#8211; </td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="gui.GlobalPanel">
+<em class="property">class </em><code class="descclassname">gui.</code><code class="descname">GlobalPanel</code><span class="sig-paren">(</span><em>parent</em>, <em>params</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gui.html#GlobalPanel"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gui.GlobalPanel" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#gui.InputPanel" title="gui.InputPanel"><code class="xref py py-class docutils literal"><span class="pre">gui.InputPanel</span></code></a></p>
+<p>Subclass of InputPanel, contains a few aesthetic changes in its init
+since not part of a notebook.</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="gui.TextCtrlValidator">
+<em class="property">class </em><code class="descclassname">gui.</code><code class="descname">TextCtrlValidator</code><a class="reference internal" href="_modules/gui.html#TextCtrlValidator"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gui.TextCtrlValidator" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">wx._core.PyValidator</span></code></p>
+<p>Validator class to ensure proper entry of parameters.</p>
+<dl class="method">
+<dt id="gui.TextCtrlValidator.Clone">
+<code class="descname">Clone</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/gui.html#TextCtrlValidator.Clone"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gui.TextCtrlValidator.Clone" title="Permalink to this definition">¶</a></dt>
+<dd><p>Standard cloner. All validators are required to implement the Clone()
+method.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="gui.TextCtrlValidator.Validate">
+<code class="descname">Validate</code><span class="sig-paren">(</span><em>win</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gui.html#TextCtrlValidator.Validate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gui.TextCtrlValidator.Validate" title="Permalink to this definition">¶</a></dt>
+<dd><p>Validate contents of given TextCtrl.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>win</strong> &#8211; </td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="gui.TextCtrlValidator.TransferToWindow">
+<code class="descname">TransferToWindow</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/gui.html#TextCtrlValidator.TransferToWindow"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gui.TextCtrlValidator.TransferToWindow" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="gui.TextCtrlValidator.TransferFromWindow">
+<code class="descname">TransferFromWindow</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/gui.html#TextCtrlValidator.TransferFromWindow"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gui.TextCtrlValidator.TransferFromWindow" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="gui.MyFrame">
+<em class="property">class </em><code class="descclassname">gui.</code><code class="descname">MyFrame</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gui.html#MyFrame"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gui.MyFrame" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">wx._windows.Frame</span></code></p>
+<p>Class for generating window. Instantiates notebook and panels.</p>
+<dl class="method">
+<dt id="gui.MyFrame.merge_dicts">
+<code class="descname">merge_dicts</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/gui.html#MyFrame.merge_dicts"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gui.MyFrame.merge_dicts" title="Permalink to this definition">¶</a></dt>
+<dd><p>Merges dictionaries with params from each panel</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="gui.MyFrame.on_run_button">
+<code class="descname">on_run_button</code><span class="sig-paren">(</span><em>event</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gui.html#MyFrame.on_run_button"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gui.MyFrame.on_run_button" title="Permalink to this definition">¶</a></dt>
+<dd><p>Method for running stimulus. Makes call to StimProgram.py. Gets
+necessary params from global panel (g1).</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>event</strong> &#8211; event passed by binder</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="gui.MyFrame.on_win_button">
+<code class="descname">on_win_button</code><span class="sig-paren">(</span><em>event</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gui.html#MyFrame.on_win_button"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gui.MyFrame.on_win_button" title="Permalink to this definition">¶</a></dt>
+<dd><p>Method for regenerating stim window. Makes call to StimProgram. Gets
+size from global panel.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>event</strong> &#8211; event passed by binder</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="gui.MyFrame.on_stop_button">
+<code class="descname">on_stop_button</code><span class="sig-paren">(</span><em>event</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gui.html#MyFrame.on_stop_button"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gui.MyFrame.on_stop_button" title="Permalink to this definition">¶</a></dt>
+<dd><p>Method for stopping stim. Makes call to StimProgram.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>event</strong> &#8211; event passed by binder</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="gui.MyFrame.on_calib_button">
+<code class="descname">on_calib_button</code><span class="sig-paren">(</span><em>event</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gui.html#MyFrame.on_calib_button"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gui.MyFrame.on_calib_button" title="Permalink to this definition">¶</a></dt>
+<dd><p>Method for calling gamma correction script.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>event</strong> &#8211; event passed by binder</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="gui.MyFrame.on_exit_button">
+<code class="descname">on_exit_button</code><span class="sig-paren">(</span><em>event</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gui.html#MyFrame.on_exit_button"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gui.MyFrame.on_exit_button" title="Permalink to this definition">¶</a></dt>
+<dd><p>Closes application.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>event</strong> &#8211; event passed by binder</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="gui.MyFrame.on_keypress">
+<code class="descname">on_keypress</code><span class="sig-paren">(</span><em>event</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gui.html#MyFrame.on_keypress"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gui.MyFrame.on_keypress" title="Permalink to this definition">¶</a></dt>
+<dd><p>Various keypress actions. Requires focus on GUI.</p>
+<div class="highlight-python"><div class="highlight"><pre>ESCAPE : stop stim
+DELETE : close window
+ENTER  : add stim
+CTRL-R : run stim
+CTRL-W : exit
+</pre></div>
+</div>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>event</strong> &#8211; event passed by binder</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="gui.main">
+<code class="descclassname">gui.</code><code class="descname">main</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/gui.html#main"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gui.main" title="Permalink to this definition">¶</a></dt>
+<dd><p>Main method to start GUI.</p>
+</dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="GammaCorrection.html" title="GammaCorrection module"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="StimProgram.html" title="StimProgram module"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">Stimulus Program 1.1 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &copy; Copyright 2016, Alexander Tomlinson.
+      Last updated on Feb 02, 2016.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.3.5.
+    </div>
+  </body>
+</html>

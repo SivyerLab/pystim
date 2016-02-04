@@ -1,0 +1,10 @@
+GammaCorrection module
+======================
+
+.. automodule:: GammaCorrection
+    :members: gammaCorrect, make_correction
+    :show-inheritance:
+
+.. autoclass:: GammaCorrection.GammaValues
+    :special-members: __init__, __call__
+

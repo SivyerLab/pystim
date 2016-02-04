@@ -4,28 +4,31 @@
 Program for presenting visual stimuli to patch clamped retinal neurons.
 """
 
-from psychopy import visual, logging, core, event, filters
-from psychopy.tools.coordinatetools import pol2cart
-from random import Random
-from time import strftime, localtime
-from PIL import Image
-from math import copysign
-from tabulate import tabulate
 from GammaCorrection import GammaValues  # necessary for pickling
+from psychopy.tools.coordinatetools import pol2cart
+from psychopy import visual, core, event, filters
+from time import strftime, localtime
+from random import Random
+from PIL import Image
+import ConfigParser
+import cPickle
 import scipy
-import scipy.signal
 import numpy
+import copy
 import sys
 import os
-import cPickle
-import copy
-import ConfigParser
 
 try:
     from igor import binarywave, packed
     has_igor = True
 except ImportError:
     has_igor = False
+
+try:
+    from tabulate import tabulate
+    has_tabulate = True
+except ImportError:
+    has_tabulate = False
 
 try:
     import u3
@@ -39,7 +42,8 @@ __version__ = "1.1"
 __email__   = "tomlinsa@ohsu.edu"
 __status__  = "Beta"
 
-# to suppress extra warnings, uncomment next line
+# to suppress extra warnings, uncomment next lines
+# from psychopy import logging
 # logging.console.setLevel(logging.CRITICAL)
 
 # read ini file
@@ -415,7 +419,6 @@ class StimDefaults(object):
                  start_dir=0,
                  start_radius=300,
                  travel_distance=50,
-                 phase_mod=False,
                  intensity_dir='both',
                  sf=1,
                  phase=None,
@@ -456,7 +459,6 @@ class StimDefaults(object):
         self.num_jumps = num_jumps
         self.color_mode = color_mode
         self.alpha = alpha
-        self.phase_mod = phase_mod
 
         # list variables
         if color is not None:
@@ -811,7 +813,6 @@ class StaticStim(StimDefaults):
         if MyWindow.gamma_mon is not None and self.fill_mode not in ['image']:
             texture = MyWindow.gamma_mon(texture)
 
-        print texture[0][0]
         return texture
 
     def gen_timing(self, frame):
@@ -1517,16 +1518,30 @@ def log_stats(count_reps, reps, count_frames, num_frames, elapsed_time,
             file_name = 'Randomlog_' + current_time_string + '_' + '.txt'
             with open((path+file_name), 'w') as f:
 
-                temp = []
-                for j in range(len(to_animate[i].log[0])):
-                    temp.append([to_animate[i].log[0][j],
-                                 to_animate[i].log[1][j],
-                                 scipy.around(to_animate[i].log[2][j][0], 2),
-                                 scipy.around(to_animate[i].log[2][j][1], 2)])
+                if has_tabulate:
+                    # nicer formatting
+                    temp = []
+                    for j in range(len(to_animate[i].log[0])):
+                        temp.append([to_animate[i].log[0][j],
+                                     to_animate[i].log[1][j],
+                                     scipy.around(to_animate[i].log[2][j][0], 2),
+                                     scipy.around(to_animate[i].log[2][j][1], 2)])
 
-                f.write(tabulate(temp,
-                                 headers=['angle', 'frame', 'pos x', 'pos y'],
-                                 tablefmt="orgtbl"))
+                    f.write(tabulate(temp,
+                                     headers=['angle', 'frame', 'pos x', 'pos y'],
+                                     tablefmt="orgtbl"))
+
+                else:
+                    for j in range(len(to_animate[i].log[0])):
+                        f.write('angle: ')
+                        f.write(str(to_animate[i].log[0][j]))
+                        f.write(' frame: ')
+                        f.write(str(to_animate[i].log[1][j]))
+                        f.write(' position: ')
+                        f.write(str(to_animate[i].log[2][j][0]))
+                        f.write(', ')
+                        f.write(str(to_animate[i].log[2][j][1]))
+                        f.write('\n')
 
                 f.write('\n\nangle list:\n')
 
@@ -1606,6 +1621,8 @@ def main(stim_list, verbose=True):
                 # make necessary changes
                 stim.parameters['timing'] = 'step'
                 stim.parameters['color'] = GlobalDefaults['background']
+                stim.parameters['intensity'] = 0
+                stim.parameters['fill_mode'] = 'uniform'
                 stim.parameters['outer_diameter'] = stim.parameters[
                     'inner_diameter']
 
