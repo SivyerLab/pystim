@@ -23,8 +23,7 @@ Stimulus program is tested and works on both OSX and Windows. Stimulus
 program requires several libraries, along with their associated dependencies,
 to run. They are listed below:
 
-- psychopy (see psychopy [documentation](http://www.psychopy
-.org/documentation.html) for required dependencies)
+- psychopy (see psychopy [documentation](http://www.psychopy.org/documentation.html) for required dependencies)
 - tabulate
 - wxPython
 
