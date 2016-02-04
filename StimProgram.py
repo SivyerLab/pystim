@@ -10,6 +10,7 @@ from random import Random
 from time import strftime, localtime
 from PIL import Image
 from math import copysign
+from tabulate import tabulate
 from GammaCorrection import GammaValues  # necessary for pickling
 import scipy
 import scipy.signal
@@ -19,7 +20,6 @@ import os
 import cPickle
 import copy
 import ConfigParser
-from tabulate import tabulate
 
 try:
     from igor import binarywave, packed
@@ -33,11 +33,11 @@ try:
 except ImportError:
     has_u3 = False
 
-__author__ =  "Alexander Tomlinson"
+__author__  = "Alexander Tomlinson"
 __license__ = "GPL"
 __version__ = "1.1"
-__email__ =   "tomlinsa@ohsu.edu"
-__status__ =  "Beta"
+__email__   = "tomlinsa@ohsu.edu"
+__status__  = "Beta"
 
 # to suppress extra warnings, uncomment next line
 # logging.console.setLevel(logging.CRITICAL)
@@ -209,9 +209,13 @@ class MyWindow(object):
     """
 
     # Class attributes
+    #: Psychopy window instance.
     win = None
+    #: Gamma correction instance. See GammaCorrection.py.
     gamma_mon = None
+    #: Used to break out of animation loop in main().
     should_break = False
+    #: Labjack U3 instance for triggering.
     d = None
 
     @staticmethod
@@ -229,7 +233,7 @@ class MyWindow(object):
         gamma = GlobalDefaults['gamma_correction']
 
         if gamma != 'default':
-            gamma_file = './psychopy/gammaTables.txt'
+            gamma_file = './psychopy/data/gammaTables.txt'
 
             if os.path.exists(gamma_file):
                 with open(gamma_file, 'rb') as f:
@@ -288,6 +292,104 @@ class StimDefaults(object):
     """
     Super class to hold parameter defaults. GUI passes dictionary of all
     parameters, whether used to make stim or not.
+
+    :param string shape: Shape of the stim, 'circle', 'rectangle, or 'annulus'.
+
+    :param string fill_mode: How the stim is filled. Can be 'uniform',
+     'sine', 'square', 'concentric', 'checkerboard', 'random', 'image',
+     or 'movie'.
+
+    :param float orientation: Orientation of the stim, in degrees.
+
+    :param list size: Size of the stim, as an x, y list.
+
+    :param float outer_diameter: Size of circle, or outer diameter of
+     annulus, in micrometers.
+
+    :param float inner_diameter: Inner diameter of annulus, in micrometers.
+
+    :param list check_size: Size of each check in a checkerboard or randomly
+     filled board, as an x, y list in micrometers.
+
+    :param int num_check: The number of checks in each direction.
+
+    :param float delay: The time to between the first frame and the stim
+     appearing on screen. Rounds up to the nearest frame.
+
+    :param float duration: The duration for which the stim will animated.
+     Rounds up to the nearest frame.
+
+    :param list location: Coordinates of the stim, as an x, y list.
+
+    :param string timing: How the stim appears on screen over time. For
+     'step', the stim appears immediately. Other options include 'sine',
+     'sawtooth', 'square', and 'linear'.
+
+    :param float period_mod: For cyclic timing modes, the number of cycles.
+
+    :param float alpha: The transparency of the of the stim, between 0 and 1.
+     Does not apply to checkerboard or random fill stims, or images and movies.
+
+    :param string color_mode: The way in which the color of the stim is
+     determined. Can be either 'intensity', or 'rgb'.
+
+    :param string contrast_channel: The color channel in which color is
+     displayed in intensity mode. For the RGB color mode, contrast channel is
+     only used if a fill other than uniform is specified.
+
+    :param float intensity: The color of the stim relative to background,
+     between -1 and 1. For  fills, the color will fluctuate between high and
+     low values of the  specified intensity relative to background, and thus
+     background values on either extreme must use low intensities or risk
+     hitting the color ceiling/floor of the monitor.
+
+    :param list color: RGB color values of the stim, as a list of 3 values
+     between -1 and 1.
+
+    :param float fill_seed: The seed for the random number generator for
+     random fills.
+
+    :param float move_seed: The seed for the random number generator for
+     random movement.
+
+    :param float speed: The speed of moving stims, in micrometers per second.
+
+    :param int num_dirs: The number of directions radially moving stims will
+     travel in.
+
+    :param float start_dir: The start direction for radially moving stims.
+
+    :param float start_radius: The start radius for radially moving stims.
+
+    :param float move_delay: The amount of wait time between each move
+     direction.
+
+    :param float travel_distance: The distance that randomly moving stims
+     will travel before choosing a new direction.
+
+    :param float sf: The spatial frequency of a stim texture.
+
+    :param list phase: The offset of texture in the stim. Units are in
+     cycles, so integer phases will result in no discernible change.
+
+    :param string movie_filename: File path of the movie to be displayed.
+
+    :param list movie_size: Size of the movie, as an x, y list, in micrometers.
+     Keep aspect ratio or movie will be distorted.
+
+    :param string image_filename: File path of the image to be displayed.
+
+    :param list image_size: Size of the image, as an x, y list, in micrometers.
+     Keep aspect ratio or movie will be distorted.
+
+    :param string table_filename: File path of the table to be used for
+     coordinates.
+
+    :param bool trigger: Whether or not to send a trigger for the stim.
+
+    :param int num_jumps:
+
+    :param float jump_delay:
     """
     def __init__(self,
                  shape='circle',
@@ -303,6 +405,7 @@ class StimDefaults(object):
                  location=None,
                  timing='step',
                  intensity=1,
+                 alpha=1,
                  color=None,
                  color_mode='intensity',
                  fill_seed=1,
@@ -312,8 +415,11 @@ class StimDefaults(object):
                  start_dir=0,
                  start_radius=300,
                  travel_distance=50,
+                 phase_mod=False,
+                 intensity_dir='both',
                  sf=1,
                  phase=None,
+                 phase_speed=None,
                  contrast_channel='Green',
                  movie_filename=None,
                  movie_size=None,
@@ -339,6 +445,7 @@ class StimDefaults(object):
         self.move_seed = move_seed
         self.num_dirs = num_dirs
         self.start_dir = start_dir
+        self.intensity_dir = intensity_dir
         self.sf = sf
         self.contrast_channel = ['red', 'green', 'blue'].index(contrast_channel)
         self.movie_filename = movie_filename
@@ -348,6 +455,8 @@ class StimDefaults(object):
         self.trigger = trigger
         self.num_jumps = num_jumps
         self.color_mode = color_mode
+        self.alpha = alpha
+        self.phase_mod = phase_mod
 
         # list variables
         if color is not None:
@@ -412,6 +521,14 @@ class StimDefaults(object):
         else:
             self.check_size = [100, 100]
 
+        if phase_speed is not None:
+            self.phase_speed = [phase_speed[0] * 1.0 / GlobalDefaults[
+                                    'frame_rate'],
+                                phase_speed[1] * 1.0 / GlobalDefaults[
+                                    'frame_rate']]
+        else:
+            self.phase_speed = [0, 0]
+
 
 class StaticStim(StimDefaults):
     """
@@ -444,23 +561,15 @@ class StaticStim(StimDefaults):
         """
         Creates instance of psychopy stim object.
         """
-        if self.fill_mode == 'image':
-            self.stim = visual.ImageStim(win=MyWindow.win,
-                                         size=self.gen_size(),
-                                         pos=self.location,
-                                         ori=self.orientation,
-                                         image=self.image_filename)
+        self.stim = visual.GratingStim(win=MyWindow.win,
+                                       size=self.gen_size(),
+                                       mask=self.gen_mask(),
+                                       tex=self.gen_texture(),
+                                       pos=self.location,
+                                       phase=self.phase,
+                                       ori=self.orientation)
 
-        else:
-            self.stim = visual.GratingStim(win=MyWindow.win,
-                                           size=self.gen_size(),
-                                           mask=self.gen_mask(),
-                                           tex=self.gen_texture(),
-                                           pos=self.location,
-                                           phase=self.phase,
-                                           ori=self.orientation)
-
-            self.stim.sf *= self.sf
+        self.stim.sf *= self.sf
 
     def draw_times(self):
         """
@@ -490,11 +599,16 @@ class StaticStim(StimDefaults):
         # check if within animation range
         if self.start_stim <= frame < self.end_stim:
             # adjust colors based on timing
-            # if self.fill_mode != 'movie':
-            #     self.set_rgb(self.gen_timing(frame))
+            if self.fill_mode not in ['movie']:
+                self.gen_timing(frame)
+
+            # move phase
+            self.gen_phase()
+
             # draw to back buffer
             self.stim.draw()
-            # trigger just before window flip
+
+            # trigger just before first window flip
             if self.trigger and self.start_stim == frame:
                 MyWindow.send_trigger()
 
@@ -519,8 +633,8 @@ class StaticStim(StimDefaults):
                    1) / 2
 
             # add alpha
-            high = numpy.append(high, 1)
-            low = numpy.append(low, 1)
+            high = numpy.append(high, self.alpha)
+            low = numpy.append(low, self.alpha)
 
             delta = (high[self.contrast_channel] - low[
                 self.contrast_channel])
@@ -532,9 +646,20 @@ class StaticStim(StimDefaults):
             # get change relative to background
             delta = background * self.intensity
 
-            # unscale high/low
-            high = ((background + abs(delta)) + 1) / 2
-            low = ((background - abs(delta)) + 1) / 2
+            # get high and low
+            high = background + delta
+            low = background - delta
+
+            # if single direction, bring middle up to halfway between high
+            # and background
+            if self.intensity_dir == 'single':
+                low += delta
+                delta /= 2
+                background += delta
+
+            # unscale high/low (only used by board texture)
+            high = high * 2.0 - 1
+            low = low * 2.0 - 1
 
             color = high, low, delta, background
 
@@ -586,7 +711,7 @@ class StaticStim(StimDefaults):
         size = (max(self.gen_size()),) * 2  # make square, largest size
         texture = numpy.zeros(size+(4,))    # add rgba
         # turn rgb guns off, set opaque
-        texture[:, :, ] = [-1, -1, -1, 1]
+        texture[:, :, ] = [-1, -1, -1, self.alpha]
 
         high, low, delta, background = self.gen_rgb()
 
@@ -631,15 +756,72 @@ class StaticStim(StimDefaults):
             # color array
             texture[:, :, self.contrast_channel] = color
 
+        elif self.fill_mode == 'image':
+            if MyWindow.gamma_mon is not None:
+
+                # data folder
+                data = './psychopy/data/'
+                pics = './psychopy/data/pics/'
+
+                # create folders if not present
+                if not os.path.exists(data):
+                    os.makedirs(data)
+                if not os.path.exists(pics):
+                    os.makedirs(pics)
+
+                pic_name = os.path.basename(self.image_filename)
+                pic_name += '_{}_{}.txt'.format(self.gen_size()[0],
+                                                self.gen_size()[1])
+
+                # if not the first time gamma correcting this image
+                if os.path.exists(pics + pic_name):
+                    with open(pics + pic_name, 'rb') as f:
+                        texture = cPickle.load(f)
+                    print 'loaded'
+
+                # else save gamma correction for faster future loading
+                else:
+                    image = Image.open(self.image_filename)
+                    # make smaller for faster correction if possible
+                    if max(image.size) > max(self.gen_size()):
+                        image.thumbnail(self.gen_size(), Image.ANTIALIAS)
+                    texture = numpy.asarray(image) / 255.0 * 2 - 1
+                    # transform due to different indexing
+                    texture = numpy.rot90(texture, 2)
+                    # add alpha
+                    texture = numpy.insert(texture, 3, self.alpha, axis=2)
+                    # gamma correct (slow step)
+                    texture = MyWindow.gamma_mon(texture)
+
+                    print 'first time'
+                    with open(pics + pic_name, 'wb') as f:
+                        cPickle.dump(texture, f)
+
+            else:
+                image = Image.open(self.image_filename)
+
+                # turn to array and flip (different because of indexing styles
+                texture = numpy.asarray(image) / 255.0 * 2 - 1
+                texture = numpy.rot90(texture, 2)
+
+                # add alpha values
+                texture = numpy.insert(texture, 3, self.alpha, axis=2)
+
+        # gamma correct
+        if MyWindow.gamma_mon is not None and self.fill_mode not in ['image']:
+            texture = MyWindow.gamma_mon(texture)
+
+        print texture[0][0]
         return texture
 
     def gen_timing(self, frame):
         """
-        Adjusts contrast values of stims based on desired timing (i.e. as a
-        function of current frame / draw time). Recalculated on every call to
-        animate(). Also adjusts for gamma correction if necessary.
+        Adjusts alpha values of stims based on desired timing (i.e. as a
+        function of current frame over draw time). Recalculated on every call to
+        animate()
 
         TODO: precompute values
+
         :param frame: current frame number
         :return: list of rgb values as floats
         """
@@ -649,47 +831,36 @@ class StaticStim(StimDefaults):
         # calculate color factors, which are normalized to oscillate between 0
         # and 1 to avoid negative contrast values
         if self.timing == 'sine':
-            color_factor = scipy.sin(self.period_mod * scipy.pi *
+            alpha_factor = scipy.sin(self.period_mod * scipy.pi *
                                      time_fraction - scipy.pi / 2) / 2 + 0.5
 
         elif self.timing == 'square':
-            color_factor = (scipy.signal.square(self.period_mod * 2 *
+            alpha_factor = (scipy.signal.square(self.period_mod * 2 *
                                                 scipy.pi * time_fraction,
                                                 duty=0.5) + 1) / 2
 
         elif self.timing == 'sawtooth':
-            color_factor = (scipy.signal.sawtooth(self.period_mod * 2 *
+            alpha_factor = (scipy.signal.sawtooth(self.period_mod * 2 *
                                                   scipy.pi * time_fraction,
                                                   width=1) + 1) / 2
 
         elif self.timing == 'linear':
-            color_factor = time_fraction
+            alpha_factor = time_fraction
 
         elif self.timing == 'step':
-            color_factor = 1
+            alpha_factor = 1
 
-        # multiply rgbs by color factor, in proper contrast channel
-        if self.contrast_channel == 'red':
-            timing_adj_rgb = [self.contrast_adj_rgb[0] * color_factor,
-                              self.contrast_adj_rgb[1],
-                              self.contrast_adj_rgb[2]]
-        if self.contrast_channel == 'green':
-            timing_adj_rgb = [self.contrast_adj_rgb[0],
-                              self.contrast_adj_rgb[1] * color_factor,
-                              self.contrast_adj_rgb[2]]
-        if self.contrast_channel == 'blue':
-            timing_adj_rgb = [self.contrast_adj_rgb[0],
-                              self.contrast_adj_rgb[1],
-                              self.contrast_adj_rgb[2] * color_factor]
-        if self.contrast_channel == 'global':
-            timing_adj_rgb = [self.contrast_adj_rgb[0] * color_factor,
-                              self.contrast_adj_rgb[1] * color_factor,
-                              self.contrast_adj_rgb[2] * color_factor]
+        # set alpha channel
+        adj_texture = self.stim.tex
+        adj_texture[:, :, 3] = alpha_factor * self.alpha
 
-        if MyWindow.gamma_mon is not None:
-            self.contrast_adj_rgb = MyWindow.gamma_mon(self.contrast_adj_rgb)
+        self.stim.tex = adj_texture
 
-        return timing_adj_rgb
+    def gen_phase(self):
+        """
+        Changes phase of stim on each frame draw.
+        """
+        self.stim.phase += (self.phase_speed[0], self.phase_speed[1])
 
     def set_rgb(self, rgb):
         """
@@ -737,6 +908,7 @@ class MovingStim(StaticStim):
 
         self.end_stim = self.num_frames * self.num_dirs
         self.end_stim += self.start_stim
+        self.end_stim = int(self.end_stim + 0.99) - 1
 
         self.draw_duration = self.end_stim - self.start_stim
 
@@ -792,8 +964,10 @@ class MovingStim(StaticStim):
         if angle >= 360:
             angle -= 360
 
-        # orient shape if not an image
-        if self.fill_mode not in ['image', 'movie']:
+        # orient shape if not an image and fill is uniform
+        if self.fill_mode not in ['image', 'movie'] and self.fill_mode == \
+                'uniform':
+        # if self.fill_mode not in ['image', 'movie']:
             self.stim.ori = self.start_dir
 
         # calculate variables
@@ -995,7 +1169,7 @@ class TableStim(MovingStim):
 
         :return: the x, y coordinates of the stim for every frame as 2 arrays
         :raises ImportError: if attempts to load from an Igor file without
-        having the igor module
+         having the igor module
         """
         table = self.table_filename
         radii = None
@@ -1148,9 +1322,13 @@ def board_texture_class(bases, **kwargs):
                 for x in range(self.num_check/-2, self.num_check/2):
                     xys.append((self.check_size[0]*x, self.check_size[1]*y))
 
+            # get colors
+            high, low, _, _ = self.gen_rgb()
+
             # array of rgbs for each element
             self.colors = numpy.ndarray((self.num_check ** 2, 3))
-            self.colors[::] = GlobalDefaults['background']
+            self.colors[::] = [-1, -1, -1]
+            self.colors[:, self.contrast_channel] = low
 
             # index to know how to color elements in array
             self.index = numpy.zeros((self.num_check, self.num_check))
@@ -1168,7 +1346,7 @@ def board_texture_class(bases, **kwargs):
                     self.index[i] = self.fill_random.randint(0, 1)
 
             # use index to assign colors
-            self.colors[numpy.where(self.index)] = self.gen_color()[0]
+            self.colors[numpy.where(self.index), self.contrast_channel] = high
 
             self.stim = visual.ElementArrayStim(MyWindow.win,
                                                 xys=xys,
@@ -1181,16 +1359,17 @@ def board_texture_class(bases, **kwargs):
 
         def gen_timing(self, frame):
             """
-            Calls super method to get adjusted rgbs then properly assigns
-            values to stim array.
+            ElementArrayStim does not support assigning alpha values.
 
             :param frame: current frame number
-            :return: array of adjusted rgbs
             """
-            rgb = super(BoardTexture, self).gen_timing(frame)
-            self.colors[numpy.where(self.index)] = rgb
+            pass
 
-            return self.colors
+        def gen_phase(self):
+            """
+            ElementArrayStim does not support texture phase.
+            """
+            pass
 
         def set_rgb(self, colors):
             """

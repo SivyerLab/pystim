@@ -52,27 +52,34 @@ def jump():
     rand = Random()
     rand.seed(2)
 
-    num_jumps = 10
+    num_jumps = 5
+    jump_delay = 20
 
     for i in range(num_jumps):
         x = rand.randint(0, image1.size[0]-800)
         y = rand.randint(0, image1.size[1]-600)
+
         cropped = image1.crop((x, y, x+800, y+600))
         cropped_list.append(cropped)
+
         pic = visual.SimpleImageStim(win=my_win, image=cropped)
         pic.draw()
-        img_list.append(visual.BufferImageStim(my_win))
 
+        for j in range(jump_delay):
+            img_list.append(visual.BufferImageStim(my_win))
+
+        my_win.clearBuffer()
 
     pic = visual.SimpleImageStim(win=my_win, image=merge(cropped_list))
     img_list.append(pic)
 
-    for i in img_list:
-        i.draw()
-        my_win.flip()
-        core.wait(0.5)
+    # flip_times = []
+    # elapsed = core.MonotonicClock()
 
-    core.wait(3)
+    for i in range(len(img_list)):
+        img_list[i].draw()
+        # flip_times.append(elapsed.getTime())
+        my_win.flip()
 
     my_win.close()
 

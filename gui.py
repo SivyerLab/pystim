@@ -4,7 +4,7 @@
 Program for GUI interface to StimProgram.py"
 """
 
-# must turn pyglet shadow windows off to avoid conflict with wxPython and
+# must first turn pyglet shadow windows off to avoid conflict with wxPython and
 # psychopy.visual
 import pyglet
 pyglet.options['shadow_window'] = False
@@ -16,14 +16,13 @@ import StimProgram
 import copy
 import cPickle
 import ConfigParser
-from os import system
 import os
 
-__author__ = "Alexander Tomlinson"
+__author__  = "Alexander Tomlinson"
 __license__ = "GPL"
-__version__ = "0.1"
-__email__ = "tomlinsa@ohsu.edu"
-__status__ = "Prototype"
+__version__ = "1.0"
+__email__   = "tomlinsa@ohsu.edu"
+__status__  = "Beta"
 
 
 def get_config_dict(config_file):
@@ -57,14 +56,6 @@ def get_config_dict(config_file):
                         key].strip('[]').split(','))
                 except ValueError:
                     pass
-        # # look for booleans
-        # elif default_config_dict[key] == 'True':
-        #     default_config_dict[key] = True
-        # elif default_config_dict[key] == 'False':
-        #     default_config_dict[key] = False
-        # # look for 'None'
-        # elif default_config_dict[key] == 'None':
-        #     default_config_dict[key] = None
         # cast non lists
         else:
             try:
@@ -77,10 +68,14 @@ def get_config_dict(config_file):
 
     return default_config_dict
 
-config_file = './psychopy/config.ini'
+# config_file = './psychopy/config.ini'
+config_file = "C:\Users\Alex\PycharmProjects\StimulusProgram\psychopy\config.ini"
+
 config_dict = get_config_dict(config_file)
 
-gamma_file = './psychopy/gammaTables.txt'
+gamma_file = './psychopy/data/gammaTables.txt'
+# gamma_file = "C:\Users\Alex\PycharmProjects\StimulusProgram\psychopy
+# \data\gammaTables.txt"
 if os.path.exists(gamma_file):
     with open(gamma_file, 'rb') as f:
         gamma_dict = cPickle.load(f)
@@ -232,14 +227,31 @@ fill_param = OrderedDict([
       'default' : config_dict['fill_mode'],
       'is_child': False,
       'children': {
-          'sine'        : ['sf', 'phase'],
-          'square'      : ['sf', 'phase'],
-          'concentric'  : ['sf', 'phase'],
-          'checkerboard': ['check_size', 'num_check', 'phase'],
-          'random'      : ['check_size', 'num_check', 'fill_seed', 'phase'],
+          'sine'        : ['intensity_dir', 'sf', 'phase', 'phase_speed'],
+          'square'      : ['intensity_dir', 'sf', 'phase', 'phase_speed'],
+          'concentric'  : ['intensity_dir', 'sf', 'phase', 'phase_speed'],
+          'checkerboard': ['check_size', 'num_check', 'phase', 'intensity_dir'],
+          'random'      : ['check_size', 'num_check', 'fill_seed', 'phase',
+                           'intensity_dir'],
           'movie'       : ['movie_filename', 'movie_size'],
-          'image'       : ['image_filename', 'image_size'],
+          'image'       : ['image_filename', 'image_size', 'phase',
+                           'phase_speed'],
       }}
+     ),
+
+    ('alpha',
+     {'type'    : 'text',
+      'label'   : 'alpha',
+      'default' : config_dict['alpha'],
+      'is_child': False}
+     ),
+
+    ('intensity_dir',
+     {'type'    : 'choice',
+      'label'   : 'intensity dir',
+      'choices' : ['single', 'both'],
+      'default' : config_dict['intensity_dir'],
+      'is_child': True}
      ),
 
     ('sf',
@@ -251,8 +263,15 @@ fill_param = OrderedDict([
 
     ('phase',
      {'type'    : 'list',
-      'label'   : 'phase',
+      'label'   : 'phase (cycles)',
       'default' : config_dict['phase'],
+      'is_child': True}
+     ),
+
+    ('phase_speed',
+     {'type'    : 'list',
+      'label'   : 'phase speed (hz)',
+      'default' : config_dict['phase_speed'],
       'is_child': True}
      ),
 
@@ -321,7 +340,8 @@ motion_param = OrderedDict([
       'default' : config_dict['move_type'],
       'is_child': False,
       'children': {
-          'moving': ['speed', 'start_dir', 'num_dirs', 'start_radius', 'move_delay'],
+          'moving': ['speed', 'start_dir', 'num_dirs', 'start_radius',
+                     'move_delay', 'phase_mod'],
           'random': ['speed', 'travel_distance', 'move_seed'],
           'table' : ['table_filename', 'start_dir'],
           'jump'  : ['num_jumps', 'jump_delay', 'move_seed'],
@@ -360,6 +380,14 @@ motion_param = OrderedDict([
      {'type'    : 'text',
       'label'   : 'move delay (s)',
       'default' : config_dict['move_delay'],
+      'is_child': True}
+     ),
+
+    ('phase_mod',
+     {'type'    : 'choice',
+      'label'   : 'phase mod',
+      'choices' : ['True', 'False'],
+      'default' : config_dict['phase_mod'],
       'is_child': True}
      ),
 
@@ -496,7 +524,6 @@ global_default_param = OrderedDict([
       'default' : config_dict['log'],
       'is_child': False}
      )
-    # ('object_list', 1)
 ])
 
 
@@ -561,46 +588,46 @@ class DirPanel(wx.Panel):
         self.load_path = None
 
         # sizer
-        panel_sizer = wx.BoxSizer(wx.VERTICAL)
+        sizer_panel = wx.BoxSizer(wx.VERTICAL)
 
         # file browser
-        if _platform == "darwin":
-            self.browser = wx.FileCtrl(self, wildCard='*.txt', size=(200, -1),
-                defaultDirectory=config_dict['savedStimDir'])
-        elif _platform == "win32":
-            self.browser = wx.FileCtrl(self, wildCard='*.txt', size=(200, -1),
-                defaultDirectory=config_dict['savedStimDir'])
+        self.browser = wx.FileCtrl(self, wildCard='*.txt', size=(200, -1),
+            defaultDirectory=config_dict['savedStimDir'])
 
         # add to sizer
-        panel_sizer.Add(self.browser, 1, wx.BOTTOM | wx.TOP | wx.EXPAND,
+        sizer_panel.Add(self.browser, 1, wx.BOTTOM | wx.TOP | wx.EXPAND,
                         border=5)
 
-        # load and save buttons sizer
-        dir_buttons_sizer = wx.BoxSizer(wx.HORIZONTAL)
+        # sizer for load and save buttons
+        sizer_buttons = wx.BoxSizer(wx.HORIZONTAL)
 
+        # instantiate buttons and add to button sizer
         self.save_button = wx.Button(self, id=wx.ID_SAVE)
-        dir_buttons_sizer.Add(self.save_button, 1, border=5,
+        sizer_buttons.Add(self.save_button, 1, border=5,
                               flag=wx.LEFT | wx.RIGHT)
 
         self.load_button = wx.Button(self, label="Load")
-        dir_buttons_sizer.Add(self.load_button, 1, border=5,
+        sizer_buttons.Add(self.load_button, 1, border=5,
                               flag=wx.LEFT | wx.RIGHT)
 
-        panel_sizer.Add(dir_buttons_sizer, border=5,
+        # add button sizer to panel sizer
+        sizer_panel.Add(sizer_buttons, border=5,
                         flag=wx.BOTTOM | wx.ALIGN_CENTER_HORIZONTAL |
                         wx.ALIGN_CENTER_VERTICAL)
 
-        # load and save button binders
+        # event binders
         self.Bind(wx.EVT_BUTTON, self.on_save_button, self.save_button)
         self.Bind(wx.EVT_BUTTON, self.on_load_button, self.load_button)
         self.Bind(wx.EVT_FILECTRL_FILEACTIVATED, self.on_double_click,
                   self.browser)
 
-        self.SetSizer(panel_sizer)
+        # lays out sizer
+        self.SetSizer(sizer_panel)
 
     def on_save_button(self, event):
         """
         Saves current param settings to text file.
+
         :param event: event passed by binder
         """
         my_frame = event.GetEventObject().GetParent().GetParent()
@@ -610,13 +637,16 @@ class DirPanel(wx.Panel):
         elif _platform == 'win32':
             default_dir = '.\\psychopy\\stims\\'
 
+        # popup save dialog
         save_dialog = wx.FileDialog(my_frame, message='File path',
             defaultDir=default_dir,
             wildcard='*.txt', style=wx.FD_SAVE | wx.FD_OVERWRITE_PROMPT)
 
+        # to exit out of popup
         if save_dialog.ShowModal() == wx.ID_CANCEL:
             return
 
+        # make list of stims queued, rename move type
         to_save = []
         for stim in my_frame.l1.stim_info_list:
             params = copy.deepcopy(stim.parameters)
@@ -629,7 +659,7 @@ class DirPanel(wx.Panel):
         with open(path, 'wb') as f:
             cPickle.dump(to_save, f)
 
-        # refresh display
+        # refresh file browser to show new saved file
         self.browser.ShowHidden(True)
         self.browser.ShowHidden(False)
 
@@ -637,7 +667,8 @@ class DirPanel(wx.Panel):
 
     def on_load_button(self, event):
         """
-        Loads params from parameter file
+        Loads params from parameter file.
+
         :param event: event passed by binder
         """
         my_frame = event.GetEventObject().GetParent().GetParent()
@@ -645,21 +676,21 @@ class DirPanel(wx.Panel):
         # get path of settings file from browser
         path = self.browser.GetPath()
 
-        # open and read settings
+        # check if file is a log file
         if _platform == 'win32':
-            is_log = os.path.dirname(path).split('\\')[-2] != 'logs'
+            is_log = os.path.dirname(path).split('\\')[-2] == 'logs'
             
         if _platform == 'darwin':
-            is_log = os.path.dirname(path).split('/')[-2] != 'logs'
+            is_log = os.path.dirname(path).split('/')[-2] == 'logs'
             
-        
-        if is_log:
+        # if its a log file, need to go to end to find Pickle data
+        if not is_log:
             with open(path, 'rb') as f:
                 to_load = cPickle.load(f)
         else:
-            # search file for PICKLE at end
             try:
                 with open(path, 'rb') as f:
+                    # iterate through lines to look for Pickle
                     next_is_pickle = False
                     to_load = ""
 
@@ -677,7 +708,7 @@ class DirPanel(wx.Panel):
                 print "\nERROR: file not a properly formatted parameter file"
                 return
 
-        # load list
+        # load list, and assign stim stype
         for stim_param in to_load:
             stim_type = stim_param.pop('move_type')
 
@@ -698,9 +729,9 @@ class DirPanel(wx.Panel):
 
     def on_double_click(self, event):
         """
-        opens file for user to inspect if log file, else loads
-        :param event:
-        :return:
+        opens file for user to inspect if log file, else loads.
+
+        :param event:event passed by binder
         """
         my_frame = event.GetEventObject().GetParent().GetParent()
 
@@ -737,11 +768,11 @@ class ListPanel(wx.Panel):
         self.index = 0
 
         # sizer
-        panel_sizer = wx.BoxSizer(wx.VERTICAL)
+        sizer_panel = wx.BoxSizer(wx.VERTICAL)
 
         # title
         title = wx.StaticText(self, label="Stims to run")
-        panel_sizer.Add(title, flag=wx.TOP, border=10)
+        sizer_panel.Add(title, flag=wx.TOP, border=10)
 
         # list control widget
         self.list_control = wx.ListCtrl(self, size=(200, -1),
@@ -752,37 +783,37 @@ class ListPanel(wx.Panel):
         self.list_control.InsertColumn(3, 'Trigger')
 
         # add to sizer
-        panel_sizer.Add(self.list_control, 1, wx.BOTTOM | wx.TOP | wx.EXPAND,
+        sizer_panel.Add(self.list_control, 1, wx.BOTTOM | wx.TOP | wx.EXPAND,
                         border=10)
 
-        # add and remove buttons sizer
-        list_buttons_sizer = wx.BoxSizer(wx.HORIZONTAL)
+        # sizer for add and remove buttons
+        sizer_buttons = wx.BoxSizer(wx.HORIZONTAL)
 
         self.add_button = wx.Button(self, id=wx.ID_ADD)
-        list_buttons_sizer.Add(self.add_button, 1, border=5,
+        sizer_buttons.Add(self.add_button, 1, border=5,
                                flag=wx.LEFT | wx.RIGHT)
 
         self.remove_button = wx.Button(self, id=wx.ID_REMOVE)
-        list_buttons_sizer.Add(self.remove_button, 1, border=5,
+        sizer_buttons.Add(self.remove_button, 1, border=5,
                                flag=wx.LEFT | wx.RIGHT)
 
-        panel_sizer.Add(list_buttons_sizer, border=5,
+        sizer_panel.Add(sizer_buttons, border=5,
                         flag=wx.BOTTOM | wx.ALIGN_CENTER_HORIZONTAL |
                         wx.ALIGN_CENTER_VERTICAL)
 
         # load and save button binders
         self.Bind(wx.EVT_BUTTON, self.on_add_button, self.add_button)
         self.Bind(wx.EVT_BUTTON, self.on_remove_button, self.remove_button)
-        # self.Bind(wx.EVT_BUTTON, self.on_clear_button, self.clear_button)
         # double click to load binder
         self.Bind(wx.EVT_LIST_ITEM_ACTIVATED, self.on_double_click,
                   self.list_control)
 
-        self.SetSizer(panel_sizer)
+        self.SetSizer(sizer_panel)
 
     def on_add_button(self, event):
         """
         Gets stim params from event, to pass to add_stim.
+
         :param event: event passed by binder
         """
         my_frame = event.GetEventObject().GetParent().GetParent()
@@ -799,9 +830,9 @@ class ListPanel(wx.Panel):
     def add_stim(self, stim_type, param_dict):
         """
         Adds stim to list of stims to run
+
         :param stim_type:
         :param param_dict:
-        :return:
         """
         shape = param_dict['shape']
         fill = param_dict['fill_mode']
@@ -838,6 +869,7 @@ class ListPanel(wx.Panel):
     def on_remove_button(self, event):
         """
         Removes stims from stim list. If none selected, clears all
+
         :param event:
         """
         if self.list_control.GetSelectedItemCount() > 0:
@@ -855,6 +887,7 @@ class ListPanel(wx.Panel):
     def on_double_click(self, event):
         """
         Loads params from list on double click
+
         :param event:
         """
         my_frame = event.GetEventObject().GetParent().GetParent()
@@ -899,8 +932,8 @@ class ListPanel(wx.Panel):
 
 class InputPanel(wx.Panel):
     """
-    Class for generic panel with input widgets and labels.
-    Also superclass of SubPanel and GlobalPanel.
+    Class for generic panel with input widgets and labels. Also superclass of
+    SubPanel and GlobalPanel.
     """
     def __init__(self, params, parent):
         """
@@ -1092,17 +1125,18 @@ class InputPanel(wx.Panel):
     #     """
     #     textctrl = event.GetEventObject()
     #     wx.CallAfter(self.select_all, textctrl)
-
-    def select_all(self, textctrl):
-        """
-        Method to highlight all on focus, for easier replacing, especially
-        when tabbing on OSX where default behavior is not to highlight.
-        """
-        textctrl.SelectAll()
+    #
+    # def select_all(self, textctrl):
+    #     """
+    #     Method to highlight all on focus, for easier replacing, especially
+    #     when tabbing on OSX where default behavior is not to highlight.
+    #     """
+    #     textctrl.SelectAll()
 
     def input_update(self, event):
         """
         Method for updating param_dict on changes to input widgets
+
         :param event: wxPython event, passed by binder
         """
         self.Validate()
@@ -1188,6 +1222,7 @@ class InputPanel(wx.Panel):
         Method to change control values on load. SetValue() simulates user
         input and so generates an event, but SetStringSelection() does not,
         so it is necessary to simulate the choice event.
+
         :param value:
         :param param:
         """
@@ -1208,9 +1243,8 @@ class InputPanel(wx.Panel):
             event.SetEventObject(self.input_dict[param])
             event.SetInt(1)
             event.SetString(value)
-            self.input_dict[param].Command(event)
-            global app
-            app.ProcessPendingEvents()
+            # send event to object
+            wx.PostEvent(self.input_dict[param], event)
 
             self.input_dict[param].SetStringSelection(str(value))
 
@@ -1224,21 +1258,24 @@ class InputPanel(wx.Panel):
 class SubPanel(InputPanel):
     """
     Class for subpanels, in order to override input_update
+
+    :param params: dictionary of children parameters to be generated
+    :param parent: parent window
+    :param parent_params: dictionary where parameters of parent param
+     are stored, so that those are changed rather than in sub_param_dict
     """
     def __init__(self, params, parent, parent_params):
         """
-        :param params: dictionary of children parameters to be generated
-        :param parent: parent window
-        :param parent_params: dictionary where parameters of parent param
-        are stored, so that those are changed rather than in sub_param_dict
+        Constructor.
         """
         super(SubPanel, self).__init__(params, parent)
         self.parent_params = parent_params
 
     def input_update(self, event):
         """
-        same as super class input_update, except that changes are made to
-        param dict that parent belongs to
+        Same as super class input_update, except that changes are made to
+        param dict that parent belongs to.
+
         :param event:
         """
         param = event.GetEventObject().tag
@@ -1274,7 +1311,7 @@ class SubPanel(InputPanel):
 class GlobalPanel(InputPanel):
     """
     Subclass of InputPanel, contains a few aesthetic changes in its init
-    since not part of a notebook
+    since not part of a notebook.
     """
     def __init__(self, parent, params):
         # super initiation
@@ -1297,7 +1334,7 @@ class GlobalPanel(InputPanel):
 
 class TextCtrlValidator(wx.PyValidator):
     """
-    Validator class to ensure proper entry of parameters
+    Validator class to ensure proper entry of parameters.
     """
     def __init__(self):
         """
@@ -1307,14 +1344,15 @@ class TextCtrlValidator(wx.PyValidator):
 
     def Clone(self):
         """
-        Standard cloner.
-        All validators are required to implement the Clone() method.
+        Standard cloner. All validators are required to implement the Clone()
+        method.
         """
         return TextCtrlValidator()
 
     def Validate(self, win):
         """
         Validate contents of given TextCtrl.
+
         :param win:
         """
         text_box = self.GetWindow()
@@ -1467,6 +1505,7 @@ class MyFrame(wx.Frame):
 
 
         # key interrupts
+        # self.Bind(wx.EVT_KEY_DOWN, self.on_keypress)
         self.Bind(wx.EVT_CHAR_HOOK, self.on_keypress)
 
         # draw frame
@@ -1488,9 +1527,9 @@ class MyFrame(wx.Frame):
     def on_run_button(self, event):
         """
         Method for running stimulus. Makes call to StimProgram.py. Gets
-        necessary params from global panel (g1)
+        necessary params from global panel (g1).
+
         :param event: event passed by binder
-        :return:
         """
         # checks if stim window is open or not, to determine if needs to open a
         # window by making call to on_win_button
@@ -1513,6 +1552,7 @@ class MyFrame(wx.Frame):
         """
         Method for regenerating stim window. Makes call to StimProgram. Gets
         size from global panel.
+
         :param event: event passed by binder
         :return:
         """
@@ -1540,27 +1580,29 @@ class MyFrame(wx.Frame):
     def on_stop_button(self, event):
         """
         Method for stopping stim. Makes call to StimProgram.
+
         :param event: event passed by binder
         """
         StimProgram.MyWindow.should_break = True
 
     def on_calib_button(self, event):
         """
-        Method for calling gamma correction script
+        Method for calling gamma correction script.
+
         :param event: event passed by binder
-        :return:
         """
         if _platform == 'win32':
-            system('start python GammaCorrection.pyc')
+            os.system('start python GammaCorrection.pyc')
 
         elif _platform == 'darwin':
             current_dir = os.getcwd()
-            system('open -n -a Terminal.app {}'.format(current_dir))
+            os.system('open -n -a Terminal.app {}'.format(current_dir))
 
 
     def on_exit_button(self, event):
         """
         Closes application.
+
         :param event: event passed by binder
         """
         if self.win_open:
@@ -1570,23 +1612,57 @@ class MyFrame(wx.Frame):
 
     def on_keypress(self, event):
         """
-        Interrupt stim if escape key is pressed.
+        Various keypress actions. Requires focus on GUI. CMD is CTRL on
+        win32, 'Apple' key on darwin.
+        ::
+            ENTER  : add stim
+            CMD-R  : run stim
+            ESCAPE : stop stim
+            DELETE : close window
+            CMD-W  : exit
 
         :param event: event passed by binder
         """
         if event.GetKeyCode() == wx.WXK_ESCAPE:
             print 'escaped'
             self.on_stop_button(event)
+            event.Skip()
 
         elif event.GetKeyCode() == wx.WXK_DELETE:
             if self.win_open:
-                print 'window closed'
                 self.on_win_button(event)
+            else:
+                event.Skip()
 
-        event.Skip()
+        elif event.GetKeyCode() in [wx.WXK_RETURN, wx.WXK_NUMPAD_ENTER]:
+            evt = wx.CommandEvent(wx.EVT_BUTTON.typeId,
+                                  self.l1.add_button.Id)
+
+            evt.SetEventObject(self.l1.add_button)
+            evt.SetInt(1)
+            wx.PostEvent(self.l1, evt)
+            event.Skip()
+
+        elif event.GetKeyCode() == 82:  # letter 'r'
+            if event.CmdDown():
+                self.on_run_button(event)
+            else:
+                event.Skip()
+
+        elif event.GetKeyCode() == 87:  # letter 'w'
+            if event.CmdDown():
+                self.on_exit_button(event)
+            else:
+                event.Skip()
+
+        else:
+            event.Skip()
 
 
 def main():
+    """
+    Main method to start GUI.
+    """
     # instantiate app
     global app
     app = wx.App(False)
