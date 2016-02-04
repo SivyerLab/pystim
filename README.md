@@ -3,8 +3,8 @@
 ### What is it?
 
 Stimulus Program uses the [Psychopy](www.psychopy.org) library to create
-various visual stimuli for use with on patch clamp retinal cells. It comes
-with a GUI for ease of use. The program is capable of running at 60 fps and
+various visual stimuli for use with patch clamp retinal cells. It comes with 
+a GUI for ease of use. The program is capable of running at 60 fps and 
 triggering recording devices (using a LabJack U3).
 
 ### Latest Version
@@ -24,10 +24,14 @@ program requires several libraries, along with their associated dependencies,
 to run. They are listed below:
 
 - psychopy (see psychopy [documentation](http://www.psychopy.org/documentation.html) for required dependencies)
-- tabulate
-- wxPython
+- wxPython (for GUI)
 
+Optional libraries:
 
+- tabulate (for formatting logs)
+- igor (for parsing tables)
+- [u3](https://labjack.com/support/software/examples/ud/labjackpython) (for 
+triggering from LabJack)
 
 ### Licensing
 

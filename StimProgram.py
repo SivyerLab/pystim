@@ -8,7 +8,6 @@ from GammaCorrection import GammaValues  # necessary for pickling
 from psychopy.tools.coordinatetools import pol2cart
 from psychopy import visual, core, event, filters
 from time import strftime, localtime
-from tabulate import tabulate
 from random import Random
 from PIL import Image
 import ConfigParser
@@ -24,6 +23,12 @@ try:
     has_igor = True
 except ImportError:
     has_igor = False
+
+try:
+    from tabulate import tabulate
+    has_tabulate = True
+except ImportError:
+    has_tabulate = False
 
 try:
     import u3
@@ -1516,16 +1521,30 @@ def log_stats(count_reps, reps, count_frames, num_frames, elapsed_time,
             file_name = 'Randomlog_' + current_time_string + '_' + '.txt'
             with open((path+file_name), 'w') as f:
 
-                temp = []
-                for j in range(len(to_animate[i].log[0])):
-                    temp.append([to_animate[i].log[0][j],
-                                 to_animate[i].log[1][j],
-                                 scipy.around(to_animate[i].log[2][j][0], 2),
-                                 scipy.around(to_animate[i].log[2][j][1], 2)])
+                if has_tabulate:
+                    # nicer formatting
+                    temp = []
+                    for j in range(len(to_animate[i].log[0])):
+                        temp.append([to_animate[i].log[0][j],
+                                     to_animate[i].log[1][j],
+                                     scipy.around(to_animate[i].log[2][j][0], 2),
+                                     scipy.around(to_animate[i].log[2][j][1], 2)])
 
-                f.write(tabulate(temp,
-                                 headers=['angle', 'frame', 'pos x', 'pos y'],
-                                 tablefmt="orgtbl"))
+                    f.write(tabulate(temp,
+                                     headers=['angle', 'frame', 'pos x', 'pos y'],
+                                     tablefmt="orgtbl"))
+
+                else:
+                    for j in range(len(to_animate[i].log[0])):
+                        f.write('angle: ')
+                        f.write(str(to_animate[i].log[0][j]))
+                        f.write(' frame: ')
+                        f.write(str(to_animate[i].log[1][j]))
+                        f.write(' position: ')
+                        f.write(str(to_animate[i].log[2][j][0]))
+                        f.write(', ')
+                        f.write(str(to_animate[i].log[2][j][1]))
+                        f.write('\n')
 
                 f.write('\n\nangle list:\n')
 
