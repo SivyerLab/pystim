@@ -73,8 +73,9 @@ config_file = "C:\Users\Alex\PycharmProjects\StimulusProgram\psychopy\config.ini
 
 config_dict = get_config_dict(config_file)
 
-gamma_file = './psychopy/gammaTables.txt'
-# gamma_file = "C:\Users\Alex\PycharmProjects\StimulusProgram\psychopy\gammaTables.txt"
+gamma_file = './psychopy/data/gammaTables.txt'
+# gamma_file = "C:\Users\Alex\PycharmProjects\StimulusProgram\psychopy
+# \data\gammaTables.txt"
 if os.path.exists(gamma_file):
     with open(gamma_file, 'rb') as f:
         gamma_dict = cPickle.load(f)
@@ -262,7 +263,7 @@ fill_param = OrderedDict([
 
     ('phase',
      {'type'    : 'list',
-      'label'   : 'phase',
+      'label'   : 'phase (cycles)',
       'default' : config_dict['phase'],
       'is_child': True}
      ),
