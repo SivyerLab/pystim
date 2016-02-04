@@ -757,19 +757,58 @@ class StaticStim(StimDefaults):
             texture[:, :, self.contrast_channel] = color
 
         elif self.fill_mode == 'image':
-            # open and resize to desired size (reduces number of pixels to
-            # gamma correct)
-            image = Image.open(self.image_filename)
-            image.thumbnail(self.gen_size(), Image.ANTIALIAS)
+            if MyWindow.gamma_mon is not None:
 
-            # turn to array and flip (different because of indexing styles
-            texture = numpy.asarray(image) / 255.0 * 2 - 1
-            texture = numpy.rot90(texture, 2)
+                # data folder
+                data = './psychopy/data/'
+                pics = './psychopy/data/pics/'
 
-            # add alpha values
-            texture = numpy.insert(texture, 3, self.alpha, axis=2)
+                # create folders if not present
+                if not os.path.exists(data):
+                    os.makedirs(data)
+                if not os.path.exists(pics):
+                    os.makedirs(pics)
 
-        if MyWindow.gamma_mon is not None:
+                pic_name = os.path.basename(self.image_filename)
+                pic_name += '_{}_{}.txt'.format(self.gen_size()[0],
+                                                self.gen_size()[1])
+
+                # if not the first time gamma correcting this image
+                if os.path.exists(pics + pic_name):
+                    with open(pics + pic_name, 'rb') as f:
+                        texture = cPickle.load(f)
+                    print 'loaded'
+
+                # else save gamma correction for faster future loading
+                else:
+                    image = Image.open(self.image_filename)
+                    # make smaller for faster correction if possible
+                    if max(image.size) > max(self.gen_size()):
+                        image.thumbnail(self.gen_size(), Image.ANTIALIAS)
+                    texture = numpy.asarray(image) / 255.0 * 2 - 1
+                    # transform due to different indexing
+                    texture = numpy.rot90(texture, 2)
+                    # add alpha
+                    texture = numpy.insert(texture, 3, self.alpha, axis=2)
+                    # gamma correct (slow step)
+                    texture = MyWindow.gamma_mon(texture)
+
+                    print 'first time'
+                    with open(pics + pic_name, 'wb') as f:
+                        cPickle.dump(texture, f)
+
+            else:
+                image = Image.open(self.image_filename)
+
+                # turn to array and flip (different because of indexing styles
+                texture = numpy.asarray(image) / 255.0 * 2 - 1
+                texture = numpy.rot90(texture, 2)
+
+                # add alpha values
+                texture = numpy.insert(texture, 3, self.alpha, axis=2)
+
+        # gamma correct
+        if MyWindow.gamma_mon is not None and self.fill_mode not in ['image']:
             texture = MyWindow.gamma_mon(texture)
 
         print texture[0][0]
@@ -869,6 +908,7 @@ class MovingStim(StaticStim):
 
         self.end_stim = self.num_frames * self.num_dirs
         self.end_stim += self.start_stim
+        self.end_stim = int(self.end_stim + 0.99) - 1
 
         self.draw_duration = self.end_stim - self.start_stim
 
