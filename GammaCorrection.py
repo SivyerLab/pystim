@@ -294,7 +294,7 @@ class GammaValues(object):
 
         :return: corrected red color
         """
-        r_adj = float(self.r_spline(r * self.r_slope + self.r_int))
+        r_adj = self.r_spline(r * self.r_slope + self.r_int)
         return r_adj
 
     def g_correct(self, g):
@@ -305,7 +305,7 @@ class GammaValues(object):
         """
         # print g
         # print type(g)
-        g_adj = float(self.g_spline(g * self.g_slope + self.g_int))
+        g_adj = self.g_spline(g * self.g_slope + self.g_int)
         return g_adj
 
     def b_correct(self, b):
@@ -314,7 +314,7 @@ class GammaValues(object):
 
         :return: corrected blue color
         """
-        b_adj = float(self.b_spline(b * self.b_slope + self.b_int))
+        b_adj = self.b_spline(b * self.b_slope + self.b_int)
         return b_adj
 
     def __call__(self, color, channel=None):
@@ -332,9 +332,23 @@ class GammaValues(object):
             if len(numpy.shape(color)) == 3:
                 adj_color = numpy.copy(color)
 
-                adj_color[:, :, 0] = self.r_vect(adj_color[:, :, 0])
-                adj_color[:, :, 1] = self.g_vect(adj_color[:, :, 1])
-                adj_color[:, :, 2] = self.b_vect(adj_color[:, :, 2])
+                size = adj_color.shape[0]
+
+                r, g, b, a = numpy.split(adj_color, 4, axis=2)
+
+                r = r.flatten()
+                g = g.flatten()
+                b = b.flatten()
+                a = a.flatten()
+
+                r = self.r_correct(r)
+                g = self.g_correct(g)
+                b = self.b_correct(b)
+
+                adj_color = numpy.dstack([numpy.split(r, size),
+                                          numpy.split(g, size),
+                                          numpy.split(b, size),
+                                          numpy.split(a, size)])
 
             # if single color
             elif len(numpy.shape(color)) == 1:
