@@ -230,6 +230,7 @@ class MyWindow(object):
         present.
         """
         # create labjack instance
+
         if has_u3:
             MyWindow.d = u3.U3()
 
@@ -242,6 +243,9 @@ class MyWindow(object):
             if os.path.exists(gamma_file):
                 with open(gamma_file, 'rb') as f:
                     MyWindow.gamma_mon = cPickle.load(f)[gamma]
+
+        else:
+            MyWindow.gamma_mon = None
 
         # gamma correction as necessary
         if MyWindow.gamma_mon is not None:
@@ -601,7 +605,7 @@ class StaticStim(StimDefaults):
         # check if within animation range
         if self.start_stim <= frame < self.end_stim:
             # adjust colors based on timing
-            if self.fill_mode not in ['movie']:
+            if self.fill_mode not in ['movie'] and self.timing != 'step':
                 self.gen_timing(frame)
 
             # move phase
@@ -772,32 +776,47 @@ class StaticStim(StimDefaults):
                     os.makedirs(pics)
 
                 pic_name = os.path.basename(self.image_filename)
-                pic_name += '_{}_{}.txt'.format(self.gen_size()[0],
-                                                self.gen_size()[1])
+                filename, file_ext = os.path.splitext(pic_name)
+
+                pic_name = filename + \
+                            '_{}_{}'.format(self.gen_size()[0],
+                                            self.gen_size()[1]) + \
+                            file_ext
 
                 # if not the first time gamma correcting this image
                 if os.path.exists(pics + pic_name):
-                    with open(pics + pic_name, 'rb') as f:
-                        texture = cPickle.load(f)
-                    print 'loaded'
+                    image = Image.open(pics + pic_name)
+
+                    # turn to array and flip (different because of indexing styles
+                    texture = numpy.asarray(image) / 255.0 * 2 - 1
+                    texture = numpy.rot90(texture, 2)
+
+                    # add alpha values
+                    texture = numpy.insert(texture, 3, self.alpha, axis=2)
+
 
                 # else save gamma correction for faster future loading
                 else:
                     image = Image.open(self.image_filename)
+
                     # make smaller for faster correction if possible
                     if max(image.size) > max(self.gen_size()):
                         image.thumbnail(self.gen_size(), Image.ANTIALIAS)
+
+                    # rescale rgb
                     texture = numpy.asarray(image) / 255.0 * 2 - 1
-                    # transform due to different indexing
-                    texture = numpy.rot90(texture, 2)
-                    # add alpha
-                    texture = numpy.insert(texture, 3, self.alpha, axis=2)
+
                     # gamma correct (slow step)
                     texture = MyWindow.gamma_mon(texture)
 
-                    print 'first time'
-                    with open(pics + pic_name, 'wb') as f:
-                        cPickle.dump(texture, f)
+                    # save for future
+                    scipy.misc.imsave(pics + pic_name, texture)
+
+                    # transform due to different indexing
+                    texture = numpy.rot90(texture, 2)
+
+                    # add alpha
+                    texture = numpy.insert(texture, 3, self.alpha, axis=2)
 
             else:
                 image = Image.open(self.image_filename)
