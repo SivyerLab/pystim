@@ -2,7 +2,8 @@
 
 """
 Script for setting the gamma correction table for psychopy. Steps through
-luminosity intervals while user records values, then prompts for table. Table is
+luminosity intervals while user records values, then prompts for table.
+Can skip the luminosity stepping and go straight to table. Table is
 text file, with newline separated values, and each color (in RGB order)
 separated by 2 new lines.
 

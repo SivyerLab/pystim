@@ -419,7 +419,6 @@ class StimDefaults(object):
                  start_dir=0,
                  start_radius=300,
                  travel_distance=50,
-                 phase_mod=False,
                  intensity_dir='both',
                  sf=1,
                  phase=None,
@@ -460,7 +459,6 @@ class StimDefaults(object):
         self.num_jumps = num_jumps
         self.color_mode = color_mode
         self.alpha = alpha
-        self.phase_mod = phase_mod
 
         # list variables
         if color is not None:
@@ -815,7 +813,6 @@ class StaticStim(StimDefaults):
         if MyWindow.gamma_mon is not None and self.fill_mode not in ['image']:
             texture = MyWindow.gamma_mon(texture)
 
-        print texture[0][0]
         return texture
 
     def gen_timing(self, frame):
@@ -1624,6 +1621,8 @@ def main(stim_list, verbose=True):
                 # make necessary changes
                 stim.parameters['timing'] = 'step'
                 stim.parameters['color'] = GlobalDefaults['background']
+                stim.parameters['intensity'] = 0
+                stim.parameters['fill_mode'] = 'uniform'
                 stim.parameters['outer_diameter'] = stim.parameters[
                     'inner_diameter']
 

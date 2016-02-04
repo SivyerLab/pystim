@@ -9,8 +9,9 @@ triggering recording devices (using a LabJack U3).
 
 ### Latest Version
 
-The latest version can be found under the master branch on GitHub. The dev
-branch is experimental, but usually will contain new features and be functional.
+The latest version can be found in the master branch on GitHub. The dev 
+branch is experimental, but will usually  contain new features and be mostly
+functional.
 
 ### Documentation
 
