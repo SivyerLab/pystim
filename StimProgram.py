@@ -4,22 +4,20 @@
 Program for presenting visual stimuli to patch clamped retinal neurons.
 """
 
-from psychopy import visual, logging, core, event, filters
-from psychopy.tools.coordinatetools import pol2cart
-from random import Random
-from time import strftime, localtime
-from PIL import Image
-from math import copysign
-from tabulate import tabulate
 from GammaCorrection import GammaValues  # necessary for pickling
+from psychopy.tools.coordinatetools import pol2cart
+from psychopy import visual, core, event, filters
+from time import strftime, localtime
+from tabulate import tabulate
+from random import Random
+from PIL import Image
+import ConfigParser
+import cPickle
 import scipy
-import scipy.signal
 import numpy
+import copy
 import sys
 import os
-import cPickle
-import copy
-import ConfigParser
 
 try:
     from igor import binarywave, packed
@@ -39,7 +37,8 @@ __version__ = "1.1"
 __email__   = "tomlinsa@ohsu.edu"
 __status__  = "Beta"
 
-# to suppress extra warnings, uncomment next line
+# to suppress extra warnings, uncomment next lines
+# from psychopy import logging
 # logging.console.setLevel(logging.CRITICAL)
 
 # read ini file
