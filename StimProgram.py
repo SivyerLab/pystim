@@ -232,7 +232,12 @@ class MyWindow(object):
         # create labjack instance
 
         if has_u3:
-            MyWindow.d = u3.U3()
+            try:
+                MyWindow.d = u3.U3()
+            except Exception:
+                print 'Is the labjack connected?'
+                global has_u3
+                has_u3 = False
 
         # check if gamma splines present
         gamma = GlobalDefaults['gamma_correction']
