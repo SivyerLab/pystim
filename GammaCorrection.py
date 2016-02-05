@@ -171,12 +171,13 @@ def gammaCorrect():
         corrected[1].append(rgb[1])
         corrected[2].append(rgb[2])
 
-    plt.plot(vals, vals, 'k--', label='linear')
-    plt.plot(vals, corrected[0], 'r', label='red')
-    plt.plot(vals, corrected[1], 'g', label='green')
-    plt.plot(vals, corrected[2], 'b', label='blue')
-    plt.legend(loc=0)
-    plt.show()
+    if show_plot == 'Y':
+        plt.plot(vals, vals, 'k--', label='linear')
+        plt.plot(vals, corrected[0], 'r', label='red')
+        plt.plot(vals, corrected[1], 'g', label='green')
+        plt.plot(vals, corrected[2], 'b', label='blue')
+        plt.legend(loc=0)
+        plt.show()
 
     should_save = raw_input('\nSave? Y, N: ')
 
