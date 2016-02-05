@@ -40,6 +40,7 @@ def get_config_dict(config_file):
     # add GUI specific settings
     default_config_dict['savedStimDir'] = config.get('GUI', 'savedStimDir')
     default_config_dict['windowPos'] = config.get('GUI', 'windowPos')
+    # default_config_dict['defaults'] = config.get('GUI', 'defaults')
 
     # stab at casting non-strings
     for key, value in default_config_dict.iteritems():
@@ -1215,6 +1216,8 @@ class InputPanel(wx.Panel):
         input and so generates an event, but SetStringSelection() does not,
         so it is necessary to simulate the choice event.
 
+        TODO: SetPath does not simulate event, so path does not get changed.
+
         :param value:
         :param param:
         """
@@ -1234,7 +1237,7 @@ class InputPanel(wx.Panel):
                                     self.input_dict[param].Id)
             event.SetEventObject(self.input_dict[param])
             event.SetInt(1)
-            event.SetString(value)
+            event.SetString(str(value))
             # send event to object
             wx.PostEvent(self.input_dict[param], event)
 
@@ -1318,11 +1321,91 @@ class GlobalPanel(InputPanel):
 
         # title
         self.title = wx.StaticText(self, label="Global Defaults")
-        self.grid.Add(self.title, pos=(0, 0), span=(1, 2))
+        self.grid.Add(self.title, pos=(0, 0))
+
+        # sizer for default selector and save button
+        default_sizer = wx.GridSizer(rows=1, cols=2, hgap=5)
+
+        # default selector
+        globals_file = './psychopy/data/global_defaults.txt'
+
+        if os.path.exists(globals_file):
+            with open(globals_file, 'rb') as f:
+                global_dict = cPickle.load(f)
+            defaults_list = global_dict.keys()
+        else:
+            defaults_list = []
+
+        self.which_default = ChoiceTag(self, tag='defaults',
+                                       choices=sorted(defaults_list))
+        # self.which_default.SetStringSelection(config_dict['defaults'])
+        self.Bind(wx.EVT_CHOICE, self.on_default_select, self.which_default)
+        default_sizer.Add(self.which_default)
+
+        # save button
+        self.save_default = wx.Button(self, size=(-1,-1), id=wx.ID_SAVE)
+        self.Bind(wx.EVT_BUTTON, self.on_default_save, self.save_default)
+        default_sizer.Add(self.save_default, 1)
+
+        self.grid.Add(default_sizer, pos=(0, 1))
 
         # spacers
         self.grid.Add((5, 5), pos=(1, 0))
 
+    def on_default_save(self, event):
+        """
+        Saves global dfefaults.
+
+        :param event: event passed by binder.
+        """
+        save_name_dialog = wx.TextEntryDialog(self, 'save name')
+
+        # to exit out of popup
+        if save_name_dialog.ShowModal() == wx.ID_CANCEL:
+            return
+
+        save_name = save_name_dialog.GetValue()
+
+        params_to_save = self.get_param_dict()
+
+        globals_file = './psychopy/data/global_defaults.txt'
+
+        if os.path.exists(globals_file):
+            with open(globals_file, 'rb') as f:
+                global_dict = cPickle.load(f)
+        else:
+            global_dict = {}
+
+        if save_name not in global_dict.keys():
+            self.which_default.AppendItems([save_name])
+
+        self.which_default.SetStringSelection(save_name)
+
+        global_dict[save_name] = params_to_save
+
+        with open(globals_file, 'wb') as f:
+            cPickle.dump(global_dict, f)
+
+    def on_default_select(self, event):
+        """
+        Fills out params from saved globals.
+
+        :param event: event passed by binder.
+        """
+        which_default = event.GetString()
+        globals_file = './psychopy/data/global_defaults.txt'
+        with open(globals_file, 'rb') as f:
+            params = cPickle.load(f)[which_default]
+
+        # change True/False back to string
+        for k, v in params.iteritems():
+            if type(v) == bool and v == True:
+                params[k] = 'True'
+            elif type(v) == bool and v == False:
+                params[k] = 'False'
+
+        for param, value in params.iteritems():
+            self.set_value(param, params[param])
 
 class TextCtrlValidator(wx.PyValidator):
     """
