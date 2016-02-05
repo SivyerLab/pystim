@@ -180,7 +180,7 @@ def gammaCorrect():
 
     should_save = raw_input('\nSave? Y, N: ')
 
-    gamma_file = './psychopy/gammaTables.txt'
+    gamma_file = './psychopy/data/gammaTables.txt'
 
     if should_save == 'Y':
         if os.path.exists(gamma_file):
@@ -331,25 +331,36 @@ class GammaValues(object):
         if channel is None:
             # if entire texture
             if len(numpy.shape(color)) == 3:
+                has_alpha = bool(numpy.shape(color)[2] == 4)
+
                 adj_color = numpy.copy(color)
 
                 size = adj_color.shape[0]
 
-                r, g, b, a = numpy.split(adj_color, 4, axis=2)
+                if has_alpha:
+                    r, g, b, a = numpy.split(adj_color, 4, axis=2)
+                else:
+                    r, g, b = numpy.split(adj_color, 3, axis=2)
 
                 r = r.flatten()
                 g = g.flatten()
                 b = b.flatten()
-                a = a.flatten()
+                if has_alpha:
+                    a = a.flatten()
 
                 r = self.r_correct(r)
                 g = self.g_correct(g)
                 b = self.b_correct(b)
 
-                adj_color = numpy.dstack([numpy.split(r, size),
-                                          numpy.split(g, size),
-                                          numpy.split(b, size),
-                                          numpy.split(a, size)])
+                if has_alpha:
+                    adj_color = numpy.dstack([numpy.split(r, size),
+                                              numpy.split(g, size),
+                                              numpy.split(b, size),
+                                              numpy.split(a, size)])
+                else:
+                    adj_color = numpy.dstack([numpy.split(r, size),
+                                              numpy.split(g, size),
+                                              numpy.split(b, size)])
 
             # if single color
             elif len(numpy.shape(color)) == 1:
