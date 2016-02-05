@@ -1368,6 +1368,13 @@ class GlobalPanel(InputPanel):
 
         params_to_save = self.get_param_dict()
 
+        # data folder
+        data = os.path.abspath('./psychopy/data/')
+
+        # create folder if not present
+        if not os.path.exists(data):
+            os.makedirs(data)
+
         globals_file = os.path.abspath('./psychopy/data/global_defaults.txt')
 
         if os.path.exists(globals_file):
