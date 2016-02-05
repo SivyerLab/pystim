@@ -43,7 +43,7 @@ file for license rights and limitations.
 
 Main screen:
 
-![main screen](docs/screenshots/screen1.png)
+![main screen] (docs/screenshots/screen1.png)
 
 Stims to run:
 
@@ -51,4 +51,4 @@ Stims to run:
 
 Example stimulus:
 
-![example](./raw/master/docs/screenshots/screen4.png)
+![example] (./raw/master/docs/screenshots/screen4.png)
