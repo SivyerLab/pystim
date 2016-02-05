@@ -51,4 +51,4 @@ Stims to run:
 
 Example stimulus:
 
-![example](docs/screenshots/screen4.png)
+![example](./docs/screenshots/screen4.png)
