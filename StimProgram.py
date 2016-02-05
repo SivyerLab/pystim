@@ -821,6 +821,10 @@ class StaticStim(StimDefaults):
             else:
                 image = Image.open(self.image_filename)
 
+                # make smaller for faster correction if possible
+                if max(image.size) > max(self.gen_size()):
+                    image.thumbnail(self.gen_size(), Image.ANTIALIAS)
+
                 # turn to array and flip (different because of indexing styles
                 texture = numpy.asarray(image) / 255.0 * 2 - 1
                 texture = numpy.rot90(texture, 2)
