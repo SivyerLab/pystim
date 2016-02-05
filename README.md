@@ -47,7 +47,7 @@ Main screen:
 
 Stims to run:
 
-![stims added](docs/screenshots/screen3.png)
+[stims added](docs/screenshots/screen3.png)
 
 Example stimulus:
 
