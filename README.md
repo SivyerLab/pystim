@@ -43,7 +43,7 @@ file for license rights and limitations.
 
 Main screen:
 
-![main screen] (docs/screenshots/screen1.png)
+![main screen] (docs/screenshots/screen1.PNG)
 
 Stims to run:
 
