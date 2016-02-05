@@ -48,7 +48,7 @@ __status__  = "Beta"
 
 # read ini file
 config = ConfigParser.ConfigParser()
-config.read('./psychopy/config.ini')
+config.read(os.path.abspath('./psychopy/config.ini'))
 
 
 class StimInfo(object):
@@ -238,7 +238,7 @@ class MyWindow(object):
         gamma = GlobalDefaults['gamma_correction']
 
         if gamma != 'default':
-            gamma_file = './psychopy/data/gammaTables.txt'
+            gamma_file = os.path.abspath('./psychopy/data/gammaTables.txt')
 
             if os.path.exists(gamma_file):
                 with open(gamma_file, 'rb') as f:
@@ -766,8 +766,8 @@ class StaticStim(StimDefaults):
             if MyWindow.gamma_mon is not None:
 
                 # data folder
-                data = './psychopy/data/'
-                pics = './psychopy/data/pics/'
+                data = os.path.abspath('./psychopy/data/')
+                pics = os.path.abspath('./psychopy/data/pics/')
 
                 # create folders if not present
                 if not os.path.exists(data):

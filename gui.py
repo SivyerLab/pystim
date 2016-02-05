@@ -69,12 +69,12 @@ def get_config_dict(config_file):
 
     return default_config_dict
 
-# config_file = './psychopy/config.ini'
-config_file = "C:\Users\Alex\PycharmProjects\StimulusProgram\psychopy\config.ini"
+config_file = os.path.abspath('./psychopy/config.ini')
+# config_file = "C:\Users\Alex\PycharmProjects\StimulusProgram\psychopy\config.ini"
 
 config_dict = get_config_dict(config_file)
 
-gamma_file = './psychopy/data/gammaTables.txt'
+gamma_file = os.path.abspath('./psychopy/data/gammaTables.txt')
 # gamma_file = "C:\Users\Alex\PycharmProjects\StimulusProgram\psychopy
 # \data\gammaTables.txt"
 if os.path.exists(gamma_file):
@@ -1327,7 +1327,7 @@ class GlobalPanel(InputPanel):
         default_sizer = wx.GridSizer(rows=1, cols=2, hgap=5)
 
         # default selector
-        globals_file = './psychopy/data/global_defaults.txt'
+        globals_file = os.path.abspath('./psychopy/data/global_defaults.txt')
 
         if os.path.exists(globals_file):
             with open(globals_file, 'rb') as f:
@@ -1368,7 +1368,7 @@ class GlobalPanel(InputPanel):
 
         params_to_save = self.get_param_dict()
 
-        globals_file = './psychopy/data/global_defaults.txt'
+        globals_file = os.path.abspath('./psychopy/data/global_defaults.txt')
 
         if os.path.exists(globals_file):
             with open(globals_file, 'rb') as f:
@@ -1393,7 +1393,7 @@ class GlobalPanel(InputPanel):
         :param event: event passed by binder.
         """
         which_default = event.GetString()
-        globals_file = './psychopy/data/global_defaults.txt'
+        globals_file = os.path.abspath('./psychopy/data/global_defaults.txt')
         with open(globals_file, 'rb') as f:
             params = cPickle.load(f)[which_default]
 
