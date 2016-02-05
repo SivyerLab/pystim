@@ -234,7 +234,8 @@ class MyWindow(object):
         if has_u3:
             try:
                 MyWindow.d = u3.U3()
-            except Exception:
+            except Exception as e:
+                print  e
                 print 'Is the labjack connected?'
                 global has_u3
                 has_u3 = False
@@ -784,13 +785,15 @@ class StaticStim(StimDefaults):
                 filename, file_ext = os.path.splitext(pic_name)
 
                 pic_name = filename + \
-                            '_{}_{}'.format(self.gen_size()[0],
+                           '_{}_{}'.format(self.gen_size()[0],
                                             self.gen_size()[1]) + \
-                            file_ext
+                           file_ext
+
+                savedir = os.path.join(pics, pic_name)
 
                 # if not the first time gamma correcting this image
-                if os.path.exists(pics + pic_name):
-                    image = Image.open(pics + pic_name)
+                if os.path.exists(savedir):
+                    image = Image.open(savedir)
 
                     # turn to array and flip (different because of indexing styles
                     texture = numpy.asarray(image) / 255.0 * 2 - 1
@@ -815,7 +818,7 @@ class StaticStim(StimDefaults):
                     texture = MyWindow.gamma_mon(texture)
 
                     # save for future
-                    scipy.misc.imsave(pics + pic_name, texture)
+                    scipy.misc.imsave(savedir, texture)
 
                     # transform due to different indexing
                     texture = numpy.rot90(texture, 2)
