@@ -352,7 +352,7 @@ motion_param = OrderedDict([
           'moving': ['speed', 'start_dir', 'num_dirs', 'start_radius',
                      'move_delay'],
           'random': ['speed', 'travel_distance', 'move_seed'],
-          'table' : ['table_filename', 'start_dir'],
+          'table' : ['table_filename', 'start_dir', 'num_dirs', 'move_delay'],
           'jump'  : ['num_jumps', 'jump_delay', 'move_seed'],
       }}
      ),
@@ -1634,7 +1634,6 @@ class MyFrame(wx.Frame):
                 self.on_stop_button(event)
                 try:
                     fps, time = StimProgram.main(self.l1.stim_info_list)
-                    print fps, time
                     self.SetStatusText('Last run: {0:.2f} fps, '.format(fps) \
                                        + '{0:.2f} seconds'.format(time))
                 except:

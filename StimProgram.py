@@ -498,7 +498,7 @@ class StimDefaults(object):
         # time conversions
         self.delay = delay * GlobalDefaults['frame_rate']
         self.duration = duration * GlobalDefaults['frame_rate']
-        self.move_delay = move_delay * GlobalDefaults['frame_rate']
+        self.move_delay = int(move_delay * GlobalDefaults['frame_rate'])
         self.jump_delay = jump_delay * GlobalDefaults['frame_rate']
 
         # speed conversion
@@ -860,7 +860,7 @@ class StaticStim(StimDefaults):
         if MyWindow.gamma_mon is not None and self.fill_mode not in ['image']:
             texture = MyWindow.gamma_mon(texture)
 
-        print texture.dtype, texture.itemsize, texture.nbytes / 1e9
+        # print texture.dtype, texture.itemsize, texture.nbytes / 1e9
         return texture
 
     def gen_timing(self, frame):
@@ -976,17 +976,28 @@ class MovingStim(StaticStim):
             # if next coordinate is calculated, moves stim, else calls
             # gen_movement() and retries
             try:
-                x, y = self.get_next_pos()
-                print frame, x, y
-                self.set_pos(x, y)
 
-                if self.trigger_frames is not None and \
-                        self.trigger_frames[frame]:
-                    MyWindow.send_trigger()
+                if self.trigger_frames is not None:
+                    x, y, trigger_frame = self.get_next_pos()
+                    self.set_pos(x, y)
+
+                    if self.trigger_frames[trigger_frame]:
+                        MyWindow.send_trigger()
+
+                else:
+                    x, y = self.get_next_pos()
+                    self.set_pos(x, y)
 
                 super(MovingStim, self).animate(frame)
 
+                # to raise errors to stop recursion
+                self.error_count = 0
+
             except (AttributeError, IndexError, TypeError):
+                self.error_count += 1
+                if self.error_count == 2:
+                    raise
+
                 self.gen_pos()
 
                 # log frame number for RandomlyMovingStim
@@ -1195,14 +1206,30 @@ class TableStim(MovingStim):
 
         :return: last frame number as int
         """
+        # self.start_stim = self.delay
+        #
+        # # need to generate movement to get number of frames
+        # self.gen_pos()
+        #
+        # self.end_stim = self.num_frames + self.start_stim + self.move_delay
+        #
+        # self.draw_duration = self.end_stim - self.start_stim
+        #
+        # return self.end_stim
+
         self.start_stim = self.delay
 
         # need to generate movement to get number of frames
         self.gen_pos()
 
-        self.end_stim = self.num_frames + self.start_stim + self.move_delay
+        self.end_stim = self.num_frames * self.num_dirs
+        self.end_stim += self.start_stim
+        self.end_stim = int(self.end_stim + 0.99) - 1
 
         self.draw_duration = self.end_stim - self.start_stim
+
+        print len(self.x_array)
+        self.error_count = 0
 
         return self.end_stim
 
@@ -1212,6 +1239,30 @@ class TableStim(MovingStim):
         """
         self.frame_counter = 0
         self.x_array, self.y_array = self.gen_pos_array()
+
+        # add in move delay by placing stim off screen
+        if len(self.stim.size) > 1:
+            max_size = max(self.stim.size)
+        else:
+            max_size = self.stim.size
+
+        off_x = (GlobalDefaults['display_size'][0] + max_size) / 2
+        off_y = (GlobalDefaults['display_size'][1] + max_size) / 2
+
+        for i in range(self.move_delay):
+            self.x_array = scipy.append(self.x_array, off_x)
+            self.y_array = scipy.append(self.y_array, off_y)
+            self.trigger_frames = scipy.append(self.y_array, 0)
+
+        self.num_frames += self.move_delay
+
+        # set start_dir for next call of gen_pos()
+        self.start_dir += 360 / self.num_dirs
+
+        # start_dir cannot be more than 360
+        if self.start_dir >= 360:
+            self.start_dir -= 360
+
 
     def gen_pos_array(self, *args):
         """
@@ -1269,22 +1320,22 @@ class TableStim(MovingStim):
         theta = self.start_dir * -1 + 90  # origins are different in pol/cart
         x, y = map(list, zip(*[pol2cart(theta, r) for r in radii]))
 
-        # add in move delay by placing stim off screen
-        if len(self.stim.size) > 1:
-            max_size = max(self.stim.size)
-        else:
-            max_size = self.stim.size
-
-        off_x = (GlobalDefaults['display_size'][0] + max_size) / 2
-        off_y = (GlobalDefaults['display_size'][1] + max_size) / 2
-
-        for i in range(self.move_delay):
-            self.x_array = scipy.append(self.x_array, off_x)
-            self.y_array = scipy.append(self.y_array, off_y)
-
-        self.num_frames += self.move_delay
-
         return x, y
+
+    def get_next_pos(self):
+        """
+        Returns the next coordinate from x, y_array for animate to set the
+        position of the stim for the next frame.
+        :return: x, y coordinate as tuple
+        """
+        x = self.x_array[self.frame_counter]
+        y = self.y_array[self.frame_counter]
+        to_trigger = self.frame_counter
+
+        # increment frame counter
+        self.frame_counter += 1
+
+        return x, y, to_trigger
 
 
 class ImageJumpStim(StaticStim):
