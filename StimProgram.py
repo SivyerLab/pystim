@@ -620,12 +620,12 @@ class StaticStim(StimDefaults):
             # move phase
             self.gen_phase()
 
-            # draw to back buffer
-            self.stim.draw()
-
             # trigger just before first window flip
             if self.trigger and self.start_stim == frame:
                 MyWindow.send_trigger()
+
+            # draw to back buffer
+            self.stim.draw()
 
     def gen_rgb(self):
         """
@@ -724,7 +724,7 @@ class StaticStim(StimDefaults):
 
         # make array
         size = (max(self.gen_size()),) * 2  # make square, largest size
-        texture = numpy.zeros(size+(4,), dtype=numpy.float32)    # add rgba
+        texture = numpy.zeros(size+(4,))    # add rgba
         # turn rgb guns off, set opaque
         texture[:, :, ] = [-1, -1, -1, self.alpha]
 
@@ -805,7 +805,7 @@ class StaticStim(StimDefaults):
 
                     # turn into array and flip (different because of indexing
                     # styles)
-                    texture = numpy.asarray(image, dtype=numpy.float32) / \
+                    texture = numpy.asarray(image) / \
                               255.0 * 2 - 1
                     texture = numpy.rot90(texture, 2)
 
@@ -822,7 +822,7 @@ class StaticStim(StimDefaults):
                         image.thumbnail(self.gen_size(), Image.ANTIALIAS)
 
                     # rescale rgb
-                    texture = numpy.asarray(image, dtype=numpy.float32) / 255.0 * 2 - 1
+                    texture = numpy.asarray(image) / 255.0 * 2 - 1
 
                     if self.image_channel != 3:
                         for i in range(3):
@@ -850,7 +850,7 @@ class StaticStim(StimDefaults):
                     image.thumbnail(self.gen_size(), Image.ANTIALIAS)
 
                 # turn to array and flip (different because of indexing styles
-                texture = numpy.asarray(image, dtype=numpy.float32) / 255.0 * 2 - 1
+                texture = numpy.asarray(image) / 255.0 * 2 - 1
                 texture = numpy.rot90(texture, 2)
 
                 # add alpha values
@@ -977,6 +977,7 @@ class MovingStim(StaticStim):
             # gen_movement() and retries
             try:
                 x, y = self.get_next_pos()
+                print frame, x, y
                 self.set_pos(x, y)
 
                 if self.trigger_frames is not None and \
@@ -1199,7 +1200,7 @@ class TableStim(MovingStim):
         # need to generate movement to get number of frames
         self.gen_pos()
 
-        self.end_stim = self.num_frames + self.start_stim
+        self.end_stim = self.num_frames + self.start_stim + self.move_delay
 
         self.draw_duration = self.end_stim - self.start_stim
 
@@ -1267,6 +1268,21 @@ class TableStim(MovingStim):
         # make arrays
         theta = self.start_dir * -1 + 90  # origins are different in pol/cart
         x, y = map(list, zip(*[pol2cart(theta, r) for r in radii]))
+
+        # add in move delay by placing stim off screen
+        if len(self.stim.size) > 1:
+            max_size = max(self.stim.size)
+        else:
+            max_size = self.stim.size
+
+        off_x = (GlobalDefaults['display_size'][0] + max_size) / 2
+        off_y = (GlobalDefaults['display_size'][1] + max_size) / 2
+
+        for i in range(self.move_delay):
+            self.x_array = scipy.append(self.x_array, off_x)
+            self.y_array = scipy.append(self.y_array, off_y)
+
+        self.num_frames += self.move_delay
 
         return x, y
 
