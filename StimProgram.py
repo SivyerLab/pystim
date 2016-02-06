@@ -422,6 +422,7 @@ class StimDefaults(object):
                  alpha=1,
                  color=None,
                  color_mode='intensity',
+                 image_channel='all',
                  fill_seed=1,
                  move_seed=1,
                  speed=10,
@@ -469,6 +470,8 @@ class StimDefaults(object):
         self.num_jumps = num_jumps
         self.color_mode = color_mode
         self.alpha = alpha
+        self.image_channel = ['red', 'green', 'blue', 'all'].index(
+                image_channel)
 
         # list variables
         if color is not None:
@@ -721,7 +724,7 @@ class StaticStim(StimDefaults):
 
         # make array
         size = (max(self.gen_size()),) * 2  # make square, largest size
-        texture = numpy.zeros(size+(4,))    # add rgba
+        texture = numpy.zeros(size+(4,), dtype=numpy.float32)    # add rgba
         # turn rgb guns off, set opaque
         texture[:, :, ] = [-1, -1, -1, self.alpha]
 
@@ -785,6 +788,10 @@ class StaticStim(StimDefaults):
                 filename, file_ext = os.path.splitext(pic_name)
 
                 pic_name = filename + \
+                           '_' + \
+                           GlobalDefaults['gamma_correction'] + \
+                           '_' + \
+                           str(self.image_channel) + \
                            '_{}_{}'.format(self.gen_size()[0],
                                             self.gen_size()[1]) + \
                            file_ext
@@ -793,10 +800,13 @@ class StaticStim(StimDefaults):
 
                 # if not the first time gamma correcting this image
                 if os.path.exists(savedir):
+                    pass
                     image = Image.open(savedir)
 
-                    # turn to array and flip (different because of indexing styles
-                    texture = numpy.asarray(image) / 255.0 * 2 - 1
+                    # turn into array and flip (different because of indexing
+                    # styles)
+                    texture = numpy.asarray(image, dtype=numpy.float32) / \
+                              255.0 * 2 - 1
                     texture = numpy.rot90(texture, 2)
 
                     # add alpha values
@@ -812,7 +822,13 @@ class StaticStim(StimDefaults):
                         image.thumbnail(self.gen_size(), Image.ANTIALIAS)
 
                     # rescale rgb
-                    texture = numpy.asarray(image) / 255.0 * 2 - 1
+                    texture = numpy.asarray(image, dtype=numpy.float32) / 255.0 * 2 - 1
+
+                    if self.image_channel != 3:
+                        for i in range(3):
+                            if self.image_channel != i:
+                                print i
+                                texture[:, :, i] = -1
 
                     # gamma correct (slow step)
                     texture = MyWindow.gamma_mon(texture)
@@ -834,7 +850,7 @@ class StaticStim(StimDefaults):
                     image.thumbnail(self.gen_size(), Image.ANTIALIAS)
 
                 # turn to array and flip (different because of indexing styles
-                texture = numpy.asarray(image) / 255.0 * 2 - 1
+                texture = numpy.asarray(image, dtype=numpy.float32) / 255.0 * 2 - 1
                 texture = numpy.rot90(texture, 2)
 
                 # add alpha values
@@ -844,6 +860,7 @@ class StaticStim(StimDefaults):
         if MyWindow.gamma_mon is not None and self.fill_mode not in ['image']:
             texture = MyWindow.gamma_mon(texture)
 
+        print texture.dtype, texture.itemsize, texture.nbytes / 1e9
         return texture
 
     def gen_timing(self, frame):
@@ -1214,6 +1231,7 @@ class TableStim(MovingStim):
             radii = [i.split()[0] for i in lines]
             self.trigger_frames = [i.split()[1] for i in lines]
             self.trigger_frames[0] = 0
+            self.trigger_frames[-1] = 1  # trigger on last frame
 
         # if igor binary wave format or packed experiment format
         elif os.path.splitext(table)[1] in ['.ibw', '.pxp']:
@@ -1517,11 +1535,11 @@ def log_stats(count_reps, reps, count_frames, num_frames, elapsed_time,
                 format(reps, len(stim_list)))
 
         f.write("\n{}/{} frames displayed. ".
-                format(count_reps * num_frames + count_frames, reps *
+                format(count_reps * num_frames+1 + count_frames, reps *
                        num_frames))
 
-        f.write("Average fps: {0:.2f} hz.".
-                format((count_reps * num_frames + count_frames) / elapsed_time))
+        average_fps = (count_reps * num_frames+1 + count_frames) / elapsed_time
+        f.write("Average fps: {0:.2f} hz.".format(average_fps))
 
         f.write("\nElapsed time: {0:.3f} seconds.\n".format(elapsed_time))
 
@@ -1597,6 +1615,8 @@ def log_stats(count_reps, reps, count_frames, num_frames, elapsed_time,
                 for j in range(len(to_animate[i].log[0])):
                     f.write(str(to_animate[i].log[2][j][1]))
                     f.write('\n')
+
+    return average_fps
 
 
 def main(stim_list, verbose=True):
@@ -1724,10 +1744,13 @@ def main(stim_list, verbose=True):
         print "Elapsed time: {0:.3f} seconds.\n". \
             format(count_elapsed_time)
 
-
     if GlobalDefaults['log']:
         log_stats(count_reps, reps, count_frames, num_frames,
                   count_elapsed_time, stim_list, to_animate, current_time)
+
+    fps = (count_reps * num_frames+1 + count_frames) / count_elapsed_time
+
+    return fps, count_elapsed_time
 
 if __name__ == '__main__':
     pass

@@ -236,7 +236,7 @@ fill_param = OrderedDict([
                            'intensity_dir'],
           'movie'       : ['movie_filename', 'movie_size'],
           'image'       : ['image_filename', 'image_size', 'phase',
-                           'phase_speed'],
+                           'phase_speed', 'image_channel'],
       }}
      ),
 
@@ -273,6 +273,14 @@ fill_param = OrderedDict([
      {'type'    : 'list',
       'label'   : 'phase speed (hz)',
       'default' : config_dict['phase_speed'],
+      'is_child': True}
+     ),
+
+    ('image_channel',
+     {'type'    : 'choice',
+      'label'   : 'color channel',
+      'choices' : ['all', 'red', 'green', 'blue'],
+      'default' : config_dict['image_channel'],
       'is_child': True}
      ),
 
@@ -1553,6 +1561,10 @@ class MyFrame(wx.Frame):
                            wx.BOTTOM, border=5)
         self.win_sizer.Add(panel_button_sizer)
 
+        # status bar
+        self.CreateStatusBar(1)
+        self.SetStatusText('hi there')
+
         # place on monitor (arbitrary, from ini)
         pos = config_dict['windowPos'][0], config_dict['windowPos'][1]
         self.SetPosition(pos)
@@ -1621,7 +1633,10 @@ class MyFrame(wx.Frame):
                 # caught and thrown to avoid hanging.
                 self.on_stop_button(event)
                 try:
-                    StimProgram.main(self.l1.stim_info_list)
+                    fps, time = StimProgram.main(self.l1.stim_info_list)
+                    print fps, time
+                    self.SetStatusText('Last run: {0:.2f} fps, '.format(fps) \
+                                       + '{0:.2f} seconds'.format(time))
                 except:
                     raise
             else:

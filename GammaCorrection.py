@@ -349,9 +349,12 @@ class GammaValues(object):
                 if has_alpha:
                     a = a.flatten()
 
-                r = self.r_correct(r)
-                g = self.g_correct(g)
-                b = self.b_correct(b)
+                print 'red correcting...',
+                r = self.r_correct(r).astype(numpy.float32)
+                print 'green correcting...',
+                g = self.g_correct(g).astype(numpy.float32)
+                print 'blue correcting...'
+                b = self.b_correct(b).astype(numpy.float32)
 
                 if has_alpha:
                     adj_color = numpy.dstack([numpy.split(r, size),
