@@ -291,6 +291,7 @@ class MyWindow(object):
         """
         # flip window to clear stims if wait time after trigger/between triggers
         if has_u3:
+            print 'triggered'
             if GlobalDefaults['trigger_wait'] != 0:
                 MyWindow.win.flip()
 
@@ -1252,7 +1253,7 @@ class TableStim(MovingStim):
         for i in range(self.move_delay):
             self.x_array = scipy.append(self.x_array, off_x)
             self.y_array = scipy.append(self.y_array, off_y)
-            self.trigger_frames = scipy.append(self.y_array, 0)
+            self.trigger_frames = scipy.append(self.trigger_frames, 0)
 
         self.num_frames += self.move_delay
 
@@ -1283,7 +1284,7 @@ class TableStim(MovingStim):
             radii = [i.split()[0] for i in lines]
             self.trigger_frames = [i.split()[1] for i in lines]
             self.trigger_frames[0] = 0
-            self.trigger_frames[-1] = 1  # trigger on last frame
+            # self.trigger_frames[-1] = 1  # trigger on last frame
 
         # if igor binary wave format or packed experiment format
         elif os.path.splitext(table)[1] in ['.ibw', '.pxp']:
