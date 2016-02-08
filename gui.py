@@ -24,9 +24,63 @@ __version__ = "1.0"
 __email__   = "tomlinsa@ohsu.edu"
 __status__  = "Beta"
 
+config_default_dict = dict(
+    pix_per_micron=1,
+    scale=1,
+    offset=[0, 0],
+    display_size=[400, 400],
+    position=[0, 0],
+    protocol_reps=1,
+    background=[-1, 0, -1],
+    fullscreen=False,
+    log=False,
+    screen_num=1,
+    gamma_correction='default',
+    trigger_wait=0.1,
+    shape='circle',
+    fill_mode='uniform',
+    orientation=0,
+    size=None,
+    outer_diameter=75,
+    inner_diameter=40,
+    check_size=None,
+    num_check=64,
+    delay=0,
+    duration=0.5,
+    location=None,
+    timing='step',
+    intensity=1,
+    alpha=1,
+    color=None,
+    color_mode='intensity',
+    image_channel='all',
+    fill_seed=1,
+    move_seed=1,
+    speed=10,
+    num_dirs=4,
+    start_dir=0,
+    start_radius=300,
+    travel_distance=50,
+    intensity_dir='both',
+    sf=1,
+    phase=None,
+    phase_speed=None,
+    contrast_channel='Green',
+    movie_filename=None,
+    movie_size=None,
+    period_mod=1,
+    image_size=None,
+    image_filename=None,
+    table_filename=None,
+    trigger=False,
+    move_delay=0,
+    num_jumps=5,
+    jump_delay=100)
 
 def get_config_dict(config_file):
-    config = ConfigParser.ConfigParser()
+    defaults = dict(zip(config_default_dict, map(str,
+                                                 config_default_dict.values())))
+    config = ConfigParser.ConfigParser(defaults=defaults)
     config.read(config_file)
 
     default_config_dict = {}
@@ -922,11 +976,20 @@ class ListPanel(wx.Panel):
         # load in panels and subpanels
         for panel in my_frame.input_nb.GetChildren():
             for param, control in panel.input_dict.iteritems():
-                panel.set_value(param, param_dict[param])
+                # if not in file, get from defaults
+                try:
+                    panel.set_value(param, param_dict[param])
+                except KeyError:
+                    panel.set_value(param, config_dict[param])
             for value in panel.sub_panel_dict.itervalues():
                 for subpanel in value.itervalues():
                     for param, control in subpanel.input_dict.iteritems():
-                        subpanel.set_value(param, param_dict[param])
+                        # if not in file, get from defaults
+                        try:
+                            subpanel.set_value(param, param_dict[param])
+                        except KeyError:
+                            subpanel.set_value(param, config_dict[param])
+
 
         print '\nPARAM LOADED'
 

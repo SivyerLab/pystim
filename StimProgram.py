@@ -42,11 +42,14 @@ __version__ = "1.1"
 __email__   = "tomlinsa@ohsu.edu"
 __status__  = "Beta"
 
-# to suppress extra warnings, uncomment next lines
+# to suppress extra warnings, uncomment next 2 lines
 # from psychopy import logging
 # logging.console.setLevel(logging.CRITICAL)
 
 # read ini file
+defaults = dict(
+    logsDir = '.\\psychopy\\logs\\',
+    monitor = 'blank')
 config = ConfigParser.ConfigParser()
 config.read(os.path.abspath('./psychopy/config.ini'))
 
