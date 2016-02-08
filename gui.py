@@ -650,24 +650,23 @@ class DirPanel(wx.Panel):
             defaultDirectory=config_dict['savedStimDir'])
 
         # add to sizer
-        sizer_panel.Add(self.browser, 1, wx.BOTTOM | wx.TOP | wx.EXPAND,
-                        border=5)
+        sizer_panel.Add(self.browser, 1,wx.EXPAND)
 
         # sizer for load and save buttons
         sizer_buttons = wx.BoxSizer(wx.HORIZONTAL)
 
         # instantiate buttons and add to button sizer
         self.save_button = wx.Button(self, id=wx.ID_SAVE)
+        self.load_button = wx.Button(self, label="Load")
+
         sizer_buttons.Add(self.save_button, 1, border=5,
                               flag=wx.LEFT | wx.RIGHT)
-
-        self.load_button = wx.Button(self, label="Load")
         sizer_buttons.Add(self.load_button, 1, border=5,
                               flag=wx.LEFT | wx.RIGHT)
 
         # add button sizer to panel sizer
         sizer_panel.Add(sizer_buttons, border=5,
-                        flag=wx.BOTTOM | wx.ALIGN_CENTER_HORIZONTAL |
+                        flag=wx.BOTTOM | wx.TOP | wx.ALIGN_CENTER_HORIZONTAL |
                         wx.ALIGN_CENTER_VERTICAL)
 
         # event binders
@@ -822,38 +821,40 @@ class ListPanel(wx.Panel):
         self.stim_info_list = []
         self.index = 0
 
-        # sizer
+        # title and its sizer
+        title = wx.StaticText(self, label="stims to run")
+        title_sizer = wx.BoxSizer()
+        title_sizer.Add(title, flag=wx.TOP | wx.BOTTOM, border=7)
+
+        # sizer for panel
         sizer_panel = wx.BoxSizer(wx.VERTICAL)
 
-        # title
-        title = wx.StaticText(self, label="Stims to run")
-        sizer_panel.Add(title, flag=wx.TOP, border=10)
+        sizer_panel.Add(title_sizer, flag=wx.BOTTOM | wx.LEFT, border=3)
 
         # list control widget
         self.list_control = wx.ListCtrl(self, size=(200, -1),
-                                        style=wx.LC_REPORT | wx.BORDER_SUNKEN)
+                                        style=wx.LC_REPORT)
         self.list_control.InsertColumn(0, 'Shape')
         self.list_control.InsertColumn(1, 'Type')
         self.list_control.InsertColumn(2, 'Fill')
         self.list_control.InsertColumn(3, 'Trigger')
 
         # add to sizer
-        sizer_panel.Add(self.list_control, 1, wx.BOTTOM | wx.TOP | wx.EXPAND,
-                        border=10)
+        sizer_panel.Add(self.list_control, 1, wx.EXPAND)
 
         # sizer for add and remove buttons
         sizer_buttons = wx.BoxSizer(wx.HORIZONTAL)
 
         self.add_button = wx.Button(self, id=wx.ID_ADD)
+        self.remove_button = wx.Button(self, id=wx.ID_REMOVE)
+
         sizer_buttons.Add(self.add_button, 1, border=5,
                                flag=wx.LEFT | wx.RIGHT)
-
-        self.remove_button = wx.Button(self, id=wx.ID_REMOVE)
         sizer_buttons.Add(self.remove_button, 1, border=5,
                                flag=wx.LEFT | wx.RIGHT)
 
         sizer_panel.Add(sizer_buttons, border=5,
-                        flag=wx.BOTTOM | wx.ALIGN_CENTER_HORIZONTAL |
+                        flag=wx.BOTTOM | wx.TOP | wx.ALIGN_CENTER_HORIZONTAL |
                         wx.ALIGN_CENTER_VERTICAL)
 
         # load and save button binders
@@ -1565,39 +1566,22 @@ class MyFrame(wx.Frame):
         self.input_nb.AddPage(self.panel_fill, " Fill ")
         self.input_nb.AddPage(self.panel_move, "Motion")
 
+        # instantiate global panel
+        self.g1 = GlobalPanel(global_default_param, self)
+
         # sizer to hold notebook and global panel
         panel_row = wx.BoxSizer(wx.HORIZONTAL)
 
-        # add notebook to sizer
-        panel_row.Add(self.input_nb, 1, wx.EXPAND)
+        # add notebook panel and global panel to sizer
+        panel_row.Add(self.input_nb, 1,wx.EXPAND)
+        panel_row.Add(self.g1, 1,wx.EXPAND)
 
-        # instantiate global panel and add to sizer
-        self.g1 = GlobalPanel(global_default_param, self)
-        panel_row.Add(self.g1, 1, wx.TOP | wx.EXPAND, border=5)
-
-        # sizer for buttons under panel_row
-        stim_buttons_sizer = wx.BoxSizer(wx.HORIZONTAL)
-
-        # create buttons and add to button sizer
+        # create buttons
         self.run_button = wx.Button(self, label="Run")
-        stim_buttons_sizer.Add(self.run_button, 1, border=5,
-                               flag=wx.LEFT | wx.RIGHT)
-
         self.stop_button = wx.Button(self, label="Stop")
-        stim_buttons_sizer.Add(self.stop_button, 1, border=5,
-                               flag=wx.LEFT | wx.RIGHT)
-
         self.win_button = wx.Button(self, label="Window")
-        stim_buttons_sizer.Add(self.win_button, 1, border=5,
-                               flag=wx.LEFT | wx.RIGHT)
-
         self.calib_button = wx.Button(self, label="Calib")
-        stim_buttons_sizer.Add(self.calib_button, 1, border=5,
-                               flag=wx.LEFT | wx.RIGHT)
-
         self.exit_button = wx.Button(self, label="Exit")
-        stim_buttons_sizer.Add(self.exit_button, 1, border=5,
-                               flag=wx.LEFT | wx.RIGHT)
 
         # binders
         self.Bind(wx.EVT_BUTTON, self.on_run_button, self.run_button)
@@ -1606,22 +1590,40 @@ class MyFrame(wx.Frame):
         self.Bind(wx.EVT_BUTTON, self.on_calib_button, self.calib_button)
         self.Bind(wx.EVT_BUTTON, self.on_exit_button, self.exit_button)
 
-        # sizer for panel and buttons
+        # sizer for buttons under panel_row
+        stim_buttons_sizer = wx.BoxSizer(wx.HORIZONTAL)
+
+        # add to sizer
+        stim_buttons_sizer.Add(self.run_button, 1, border=5,
+                               flag=wx.LEFT | wx.RIGHT)
+        stim_buttons_sizer.Add(self.stop_button, 1, border=5,
+                               flag=wx.LEFT | wx.RIGHT)
+        stim_buttons_sizer.Add(self.win_button, 1, border=5,
+                               flag=wx.LEFT | wx.RIGHT)
+        stim_buttons_sizer.Add(self.calib_button, 1, border=5,
+                               flag=wx.LEFT | wx.RIGHT)
+        stim_buttons_sizer.Add(self.exit_button, 1, border=5,
+                               flag=wx.LEFT | wx.RIGHT)
+
+        # sizer for input and global panels and buttons
         panel_button_sizer = wx.BoxSizer(wx.VERTICAL)
+
+        # add buttons and panels
         panel_button_sizer.Add(panel_row, 1, wx.EXPAND)
-        panel_button_sizer.Add(stim_buttons_sizer, border=10,
-                               flag=wx.BOTTOM | wx.ALIGN_CENTER_HORIZONTAL |
-                               wx.ALIGN_CENTER_VERTICAL)
+        panel_button_sizer.Add(stim_buttons_sizer, border=5,
+                               flag=wx.BOTTOM | wx.TOP|
+                                    wx.ALIGN_CENTER_HORIZONTAL |
+                                    wx.ALIGN_CENTER_VERTICAL)
 
         # save and list panels
-        self.l1 = ListPanel(self)
         self.b1 = DirPanel(self)
+        self.l1 = ListPanel(self)
 
         # window sizer, to hold panel_button_sizer and save and list panels
         self.win_sizer = wx.BoxSizer(wx.HORIZONTAL)
-        self.win_sizer.Add(self.b1, 1, wx.EXPAND | wx.ALL, border=5)
-        self.win_sizer.Add(self.l1, 1, wx.EXPAND | wx.TOP | wx.RIGHT |
-                           wx.BOTTOM, border=5)
+
+        self.win_sizer.Add(self.b1, 1, flag=wx.EXPAND | wx.RIGHT, border=5)
+        self.win_sizer.Add(self.l1, 1, border=5, flag=wx.EXPAND | wx.RIGHT)
         self.win_sizer.Add(panel_button_sizer)
 
         # status bar
