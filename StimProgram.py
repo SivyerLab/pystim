@@ -940,6 +940,7 @@ class MovingStim(StaticStim):
         self.y_array = None
         self.num_frames = None
         self.trigger_frames = None
+        self.error_count = 0
 
         # to track random motion positions
         self.log = [[], [0], []]  # angle, frame num, position
@@ -979,10 +980,10 @@ class MovingStim(StaticStim):
             try:
 
                 if self.trigger_frames is not None:
-                    x, y, trigger_frame = self.get_next_pos()
+                    x, y, to_trigger = self.get_next_pos()
                     self.set_pos(x, y)
 
-                    if self.trigger_frames[trigger_frame]:
+                    if to_trigger:
                         MyWindow.send_trigger()
 
                 else:
@@ -996,9 +997,12 @@ class MovingStim(StaticStim):
 
             except (AttributeError, IndexError, TypeError):
                 self.error_count += 1
+
                 if self.error_count == 2:
                     raise
 
+                # make new coordinate array
+                # TODO: don't generate on the fly
                 self.gen_pos()
 
                 # log frame number for RandomlyMovingStim
@@ -1207,16 +1211,6 @@ class TableStim(MovingStim):
 
         :return: last frame number as int
         """
-        # self.start_stim = self.delay
-        #
-        # # need to generate movement to get number of frames
-        # self.gen_pos()
-        #
-        # self.end_stim = self.num_frames + self.start_stim + self.move_delay
-        #
-        # self.draw_duration = self.end_stim - self.start_stim
-        #
-        # return self.end_stim
 
         self.start_stim = self.delay
 
@@ -1230,7 +1224,6 @@ class TableStim(MovingStim):
         self.draw_duration = self.end_stim - self.start_stim
 
         print len(self.x_array)
-        self.error_count = 0
 
         return self.end_stim
 
@@ -1326,14 +1319,15 @@ class TableStim(MovingStim):
     def get_next_pos(self):
         """
         Returns the next coordinate from x, y_array for animate to set the
-        position of the stim for the next frame.
+        position of the stim for the next frame, along with whether or not to
+        trigger this frame.
         :return: x, y coordinate as tuple
         """
         x = self.x_array[self.frame_counter]
         y = self.y_array[self.frame_counter]
-        to_trigger = self.frame_counter
+        to_trigger = self.trigger_frames[self.frame_counter]
 
-        # increment frame counter
+        # increment frame counter for next frame
         self.frame_counter += 1
 
         return x, y, to_trigger
