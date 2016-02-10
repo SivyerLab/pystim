@@ -435,6 +435,7 @@ class StimDefaults(object):
                  start_dir=0,
                  start_radius=300,
                  travel_distance=50,
+                 ori_with_dir=False,
                  intensity_dir='both',
                  sf=1,
                  phase=None,
@@ -464,6 +465,7 @@ class StimDefaults(object):
         self.move_seed = move_seed
         self.num_dirs = num_dirs
         self.start_dir = start_dir
+        self.ori_with_dir = ori_with_dir
         self.intensity_dir = intensity_dir
         self.sf = sf
         self.contrast_channel = ['red', 'green', 'blue'].index(contrast_channel)
@@ -1035,10 +1037,8 @@ class MovingStim(StaticStim):
             angle -= 360
 
         # orient shape if not an image and fill is uniform
-        if self.fill_mode not in ['image', 'movie'] and self.fill_mode == \
-                'uniform':
-        # if self.fill_mode not in ['image', 'movie']:
-            self.stim.ori = self.start_dir
+        if self.ori_with_dir:
+            self.stim.ori = self.start_dir + self.orientation
 
         # calculate variables
         travel_distance = ((self.current_x**2 + self.current_y**2) ** 0.5) * 2
@@ -1237,6 +1237,10 @@ class TableStim(MovingStim):
         """
         self.frame_counter = 0
         self.x_array, self.y_array = self.gen_pos_array()
+
+        # orient shape if not an image and fill is uniform
+        if self.ori_with_dir:
+            self.stim.ori = self.start_dir + self.orientation
 
         # add in move delay by placing stim off screen
         if len(self.stim.size) > 1:
