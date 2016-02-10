@@ -1428,7 +1428,7 @@ class GlobalPanel(InputPanel):
         self.grid.Add(self.save_default, pos=(1, 0))
 
         # delete button
-        self.delete_default = wx.Button(self, size=(-1,-1), label='load')
+        self.delete_default = wx.Button(self, size=(-1,-1), label='Delete')
         self.Bind(wx.EVT_BUTTON, self.on_default_delete, self.delete_default)
         self.grid.Add(self.delete_default, pos=(1, 1))
 
@@ -1437,7 +1437,7 @@ class GlobalPanel(InputPanel):
 
     def on_default_save(self, event):
         """
-        Saves global dfefaults.
+        Saves global defaults.
 
         :param event: event passed by binder.
         """
@@ -1477,7 +1477,32 @@ class GlobalPanel(InputPanel):
             cPickle.dump(global_dict, f)
 
     def on_default_delete(self, event):
-        pass
+        """
+        Removes a global default save.
+
+        :param event: event passed by binder.
+        """
+        selected = self.which_default.GetStringSelection()
+        globals_file = os.path.abspath('./psychopy/data/global_defaults.txt')
+        with open(globals_file, 'rb') as f:
+            params_dict = cPickle.load(f)
+
+        del params_dict[selected]
+
+        with open(globals_file, 'wb') as f:
+            cPickle.dump(params_dict, f)
+
+        # add blank to switch to
+        self.which_default.Append('')
+        self.which_default.SetStringSelection('')
+
+        # delete deleted
+        ind = self.which_default.GetItems().index(selected)
+        self.which_default.Delete(ind)
+
+        # delete blank so it can't be reselected (stays selected though)
+        ind = self.which_default.GetItems().index('')
+        self.which_default.Delete(ind)
 
     def on_default_select(self, event):
         """
