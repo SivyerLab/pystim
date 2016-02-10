@@ -27,22 +27,24 @@ Example::
     0.24
     0.25
 
-Currently, in OSX, the calibrate button in the GUI is unable to invoke the
-script, but instead brings up a terminal window in the correct location,
-and the script can be started by entering (note .pyc, not .py)::
+The script can be invoked from the command line/terminal::
 
-    python GammaCorrection.pyc
+    python GammaCorrection.py
+
+Psychopy has built in gamma correction. This script provides an alternative
+to that due to difficulties using it on some platforms. See the psychopy
+documentation for information on using that gamma correction.
 """
 
 from psychopy import visual, core, event, logging
 from psychopy.monitors import Monitor
 from scipy import stats, interpolate, array, ndarray
-import matplotlib.pyplot as plt
 import cPickle
 import os.path
 import numpy
 import sys
 import copy_reg, types
+# import matplotlib.pyplot as plt
 
 # suppress extra warnings
 logging.console.setLevel(logging.CRITICAL)
@@ -154,30 +156,30 @@ def gammaCorrect():
     g_tuple = make_correction(g)
     b_tuple = make_correction(b)
 
-    show_plot = raw_input('\nShow plots? Y, N: ')
-    if show_plot == 'Y':
-        plt.legend(loc=0)
-        plt.show()
+    # show_plot = raw_input('\nShow plots? Y, N: ')
+    # if show_plot == 'Y':
+    #     plt.legend(loc=0)
+    #     plt.show()
 
     gamma_correction = GammaValues(r_tuple, g_tuple, b_tuple)
 
     ## GRAPHING STUFF TO TEST ##
-    vals = [i * 1.0 / (51 - 1) * 2 - 1 for i in range(51)]
-    corrected = [[], [], []]
-    for i in range(len(vals)):
-        rgb = [vals[i]] * 3
-        rgb = gamma_correction(rgb)
-        corrected[0].append(rgb[0])
-        corrected[1].append(rgb[1])
-        corrected[2].append(rgb[2])
-
-    if show_plot == 'Y':
-        plt.plot(vals, vals, 'k--', label='linear')
-        plt.plot(vals, corrected[0], 'r', label='red')
-        plt.plot(vals, corrected[1], 'g', label='green')
-        plt.plot(vals, corrected[2], 'b', label='blue')
-        plt.legend(loc=0)
-        plt.show()
+    # vals = [i * 1.0 / (51 - 1) * 2 - 1 for i in range(51)]
+    # corrected = [[], [], []]
+    # for i in range(len(vals)):
+    #     rgb = [vals[i]] * 3
+    #     rgb = gamma_correction(rgb)
+    #     corrected[0].append(rgb[0])
+    #     corrected[1].append(rgb[1])
+    #     corrected[2].append(rgb[2])
+    #
+    # if show_plot == 'Y':
+    #     plt.plot(vals, vals, 'k--', label='linear')
+    #     plt.plot(vals, corrected[0], 'r', label='red')
+    #     plt.plot(vals, corrected[1], 'g', label='green')
+    #     plt.plot(vals, corrected[2], 'b', label='blue')
+    #     plt.legend(loc=0)
+    #     plt.show()
 
     should_save = raw_input('\nSave? Y, N: ')
 
@@ -249,13 +251,13 @@ def make_correction(measured):
 
     to_plot = []
     # points
-    to_plot.append(plt.plot(measured_at, measured, 'ro', label='measured'))
+    # to_plot.append(plt.plot(measured_at, measured, 'ro', label='measured'))
     # fit
-    to_plot.append(plt.plot(measured_at, spline_values, label='interpolated'))
+    # to_plot.append(plt.plot(measured_at, spline_values, label='interpolated'))
     # corrected
-    to_plot.append(plt.plot(measured_at, graph_corrected, label='corrected'))
+    # to_plot.append(plt.plot(measured_at, graph_corrected, label='corrected'))
     # check against linear
-    to_plot.append(plt.plot(measured_at, linear, label='linear'))
+    # to_plot.append(plt.plot(measured_at, linear, label='linear'))
     # plt.legend(loc=0)
     # plt.show()
 
@@ -286,9 +288,9 @@ class GammaValues(object):
         self.b_slope = b[1]
         self.b_int = b[2]
 
-        self.r_vect = numpy.vectorize(self.r_correct, otypes=[numpy.float])
-        self.g_vect = numpy.vectorize(self.g_correct, otypes=[numpy.float])
-        self.b_vect = numpy.vectorize(self.b_correct, otypes=[numpy.float])
+        # self.r_vect = numpy.vectorize(self.r_correct, otypes=[numpy.float])
+        # self.g_vect = numpy.vectorize(self.g_correct, otypes=[numpy.float])
+        # self.b_vect = numpy.vectorize(self.b_correct, otypes=[numpy.float])
 
     def r_correct(self, r):
         """
@@ -349,12 +351,15 @@ class GammaValues(object):
                 if has_alpha:
                     a = a.flatten()
 
-                print 'red correcting...',
+                print 'red correcting.....',
                 r = self.r_correct(r)
+                print 'done'
                 print 'green correcting...',
                 g = self.g_correct(g)
-                print 'blue correcting...'
+                print 'done'
+                print 'blue correcting....',
                 b = self.b_correct(b)
+                print 'done'
 
                 if has_alpha:
                     adj_color = numpy.dstack([numpy.split(r, size),
