@@ -389,7 +389,7 @@ fill_param = OrderedDict([
 
     ('period_mod',
      {'type'    : 'text',
-      'label'   : 'period mod',
+      'label'   : 'frequency (hz)',
       'default' : config_dict['period_mod'],
       'is_child': True}
      ),
@@ -1612,8 +1612,8 @@ class MyFrame(wx.Frame):
         panel_row = wx.BoxSizer(wx.HORIZONTAL)
 
         # add notebook panel and global panel to sizer
-        panel_row.Add(self.input_nb, 1,wx.EXPAND)
-        panel_row.Add(self.g1, 1,wx.EXPAND)
+        panel_row.Add(self.input_nb, 1, wx.EXPAND)
+        panel_row.Add(self.g1, 1, wx.EXPAND)
 
         # create buttons
         self.run_button = wx.Button(self, label="Run")
@@ -1731,9 +1731,9 @@ class MyFrame(wx.Frame):
         # window by making call to on_win_button
         if len(self.l1.stim_info_list) != 0:
             if self.win_open:
+                self.on_stop_button(event)
                 # try/except, so that errors thrown by StimProgram can be
                 # caught and thrown to avoid hanging.
-                self.on_stop_button(event)
                 try:
                     fps, time = StimProgram.main(self.l1.stim_info_list)
                     if time != 'error':
@@ -1784,6 +1784,7 @@ class MyFrame(wx.Frame):
 
         :param event: event passed by binder
         """
+        print 'stopped'
         StimProgram.MyWindow.should_break = True
 
     def on_exit_button(self, event):

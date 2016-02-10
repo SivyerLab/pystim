@@ -470,7 +470,7 @@ class StimDefaults(object):
         self.sf = sf
         self.contrast_channel = ['red', 'green', 'blue'].index(contrast_channel)
         self.movie_filename = movie_filename
-        self.period_mod = period_mod
+        self.period_mod = period_mod * 2.0 * duration
         self.image_filename = image_filename
         self.table_filename = table_filename
         self.trigger = trigger
