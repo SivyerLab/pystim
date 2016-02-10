@@ -833,7 +833,7 @@ class ListPanel(wx.Panel):
 
         # list control widget
         self.list_control = wx.ListCtrl(self, size=(200, -1),
-                                        style=wx.LC_REPORT)
+                                        style=wx.LC_REPORT | wx.SUNKEN_BORDER)
         self.list_control.InsertColumn(0, 'Shape')
         self.list_control.InsertColumn(1, 'Type')
         self.list_control.InsertColumn(2, 'Fill')
@@ -1395,8 +1395,8 @@ class GlobalPanel(InputPanel):
         self.title = wx.StaticText(self, label="Global Defaults")
         self.grid.Add(self.title, pos=(0, 0))
 
-        # sizer for default selector and save button
-        default_sizer = wx.GridSizer(rows=1, cols=2, hgap=5)
+        # # sizer for default selector and save button
+        # default_sizer = wx.GridSizer(rows=1, cols=2, hgap=5)
 
         # default selector
         globals_file = os.path.abspath('./psychopy/data/global_defaults.txt')
@@ -1410,19 +1410,21 @@ class GlobalPanel(InputPanel):
 
         self.which_default = ChoiceTag(self, tag='defaults',
                                        choices=sorted(defaults_list))
-        # self.which_default.SetStringSelection(config_dict['defaults'])
         self.Bind(wx.EVT_CHOICE, self.on_default_select, self.which_default)
-        default_sizer.Add(self.which_default)
+        self.grid.Add(self.which_default, pos=(0, 1))
 
         # save button
         self.save_default = wx.Button(self, size=(-1,-1), id=wx.ID_SAVE)
         self.Bind(wx.EVT_BUTTON, self.on_default_save, self.save_default)
-        default_sizer.Add(self.save_default, 1)
+        self.grid.Add(self.save_default, pos=(1, 0))
 
-        self.grid.Add(default_sizer, pos=(0, 1))
+        # delete button
+        self.delete_default = wx.Button(self, size=(-1,-1), label='load')
+        self.Bind(wx.EVT_BUTTON, self.on_default_delete, self.delete_default)
+        self.grid.Add(self.delete_default, pos=(1, 1))
 
-        # spacers
-        self.grid.Add((5, 5), pos=(1, 0))
+        # # spacers
+        # self.grid.Add((5, 5), pos=(1, 0))
 
     def on_default_save(self, event):
         """
@@ -1464,6 +1466,9 @@ class GlobalPanel(InputPanel):
 
         with open(globals_file, 'wb') as f:
             cPickle.dump(global_dict, f)
+
+    def on_default_delete(self, event):
+        pass
 
     def on_default_select(self, event):
         """
@@ -1539,17 +1544,17 @@ class MyFrame(wx.Frame):
     """
     Class for generating window. Instantiates notebook and panels.
     """
-    def __init__(self, *args, **kwargs):
+    def __init__(self):
         """
         Constructor. Creates and lays out panels in sizers, finally hiding
-        necessary subpanels.
+        unnecessary subpanels.
         """
+
         # super initiation
-        super(MyFrame, self).__init__(*args, **kwargs)
+        super(MyFrame, self).__init__(None)
 
         # instance attributes
         self.win_open = False
-        self.background = None
 
         # notebook to hold input panels
         self.input_nb = wx.Notebook(self)
@@ -1664,8 +1669,10 @@ class MyFrame(wx.Frame):
 
 
         # key interrupts
-        # self.Bind(wx.EVT_KEY_DOWN, self.on_keypress)
         self.Bind(wx.EVT_CHAR_HOOK, self.on_keypress)
+
+        # change background color to match panels
+        self.SetBackgroundColour(wx.NullColour)
 
         # draw frame
         self.Show()
@@ -1699,8 +1706,11 @@ class MyFrame(wx.Frame):
                 self.on_stop_button(event)
                 try:
                     fps, time = StimProgram.main(self.l1.stim_info_list)
-                    self.SetStatusText('Last run: {0:.2f} fps, '.format(fps) \
-                                       + '{0:.2f} seconds'.format(time))
+                    if time != 'error':
+                        self.SetStatusText('Last run: {0:.2f} fps, '.format(fps) \
+                                           + '{0:.2f} seconds'.format(time))
+                    else:
+                        self.SetStatusText(fps)
                 except:
                     raise
             else:
@@ -1758,7 +1768,6 @@ class MyFrame(wx.Frame):
         elif _platform == 'darwin':
             current_dir = os.getcwd()
             os.system('open -n -a Terminal.app {}'.format(current_dir))
-
 
     def on_exit_button(self, event):
         """
@@ -1819,6 +1828,18 @@ class MyFrame(wx.Frame):
         else:
             event.Skip()
 
+# class MainFrame(wx.Frame):
+#     def __init__(self, *args, **kwargs):
+#         """
+#         Constructor. Creates and lays out panels in sizers, finally hiding
+#         necessary subpanels.
+#         """
+#         # super initiation
+#         super(MainFrame, self).__init__(None)
+#         panel = MyFrame(self)
+#         self.Fit()
+#         # draw frame
+#         self.Show()
 
 def main():
     """
@@ -1828,7 +1849,8 @@ def main():
     global app
     app = wx.App(False)
     # instantiate window
-    frame = MyFrame(None)
+    frame = MyFrame()
+    # frame = MainFrame()
     # run app
     app.MainLoop()
 
