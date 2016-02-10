@@ -1585,14 +1585,12 @@ class MyFrame(wx.Frame):
         self.run_button = wx.Button(self, label="Run")
         self.stop_button = wx.Button(self, label="Stop")
         self.win_button = wx.Button(self, label="Window")
-        self.calib_button = wx.Button(self, label="Calib")
         self.exit_button = wx.Button(self, label="Exit")
 
         # binders
         self.Bind(wx.EVT_BUTTON, self.on_run_button, self.run_button)
         self.Bind(wx.EVT_BUTTON, self.on_win_button, self.win_button)
         self.Bind(wx.EVT_BUTTON, self.on_stop_button, self.stop_button)
-        self.Bind(wx.EVT_BUTTON, self.on_calib_button, self.calib_button)
         self.Bind(wx.EVT_BUTTON, self.on_exit_button, self.exit_button)
 
         # sizer for buttons under panel_row
@@ -1604,8 +1602,6 @@ class MyFrame(wx.Frame):
         stim_buttons_sizer.Add(self.stop_button, 1, border=5,
                                flag=wx.LEFT | wx.RIGHT)
         stim_buttons_sizer.Add(self.win_button, 1, border=5,
-                               flag=wx.LEFT | wx.RIGHT)
-        stim_buttons_sizer.Add(self.calib_button, 1, border=5,
                                flag=wx.LEFT | wx.RIGHT)
         stim_buttons_sizer.Add(self.exit_button, 1, border=5,
                                flag=wx.LEFT | wx.RIGHT)
@@ -1755,19 +1751,6 @@ class MyFrame(wx.Frame):
         :param event: event passed by binder
         """
         StimProgram.MyWindow.should_break = True
-
-    def on_calib_button(self, event):
-        """
-        Method for calling gamma correction script.
-
-        :param event: event passed by binder
-        """
-        if _platform == 'win32':
-            os.system('start python GammaCorrection.pyc')
-
-        elif _platform == 'darwin':
-            current_dir = os.getcwd()
-            os.system('open -n -a Terminal.app {}'.format(current_dir))
 
     def on_exit_button(self, event):
         """
