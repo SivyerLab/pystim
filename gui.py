@@ -1811,29 +1811,16 @@ class MyFrame(wx.Frame):
         else:
             event.Skip()
 
-# class MainFrame(wx.Frame):
-#     def __init__(self, *args, **kwargs):
-#         """
-#         Constructor. Creates and lays out panels in sizers, finally hiding
-#         necessary subpanels.
-#         """
-#         # super initiation
-#         super(MainFrame, self).__init__(None)
-#         panel = MyFrame(self)
-#         self.Fit()
-#         # draw frame
-#         self.Show()
 
 def main():
     """
-    Main method to start GUI.
+    Main function to start GUI.
     """
     # instantiate app
     global app
     app = wx.App(False)
     # instantiate window
     frame = MyFrame()
-    # frame = MainFrame()
     # run app
     app.MainLoop()
 
