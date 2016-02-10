@@ -273,8 +273,7 @@ class GammaValues(object):
     """
     def __init__(self, r, g, b):
         """
-        Instantiates class, pulls values out of tuples. Vectorizes
-        correction functions.
+        Instantiates class, pulls values out of tuples.
         """
         self.r_spline = r[0]
         self.r_slope = r[1]
@@ -287,10 +286,6 @@ class GammaValues(object):
         self.b_spline = b[0]
         self.b_slope = b[1]
         self.b_int = b[2]
-
-        # self.r_vect = numpy.vectorize(self.r_correct, otypes=[numpy.float])
-        # self.g_vect = numpy.vectorize(self.g_correct, otypes=[numpy.float])
-        # self.b_vect = numpy.vectorize(self.b_correct, otypes=[numpy.float])
 
     def r_correct(self, r):
         """
