@@ -303,7 +303,8 @@ class MyWindow(object):
             # reset
             MyWindow.d.setFIOState(4, 0)
             # wait
-            core.wait(GlobalDefaults['trigger_wait'])
+            if GlobalDefaults['trigger_wait'] != 0:
+                core.wait(GlobalDefaults['trigger_wait'])
 
 
 class StimDefaults(object):
@@ -1709,85 +1710,93 @@ def main(stim_list, verbose=True):
     # to exit out of nested loops
     MyWindow.should_break = False
 
+    # to pass back error
+    did_error = False
+
     # outer loop for number of reps
-    for x in range(reps):
-        # prep stims
-        to_animate = []
+    try:
+        for x in range(reps):
+            # prep stims
+            to_animate = []
 
-        for stim in stim_list:
-            # checkerboard and movie inheritance depends on motion type,
-            # so instantiate accordingly
-            if stim.parameters['fill_mode'] in ['checkerboard', 'random']:
-                to_animate.append(board_texture_class(globals()[
-                                                          stim.stim_type],
-                                  **stim.parameters))
-            elif stim.parameters['fill_mode'] == 'movie':
-                to_animate.append(movie_stim_class(globals()[stim.stim_type],
-                                  **stim.parameters))
+            for stim in stim_list:
+                # checkerboard and movie inheritance depends on motion type,
+                # so instantiate accordingly
+                if stim.parameters['fill_mode'] in ['checkerboard', 'random']:
+                    to_animate.append(board_texture_class(globals()[
+                                                              stim.stim_type],
+                                      **stim.parameters))
+                elif stim.parameters['fill_mode'] == 'movie':
+                    to_animate.append(movie_stim_class(globals()[stim.stim_type],
+                                      **stim.parameters))
 
-            # all other stims, instantiate by looking up class in globals(), and
-            # pass dictionary of parameters
-            else:
-                to_animate.append(globals()[stim.stim_type](**stim.parameters))
+                # all other stims, instantiate by looking up class in globals(), and
+                # pass dictionary of parameters
+                else:
+                    to_animate.append(globals()[stim.stim_type](**stim.parameters))
 
-            # annuli are handled by creating a duplicate smaller nested
-            # circle within the larger circle, and setting its color to
-            # background and its timing to instant
-            if stim.parameters['shape'] == 'annulus':
-                # make necessary changes
-                stim.parameters['timing'] = 'step'
-                stim.parameters['color'] = GlobalDefaults['background']
-                stim.parameters['intensity'] = 0
-                stim.parameters['fill_mode'] = 'uniform'
-                stim.parameters['outer_diameter'] = stim.parameters[
-                    'inner_diameter']
+                # annuli are handled by creating a duplicate smaller nested
+                # circle within the larger circle, and setting its color to
+                # background and its timing to instant
+                if stim.parameters['shape'] == 'annulus':
+                    # make necessary changes
+                    stim.parameters['timing'] = 'step'
+                    stim.parameters['color'] = GlobalDefaults['background']
+                    stim.parameters['intensity'] = 0
+                    stim.parameters['fill_mode'] = 'uniform'
+                    stim.parameters['outer_diameter'] = stim.parameters[
+                        'inner_diameter']
 
-                # add
-                to_animate.append(globals()[stim.stim_type](**stim.parameters))
+                    # add
+                    to_animate.append(globals()[stim.stim_type](**stim.parameters))
 
-        # generate stims
-        for stim in to_animate:
-            stim.make_stim()
-
-        # determine end time of last stim
-        num_frames = max(stim.draw_times() for stim in to_animate)
-        # round up, then subtract 1 because index starts at 0
-        # num_frames = int(num_frames + 0.99) - 1
-
-        # clock for timing
-        elapsed_time = core.MonotonicClock()
-
-        # draw stims and flip window
-        for frame in xrange(num_frames):
+            # generate stims
             for stim in to_animate:
-                stim.animate(frame)
-            MyWindow.win.flip()
+                stim.make_stim()
 
-            # escape key breaks if focus on window
-            for key in event.getKeys(keyList=['escape']):
-                if key in ['escape']:
-                    MyWindow.should_break = True
+            # determine end time of last stim
+            num_frames = max(stim.draw_times() for stim in to_animate)
+            # round up, then subtract 1 because index starts at 0
+            # num_frames = int(num_frames + 0.99) - 1
 
-            # inner break
+            # clock for timing
+            elapsed_time = core.MonotonicClock()
+
+            # draw stims and flip window
+            for frame in xrange(num_frames):
+                for stim in to_animate:
+                    stim.animate(frame)
+                MyWindow.win.flip()
+
+                # escape key breaks if focus on window
+                for key in event.getKeys(keyList=['escape']):
+                    if key in ['escape']:
+                        MyWindow.should_break = True
+
+                # inner break
+                if MyWindow.should_break:
+                    count_frames = frame + 1
+                    # count_elapsed_time += elapsed_time.getTime()
+                    break
+
+            # get elapsed time for fps
+            count_elapsed_time += elapsed_time.getTime()
+
+            # stop movies from continuing in background
+            for stim in to_animate:
+                if stim.fill_mode == 'movie':
+                    stim.stim.pause()
+
+            # outer break
             if MyWindow.should_break:
-                count_frames = frame + 1
-                # count_elapsed_time += elapsed_time.getTime()
+                print '\n Interrupt!'
                 break
 
-        # get elapsed time for fps
-        count_elapsed_time += elapsed_time.getTime()
-
-        # stop movies from continuing in background
-        for stim in to_animate:
-            if stim.fill_mode == 'movie':
-                stim.stim.pause()
-
-        # outer break
-        if MyWindow.should_break:
-            print '\n Interrupt!'
-            break
-
-        count_reps += 1
+            count_reps += 1
+    except Exception as e:
+        did_error = e
+        print e
+        return str(e), 'error'
 
     # one last flip to clear window
     MyWindow.win.flip()
