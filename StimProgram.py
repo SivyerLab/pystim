@@ -10,26 +10,31 @@ from psychopy import visual, core, event, filters
 from time import strftime, localtime
 from random import Random
 from PIL import Image
+
+import scipy, scipy.signal
 import ConfigParser
+import traceback
 import cPickle
-import scipy
 import numpy
 import copy
 import sys
 import os
 
+global has_igor
 try:
     from igor import binarywave, packed
     has_igor = True
 except ImportError:
     has_igor = False
 
+global has_tabulate
 try:
     from tabulate import tabulate
     has_tabulate = True
 except ImportError:
     has_tabulate = False
 
+global has_u3
 try:
     import u3
     has_u3 = True
@@ -234,13 +239,13 @@ class MyWindow(object):
         """
         # create labjack instance
 
+        global has_u3
         if has_u3:
             try:
                 MyWindow.d = u3.U3()
             except Exception as e:
                 print  e
                 print 'Is the labjack connected?'
-                global has_u3
                 has_u3 = False
 
         # check if gamma splines present
@@ -294,7 +299,6 @@ class MyWindow(object):
         """
         # flip window to clear stims if wait time after trigger/between triggers
         if has_u3:
-            print 'triggered'
             if GlobalDefaults['trigger_wait'] != 0:
                 MyWindow.win.flip()
 
@@ -604,7 +608,7 @@ class StaticStim(StimDefaults):
 
         self.end_stim = self.duration
         self.end_stim += self.start_stim
-        self.end_stim = int(self.end_stim + 0.99) - 1
+        self.end_stim = int(self.end_stim + 0.99)
 
         self.draw_duration = self.end_stim - self.start_stim
 
@@ -867,7 +871,6 @@ class StaticStim(StimDefaults):
         if MyWindow.gamma_mon is not None and self.fill_mode not in ['image']:
             texture = MyWindow.gamma_mon(texture)
 
-        # print texture.dtype, texture.itemsize, texture.nbytes / 1e9
         return texture
 
     def gen_timing(self, frame):
@@ -883,9 +886,67 @@ class StaticStim(StimDefaults):
         """
         stim_frame_num = frame - self.start_stim
         time_fraction = stim_frame_num * 1.0 / self.draw_duration
+        texture = self.stim.tex
 
-        # calculate color factors, which are normalized to oscillate between 0
-        # and 1 to avoid negative contrast values
+        high, low, delta, background = self.gen_rgb()
+
+        if self.timing == 'sine':
+            # adjust color
+            if self.intensity_dir == 'both':
+                color = scipy.sin(self.period_mod * scipy.pi *
+                                  time_fraction) * delta + background
+
+            elif self.intensity_dir == 'single':
+                color = scipy.sin(self.period_mod * scipy.pi *
+                                  time_fraction - scipy.pi / 2) * delta + \
+                        background
+
+            # unscale
+            color = color * 2 - 1
+            # color array
+            texture[:, :, self.contrast_channel] = color
+
+        elif self.timing == 'square':
+            if self.intensity_dir == 'both':
+                color = (scipy.signal.square(self.period_mod * scipy.pi *
+                                             time_fraction, duty=0.5) * 2) / \
+                        2 * delta + background
+
+            if self.intensity_dir == 'single':
+                color = scipy.signal.square(self.period_mod * scipy.pi *
+                                             time_fraction, duty=0.5) * delta\
+                        + background
+
+            # unscale
+            color = color * 2 - 1
+            # color array
+            texture[:, :, self.contrast_channel] = color
+
+        elif self.timing == 'sawtooth':
+            if self.intensity_dir == 'both':
+                color = (scipy.signal.square(self.period_mod * scipy.pi *
+                                             time_fraction, duty=0.5) * 2) / \
+                        2 * delta + background
+
+            if self.intensity_dir == 'single':
+                color = scipy.signal.square(self.period_mod * scipy.pi *
+                                             time_fraction, duty=0.5) * delta\
+                        + background
+
+            # unscale
+            color = color * 2 - 1
+            # color array
+            texture[:, :, self.contrast_channel] = color
+
+        # gamma correct
+        if MyWindow.gamma_mon is not None and self.fill_mode not in ['image']:
+            texture = MyWindow.gamma_mon(texture)
+
+        self.stim.tex = texture
+
+        '''
+        # calculate alpha factors, which are normalized to oscillate between 0
+        # and 1 to avoid negative alpha values
         if self.timing == 'sine':
             alpha_factor = scipy.sin(self.period_mod * scipy.pi *
                                      time_fraction - scipy.pi / 2) / 2 + 0.5
@@ -910,7 +971,7 @@ class StaticStim(StimDefaults):
         adj_texture = self.stim.tex
         adj_texture[:, :, 3] = alpha_factor * self.alpha
 
-        self.stim.tex = adj_texture
+        self.stim.tex = adj_texture'''
 
     def gen_phase(self):
         """
@@ -965,7 +1026,7 @@ class MovingStim(StaticStim):
 
         self.end_stim = self.num_frames * self.num_dirs
         self.end_stim += self.start_stim
-        self.end_stim = int(self.end_stim + 0.99) - 1
+        self.end_stim = int(self.end_stim + 0.99)
 
         self.draw_duration = self.end_stim - self.start_stim
 
@@ -1223,7 +1284,7 @@ class TableStim(MovingStim):
 
         self.end_stim = self.num_frames * self.num_dirs
         self.end_stim += self.start_stim
-        self.end_stim = int(self.end_stim + 0.99) - 1
+        self.end_stim = int(self.end_stim + 0.99)
 
         self.draw_duration = self.end_stim - self.start_stim
 
@@ -1605,10 +1666,10 @@ def log_stats(count_reps, reps, count_frames, num_frames, elapsed_time,
                 format(reps, len(stim_list)))
 
         f.write("\n{}/{} frames displayed. ".
-                format(count_reps * num_frames+1 + count_frames, reps *
+                format(count_reps * num_frames + count_frames, reps *
                        num_frames))
 
-        average_fps = (count_reps * num_frames+1 + count_frames) / elapsed_time
+        average_fps = (count_reps * num_frames + count_frames) / elapsed_time
         f.write("Average fps: {0:.2f} hz.".format(average_fps))
 
         f.write("\nElapsed time: {0:.3f} seconds.\n".format(elapsed_time))
@@ -1686,7 +1747,7 @@ def log_stats(count_reps, reps, count_frames, num_frames, elapsed_time,
                     f.write(str(to_animate[i].log[2][j][1]))
                     f.write('\n')
 
-    return average_fps
+    return current_time_string
 
 
 def main(stim_list, verbose=True):
@@ -1799,8 +1860,8 @@ def main(stim_list, verbose=True):
             count_reps += 1
     except Exception as e:
         did_error = e
-        print e
-        return str(e), 'error'
+        traceback.print_exc()
+        return str(e), 'error', None
 
     # one last flip to clear window
     MyWindow.win.flip()
@@ -1815,20 +1876,23 @@ def main(stim_list, verbose=True):
         print "\n{} rep(s) of {} stim(s) generated.". \
             format(reps, len(stim_list))
         print "{}/{} frames displayed.". \
-            format(count_reps * (num_frames+1) + count_frames, reps *
-                   (num_frames+1)),
+            format(count_reps * (num_frames) + count_frames, reps *
+                   (num_frames)),
         print "Average fps: {0:.2f} hz.". \
-            format((count_reps * (num_frames+1) + count_frames) / count_elapsed_time)
+            format((count_reps * (num_frames) + count_frames) / count_elapsed_time)
         print "Elapsed time: {0:.3f} seconds.\n". \
             format(count_elapsed_time)
 
+    time_stamp = None
+
     if GlobalDefaults['log']:
-        log_stats(count_reps, reps, count_frames, num_frames,
-                  count_elapsed_time, stim_list, to_animate, current_time)
+        time_stamp = log_stats(count_reps, reps, count_frames, num_frames,
+                               count_elapsed_time, stim_list, to_animate,
+                               current_time)
 
-    fps = (count_reps * num_frames+1 + count_frames) / count_elapsed_time
+    fps = (count_reps * num_frames + count_frames) / count_elapsed_time
 
-    return fps, count_elapsed_time
+    return fps, count_elapsed_time, time_stamp
 
 if __name__ == '__main__':
     pass
