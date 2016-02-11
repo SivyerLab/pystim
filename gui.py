@@ -268,9 +268,10 @@ fill_param = OrderedDict([
       'default' : config_dict['timing'],
       'is_child': False,
       'children': {
-          'sine'    : ['period_mod'],
-          'square'  : ['period_mod'],
-          'sawtooth': ['period_mod'],
+          'sine'    : ['period_mod', 'intensity_dir'],
+          'square'  : ['period_mod', 'intensity_dir'],
+          'sawtooth': ['period_mod', 'intensity_dir'],
+          'linear'  : ['intensity_dir']
       }}
      ),
 
@@ -303,7 +304,7 @@ fill_param = OrderedDict([
 
     ('intensity_dir',
      {'type'    : 'choice',
-      'label'   : 'intensity dir',
+      'label'   : 'contrast dir',
       'choices' : ['single', 'both'],
       'default' : config_dict['intensity_dir'],
       'is_child': True}
@@ -1735,10 +1736,16 @@ class MyFrame(wx.Frame):
                 # try/except, so that errors thrown by StimProgram can be
                 # caught and thrown to avoid hanging.
                 try:
-                    fps, time = StimProgram.main(self.l1.stim_info_list)
+                    fps, time, time_stamp = StimProgram.main(
+                        self.l1.stim_info_list)
                     if time != 'error':
-                        self.SetStatusText('Last run: {0:.2f} fps, '.format(fps) \
-                                           + '{0:.2f} seconds'.format(time))
+                        status_text = 'Last run: {0:.2f} fps, '.format(fps) \
+                                           + '{0:.2f} seconds.'.format(time)
+
+                        if time_stamp is not None:
+                            status_text += ' Timestamp: {}'.format(time_stamp)
+
+                        self.SetStatusText(status_text)
                     else:
                         self.SetStatusText(fps)
                 except:
@@ -1784,7 +1791,7 @@ class MyFrame(wx.Frame):
 
         :param event: event passed by binder
         """
-        print 'stopped'
+        # TODO: why not stopping on rerun
         StimProgram.MyWindow.should_break = True
 
     def on_exit_button(self, event):
