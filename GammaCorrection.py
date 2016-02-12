@@ -289,7 +289,7 @@ class GammaValues(object):
 
     def r_correct(self, r):
         """
-        Function to gamma correct red channel
+        Method to gamma correct red channel.
 
         :return: corrected red color
         """
@@ -298,7 +298,7 @@ class GammaValues(object):
 
     def g_correct(self, g):
         """
-        Function to gamma correct green channel
+        Method to gamma correct green channel.
 
         :return: corrected green color
         """
@@ -309,7 +309,7 @@ class GammaValues(object):
 
     def b_correct(self, b):
         """
-        Function to gamma correct blue channel
+        Method to gamma correct blue channel.
 
         :return: corrected blue color
         """
