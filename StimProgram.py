@@ -12,6 +12,7 @@ from random import Random
 from PIL import Image
 
 import scipy, scipy.signal
+import sortedcontainers
 import ConfigParser
 import traceback
 import cPickle
@@ -188,7 +189,8 @@ class GlobalDefaults(object):
             self.defaults['screen_num'] = screen_num
 
         if screen_num is not None:
-            self.defaults['trigger_wait'] = trigger_wait
+            self.defaults['trigger_wait'] = int(trigger_wait * 1.0 *
+                                                frame_rate + 0.99)
 
         if log is not None:
             self.defaults['log'] = log
@@ -229,6 +231,9 @@ class MyWindow(object):
     should_break = False
     #: Labjack U3 instance for triggering.
     d = None
+    #: list of frames to trigger on
+    frame_trigger_list = sortedcontainers.SortedList()
+    frame_trigger_list.add(1e9)
 
     @staticmethod
     def make_win():
@@ -299,16 +304,11 @@ class MyWindow(object):
         """
         # flip window to clear stims if wait time after trigger/between triggers
         if has_u3:
-            if GlobalDefaults['trigger_wait'] != 0:
-                MyWindow.win.flip()
-
             # voltage spike; 0 is low, 1 is high, on flexible IO #4
             MyWindow.d.setFIOState(4, 1)
             # reset
             MyWindow.d.setFIOState(4, 0)
-            # wait
-            if GlobalDefaults['trigger_wait'] != 0:
-                core.wait(GlobalDefaults['trigger_wait'])
+            print 'triggered'
 
 
 class StimDefaults(object):
@@ -604,7 +604,11 @@ class StaticStim(StimDefaults):
 
         :return: last frame number as int
         """
-        self.start_stim = self.delay
+        self.start_stim = int(self.delay + 0.99)
+
+        if self.trigger:
+            if not self.start_stim in MyWindow.frame_trigger_list:
+                MyWindow.frame_trigger_list.add(self.start_stim)
 
         self.end_stim = self.duration
         self.end_stim += self.start_stim
@@ -625,15 +629,11 @@ class StaticStim(StimDefaults):
         # check if within animation range
         if self.start_stim <= frame < self.end_stim:
             # adjust colors based on timing
-            if self.fill_mode not in ['movie'] and self.timing != 'step':
+            if self.fill_mode not in ['movie', 'image'] and self.timing != 'step':
                 self.gen_timing(frame)
 
             # move phase
             self.gen_phase()
-
-            # trigger just before first window flip
-            if self.trigger and self.start_stim == frame:
-                MyWindow.send_trigger()
 
             # draw to back buffer
             self.stim.draw()
@@ -1019,7 +1019,7 @@ class MovingStim(StaticStim):
 
         :return: last frame number as int
         """
-        self.start_stim = self.delay
+        self.start_stim = int(self.delay + 0.99)
 
         # need to generate movement to get number of frames
         self.gen_pos()
@@ -1029,6 +1029,12 @@ class MovingStim(StaticStim):
         self.end_stim = int(self.end_stim + 0.99)
 
         self.draw_duration = self.end_stim - self.start_stim
+
+        if self.trigger:
+            for x in range(self.num_dirs):
+                trigger_frame = self.num_frames * x + self.start_stim
+                if not trigger_frame in MyWindow.frame_trigger_list:
+                    MyWindow.frame_trigger_list.add(trigger_frame)
 
         return self.end_stim
 
@@ -1045,17 +1051,8 @@ class MovingStim(StaticStim):
             # if next coordinate is calculated, moves stim, else calls
             # gen_movement() and retries
             try:
-
-                if self.trigger_frames is not None:
-                    x, y, to_trigger = self.get_next_pos()
-                    self.set_pos(x, y)
-
-                    if to_trigger:
-                        MyWindow.send_trigger()
-
-                else:
-                    x, y = self.get_next_pos()
-                    self.set_pos(x, y)
+                x, y = self.get_next_pos()
+                self.set_pos(x, y)
 
                 super(MovingStim, self).animate(frame)
 
@@ -1064,7 +1061,6 @@ class MovingStim(StaticStim):
 
             except (AttributeError, IndexError, TypeError):
                 self.error_count += 1
-
                 if self.error_count == 2:
                     raise
 
@@ -1074,9 +1070,6 @@ class MovingStim(StaticStim):
 
                 # log frame number for RandomlyMovingStim
                 self.log[1].append(frame)
-
-                if self.trigger:
-                    MyWindow.send_trigger()
 
                 # retry
                 self.animate(frame)
@@ -1217,7 +1210,16 @@ class RandomlyMovingStim(MovingStim):
         :return: last frame number as int
         """
         self.gen_pos()
-        return super(MovingStim, self).draw_times()
+
+        self.end_stim = super(MovingStim, self).draw_times()
+
+        if self.trigger:
+            for x in range(self.duration / self.num_frames):
+                trigger_frame = self.num_frames * x + self.start_stim
+                if not trigger_frame in MyWindow.frame_trigger_list:
+                    MyWindow.frame_trigger_list.add(trigger_frame)
+
+        return self.end_stim
 
     def gen_pos(self):
         """
@@ -1288,7 +1290,13 @@ class TableStim(MovingStim):
 
         self.draw_duration = self.end_stim - self.start_stim
 
-        print len(self.x_array)
+        if self.trigger_frames is not None:
+            if self.trigger:
+                for j in range(self.num_dirs):
+                    for i in self.trigger_frames:
+                        trigger_frame = i + j * self.num_frames
+                        if trigger_frame not in MyWindow.frame_trigger_list:
+                            MyWindow.frame_trigger_list.add(trigger_frame)
 
         return self.end_stim
 
@@ -1315,7 +1323,6 @@ class TableStim(MovingStim):
         for i in range(self.move_delay):
             self.x_array = scipy.append(self.x_array, off_x)
             self.y_array = scipy.append(self.y_array, off_y)
-            self.trigger_frames = scipy.append(self.trigger_frames, 0)
 
         self.num_frames += self.move_delay
 
@@ -1344,9 +1351,9 @@ class TableStim(MovingStim):
                 lines = [line.strip() for line in f]
 
             radii = [i.split()[0] for i in lines]
-            self.trigger_frames = [i.split()[1] for i in lines]
-            self.trigger_frames[0] = 0
-            # self.trigger_frames[-1] = 1  # trigger on last frame
+            trigger_list = [i.split()[1] for i in lines]
+            trigger_list[0] = 1
+            trigger_list[-1] = 1  # trigger on last frame
 
         # if igor binary wave format or packed experiment format
         elif os.path.splitext(table)[1] in ['.ibw', '.pxp']:
@@ -1357,7 +1364,7 @@ class TableStim(MovingStim):
                 elif os.path.splitext(table)[1] == '.pxp':
                     radii = packed.load(table)[1]['root']['wave0'].wave[
                         'wave']['wData']
-                    self.trigger_frames = packed.load(table)[1]['root'][
+                    trigger_list = packed.load(table)[1]['root'][
                         'wave1'].wave['wave']['wData']
 
             elif not has_igor:
@@ -1371,8 +1378,15 @@ class TableStim(MovingStim):
         else:
             raise IOError('File not a supported format. See docs for '
                           'reference.')
-        if self.trigger_frames is not None:
-            self.trigger_frames = map(int, self.trigger_frames)
+
+        if trigger_list is not None:
+            trigger_list = map(int, trigger_list)
+            self.trigger_frames = []
+
+            for i in range(len(trigger_list)):
+                if trigger_list[i] == 1:
+                    self.trigger_frames.append(i)
+
 
         self.num_frames = len(radii)
 
@@ -1394,12 +1408,11 @@ class TableStim(MovingStim):
         """
         x = self.x_array[self.frame_counter]
         y = self.y_array[self.frame_counter]
-        to_trigger = self.trigger_frames[self.frame_counter]
 
         # increment frame counter for next frame
         self.frame_counter += 1
 
-        return x, y, to_trigger
+        return x, y
 
 
 class ImageJumpStim(StaticStim):
@@ -1464,9 +1477,6 @@ class ImageJumpStim(StaticStim):
         :param frame: current frame number
         """
         if self.start_stim <= frame < self.end_stim:
-            # send trigger at just before first frame that stim object is drawn
-            if self.trigger and self.start_stim == frame:
-                MyWindow.send_trigger()
             i = frame - self.delay * GlobalDefaults.defaults['frame_rate']
             # draw to back buffer
             self.stim[i].draw()
@@ -1819,19 +1829,37 @@ def main(stim_list, verbose=True):
             for stim in to_animate:
                 stim.make_stim()
 
+            # reset frame trigger times
+            del MyWindow.frame_trigger_list[:-1]
+
             # determine end time of last stim
             num_frames = max(stim.draw_times() for stim in to_animate)
             # round up, then subtract 1 because index starts at 0
             # num_frames = int(num_frames + 0.99) - 1
 
+            # draw stims and flip window
+            if GlobalDefaults['trigger_wait'] != 0:
+                MyWindow.win.callOnFlip(MyWindow.send_trigger)
+            MyWindow.win.flip()
+
+            if GlobalDefaults['trigger_wait'] != 0:
+                for y in xrange(GlobalDefaults['trigger_wait'] - 1):
+                    MyWindow.win.flip()
+
+            index = 0
             # clock for timing
             elapsed_time = core.MonotonicClock()
 
-            # draw stims and flip window
+            print MyWindow.frame_trigger_list
+
             for frame in xrange(num_frames):
                 for stim in to_animate:
                     stim.animate(frame)
                 MyWindow.win.flip()
+                if frame == MyWindow.frame_trigger_list[index]:
+                    print frame,
+                    MyWindow.send_trigger()
+                    index += 1
 
                 # escape key breaks if focus on window
                 for key in event.getKeys(keyList=['escape']):
