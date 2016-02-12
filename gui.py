@@ -544,7 +544,7 @@ global_default_param = OrderedDict([
 
     ('trigger_wait',
      {'type'    : 'text',
-      'label'   : 'trigger wait',
+      'label'   : 'start trigger wait',
       'default' : config_dict['trigger_wait'],
       'is_child': False}
      ),
@@ -1703,7 +1703,8 @@ class MyFrame(wx.Frame):
         self.Bind(wx.EVT_CHAR_HOOK, self.on_keypress)
 
         # change background color to match panels
-        self.SetBackgroundColour(wx.NullColour)
+        if _platform == 'win32':
+            self.SetBackgroundColour(wx.NullColour)
 
         # draw frame
         self.Show()
