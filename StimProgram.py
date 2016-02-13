@@ -308,7 +308,6 @@ class MyWindow(object):
             MyWindow.d.setFIOState(4, 1)
             # reset
             MyWindow.d.setFIOState(4, 0)
-            print 'triggered'
 
 
 class StimDefaults(object):
@@ -444,7 +443,7 @@ class StimDefaults(object):
                  sf=1,
                  phase=None,
                  phase_speed=None,
-                 contrast_channel='Green',
+                 contrast_channel='green',
                  movie_filename=None,
                  movie_size=None,
                  period_mod=1,
@@ -597,6 +596,16 @@ class StaticStim(StimDefaults):
 
         self.stim.sf *= self.sf
 
+        if self.fill_mode == 'image':
+            image = numpy.rot90(self.gen_texture(), 2)
+            image = scipy.misc.toimage(numpy.rot90(self.gen_texture(), 2))
+            self.stim = visual.ImageStim(win=MyWindow.win,
+                                         size=self.gen_size(),
+                                         mask=self.gen_mask(),
+                                         image=image,
+                                         pos=self.location,
+                                         ori=self.orientation)
+
     def draw_times(self):
         """
         Determines during which frames stim should be drawn, based on desired
@@ -632,8 +641,8 @@ class StaticStim(StimDefaults):
             if self.fill_mode not in ['movie', 'image'] and self.timing != 'step':
                 self.gen_timing(frame)
 
-            # move phase
-            self.gen_phase()
+                # move phase
+                self.gen_phase()
 
             # draw to back buffer
             self.stim.draw()
@@ -1214,7 +1223,7 @@ class RandomlyMovingStim(MovingStim):
         self.end_stim = super(MovingStim, self).draw_times()
 
         if self.trigger:
-            for x in range(self.duration / self.num_frames):
+            for x in range(int(self.duration / self.num_frames+0.99)):
                 trigger_frame = self.num_frames * x + self.start_stim
                 if not trigger_frame in MyWindow.frame_trigger_list:
                     MyWindow.frame_trigger_list.add(trigger_frame)
@@ -1850,14 +1859,13 @@ def main(stim_list, verbose=True):
             # clock for timing
             elapsed_time = core.MonotonicClock()
 
-            print MyWindow.frame_trigger_list
-
             for frame in xrange(num_frames):
                 for stim in to_animate:
                     stim.animate(frame)
+
                 MyWindow.win.flip()
+
                 if frame == MyWindow.frame_trigger_list[index]:
-                    print frame,
                     MyWindow.send_trigger()
                     index += 1
 
