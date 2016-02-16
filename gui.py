@@ -1737,6 +1737,7 @@ class MyFrame(wx.Frame):
                 # try/except, so that errors thrown by StimProgram can be
                 # caught and thrown to avoid hanging.
                 try:
+                    self.SetStatusText('running...')
                     fps, time, time_stamp = StimProgram.main(
                         self.l1.stim_info_list)
                     if time != 'error':
