@@ -53,9 +53,8 @@ __status__  = "Beta"
 # logging.console.setLevel(logging.CRITICAL)
 
 # read ini file
-defaults = dict(
-    logsDir = '.\\psychopy\\logs\\',
-    monitor = 'blank')
+defaults = dict(logsDir='.\\psychopy\\logs\\',
+                monitor='blank')
 config = ConfigParser.ConfigParser()
 config.read(os.path.abspath('./psychopy/config.ini'))
 
@@ -249,7 +248,7 @@ class MyWindow(object):
             try:
                 MyWindow.d = u3.U3()
             except Exception as e:
-                print  e
+                print e
                 print 'Is the labjack connected?'
                 has_u3 = False
 
@@ -513,7 +512,7 @@ class StimDefaults(object):
 
         # speed conversion
         self.speed = speed * (1.0 * GlobalDefaults['pix_per_micron'] /
-                                    GlobalDefaults['frame_rate'])
+                              GlobalDefaults['frame_rate'])
 
         # list variable with unit conversion
         if location is not None:
@@ -616,7 +615,7 @@ class StaticStim(StimDefaults):
         self.start_stim = int(self.delay + 0.99)
 
         if self.trigger:
-            if not self.start_stim in MyWindow.frame_trigger_list:
+            if self.start_stim not in MyWindow.frame_trigger_list:
                 MyWindow.frame_trigger_list.add(self.start_stim)
 
         self.end_stim = self.duration
@@ -638,7 +637,8 @@ class StaticStim(StimDefaults):
         # check if within animation range
         if self.start_stim <= frame < self.end_stim:
             # adjust colors based on timing
-            if self.fill_mode not in ['movie', 'image'] and self.timing != 'step':
+            if self.fill_mode not in ['movie', 'image'] and self.timing != \
+                    'step':
                 self.gen_timing(frame)
 
                 # move phase
@@ -832,7 +832,6 @@ class StaticStim(StimDefaults):
                     # add alpha values
                     texture = numpy.insert(texture, 3, self.alpha, axis=2)
 
-
                 # else save gamma correction for faster future loading
                 else:
                     image = Image.open(self.image_filename)
@@ -923,7 +922,7 @@ class StaticStim(StimDefaults):
 
             if self.intensity_dir == 'single':
                 color = scipy.signal.square(self.period_mod * scipy.pi *
-                                             time_fraction, duty=0.5) * delta\
+                                            time_fraction, duty=0.5) * delta\
                         + background
 
             # unscale
@@ -939,7 +938,7 @@ class StaticStim(StimDefaults):
 
             if self.intensity_dir == 'single':
                 color = scipy.signal.square(self.period_mod * scipy.pi *
-                                             time_fraction, duty=0.5) * delta\
+                                            time_fraction, duty=0.5) * delta\
                         + background
 
             # unscale
@@ -1114,19 +1113,20 @@ class MovingStim(StaticStim):
                                                         angle)
 
         # add in move delay by placing stim off screen
-        if len(self.stim.size) > 1:
-            max_size = max(self.stim.size)
-        else:
-            max_size = self.stim.size
+        if self.move_delay > 0:
+            if len(self.stim.size) > 1:
+                max_size = max(self.stim.size)
+            else:
+                max_size = self.stim.size
 
-        off_x = (GlobalDefaults['display_size'][0] + max_size) / 2
-        off_y = (GlobalDefaults['display_size'][1] + max_size) / 2
+            off_x = (GlobalDefaults['display_size'][0] + max_size) / 2
+            off_y = (GlobalDefaults['display_size'][1] + max_size) / 2
 
-        for i in range(self.move_delay):
-            self.x_array = scipy.append(self.x_array, off_x)
-            self.y_array = scipy.append(self.y_array, off_y)
+            for i in range(self.move_delay):
+                self.x_array = scipy.append(self.x_array, off_x)
+                self.y_array = scipy.append(self.y_array, off_y)
 
-        self.num_frames += self.move_delay
+            self.num_frames += self.move_delay
 
         # set start_dir for next call of gen_pos()
         self.start_dir += 360 / self.num_dirs
@@ -1649,6 +1649,7 @@ def log_stats(count_reps, reps, count_frames, num_frames, elapsed_time,
     :param num_frames: Total possible frames.
     :param elapsed_time: Elapsed time
     :param stim_list: List of stims that ran.
+    :param to_animate: List of stims animated (includes annuli)
     :param time_at_run: Time at which stims were run
     """
     current_time = time_at_run
