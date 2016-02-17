@@ -116,6 +116,8 @@ class GlobalDefaults(object):
     :param int protocol_reps: Number of repetitions to cycle through of all
      stims.
     :param list background: RGB list of window background.
+    :param float pref_dir: Cell preferred direction. If not -1, overrides
+     start_dir
     :param bool fullscreen: Boolean, whether or not window should be fullscreen.
     :param int screen_num: On which monitor to display the window.
     :param string gamma_correction: Spline to use for gamma correction. See
@@ -138,6 +140,7 @@ class GlobalDefaults(object):
                     position=[0, 0],
                     protocol_reps=1,
                     background=[-1, 0, -1],
+                    pref_dir=-1,
                     fullscreen=False,
                     log=False,
                     screen_num=1,
@@ -152,6 +155,7 @@ class GlobalDefaults(object):
                  position=None,
                  protocol_reps=None,
                  background=None,
+                 pref_dir=None,
                  fullscreen=None,
                  screen_num=None,
                  trigger_wait=None,
@@ -181,6 +185,9 @@ class GlobalDefaults(object):
 
         if background is not None:
             self.defaults['background'] = background
+
+        if pref_dir is not None:
+            self.defaults['pref_dir'] = pref_dir
 
         if fullscreen is not None:
             self.defaults['fullscreen'] = fullscreen
@@ -470,7 +477,6 @@ class StimDefaults(object):
         self.period_mod = period_mod * 2.0 * duration
         self.move_seed = move_seed
         self.num_dirs = num_dirs
-        self.start_dir = start_dir
         self.ori_with_dir = ori_with_dir
         self.movie_filename = movie_filename
         self.image_filename = image_filename
@@ -480,6 +486,12 @@ class StimDefaults(object):
         self.contrast_channel = ['red', 'green', 'blue'].index(contrast_channel)
         self.image_channel = ['red', 'green', 'blue', 'all'].index(
                 image_channel)
+
+        # override start dir with global
+        if GlobalDefaults['pref_dir'] != -1:
+            self.start_dir = GlobalDefaults['pref_dir']
+        else:
+            self.start_dir = start_dir
 
         # mutable variables
         if color is not None:
