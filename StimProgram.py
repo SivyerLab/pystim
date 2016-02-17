@@ -1107,6 +1107,10 @@ class MovingStim(StaticStim):
         if angle >= 360:
             angle -= 360
 
+        # add to log
+        self.log[0].append(angle)
+        self.log[2].append(self.get_pos())
+
         # orient shape if not an image and fill is uniform
         if self.ori_with_dir:
             self.stim.ori = self.start_dir + self.orientation
@@ -1823,7 +1827,7 @@ def main(stim_list, verbose=True):
             to_animate = []
 
             for stim in stim_list:
-                print stim.number
+                # print stim.number
                 # checkerboard and movie inheritance depends on motion type,
                 # so instantiate accordingly
                 if stim.parameters['fill_mode'] in ['checkerboard', 'random']:
@@ -1843,7 +1847,10 @@ def main(stim_list, verbose=True):
                 # circle within the larger circle, and setting its color to
                 # background and its timing to instant
                 if stim.parameters['shape'] == 'annulus':
-                    # make necessary changes
+                    # make necessary changes to copy so not overwritten for
+                    # next run
+                    stim = copy.deepcopy(stim)
+
                     stim.parameters['timing'] = 'step'
                     stim.parameters['color'] = GlobalDefaults['background']
                     stim.parameters['intensity'] = 0
@@ -1919,12 +1926,14 @@ def main(stim_list, verbose=True):
 
             count_reps += 1
     except Exception as e:
-        did_error = e
         traceback.print_exc()
         return str(e), 'error', None
 
-    # one last flip to clear window
-    MyWindow.win.flip()
+    # one last flip to clear window if still open
+    try:
+        MyWindow.win.flip()
+    except AttributeError:
+        pass
 
     # print some stats
     if verbose:
