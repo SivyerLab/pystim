@@ -29,9 +29,9 @@ to run. They are listed below:
 for required [dependencies](http://www.psychopy.org/installation
 .html#essential-packages)). Psychopy is available through:
 
-'''
+```
 pip install psychopy
-'''
+```
 
 - [wxPython](http://www.wxpython.org/download.php) (for GUI)
 
