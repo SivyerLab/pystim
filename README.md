@@ -30,7 +30,7 @@ for required [dependencies](http://www.psychopy.org/installation
 .html#essential-packages)). Psychopy is available through:
 
 ```
-pip install psychopy
+    pip install psychopy
 ```
 
 - [wxPython](http://www.wxpython.org/download.php) (for GUI)
