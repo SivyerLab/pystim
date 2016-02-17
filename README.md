@@ -49,13 +49,9 @@ file for license rights and limitations.
 
 ### Screen Shots (Windows 7)
 
-Main screen:
+Main screen with queued stims:
 
 ![main screen](docs/screenshots/screen1.PNG)
-
-Stims to run:
-
-![stims added](docs/screenshots/screen3.PNG)
 
 Example stimuli:
 
