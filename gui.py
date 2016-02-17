@@ -408,7 +408,7 @@ motion_param = OrderedDict([
     ('move_type',
      {'type'    : 'choice',
       'label'   : 'move type',
-      'choices' : ['static', 'moving', 'table', 'random', 'jump'],
+      'choices' : ['static', 'moving', 'table', 'random'], #, 'jump'],
       'default' : config_dict['move_type'],
       'is_child': False,
       'children': {
@@ -417,7 +417,7 @@ motion_param = OrderedDict([
           'random': ['speed', 'travel_distance', 'move_seed'],
           'table' : ['table_filename', 'start_dir', 'num_dirs', 'move_delay',
                      'ori_with_dir'],
-          'jump'  : ['num_jumps', 'jump_delay', 'move_seed'],
+          #'jump'  : ['num_jumps', 'jump_delay', 'move_seed'],
       }}
      ),
 
