@@ -17,7 +17,7 @@ functional.
 ### Documentation
 
 Documentation is included in HTML format in the docs/html/ directory. Further
-documentation on Psychopy can be found at on the psychopy [website](www.psychopy.org).
+documentation on Psychopy can be found on the psychopy [website](www.psychopy.org).
 
 ### Installation
 
