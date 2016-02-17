@@ -26,7 +26,13 @@ Program requires several libraries, along with their associated dependencies,
 to run. They are listed below:
 
 - psychopy (see psychopy [documentation](http://www.psychopy.org/documentation.html) 
-for required [dependencies](http://www.psychopy.org/installation.html#essential-packages))
+for required [dependencies](http://www.psychopy.org/installation
+.html#essential-packages)). Psychopy is available through:
+
+'''
+    pip install psychopy
+'''
+
 - [wxPython](http://www.wxpython.org/download.php) (for GUI)
 
 Optional libraries:
@@ -51,6 +57,6 @@ Stims to run:
 
 ![stims added](docs/screenshots/screen3.PNG)
 
-Example stimulus:
+Example stimuli:
 
 ![example](docs/screenshots/screen4.PNG)
