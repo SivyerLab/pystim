@@ -919,7 +919,7 @@ class ListPanel(wx.Panel):
 
         self.add_stim(stim_type, param_dict)
 
-    def add_stim(self, stim_type, param_dict, list_pos=None):
+    def add_stim(self, stim_type, param_dict, insert_pos=None):
         """
         Adds stim to list of stims to run
 
@@ -933,8 +933,8 @@ class ListPanel(wx.Panel):
             shape = param_dict['shape']
         trigger = str(param_dict['trigger'])
 
-        if list_pos is not None:
-            index = list_pos
+        if insert_pos is not None:
+            index = insert_pos
         else:
             index = self.list_control.GetItemCount()
 
@@ -963,10 +963,16 @@ class ListPanel(wx.Panel):
 
         stim_info = StimProgram.StimInfo(stim_type, param_dict,
                                          index)
-        if list_pos is not None:
+        if insert_pos is not None:
             self.stim_info_list.insert(index, stim_info)
         else:
             self.stim_info_list.append(stim_info)
+
+        # deselect all so most recently added can be selected
+        while self.list_control.GetSelectedItemCount() != 0:
+            self.list_control.Select(self.list_control.GetFirstSelected(), on=0)
+
+        self.list_control.Select(index)
 
         # reset stim numbers
         index = 0
@@ -1003,26 +1009,27 @@ class ListPanel(wx.Panel):
         :param event:
         :return:
         """
-        index = self.list_control.GetFirstSelected()
-        if index > 0:
-            item = self.stim_info_list[index]
-            stim_type = item.stim_type
+        if self.list_control.GetSelectedItemCount() == 1:
+            index = self.list_control.GetFirstSelected()
+            if index > 0:
+                item = self.stim_info_list[index]
+                stim_type = item.stim_type
 
-            if stim_type == 'StaticStim':
-                stim_type = 'static'
-            elif stim_type == 'MovingStim':
-                stim_type = 'moving'
-            elif stim_type == 'RandomlyMovingStim':
-                stim_type = 'random'
-            elif stim_type == 'TableStim':
-                stim_type = 'table'
-            elif stim_type == 'ImageJumpStim':
-                stim_type = 'jump'
+                if stim_type == 'StaticStim':
+                    stim_type = 'static'
+                elif stim_type == 'MovingStim':
+                    stim_type = 'moving'
+                elif stim_type == 'RandomlyMovingStim':
+                    stim_type = 'random'
+                elif stim_type == 'TableStim':
+                    stim_type = 'table'
+                elif stim_type == 'ImageJumpStim':
+                    stim_type = 'jump'
 
-            self.on_remove_button(event)
-            self.add_stim(stim_type, item.parameters, index-1)
+                self.on_remove_button(event)
+                self.add_stim(stim_type, item.parameters, index-1)
 
-            self.list_control.Select(index-1)
+            # self.list_control.Select(index-1)
 
     def on_down_button(self, event):
         """
@@ -1031,26 +1038,27 @@ class ListPanel(wx.Panel):
         :param event:
         :return:
         """
-        index = self.list_control.GetFirstSelected()
-        if index < self.list_control.GetItemCount() - 1:
-            item = self.stim_info_list[index]
-            stim_type = item.stim_type
+        if self.list_control.GetSelectedItemCount() == 1:
+            index = self.list_control.GetFirstSelected()
+            if index < self.list_control.GetItemCount() - 1:
+                item = self.stim_info_list[index]
+                stim_type = item.stim_type
 
-            if stim_type == 'StaticStim':
-                stim_type = 'static'
-            elif stim_type == 'MovingStim':
-                stim_type = 'moving'
-            elif stim_type == 'RandomlyMovingStim':
-                stim_type = 'random'
-            elif stim_type == 'TableStim':
-                stim_type = 'table'
-            elif stim_type == 'ImageJumpStim':
-                stim_type = 'jump'
+                if stim_type == 'StaticStim':
+                    stim_type = 'static'
+                elif stim_type == 'MovingStim':
+                    stim_type = 'moving'
+                elif stim_type == 'RandomlyMovingStim':
+                    stim_type = 'random'
+                elif stim_type == 'TableStim':
+                    stim_type = 'table'
+                elif stim_type == 'ImageJumpStim':
+                    stim_type = 'jump'
 
-            self.on_remove_button(event)
-            self.add_stim(stim_type, item.parameters, index+1)
+                self.on_remove_button(event)
+                self.add_stim(stim_type, item.parameters, index+1)
 
-            self.list_control.Select(index+1)
+                # self.list_control.Select(index+1)
 
     def on_double_click(self, event):
         """
