@@ -75,7 +75,8 @@ config_default_dict = dict(
     trigger=False,
     move_delay=0,
     num_jumps=5,
-    jump_delay=100)
+    jump_delay=100,
+    force_stop=0)
 
 def get_config_dict(config_file):
     defaults = dict(zip(config_default_dict, map(str,
@@ -207,6 +208,13 @@ timing_param = OrderedDict([
      {'type'    : 'text',
       'label'   : 'duration',
       'default' : config_dict['duration'],
+      'is_child': False}
+     ),
+
+    ('force_stop',
+     {'type'    : 'text',
+      'label'   : 'end (non 0 overrides)',
+      'default' : config_dict['force_stop'],
       'is_child': False}
      ),
 
@@ -829,7 +837,6 @@ class ListPanel(wx.Panel):
 
         # instance attributes
         self.stim_info_list = []
-        self.index = 0
 
         # title and its sizer
         title = wx.StaticText(self, label="stims to run")
@@ -844,26 +851,45 @@ class ListPanel(wx.Panel):
         # list control widget
         self.list_control = wx.ListCtrl(self, size=(200, -1),
                                         style=wx.LC_REPORT | wx.SUNKEN_BORDER)
-        self.list_control.InsertColumn(0, 'Shape')
-        self.list_control.InsertColumn(1, 'Type')
-        self.list_control.InsertColumn(2, 'Fill')
+        self.list_control.InsertColumn(0, 'Fill')
+        self.list_control.InsertColumn(1, 'Shape')
+        self.list_control.InsertColumn(2, 'Type')
         self.list_control.InsertColumn(3, 'Trigger')
 
         # add to sizer
         sizer_panel.Add(self.list_control, 1, wx.EXPAND)
 
+        # sizer for up and down buttons
+        sizer_up_down_buttons = wx.BoxSizer(wx.HORIZONTAL)
+
+        self.up_button = wx.Button(self, label='Move up')
+        self.down_button = wx.Button(self, label='Move down')
+
+        sizer_up_down_buttons.Add(self.up_button, 1, border=5,
+                               flag=wx.LEFT | wx.RIGHT)
+        sizer_up_down_buttons.Add(self.down_button, 1, border=5,
+                               flag=wx.LEFT | wx.RIGHT)
+
+        sizer_panel.Add(sizer_up_down_buttons, border=5,
+                        flag=wx.TOP | wx.ALIGN_CENTER_HORIZONTAL |
+                        wx.ALIGN_CENTER_VERTICAL)
+
+        # up and down button binders
+        self.Bind(wx.EVT_BUTTON, self.on_up_button, self.up_button)
+        self.Bind(wx.EVT_BUTTON, self.on_down_button, self.down_button)
+
         # sizer for add and remove buttons
-        sizer_buttons = wx.BoxSizer(wx.HORIZONTAL)
+        sizer_add_remove_buttons = wx.BoxSizer(wx.HORIZONTAL)
 
         self.add_button = wx.Button(self, id=wx.ID_ADD)
         self.remove_button = wx.Button(self, id=wx.ID_REMOVE)
 
-        sizer_buttons.Add(self.add_button, 1, border=5,
+        sizer_add_remove_buttons.Add(self.add_button, 1, border=5,
                                flag=wx.LEFT | wx.RIGHT)
-        sizer_buttons.Add(self.remove_button, 1, border=5,
+        sizer_add_remove_buttons.Add(self.remove_button, 1, border=5,
                                flag=wx.LEFT | wx.RIGHT)
 
-        sizer_panel.Add(sizer_buttons, border=5,
+        sizer_panel.Add(sizer_add_remove_buttons, border=5,
                         flag=wx.BOTTOM | wx.TOP | wx.ALIGN_CENTER_HORIZONTAL |
                         wx.ALIGN_CENTER_VERTICAL)
 
@@ -893,22 +919,31 @@ class ListPanel(wx.Panel):
 
         self.add_stim(stim_type, param_dict)
 
-    def add_stim(self, stim_type, param_dict):
+    def add_stim(self, stim_type, param_dict, list_pos=None):
         """
         Adds stim to list of stims to run
 
         :param stim_type:
         :param param_dict:
         """
-        shape = param_dict['shape']
         fill = param_dict['fill_mode']
+        if fill in ['random', 'checkerboard']:
+            shape = 'rectangle'
+        else:
+            shape = param_dict['shape']
         trigger = str(param_dict['trigger'])
 
+        if list_pos is not None:
+            index = list_pos
+        else:
+            index = self.list_control.GetItemCount()
+
+
         # add info to list
-        self.list_control.InsertStringItem(self.index, shape)
-        self.list_control.SetStringItem(self.index, 1, stim_type)
-        self.list_control.SetStringItem(self.index, 2, fill)
-        self.list_control.SetStringItem(self.index, 3, trigger)
+        self.list_control.InsertStringItem(index, fill)
+        self.list_control.SetStringItem(index, 1, shape)
+        self.list_control.SetStringItem(index, 2, stim_type)
+        self.list_control.SetStringItem(index, 3, trigger)
         # resize columns to fit
         self.list_control.SetColumnWidth(0, wx.LIST_AUTOSIZE)
         self.list_control.SetColumnWidth(1, wx.LIST_AUTOSIZE)
@@ -927,10 +962,17 @@ class ListPanel(wx.Panel):
             stim_type = 'ImageJumpStim'
 
         stim_info = StimProgram.StimInfo(stim_type, param_dict,
-                                         self.index + 1)
-        self.stim_info_list.append(stim_info)
+                                         index)
+        if list_pos is not None:
+            self.stim_info_list.insert(index, stim_info)
+        else:
+            self.stim_info_list.append(stim_info)
 
-        self.index += 1
+        # reset stim numbers
+        index = 0
+        for stim in self.stim_info_list:
+            stim.number = index
+            index += 1
 
     def on_remove_button(self, event):
         """
@@ -944,11 +986,71 @@ class ListPanel(wx.Panel):
                 # print int(selected)
                 self.stim_info_list.pop(selected)
                 self.list_control.DeleteItem(selected)
-                self.index -= 1
         else:
             self.list_control.DeleteAllItems()
             del self.stim_info_list[:]
-            self.index = 0
+
+        # reset stim numbers
+        index = 0
+        for stim in self.stim_info_list:
+            stim.number = index
+            index += 1
+
+    def on_up_button(self, event):
+        """
+        Moves a stim up in the list
+
+        :param event:
+        :return:
+        """
+        index = self.list_control.GetFirstSelected()
+        if index > 0:
+            item = self.stim_info_list[index]
+            stim_type = item.stim_type
+
+            if stim_type == 'StaticStim':
+                stim_type = 'static'
+            elif stim_type == 'MovingStim':
+                stim_type = 'moving'
+            elif stim_type == 'RandomlyMovingStim':
+                stim_type = 'random'
+            elif stim_type == 'TableStim':
+                stim_type = 'table'
+            elif stim_type == 'ImageJumpStim':
+                stim_type = 'jump'
+
+            self.on_remove_button(event)
+            self.add_stim(stim_type, item.parameters, index-1)
+
+            self.list_control.Select(index-1)
+
+    def on_down_button(self, event):
+        """
+        Moves a stim up in the list
+
+        :param event:
+        :return:
+        """
+        index = self.list_control.GetFirstSelected()
+        if index < self.list_control.GetItemCount() - 1:
+            item = self.stim_info_list[index]
+            stim_type = item.stim_type
+
+            if stim_type == 'StaticStim':
+                stim_type = 'static'
+            elif stim_type == 'MovingStim':
+                stim_type = 'moving'
+            elif stim_type == 'RandomlyMovingStim':
+                stim_type = 'random'
+            elif stim_type == 'TableStim':
+                stim_type = 'table'
+            elif stim_type == 'ImageJumpStim':
+                stim_type = 'jump'
+
+            self.on_remove_button(event)
+            self.add_stim(stim_type, item.parameters, index+1)
+
+            self.list_control.Select(index+1)
 
     def on_double_click(self, event):
         """
