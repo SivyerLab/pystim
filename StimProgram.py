@@ -9,7 +9,8 @@ from psychopy.tools.coordinatetools import pol2cart
 from psychopy import visual, core, event, filters
 from time import strftime, localtime
 from random import Random
-from PIL import Image
+from PIL import Image, ImageSequence
+from images2gif import writeGif
 
 import scipy, scipy.signal
 import sortedcontainers
@@ -452,7 +453,8 @@ class StimDefaults(object):
                  trigger=False,
                  move_delay=0,
                  num_jumps=5,
-                 jump_delay=100):
+                 jump_delay=100,
+                 force_stop=0):
         """
         Default variable constructors; distance and time units converted
         appropriately.
@@ -509,6 +511,7 @@ class StimDefaults(object):
         self.duration = duration * GlobalDefaults['frame_rate']
         self.move_delay = int(move_delay * GlobalDefaults['frame_rate'])
         self.jump_delay = jump_delay * GlobalDefaults['frame_rate']
+        self.force_stop = force_stop * GlobalDefaults['frame_rate']
 
         # speed conversion
         self.speed = speed * (1.0 * GlobalDefaults['pix_per_micron'] /
@@ -623,6 +626,9 @@ class StaticStim(StimDefaults):
         self.end_stim = int(self.end_stim + 0.99)
 
         self.draw_duration = self.end_stim - self.start_stim
+
+        if self.force_stop != 0:
+            self.end_stim = self.force_stop
 
         return self.end_stim
 
@@ -1044,6 +1050,9 @@ class MovingStim(StaticStim):
                 if not trigger_frame in MyWindow.frame_trigger_list:
                     MyWindow.frame_trigger_list.add(trigger_frame)
 
+        if self.force_stop != 0:
+            self.end_stim = self.force_stop
+
         return self.end_stim
 
     def animate(self, frame):
@@ -1228,6 +1237,9 @@ class RandomlyMovingStim(MovingStim):
                 if not trigger_frame in MyWindow.frame_trigger_list:
                     MyWindow.frame_trigger_list.add(trigger_frame)
 
+        if self.force_stop != 0:
+            self.end_stim = self.force_stop
+
         return self.end_stim
 
     def gen_pos(self):
@@ -1306,6 +1318,9 @@ class TableStim(MovingStim):
                         trigger_frame = i + j * self.num_frames
                         if trigger_frame not in MyWindow.frame_trigger_list:
                             MyWindow.frame_trigger_list.add(trigger_frame)
+
+        if self.force_stop != 0:
+            self.end_stim = self.force_stop
 
         return self.end_stim
 
@@ -1557,6 +1572,9 @@ def board_texture_class(bases, **kwargs):
                                                 sizes=(self.check_size[0],
                                                        self.check_size[1]))
 
+            self.stim.size = (self.check_size[0] * self.num_check,
+                              self.check_size[1] * self.num_check)
+
         def gen_timing(self, frame):
             """
             ElementArrayStim does not support assigning alpha values.
@@ -1805,6 +1823,7 @@ def main(stim_list, verbose=True):
             to_animate = []
 
             for stim in stim_list:
+                print stim.number
                 # checkerboard and movie inheritance depends on motion type,
                 # so instantiate accordingly
                 if stim.parameters['fill_mode'] in ['checkerboard', 'random']:
@@ -1844,12 +1863,11 @@ def main(stim_list, verbose=True):
 
             # determine end time of last stim
             num_frames = max(stim.draw_times() for stim in to_animate)
-            # round up, then subtract 1 because index starts at 0
-            # num_frames = int(num_frames + 0.99) - 1
 
             # draw stims and flip window
             if GlobalDefaults['trigger_wait'] != 0:
                 MyWindow.win.callOnFlip(MyWindow.send_trigger)
+                # print 'trigg'
             MyWindow.win.flip()
 
             if GlobalDefaults['trigger_wait'] != 0:
@@ -1860,14 +1878,19 @@ def main(stim_list, verbose=True):
             # clock for timing
             elapsed_time = core.MonotonicClock()
 
+            win_list = []
+
             for frame in xrange(num_frames):
                 for stim in to_animate:
                     stim.animate(frame)
+
+                # win_list.append(visual.BufferImageStim(MyWindow.win).image)
 
                 MyWindow.win.flip()
 
                 if frame == MyWindow.frame_trigger_list[index]:
                     MyWindow.send_trigger()
+                    # print frame, 'triggered'
                     index += 1
 
                 # escape key breaks if focus on window
@@ -1928,6 +1951,9 @@ def main(stim_list, verbose=True):
                                current_time)
 
     fps = (count_reps * num_frames + count_frames) / count_elapsed_time
+
+    # for i in range(len(win_list)):
+    #     win_list[i].save('./screens/' + str(i) + '.jpg', format='JPEG')
 
     return fps, count_elapsed_time, time_stamp
 
