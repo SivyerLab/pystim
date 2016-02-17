@@ -1734,10 +1734,14 @@ def log_stats(count_reps, reps, count_frames, num_frames, elapsed_time,
         f.write(cPickle.dumps(to_write))
 
     for i in range(len(stim_list)):
-        if stim_list[i].stim_type == 'RandomlyMovingStim' and stim_list[
-            i].parameters['shape'] != 'annulus':
+        if stim_list[i].parameters['shape'] != 'annulus':
 
-            file_name = 'Randomlog_' + current_time_string + '_' + '.txt'
+            if stim_list[i].stim_type == 'RandomlyMovingStim':
+                file_name = 'Randomlog_' + current_time_string + '_' + '.txt'
+
+            if stim_list[i].stim_type == 'MovingStim':
+                file_name = 'Movinglog_' + current_time_string + '_' + '.txt'
+
             with open((path+file_name), 'w') as f:
 
                 if has_tabulate:
@@ -1753,6 +1757,7 @@ def log_stats(count_reps, reps, count_frames, num_frames, elapsed_time,
                                      headers=['angle', 'frame', 'pos x', 'pos y'],
                                      tablefmt="orgtbl"))
 
+                # ugly formatting
                 else:
                     for j in range(len(to_animate[i].log[0])):
                         f.write('angle: ')
