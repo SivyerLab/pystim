@@ -76,7 +76,8 @@ config_default_dict = dict(
     move_delay=0,
     num_jumps=5,
     jump_delay=100,
-    force_stop=0)
+    force_stop=0,
+    pref_dir=-1)
 
 def get_config_dict(config_file):
     defaults = dict(zip(config_default_dict, map(str,
@@ -561,6 +562,13 @@ global_default_param = OrderedDict([
      {'type'    : 'list',
       'label'   : 'background (RGB)',
       'default' : config_dict['background'],
+      'is_child': False}
+     ),
+
+    ('pref_dir',
+     {'type'    : 'text',
+      'label'   : 'preffered dir',
+      'default' : config_dict['pref_dir'],
       'is_child': False}
      ),
 
@@ -1696,7 +1704,7 @@ class MyFrame(wx.Frame):
         """
 
         # super initiation
-        super(MyFrame, self).__init__(None)
+        super(MyFrame, self).__init__(None, title="Stimulus Program")
 
         # instance attributes
         self.win_open = False
