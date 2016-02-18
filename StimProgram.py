@@ -910,11 +910,6 @@ class StaticStim(StimDefaults):
                                   time_fraction - scipy.pi / 2) * delta + \
                         background
 
-            # unscale
-            color = color * 2 - 1
-            # color array
-            texture[:, :, self.contrast_channel] = color
-
         elif self.timing == 'square':
             if self.intensity_dir == 'both':
                 color = (scipy.signal.square(self.period_mod * scipy.pi *
@@ -926,31 +921,34 @@ class StaticStim(StimDefaults):
                                             time_fraction, duty=0.5) * delta\
                         + background
 
-            # unscale
-            color = color * 2 - 1
-            # color array
-            texture[:, :, self.contrast_channel] = color
-
         elif self.timing == 'sawtooth':
             if self.intensity_dir == 'both':
-                color = (scipy.signal.square(self.period_mod * scipy.pi *
-                                             time_fraction, duty=0.5) * 2) / \
-                        2 * delta + background
+                color = (scipy.signal.sawtooth(self.period_mod * scipy.pi *
+                                               time_fraction, width=0.5) * 2)\
+                        / 2 * delta + background
 
             if self.intensity_dir == 'single':
-                color = scipy.signal.square(self.period_mod * scipy.pi *
-                                            time_fraction, duty=0.5) * delta\
+                color = scipy.signal.sawtooth(self.period_mod * scipy.pi *
+                                              time_fraction, width=0.5) * delta\
                         + background
 
-            # unscale
-            color = color * 2 - 1
-            # color array
-            texture[:, :, self.contrast_channel] = color
+        elif self.timing == 'linear':
+            # if self.intensity_dir == 'both':
+            color = background + delta * (time_fraction * 2 - 1)
+
+            # if self.intensity_dir == 'single':
+            #     color = background + delta * time_fraction
+
+        # unscale
+        color = color * 2 - 1
 
         # gamma correct
         if MyWindow.gamma_mon is not None and self.fill_mode not in ['image']:
-            texture = MyWindow.gamma_mon(texture)
+            color = MyWindow.gamma_mon(color, channel=self.contrast_channel)
 
+        texture[:, :, self.contrast_channel] = color
+
+        # print texture[0][0][1]
         self.stim.tex = texture
 
     def gen_phase(self):
@@ -1066,6 +1064,10 @@ class MovingStim(StaticStim):
         if angle >= 360:
             angle -= 360
 
+        # orient shape if not an image and fill is uniform
+        if self.ori_with_dir:
+            self.stim.ori = self.start_dir + self.orientation
+
         # set start_dir for next call of gen_pos()
         self.start_dir += 360 / self.num_dirs
 
@@ -1076,10 +1078,6 @@ class MovingStim(StaticStim):
         # add to log
         self.log[0].append(angle)
         self.log[2].append(self.get_pos())
-
-        # orient shape if not an image and fill is uniform
-        if self.ori_with_dir:
-            self.stim.ori = self.start_dir + self.orientation
 
         # calculate variables
         travel_distance = ((self.current_x**2 + self.current_y**2) ** 0.5) * 2
@@ -1372,7 +1370,7 @@ class TableStim(MovingStim):
         radii = [r * GlobalDefaults['pix_per_micron'] for r in radii]
 
         # make arrays
-        theta = self.start_dir * -1 + 90  # origins are different in pol/cart
+        theta = self.start_dir * -1 - 90  # origins are different in pol/cart
         x, y = map(list, zip(*[pol2cart(theta, r) for r in radii]))
 
         return x, y
