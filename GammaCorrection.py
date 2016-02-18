@@ -373,9 +373,15 @@ class GammaValues(object):
                 g = color[1]
                 b = color[2]
 
+                print 'red correcting.....',
                 r_adj = self.r_correct(r)
+                print 'done'
+                print 'green correcting...',
                 g_adj = self.g_correct(g)
+                print 'done'
+                print 'blue correcting....',
                 b_adj = self.b_correct(b)
+                print 'done'
 
                 adj_color = color[:]
 
@@ -393,11 +399,17 @@ class GammaValues(object):
         # if single channel
         elif channel is not None:
             if channel == 0:
+                print 'red correcting.....',
                 adj = self.r_correct(color)
+                print 'done'
             if channel == 1:
+                print 'green correcting...',
                 adj = self.g_correct(color)
+                print 'done'
             if channel == 2:
+                print 'blue correcting....',
                 adj = self.b_correct(color)
+                print 'done'
 
             adj_color = adj
 
