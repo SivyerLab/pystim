@@ -1690,6 +1690,9 @@ class TextCtrlValidator(wx.PyValidator):
         text_box = self.GetWindow()
         value = text_box.GetValue()
 
+        if value == 'table':
+            return True
+
         try:
             value = int(value)
             text_box.SetBackgroundColour('white')
@@ -1742,10 +1745,10 @@ class MyGrid(wx.Frame):
         # bind grid events
         self.Bind(wx.grid.EVT_GRID_LABEL_RIGHT_CLICK,
                   self.on_grid_label_right_click)
-        # self.Bind(wx.grid.EVT_GRID_CELL_RIGHT_CLICK,
-        #           self.on_grid_cell_right_click)
-        # self.Bind(wx.grid.EVT_GRID_CELL_CHANGED,
-        #           self.on_grid_cell_changed)
+        self.Bind(wx.grid.EVT_GRID_CELL_RIGHT_CLICK,
+                  self.on_grid_cell_right_click)
+        self.Bind(wx.grid.EVT_GRID_CELL_CHANGED,
+                  self.on_grid_cell_changed)
 
         # catch close to only hide grid
         self.Bind(wx.EVT_CLOSE, self.on_close_button)
@@ -1787,6 +1790,7 @@ class MyGrid(wx.Frame):
             ctrl.in_table = True
 
             self.grid.ClearSelection()
+            self.grid.SetGridCursor(0, self.grid.GetNumberCols())
             self.grid.AppendCols(1)
             if ctrl.tag2 is None:
                 self.grid.SetColLabelValue(self.grid.GetNumberCols()-1, param)
@@ -1804,12 +1808,35 @@ class MyGrid(wx.Frame):
             for i in range(self.grid.GetNumberCols()):
                 if self.grid.GetColLabelValue(i) == param:
                     self.grid.SelectCol(i)
+                    self.grid.SetGridCursor(0, i)
 
         self.show_grid()
+
+    def on_grid_cell_changed(self, event):
+        """Updates control value when cell changes.
+
+        :param event:
+        """
+        row = event.GetRow()
+        col = event.GetCol()
+        param = self.grid.GetColLabelValue(col)
+        try:
+            ctrl = self.control_dict[param]
+        except KeyError:
+            param = param[:-3]
+            ctrl = self.control_dict[param]
+
+        value = self.grid.GetCellValue(row, col)
+        if value == '':
+            value = None
+        ctrl.value[row] = value
+        print ctrl.value
 
     def on_grid_label_right_click(self, event):
         """If row or column header right clicked, deletes. If top left corner
         right clicked, adds another 5 rows)
+
+        :param event:
         """
         row = event.GetRow()
         col = event.GetCol()
@@ -1817,27 +1844,53 @@ class MyGrid(wx.Frame):
         if row == -1:
             if col == -1:
                 self.grid.AppendRows(5)
+                for ctrl in self.control_dict.itervalues():
+                    if ctrl.in_table:
+                        ctrl.value.extend([None] * 5)
 
             else:
                 param = self.grid.GetColLabelValue(col)
                 try:
                     ctrl = self.control_dict[param]
                 except KeyError:
-                    ctrl = self.control_dict[param[:-3]]
+                    param = param[:-3]
+                    ctrl = self.control_dict[param]
 
+                ctrl.SetValue(self.grid.GetCellValue(0, col))
                 self.grid.DeleteCols(col, 1)
-                ctrl.SetValue('')
                 ctrl.SetEditable(True)
+                ctrl.in_table = False
+                del self.control_dict[param]
 
                 if self.grid.NumberCols == 0:
                     self.grid.DeleteRows(0, numRows=self.grid.NumberRows)
                     self.Hide()
 
         elif col == -1:
-
-
+            for ctrl in self.control_dict.itervalues():
+                if ctrl.in_table:
+                    del(ctrl.value[row])
 
             self.grid.DeleteRows(row, 1)
+
+    def on_grid_cell_right_click(self, event):
+        """Removes contents of cell, sets values in list to None.
+
+        :param event:
+        """
+        row = event.GetRow()
+        col = event.GetCol()
+
+        param = self.grid.GetColLabelValue(col)
+        try:
+            ctrl = self.control_dict[param]
+        except KeyError:
+            param = param[:-3]
+            ctrl = self.control_dict[param]
+
+        self.grid.SetCellValue(row, col, '')
+        ctrl.value[row] = None
+
 
 
 class MyFrame(wx.Frame):
@@ -1988,12 +2041,27 @@ class MyFrame(wx.Frame):
         dicts.update(self.panel_fill.get_param_dict())
         dicts.update(self.panel_move.get_param_dict())
 
+        # remove trailing Nones from control value
+        for ctrl in self.grid.control_dict.itervalues():
+            to_edit = ctrl.value
+            while not to_edit[-1]:
+                to_edit.pop()
+
+            for i in range(len(to_edit)):
+                if to_edit[i] is None:
+                    if i == 0:
+                        raise IndexError('First element of table cannot be '
+                                         'left blank')
+                    else:
+                        to_edit[i] = to_edit[i - 1]
+
+            print to_edit
+
         return dicts
 
     def on_run_button(self, event):
         """
-        Method for running stimulus. Makes call to StimProgram.py. Gets
-        necessary params from global panel (g1).
+        Method for running stimulus. Makes call to StimProgram.py.
 
         :param event: event passed by binder
         """
@@ -2002,12 +2070,16 @@ class MyFrame(wx.Frame):
         if len(self.l1.stim_info_list) != 0:
             if self.win_open:
                 self.on_stop_button(event)
+
+
+
                 # try/except, so that errors thrown by StimProgram can be
                 # caught and thrown to avoid hanging.
                 try:
                     self.SetStatusText('running...')
                     fps, time, time_stamp = StimProgram.main(
                         self.l1.stim_info_list)
+
                     if time != 'error':
                         status_text = 'Last run: {0:.2f} fps, '.format(fps) \
                                            + '{0:.2f} seconds.'.format(time)
