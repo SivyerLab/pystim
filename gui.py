@@ -1007,10 +1007,12 @@ class ListPanel(wx.Panel):
                 selected = self.list_control.GetFirstSelected()
                 # print int(selected)
                 self.stim_info_list.pop(selected)
+                self.control_list_list.pop(selected)
                 self.list_control.DeleteItem(selected)
         else:
             self.list_control.DeleteAllItems()
             del self.stim_info_list[:]
+            del self.control_list_list[:]
 
         # reset stim numbers
         index = 0
@@ -1787,7 +1789,12 @@ class MyGrid(wx.Frame):
 
         :param ctrl: the input box of the parameter being added to the table.
         """
-        param = ctrl.tag
+
+        if ctrl.tag2 is None:
+            param = ctrl.tag
+        else:
+            param = ctrl.tag + '[{}]'.format(str(ctrl.tag2))
+
         in_table = ctrl.in_table
 
         if not in_table:
@@ -1800,12 +1807,7 @@ class MyGrid(wx.Frame):
             self.grid.ClearSelection()
             self.grid.SetGridCursor(0, self.grid.GetNumberCols())
             self.grid.AppendCols(1)
-            if ctrl.tag2 is None:
-                self.grid.SetColLabelValue(self.grid.GetNumberCols()-1, param)
-            else:
-                self.grid.SetColLabelValue(self.grid.GetNumberCols()-1,
-                                           param + '[{}]'.format(str(
-                                               ctrl.tag2)))
+            self.grid.SetColLabelValue(self.grid.GetNumberCols()-1, param)
 
             if self.grid.NumberCols == 1:
                 self.grid.AppendRows(5)
@@ -1818,6 +1820,7 @@ class MyGrid(wx.Frame):
                     self.grid.SelectCol(i)
                     self.grid.SetGridCursor(0, i)
 
+        # print self.control_dict
         self.show_grid()
 
     def on_grid_cell_changed(self, event):
@@ -1837,8 +1840,17 @@ class MyGrid(wx.Frame):
         value = self.grid.GetCellValue(row, col)
         if value == '':
             value = None
+
+        # try to cast
+        try:
+            value = int(value)
+        except ValueError:
+            try:
+                value = float(value)
+            except ValueError:
+                pass
+
         ctrl.value[row] = value
-        print ctrl.value
 
     def on_grid_label_right_click(self, event):
         """If row or column header right clicked, deletes. If top left corner
@@ -2054,21 +2066,45 @@ class MyFrame(wx.Frame):
         # remove trailing Nones from control value
         for param, ctrl in self.grid.control_dict.iteritems():
             to_edit = ctrl.value
-            while not to_edit[-1]:
-                to_edit.pop()
+            # while not to_edit[-1]:
+            #     to_edit.pop()
 
-            # set empty values to be previous ones
-            for i in range(len(to_edit)):
+            # set empty values to be previous ones unless trailing Nones
+            for i in range(len(to_edit)-2, -1, -1):
                 if to_edit[i] is None:
                     if i == 0:
                         raise IndexError('First element of table cannot be '
                                          'left blank')
+                    elif to_edit[i+1] is None:
+                        pass
                     else:
                         to_edit[i] = to_edit[i - 1]
 
             control_arrays[param] = to_edit
 
         return dicts, control_arrays
+
+    def run(self):
+        # try/except, so that errors thrown by StimProgram can be
+        # caught and thrown to avoid hanging.
+        try:
+            self.SetStatusText('running...')
+            fps, time, time_stamp = StimProgram.main(
+                self.l1.stim_info_list)
+
+            if time != 'error':
+                status_text = 'Last run: {0:.2f} fps, '.format(fps) \
+                                   + '{0:.2f} seconds.'.format(time)
+
+                if time_stamp is not None:
+                    status_text += ' Timestamp: {}'.format(time_stamp)
+
+                self.SetStatusText(status_text)
+            else:
+                self.SetStatusText(fps)
+        except:
+            raise
+
 
     def on_run_button(self, event):
         """
@@ -2082,6 +2118,8 @@ class MyFrame(wx.Frame):
             if self.win_open:
                 self.on_stop_button(event)
 
+                maxi = None
+
                 if self.l1.control_list_list[0]:
 
                     print self.l1.control_list_list
@@ -2089,35 +2127,37 @@ class MyFrame(wx.Frame):
                     maxi = 0
                     for item in self.l1.control_list_list:
                         for v in item.itervalues():
-                            length = len(v)
+                            length = sum(x is not None for x in v)
                             if length > maxi:
                                 maxi = length
 
+                    # for i in range(maxi):
+
+                print maxi
+
+                if maxi is None:
+                    self.run()
+
+                elif maxi is not None:
                     for i in range(maxi):
+                        for j in range(len(self.l1.control_list_list)):
+                            for param in self.l1.control_list_list[
+                                j].iterkeys():
 
+                                if self.l1.control_list_list[j][param][i] is not None:
 
-                # try/except, so that errors thrown by StimProgram can be
-                # caught and thrown to avoid hanging.
-                try:
-                    self.SetStatusText('running...')
-                    fps, time, time_stamp = StimProgram.main(
-                        self.l1.stim_info_list)
+                                    try:
+                                        self.l1.stim_info_list[j].parameters[param] =\
+                                        self.l1.control_list_list[j][param][i]
+                                    except IndexError:
+                                        pass
 
-                    if time != 'error':
-                        status_text = 'Last run: {0:.2f} fps, '.format(fps) \
-                                           + '{0:.2f} seconds.'.format(time)
+                        self.run()
 
-                        if time_stamp is not None:
-                            status_text += ' Timestamp: {}'.format(time_stamp)
-
-                        self.SetStatusText(status_text)
-                    else:
-                        self.SetStatusText(fps)
-                except:
-                    raise
             else:
                 self.on_win_button(event)
                 self.on_run_button(event)
+
         else:
             print "Please add stims."
 
