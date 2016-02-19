@@ -1406,10 +1406,11 @@ class InputPanel(wx.Panel):
         :param event:
         """
         ctrl = event.GetEventObject()
-        try:
-            self.GetParent().GetParent().grid.add_to_grid(ctrl)
-        except AttributeError:
-            self.GetParent().GetParent().GetParent().grid.add_to_grid(ctrl)
+        self.GetTopLevelParent().grid.add_to_grid(ctrl)
+        # try:
+        #     self.GetParent().GetParent().grid.add_to_grid(ctrl)
+        # except AttributeError:
+        #     self.GetParent().GetParent().GetParent().grid.add_to_grid(ctrl)
 
     def get_param_dict(self):
         """
@@ -1799,18 +1800,32 @@ class MyGrid(wx.Frame):
 
         if not in_table:
             self.control_dict[param] = ctrl
+            old_val = str(ctrl.GetValue())
             ctrl.ChangeValue('table')
             ctrl.SetEditable(False)
             ctrl.value = [None] * 5
             ctrl.in_table = True
 
             self.grid.ClearSelection()
-            self.grid.SetGridCursor(0, self.grid.GetNumberCols())
             self.grid.AppendCols(1)
+            self.grid.SetGridCursor(0, self.grid.GetNumberCols()-1)
             self.grid.SetColLabelValue(self.grid.GetNumberCols()-1, param)
 
             if self.grid.NumberCols == 1:
                 self.grid.AppendRows(5)
+
+            self.grid.SetCellValue(0, self.grid.GetNumberCols()-1, old_val)
+
+            # try to cast
+            try:
+                old_val = int(old_val)
+            except ValueError:
+                try:
+                    old_val = float(old_val)
+                except ValueError:
+                    pass
+
+            ctrl.value[0] = old_val
 
         else:
             self.grid.ClearSelection()
@@ -1851,6 +1866,7 @@ class MyGrid(wx.Frame):
                 pass
 
         ctrl.value[row] = value
+        print ctrl.value
 
     def on_grid_label_right_click(self, event):
         """If row or column header right clicked, deletes. If top left corner
@@ -2069,12 +2085,12 @@ class MyFrame(wx.Frame):
             # while not to_edit[-1]:
             #     to_edit.pop()
 
+            print param, to_edit
             # set empty values to be previous ones unless trailing Nones
             for i in range(len(to_edit)-2, -1, -1):
                 if to_edit[i] is None:
                     if i == 0:
-                        raise IndexError('First element of table cannot be '
-                                         'left blank')
+                        raise IndexError('First element of table cannot be left blank')
                     elif to_edit[i+1] is None:
                         pass
                     else:
@@ -2122,18 +2138,12 @@ class MyFrame(wx.Frame):
 
                 if self.l1.control_list_list[0]:
 
-                    print self.l1.control_list_list
-
                     maxi = 0
                     for item in self.l1.control_list_list:
                         for v in item.itervalues():
                             length = sum(x is not None for x in v)
                             if length > maxi:
                                 maxi = length
-
-                    # for i in range(maxi):
-
-                print maxi
 
                 if maxi is None:
                     self.run()
@@ -2147,8 +2157,16 @@ class MyFrame(wx.Frame):
                                 if self.l1.control_list_list[j][param][i] is not None:
 
                                     try:
-                                        self.l1.stim_info_list[j].parameters[param] =\
-                                        self.l1.control_list_list[j][param][i]
+                                        if param[-1] == ']':
+                                            k = int(param[-2])
+                                            param_not_list = param[:-3]
+                                            self.l1.stim_info_list[
+                                                j].parameters[param_not_list][k] =\
+                                            self.l1.control_list_list[j][param][i]
+
+                                        else:
+                                            self.l1.stim_info_list[j].parameters[param] =\
+                                            self.l1.control_list_list[j][param][i]
                                     except IndexError:
                                         pass
 
