@@ -4,7 +4,7 @@
 Program for presenting visual stimuli to patch clamped retinal neurons.
 """
 
-# Copyright (C) 2015 Alexander Tomlinson
+# Copyright (C) 2016 Alexander Tomlinson
 # Distributed under the terms of the GNU General Public License (GPL).
 
 from GammaCorrection import GammaValues  # necessary for pickling
@@ -1065,6 +1065,7 @@ class MovingStim(StaticStim):
             angle -= 360
 
         # orient shape if not an image and fill is uniform
+        print type(self.ori_with_dir)
         if self.ori_with_dir:
             self.stim.ori = self.start_dir + self.orientation
 

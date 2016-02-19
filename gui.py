@@ -634,6 +634,10 @@ class ChoiceTag(wx.Choice):
     def __init__(self, *args, **kwargs):
         # pop out tag if present from args/kwargs
         self.tag = kwargs.pop('tag', None)
+        # check if part of table
+        self.in_table = kwargs.pop('in_table', None)
+        # pop out value (only textctrl has value
+        self.Value = kwargs.pop('Value', None)
         wx.Choice.__init__(self, *args, **kwargs)
 
 
@@ -1218,12 +1222,16 @@ class InputPanel(wx.Panel):
 
                 elif v['type'] == 'choice':
                     input_dict[k] = (ChoiceTag(self, tag=k,
-                                               choices=v['choices']))
+                                               choices=v['choices'],
+                                               Value=v['default']))
                     # on windows, choices still default to blank, so manually
                     # set selection to default for aesthetics
                     input_dict[k].SetStringSelection(v['default'])
                     # same as above, but for wx.EVT_CHOICE event
                     self.Bind(wx.EVT_CHOICE, self.input_update,
+                              input_dict[k])
+                    # binder for inputting data in table
+                    self.Bind(wx.EVT_CONTEXT_MENU, self.on_right_click,
                               input_dict[k])
 
                 elif v['type'] == 'path':
@@ -1791,21 +1799,17 @@ class MyGrid(wx.Frame):
         :param ctrl: the input box of the parameter being added to the table.
         """
 
-        if ctrl.tag2 is None:
+        try:
+            if ctrl.tag2 is not None:
+                param = ctrl.tag + '[{}]'.format(str(ctrl.tag2))
+            else:
+                param = ctrl.tag
+        except AttributeError:
             param = ctrl.tag
-        else:
-            param = ctrl.tag + '[{}]'.format(str(ctrl.tag2))
 
         in_table = ctrl.in_table
 
         if not in_table:
-            self.control_dict[param] = ctrl
-            old_val = str(ctrl.GetValue())
-            ctrl.ChangeValue('table')
-            ctrl.SetEditable(False)
-            ctrl.value = [None] * 5
-            ctrl.in_table = True
-
             self.grid.ClearSelection()
             self.grid.AppendCols(1)
             self.grid.SetGridCursor(0, self.grid.GetNumberCols()-1)
@@ -1813,6 +1817,20 @@ class MyGrid(wx.Frame):
 
             if self.grid.NumberCols == 1:
                 self.grid.AppendRows(5)
+
+            self.control_dict[param] = ctrl
+            old_val = str(ctrl.Value)
+
+            if isinstance(ctrl, TextCtrlTag):
+                ctrl.ChangeValue('table')
+                ctrl.SetEditable(False)
+
+            if isinstance(ctrl, ChoiceTag):
+                ctrl.Append('table')
+                ctrl.SetStringSelection('table')
+
+            ctrl.value = [None] * 5
+            ctrl.in_table = True
 
             self.grid.SetCellValue(0, self.grid.GetNumberCols()-1, old_val)
 
@@ -1824,6 +1842,11 @@ class MyGrid(wx.Frame):
                     old_val = float(old_val)
                 except ValueError:
                     pass
+
+            if old_val == 'True':
+                old_val = True
+            elif old_val == 'False':
+                old_val = False
 
             ctrl.value[0] = old_val
 
@@ -1865,8 +1888,13 @@ class MyGrid(wx.Frame):
             except ValueError:
                 pass
 
+        if value == 'True':
+            value = True
+        elif value == 'False':
+            value = False
+
         ctrl.value[row] = value
-        print ctrl.value
+        # print ctrl.value
 
     def on_grid_label_right_click(self, event):
         """If row or column header right clicked, deletes. If top left corner
@@ -1892,9 +1920,15 @@ class MyGrid(wx.Frame):
                     param = param[:-3]
                     ctrl = self.control_dict[param]
 
-                ctrl.SetValue(self.grid.GetCellValue(0, col))
+                if isinstance(ctrl, TextCtrlTag):
+                    ctrl.SetValue(self.grid.GetCellValue(0, col))
+                    ctrl.SetEditable(True)
+
+                if isinstance(ctrl, ChoiceTag):
+                    ctrl.SetStringSelection(self.grid.GetCellValue(0, col))
+                    ctrl.Delete(ctrl.GetCount()-1)
+
                 self.grid.DeleteCols(col, 1)
-                ctrl.SetEditable(True)
                 ctrl.in_table = False
                 del self.control_dict[param]
 
@@ -2085,7 +2119,7 @@ class MyFrame(wx.Frame):
             # while not to_edit[-1]:
             #     to_edit.pop()
 
-            print param, to_edit
+            # print param, to_edit
             # set empty values to be previous ones unless trailing Nones
             for i in range(len(to_edit)-2, -1, -1):
                 if to_edit[i] is None:
@@ -2136,7 +2170,7 @@ class MyFrame(wx.Frame):
 
                 maxi = None
 
-                if self.l1.control_list_list[0]:
+                if len(self.l1.control_list_list) > 0 and self.l1.control_list_list[0]:
 
                     maxi = 0
                     for item in self.l1.control_list_list:
