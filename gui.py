@@ -4,6 +4,9 @@
 Program for GUI interface to StimProgram.py"
 """
 
+# Copyright (C) 2016 Alexander Tomlinson
+# Distributed under the terms of the GNU General Public License (GPL).
+
 # must first turn pyglet shadow windows off to avoid conflict with wxPython and
 # psychopy.visual
 import pyglet
@@ -847,6 +850,7 @@ class ListPanel(wx.Panel):
 
         # instance attributes
         self.stim_info_list = []
+        self.control_list_list = []
 
         # title and its sizer
         title = wx.StaticText(self, label="stims to run")
@@ -925,7 +929,8 @@ class ListPanel(wx.Panel):
             'default']
 
         # merge
-        param_dict = copy.deepcopy(my_frame.merge_dicts())
+        param_dict, control_list = copy.deepcopy(my_frame.merge_dicts())
+        self.control_list_list.append(control_list)
 
         self.add_stim(stim_type, param_dict)
 
@@ -935,6 +940,7 @@ class ListPanel(wx.Panel):
 
         :param stim_type:
         :param param_dict:
+        :param insert_pos: at what position to insert the stim
         """
         fill = param_dict['fill_mode']
         if fill in ['random', 'checkerboard']:
@@ -1039,7 +1045,8 @@ class ListPanel(wx.Panel):
                 self.on_remove_button(event)
                 self.add_stim(stim_type, item.parameters, index-1)
 
-            # self.list_control.Select(index-1)
+                l = self.control_list_list
+                l[index], l[index - 1] = l[index - 1], l[index]
 
     def on_down_button(self, event):
         """
@@ -1068,7 +1075,8 @@ class ListPanel(wx.Panel):
                 self.on_remove_button(event)
                 self.add_stim(stim_type, item.parameters, index+1)
 
-                # self.list_control.Select(index+1)
+                l = self.control_list_list
+                l[index], l[index + 1] = l[index + 1], l[index]
 
     def on_double_click(self, event):
         """
@@ -2041,12 +2049,15 @@ class MyFrame(wx.Frame):
         dicts.update(self.panel_fill.get_param_dict())
         dicts.update(self.panel_move.get_param_dict())
 
+        control_arrays = {}
+
         # remove trailing Nones from control value
-        for ctrl in self.grid.control_dict.itervalues():
+        for param, ctrl in self.grid.control_dict.iteritems():
             to_edit = ctrl.value
             while not to_edit[-1]:
                 to_edit.pop()
 
+            # set empty values to be previous ones
             for i in range(len(to_edit)):
                 if to_edit[i] is None:
                     if i == 0:
@@ -2055,9 +2066,9 @@ class MyFrame(wx.Frame):
                     else:
                         to_edit[i] = to_edit[i - 1]
 
-            print to_edit
+            control_arrays[param] = to_edit
 
-        return dicts
+        return dicts, control_arrays
 
     def on_run_button(self, event):
         """
@@ -2071,6 +2082,18 @@ class MyFrame(wx.Frame):
             if self.win_open:
                 self.on_stop_button(event)
 
+                if self.l1.control_list_list[0]:
+
+                    print self.l1.control_list_list
+
+                    maxi = 0
+                    for item in self.l1.control_list_list:
+                        for v in item.itervalues():
+                            length = len(v)
+                            if length > maxi:
+                                maxi = length
+
+                    for i in range(maxi):
 
 
                 # try/except, so that errors thrown by StimProgram can be
