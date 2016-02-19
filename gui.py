@@ -11,7 +11,7 @@ pyglet.options['shadow_window'] = False
 from collections import OrderedDict
 from sys import platform as _platform
 from GammaCorrection import GammaValues  # necessary for unpickling
-import wx
+import wx, wx.grid
 import StimProgram
 import copy
 import cPickle
@@ -618,6 +618,8 @@ class TextCtrlTag(wx.TextCtrl):
         self.tag = kwargs.pop('tag', None)
         # tag2 used in list type parameters
         self.tag2 = kwargs.pop('tag2', None)
+        # check if part of table
+        self.in_table = kwargs.pop('in_table', None)
         wx.TextCtrl.__init__(self, *args, **kwargs)
 
 
@@ -929,7 +931,7 @@ class ListPanel(wx.Panel):
 
     def add_stim(self, stim_type, param_dict, insert_pos=None):
         """
-        Adds stim to list of stims to run
+        Adds stim to list of stims to run.
 
         :param stim_type:
         :param param_dict:
@@ -1109,7 +1111,7 @@ class ListPanel(wx.Panel):
                 try:
                     panel.set_value(param, param_dict[param])
                 except KeyError:
-                    panel.set_value(param, config_dict[param])
+                    panel.set_value(param, config_default_dict[param])
             for value in panel.sub_panel_dict.itervalues():
                 for subpanel in value.itervalues():
                     for param, control in subpanel.input_dict.iteritems():
@@ -1117,7 +1119,7 @@ class ListPanel(wx.Panel):
                         try:
                             subpanel.set_value(param, param_dict[param])
                         except KeyError:
-                            subpanel.set_value(param, config_dict[param])
+                            subpanel.set_value(param, config_default_dict[param])
 
 
         print '\nPARAM LOADED'
@@ -1193,13 +1195,16 @@ class InputPanel(wx.Panel):
                 # various input widgets
                 if v['type'] == 'text':
                     input_dict[k] = (TextCtrlTag(self, size=(120, -1), tag=k,
+                                                 in_table=False,
                                                  value=str(v['default']),
                                                  validator=TextCtrlValidator()))
                     # binds event to method (so input_update() method is called
                     # on each wx.EVT_TEXT event.
                     self.Bind(wx.EVT_TEXT, self.input_update,
                               input_dict[k])
-                    # input_dict[k].Bind(wx.EVT_SET_FOCUS, self.on_focus)
+                    # binder for inputting data in table
+                    self.Bind(wx.EVT_CONTEXT_MENU, self.on_right_click,
+                              input_dict[k])
 
                 elif v['type'] == 'choice':
                     input_dict[k] = (ChoiceTag(self, tag=k,
@@ -1235,12 +1240,16 @@ class InputPanel(wx.Panel):
                         list_list.append(TextCtrlTag(self, tag=k, tag2=i,
                         size=((120 / length - (5 * (length - 1)) / length),
                               -1),  # -1 defaults to appropriate size
+                              in_table=False,
                               value=str(v['default'][i]),
                               validator=TextCtrlValidator()))
                         # add to sizer
                         list_sizer.Add(list_list[i])
                         # bind
                         self.Bind(wx.EVT_TEXT, self.input_update, list_list[i])
+                        # binder for inputting data in table
+                        self.Bind(wx.EVT_CONTEXT_MENU, self.on_right_click,
+                                  list_list[i])
                     # add sizer to input_dict for inclusion in grid
                     input_dict[k] = list_sizer
 
@@ -1380,6 +1389,17 @@ class InputPanel(wx.Panel):
                     self.sub_panel_dict[param][item].Hide()
             # redraw
             self.Fit()
+
+    def on_right_click(self, event):
+        """Adds param to table and sets it non editable.
+
+        :param event:
+        """
+        ctrl = event.GetEventObject()
+        try:
+            self.GetParent().GetParent().grid.add_to_grid(ctrl)
+        except AttributeError:
+            self.GetParent().GetParent().GetParent().grid.add_to_grid(ctrl)
 
     def get_param_dict(self):
         """
@@ -1693,6 +1713,133 @@ class TextCtrlValidator(wx.PyValidator):
         return True
 
 
+class MyGrid(wx.Frame):
+    """
+    Class for grid window.
+
+    :param parent: parent of grid
+    """
+    def __init__(self, parent):
+        # necessary call to super
+        super(MyGrid, self).__init__(parent, title='Table')
+
+        # instance attributes
+        self.grid_shown = False
+        self.control_dict = {}
+
+        # panel to hold everything
+        panel = wx.Panel(self)
+
+        # instantiate grid and create
+        self.grid = wx.grid.Grid(panel)
+        self.grid.CreateGrid(0, 0)
+
+        # sizer for grid
+        grid_sizer = wx.BoxSizer(wx.VERTICAL)
+        grid_sizer.Add(self.grid, 1, wx.EXPAND)
+        panel.SetSizer(grid_sizer)
+
+        # bind grid events
+        self.Bind(wx.grid.EVT_GRID_LABEL_RIGHT_CLICK,
+                  self.on_grid_label_right_click)
+        # self.Bind(wx.grid.EVT_GRID_CELL_RIGHT_CLICK,
+        #           self.on_grid_cell_right_click)
+        # self.Bind(wx.grid.EVT_GRID_CELL_CHANGED,
+        #           self.on_grid_cell_changed)
+
+        # catch close to only hide grid
+        self.Bind(wx.EVT_CLOSE, self.on_close_button)
+
+    def show_grid(self):
+        """Method to show grid. Unminimizes and brings to front.
+        """
+        self.Iconize(False)
+        self.Show()
+        self.Raise()
+        self.grid_shown = True
+
+    def hide_grid(self):
+        """Method to hide grid.
+        """
+        self.Hide()
+        self.grid_shown = False
+
+    def on_close_button(self, event):
+        """Catches close in order to only hide. Otherwise frame object is
+        deleted and loses all data.
+        """
+        self.Hide()
+        self.grid_shown = False
+
+    def add_to_grid(self, ctrl):
+        """Adds column to table and prevents editing of control.
+
+        :param ctrl: the input box of the parameter being added to the table.
+        """
+        param = ctrl.tag
+        in_table = ctrl.in_table
+
+        if not in_table:
+            self.control_dict[param] = ctrl
+            ctrl.ChangeValue('table')
+            ctrl.SetEditable(False)
+            ctrl.value = [None] * 5
+            ctrl.in_table = True
+
+            self.grid.ClearSelection()
+            self.grid.AppendCols(1)
+            if ctrl.tag2 is None:
+                self.grid.SetColLabelValue(self.grid.GetNumberCols()-1, param)
+            else:
+                self.grid.SetColLabelValue(self.grid.GetNumberCols()-1,
+                                           param + '[{}]'.format(str(
+                                               ctrl.tag2)))
+
+            if self.grid.NumberCols == 1:
+                self.grid.AppendRows(5)
+
+        else:
+            self.grid.ClearSelection()
+
+            for i in range(self.grid.GetNumberCols()):
+                if self.grid.GetColLabelValue(i) == param:
+                    self.grid.SelectCol(i)
+
+        self.show_grid()
+
+    def on_grid_label_right_click(self, event):
+        """If row or column header right clicked, deletes. If top left corner
+        right clicked, adds another 5 rows)
+        """
+        row = event.GetRow()
+        col = event.GetCol()
+
+        if row == -1:
+            if col == -1:
+                self.grid.AppendRows(5)
+
+            else:
+                param = self.grid.GetColLabelValue(col)
+                try:
+                    ctrl = self.control_dict[param]
+                except KeyError:
+                    ctrl = self.control_dict[param[:-3]]
+
+                self.grid.DeleteCols(col, 1)
+                ctrl.SetValue('')
+                ctrl.SetEditable(True)
+
+                if self.grid.NumberCols == 0:
+                    self.grid.DeleteRows(0, numRows=self.grid.NumberRows)
+                    self.Hide()
+
+        elif col == -1:
+
+
+
+            self.grid.DeleteRows(row, 1)
+
+
 class MyFrame(wx.Frame):
     """
     Class for generating window. Instantiates notebook and panels.
@@ -1708,6 +1855,9 @@ class MyFrame(wx.Frame):
 
         # instance attributes
         self.win_open = False
+
+        # make grid
+        self.grid = MyGrid(self)
 
         # notebook to hold input panels
         self.input_nb = wx.Notebook(self)
@@ -1938,24 +2088,26 @@ class MyFrame(wx.Frame):
 
         :param event: event passed by binder
         """
+        if wx.Window.FindFocus().GetTopLevelParent() == self:
+
+            if event.GetKeyCode() == wx.WXK_DELETE:
+                if self.win_open:
+                    self.on_win_button(event)
+                else:
+                    event.Skip()
+
+            elif event.GetKeyCode() in [wx.WXK_RETURN, wx.WXK_NUMPAD_ENTER]:
+                evt = wx.CommandEvent(wx.EVT_BUTTON.typeId,
+                                      self.l1.add_button.Id)
+
+                evt.SetEventObject(self.l1.add_button)
+                evt.SetInt(1)
+                wx.PostEvent(self.l1, evt)
+                event.Skip()
+
         if event.GetKeyCode() == wx.WXK_ESCAPE:
             print 'escaped'
             self.on_stop_button(event)
-            event.Skip()
-
-        elif event.GetKeyCode() == wx.WXK_DELETE:
-            if self.win_open:
-                self.on_win_button(event)
-            else:
-                event.Skip()
-
-        elif event.GetKeyCode() in [wx.WXK_RETURN, wx.WXK_NUMPAD_ENTER]:
-            evt = wx.CommandEvent(wx.EVT_BUTTON.typeId,
-                                  self.l1.add_button.Id)
-
-            evt.SetEventObject(self.l1.add_button)
-            evt.SetInt(1)
-            wx.PostEvent(self.l1, evt)
             event.Skip()
 
         elif event.GetKeyCode() == 82:  # letter 'r'
@@ -1969,6 +2121,13 @@ class MyFrame(wx.Frame):
                 self.on_exit_button(event)
             else:
                 event.Skip()
+
+        elif event.GetKeyCode() == wx.WXK_F8:
+            if wx.Window.FindFocus().GetTopLevelParent() == self:
+                self.grid.show_grid()
+
+            elif self.grid.grid_shown:
+                self.grid.hide_grid()
 
         else:
             event.Skip()
