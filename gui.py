@@ -801,16 +801,7 @@ class DirPanel(wx.Panel):
         for stim_param in to_load:
             stim_type = stim_param.pop('move_type')
 
-            if stim_type == 'StaticStim':
-                stim_type = 'static'
-            elif stim_type == 'MovingStim':
-                stim_type = 'moving'
-            elif stim_type == 'RandomlyMovingStim':
-                stim_type = 'random'
-            elif stim_type == 'TableStim':
-                stim_type = 'table'
-            elif stim_type == 'ImageJumpStim':
-                stim_type = 'jump'
+            stim_type = convert_stim_type(stim_type)
 
             my_frame.l1.add_stim(stim_type, stim_param)
 
@@ -970,16 +961,7 @@ class ListPanel(wx.Panel):
         self.list_control.SetColumnWidth(2, wx.LIST_AUTOSIZE)
         self.list_control.SetColumnWidth(3, wx.LIST_AUTOSIZE)
 
-        if stim_type == 'static':
-            stim_type = 'StaticStim'
-        elif stim_type == 'moving':
-            stim_type = 'MovingStim'
-        elif stim_type == 'random':
-            stim_type = 'RandomlyMovingStim'
-        elif stim_type == 'table':
-            stim_type = 'TableStim'
-        elif stim_type == 'jump':
-            stim_type = 'ImageJumpStim'
+        stim_type = convert_stim_type(stim_type)
 
         stim_info = StimProgram.StimInfo(stim_type, param_dict,
                                          index)
@@ -1037,16 +1019,7 @@ class ListPanel(wx.Panel):
                 item = self.stim_info_list[index]
                 stim_type = item.stim_type
 
-                if stim_type == 'StaticStim':
-                    stim_type = 'static'
-                elif stim_type == 'MovingStim':
-                    stim_type = 'moving'
-                elif stim_type == 'RandomlyMovingStim':
-                    stim_type = 'random'
-                elif stim_type == 'TableStim':
-                    stim_type = 'table'
-                elif stim_type == 'ImageJumpStim':
-                    stim_type = 'jump'
+                stim_type = convert_stim_type(stim_type)
 
                 self.on_remove_button(event)
                 self.add_stim(stim_type, item.parameters, index-1)
@@ -1067,16 +1040,7 @@ class ListPanel(wx.Panel):
                 item = self.stim_info_list[index]
                 stim_type = item.stim_type
 
-                if stim_type == 'StaticStim':
-                    stim_type = 'static'
-                elif stim_type == 'MovingStim':
-                    stim_type = 'moving'
-                elif stim_type == 'RandomlyMovingStim':
-                    stim_type = 'random'
-                elif stim_type == 'TableStim':
-                    stim_type = 'table'
-                elif stim_type == 'ImageJumpStim':
-                    stim_type = 'jump'
+                stim_type = convert_stim_type(stim_type)
 
                 self.on_remove_button(event)
                 self.add_stim(stim_type, item.parameters, index+1)
@@ -1105,16 +1069,7 @@ class ListPanel(wx.Panel):
 
         # re-add stim type
         stim_type = copy.deepcopy(self.stim_info_list[selected].stim_type)
-        if stim_type == 'StaticStim':
-            stim_type = 'static'
-        elif stim_type == 'MovingStim':
-            stim_type = 'moving'
-        elif stim_type == 'RandomlyMovingStim':
-            stim_type = 'random'
-        elif stim_type == 'TableStim':
-            stim_type = 'table'
-        elif stim_type == 'ImageJumpStim':
-            stim_type = 'jump'
+        stim_type = convert_stim_type(stim_type)
 
         param_dict['move_type'] = stim_type
 
@@ -1232,6 +1187,10 @@ class InputPanel(wx.Panel):
                               input_dict[k])
                     # binder for inputting data in table
                     self.Bind(wx.EVT_CONTEXT_MENU, self.on_right_click,
+                              input_dict[k])
+                    # binder to intercept left click to make read only when
+                    # in table
+                    self.Bind(wx.EVT_LEFT_DOWN, self.on_left_click,
                               input_dict[k])
 
                 elif v['type'] == 'path':
@@ -1369,6 +1328,13 @@ class InputPanel(wx.Panel):
         # get the new value from the widget
         value = event.GetString()
 
+        # skip all if choicectrl and in table
+        if isinstance(event.GetEventObject(), ChoiceTag):
+            if event.GetEventObject().in_table:
+                event.Skip(True)
+                event.GetEventObject().SetStringSelection('table')
+                return
+
         # attempt to cast to float or int, else leave as is (hopefully string)
         try:
             value = int(value)
@@ -1415,10 +1381,19 @@ class InputPanel(wx.Panel):
         """
         ctrl = event.GetEventObject()
         self.GetTopLevelParent().grid.add_to_grid(ctrl)
-        # try:
-        #     self.GetParent().GetParent().grid.add_to_grid(ctrl)
-        # except AttributeError:
-        #     self.GetParent().GetParent().GetParent().grid.add_to_grid(ctrl)
+
+    def on_left_click(self, event):
+        """Intercepts left click if set to table.
+
+        :param event:
+        """
+        ctrl = event.GetEventObject
+        print ctrl.GetStringSelection()
+        if ctrl.GetStringSelection() == 'table':
+            print 'passed'
+        else:
+            print 'skipped'
+            event.Skip()
 
     def get_param_dict(self):
         """
@@ -1436,16 +1411,7 @@ class InputPanel(wx.Panel):
         # remove move type from dictionary and set as instance attribute
         if 'move_type' in params:
             stim_type = params.pop('move_type')
-            if stim_type == 'static':
-                self.type = 'StaticStim'
-            elif stim_type == 'moving':
-                self.type = 'MovingStim'
-            elif stim_type == 'random':
-                self.type = 'RandomlyMovingStim'
-            elif stim_type == 'table':
-                self.type = 'TableStim'
-            elif stim_type == 'jump':
-                self.type = 'ImageJumpStim'
+            stim_type = convert_stim_type(stim_type)
 
         return params
 
@@ -2198,6 +2164,15 @@ class MyFrame(wx.Frame):
                                                 j].parameters[param_not_list][k] =\
                                             self.l1.control_list_list[j][param][i]
 
+                                        elif param == 'move_type':
+
+                                            stim_type = self.l1.control_list_list[j][param][i]
+
+                                            stim_type = convert_stim_type(stim_type)
+
+                                            self.l1.stim_info_list[
+                                                j].stim_type = stim_type
+
                                         else:
                                             self.l1.stim_info_list[j].parameters[param] =\
                                             self.l1.control_list_list[j][param][i]
@@ -2318,6 +2293,39 @@ class MyFrame(wx.Frame):
 
         else:
             event.Skip()
+
+
+def convert_stim_type(stim_type):
+    """
+    Converts stim_type label to class names and back
+
+    :param stim_type: string to be converted
+    :return: converted string
+    """
+
+    if stim_type == 'StaticStim':
+        stim_type = 'static'
+    elif stim_type == 'MovingStim':
+        stim_type = 'moving'
+    elif stim_type == 'RandomlyMovingStim':
+        stim_type = 'random'
+    elif stim_type == 'TableStim':
+        stim_type = 'table'
+    elif stim_type == 'ImageJumpStim':
+        stim_type = 'jump'
+
+    elif stim_type == 'static':
+        stim_type = 'StaticStim'
+    elif stim_type == 'moving':
+        stim_type = 'MovingStim'
+    elif stim_type == 'random':
+        stim_type = 'RandomlyMovingStim'
+    elif stim_type == 'table':
+        stim_type = 'TableStim'
+    elif stim_type == 'jump':
+        stim_type = 'ImageJumpStim'
+
+    return stim_type
 
 
 def main():
