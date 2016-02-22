@@ -1065,7 +1065,6 @@ class MovingStim(StaticStim):
             angle -= 360
 
         # orient shape if not an image and fill is uniform
-        print type(self.ori_with_dir)
         if self.ori_with_dir:
             self.stim.ori = self.start_dir + self.orientation
 
@@ -1355,7 +1354,7 @@ class TableStim(MovingStim):
             radii = map(float, radii)
         else:
             raise IOError('File contents not a supported format. See docs for '
-                          'reference.')
+                          'reference. Selected file: {}.'.format(self.table_filename))
 
         if trigger_list is not None:
             trigger_list = map(int, trigger_list)

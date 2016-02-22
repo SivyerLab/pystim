@@ -804,6 +804,7 @@ class DirPanel(wx.Panel):
             stim_type = convert_stim_type(stim_type)
 
             my_frame.l1.add_stim(stim_type, stim_param)
+            my_frame.l1.control_list_list.append({})
 
         print '\nSTIMS LOADED'
 
@@ -1188,10 +1189,6 @@ class InputPanel(wx.Panel):
                     # binder for inputting data in table
                     self.Bind(wx.EVT_CONTEXT_MENU, self.on_right_click,
                               input_dict[k])
-                    # binder to intercept left click to make read only when
-                    # in table
-                    self.Bind(wx.EVT_LEFT_DOWN, self.on_left_click,
-                              input_dict[k])
 
                 elif v['type'] == 'path':
                     input_dict[k] = (FilePickerCtrlTag(self, tag=k,
@@ -1331,7 +1328,7 @@ class InputPanel(wx.Panel):
         # skip all if choicectrl and in table
         if isinstance(event.GetEventObject(), ChoiceTag):
             if event.GetEventObject().in_table:
-                event.Skip(True)
+                event.Skip()
                 event.GetEventObject().SetStringSelection('table')
                 return
 
@@ -1382,19 +1379,6 @@ class InputPanel(wx.Panel):
         ctrl = event.GetEventObject()
         self.GetTopLevelParent().grid.add_to_grid(ctrl)
 
-    def on_left_click(self, event):
-        """Intercepts left click if set to table.
-
-        :param event:
-        """
-        ctrl = event.GetEventObject
-        print ctrl.GetStringSelection()
-        if ctrl.GetStringSelection() == 'table':
-            print 'passed'
-        else:
-            print 'skipped'
-            event.Skip()
-
     def get_param_dict(self):
         """
         Method for returning a dictionary with extra info stripped out,
@@ -1421,8 +1405,6 @@ class InputPanel(wx.Panel):
         input and so generates an event, but SetStringSelection() does not,
         so it is necessary to simulate the choice event.
 
-        TODO: SetPath does not simulate event, so path does not get changed.
-
         :param value:
         :param param:
         """
@@ -1431,7 +1413,10 @@ class InputPanel(wx.Panel):
             self.input_dict[param].SetValue(str(value))
 
         elif self.param_dict[param]['type'] == 'path':
+            # manually change it in defaults because SetPath doesn't generate
+            # event, and can't generate own event like for choice
             self.input_dict[param].SetPath(str(value))
+            self.param_dict[param]['default'] = str(value)
 
         elif self.param_dict[param]['type'] == 'radio':
             self.input_dict[param].SetStringSelection(str(value))
@@ -1506,6 +1491,18 @@ class SubPanel(InputPanel):
 
         if self.verbose:
             print "set to {}.".format(self.parent_params[param]['default'])
+            
+    def set_value(self, param, value):
+        """Overrides super in order to change table, since event isn't
+        generated on SetPath, value not changed in proper param dict
+        """
+
+        if self.parent_params[param]['type'] == 'path':
+            # manually change it in defaults because SetPath doesn't generate
+            # event
+            self.parent_params[param]['default'] = str(value)
+
+        super(SubPanel, self).set_value(param, value)
 
 
 class GlobalPanel(InputPanel):
@@ -1928,7 +1925,6 @@ class MyGrid(wx.Frame):
         ctrl.value[row] = None
 
 
-
 class MyFrame(wx.Frame):
     """
     Class for generating window. Instantiates notebook and panels.
@@ -2267,10 +2263,13 @@ class MyFrame(wx.Frame):
                 wx.PostEvent(self.l1, evt)
                 event.Skip()
 
-        if event.GetKeyCode() == wx.WXK_ESCAPE:
-            print 'escaped'
-            self.on_stop_button(event)
-            event.Skip()
+            elif event.GetKeyCode() == wx.WXK_ESCAPE:
+                print 'escaped'
+                self.on_stop_button(event)
+                event.Skip()
+
+            else:
+                event.Skip()
 
         elif event.GetKeyCode() == 82:  # letter 'r'
             if event.CmdDown():
