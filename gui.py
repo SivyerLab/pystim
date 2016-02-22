@@ -7,10 +7,11 @@ Program for GUI interface to StimProgram.py"
 # Copyright (C) 2016 Alexander Tomlinson
 # Distributed under the terms of the GNU General Public License (GPL).
 
-# must first turn pyglet shadow windows off to avoid conflict with wxPython and
-# psychopy.visual
+# must first turn pyglet shadow windows off to avoid conflict beteween wxPython
+# and psychopy.visual
 import pyglet
 pyglet.options['shadow_window'] = False
+
 from collections import OrderedDict
 from sys import platform as _platform
 from GammaCorrection import GammaValues  # necessary for unpickling
@@ -737,9 +738,12 @@ class DirPanel(wx.Panel):
 
         # make list of stims queued, rename move type
         to_save = []
-        for stim in my_frame.l1.stim_info_list:
-            params = copy.deepcopy(stim.parameters)
-            params['move_type'] = stim.stim_type
+        stims = my_frame.l1.stim_info_list
+        for i in range(len(stims)):
+            params = copy.deepcopy(stims[i].parameters)
+            params['move_type'] = stims[i].stim_type
+            # add in control list
+            params['control_list'] = my_frame.l1.control_list_list[i]
             to_save.append(params)
 
         # get path and open file to write
@@ -802,9 +806,9 @@ class DirPanel(wx.Panel):
             stim_type = stim_param.pop('move_type')
 
             stim_type = convert_stim_type(stim_type)
+            my_frame.l1.control_list_list.append(stim_param.pop('control_list'))
 
             my_frame.l1.add_stim(stim_type, stim_param)
-            my_frame.l1.control_list_list.append({})
 
         print '\nSTIMS LOADED'
 
@@ -2148,7 +2152,7 @@ class MyFrame(wx.Frame):
                     for i in range(maxi):
                         for j in range(len(self.l1.control_list_list)):
                             for param in self.l1.control_list_list[
-                                j].iterkeys():
+                                    j].iterkeys():
 
                                 if self.l1.control_list_list[j][param][i] is not None:
 
@@ -2158,7 +2162,7 @@ class MyFrame(wx.Frame):
                                             param_not_list = param[:-3]
                                             self.l1.stim_info_list[
                                                 j].parameters[param_not_list][k] =\
-                                            self.l1.control_list_list[j][param][i]
+                                                self.l1.control_list_list[j][param][i]
 
                                         elif param == 'move_type':
 
@@ -2171,7 +2175,8 @@ class MyFrame(wx.Frame):
 
                                         else:
                                             self.l1.stim_info_list[j].parameters[param] =\
-                                            self.l1.control_list_list[j][param][i]
+                                                self.l1.control_list_list[j][param][i]
+
                                     except IndexError:
                                         pass
 
