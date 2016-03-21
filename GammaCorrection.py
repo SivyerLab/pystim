@@ -354,7 +354,7 @@ class GammaValues(object):
                 print 'done'
                 print 'blue correcting....',
                 b = self.b_correct(b)
-                print 'done'
+                print 'done\n'
 
                 if has_alpha:
                     adj_color = numpy.dstack([numpy.split(r, size),
@@ -381,7 +381,7 @@ class GammaValues(object):
                 print 'done'
                 print 'blue correcting....',
                 b_adj = self.b_correct(b)
-                print 'done'
+                print 'done\n'
 
                 adj_color = color[:]
 
@@ -399,17 +399,17 @@ class GammaValues(object):
         # if single channel
         elif channel is not None:
             if channel == 0:
-                print 'red correcting.....',
+                # print 'red correcting.....',
                 adj = self.r_correct(color)
-                print 'done'
+                # print 'done'
             if channel == 1:
-                print 'green correcting...',
+                # print 'green correcting...',
                 adj = self.g_correct(color)
-                print 'done'
+                # print 'done'
             if channel == 2:
-                print 'blue correcting....',
+                # print 'blue correcting....',
                 adj = self.b_correct(color)
-                print 'done'
+                # print 'done'
 
             adj_color = adj
 
