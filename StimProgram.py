@@ -703,6 +703,11 @@ class StaticStim(StimDefaults):
             high = high * 2.0 - 1
             low = low * 2.0 - 1
 
+            # gamma correct high and low
+            if MyWindow.gamma_mon is not None and self.fill_mode not in ['image']:
+                high = MyWindow.gamma_mon(high, channel=self.contrast_channel)
+                low = MyWindow.gamma_mon(low, channel=self.contrast_channel)
+
             color = high, low, delta, background
 
         return color
@@ -881,12 +886,17 @@ class StaticStim(StimDefaults):
         if MyWindow.gamma_mon is not None and self.fill_mode not in ['image']:
             texture = MyWindow.gamma_mon(texture)
 
+        # make center see through if annuli
+        if self.shape == 'annulus':
+            radius = filters.makeRadialMatrix(self.outer_diameter, radius=1.0/self.outer_diameter)
+            texture[numpy.where(radius < self.inner_diameter)] = [0, 0, 0, -1]
+
         return texture
 
     def gen_timing(self, frame):
-        """Adjusts alpha values of stims based on desired timing (i.e. as a
-        function of current frame over draw time). Recalculated on every call to
-        animate()
+        """Adjusts color values of stims based on desired timing in desired
+        channel(i.e. as a function of current frame over draw time).
+        Recalculated on every call to animate()
 
         TODO: precompute values
 
@@ -897,7 +907,7 @@ class StaticStim(StimDefaults):
         time_fraction = stim_frame_num * 1.0 / self.draw_duration
         texture = self.stim.tex
 
-        high, low, delta, background = self.gen_rgb()
+        _, _, delta, background = self.gen_rgb()
 
         if self.timing == 'sine':
             # adjust color
@@ -1779,24 +1789,6 @@ def main(stim_list, verbose=True):
                 # all other stims, instantiate by looking up class in
                 # globals(), and passing dictionary of parameters
                 else:
-                    to_animate.append(globals()[stim.stim_type](**stim.parameters))
-
-                # annuli are handled by creating a duplicate smaller nested
-                # circle within the larger circle, and setting its color to
-                # background and its timing to instant
-                if stim.parameters['shape'] == 'annulus':
-                    # make necessary changes to copy so not overwritten for
-                    # next run
-                    stim = copy.deepcopy(stim)
-
-                    stim.parameters['timing'] = 'step'
-                    stim.parameters['color'] = GlobalDefaults['background']
-                    stim.parameters['intensity'] = 0
-                    stim.parameters['fill_mode'] = 'uniform'
-                    stim.parameters['outer_diameter'] = stim.parameters[
-                        'inner_diameter']
-
-                    # add
                     to_animate.append(globals()[stim.stim_type](**stim.parameters))
 
             # generate stims
