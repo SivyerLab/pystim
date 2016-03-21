@@ -12,14 +12,14 @@ Program for GUI interface to StimProgram.py"
 import pyglet
 pyglet.options['shadow_window'] = False
 
-from collections import OrderedDict
-from sys import platform as _platform
 from GammaCorrection import GammaValues  # necessary for unpickling
-import wx, wx.grid
-import StimProgram
-import copy
-import cPickle
+from sys import platform as _platform
+from collections import OrderedDict
 import ConfigParser
+import StimProgram
+import wx, wx.grid
+import cPickle
+import copy
 import os
 
 __author__  = "Alexander Tomlinson"
@@ -801,12 +801,17 @@ class DirPanel(wx.Panel):
                 print "\nERROR: file not a properly formatted parameter file"
                 return
 
-        # load list, and assign stim stype
+        # load list, and assign stim type
         for stim_param in to_load:
             stim_type = stim_param.pop('move_type')
 
             stim_type = convert_stim_type(stim_type)
-            my_frame.l1.control_list_list.append(stim_param.pop('control_list'))
+
+            try:
+                my_frame.l1.control_list_list.append(stim_param.pop('control_list'))
+            except KeyError:
+                # if load from log file no control list, so add blank
+                my_frame.l1.control_list_list.append({})
 
             my_frame.l1.add_stim(stim_type, stim_param)
 
@@ -820,10 +825,10 @@ class DirPanel(wx.Panel):
         """
         my_frame = event.GetEventObject().GetParent().GetParent()
 
-        # get path of settings file from browser
+        # get path of params file from browser
         path = self.browser.GetPath()
 
-        # open and read settings
+        # open and read params
         if _platform == 'win32':
             if os.path.dirname(path).split('\\')[-2] == 'logs':
                 os.startfile(path)
