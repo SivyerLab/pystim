@@ -4,18 +4,22 @@
 Program for GUI interface to StimProgram.py"
 """
 
-# must first turn pyglet shadow windows off to avoid conflict with wxPython and
-# psychopy.visual
+# Copyright (C) 2016 Alexander Tomlinson
+# Distributed under the terms of the GNU General Public License (GPL).
+
+# must first turn pyglet shadow windows off to avoid conflict beteween wxPython
+# and psychopy.visual
 import pyglet
 pyglet.options['shadow_window'] = False
-from collections import OrderedDict
-from sys import platform as _platform
+
 from GammaCorrection import GammaValues  # necessary for unpickling
-import wx
-import StimProgram
-import copy
-import cPickle
+from sys import platform as _platform
+from collections import OrderedDict
 import ConfigParser
+import StimProgram
+import wx, wx.grid
+import cPickle
+import copy
 import os
 
 __author__  = "Alexander Tomlinson"
@@ -75,7 +79,9 @@ config_default_dict = dict(
     trigger=False,
     move_delay=0,
     num_jumps=5,
-    jump_delay=100)
+    jump_delay=100,
+    force_stop=0,
+    pref_dir=-1)
 
 def get_config_dict(config_file):
     defaults = dict(zip(config_default_dict, map(str,
@@ -207,6 +213,13 @@ timing_param = OrderedDict([
      {'type'    : 'text',
       'label'   : 'duration',
       'default' : config_dict['duration'],
+      'is_child': False}
+     ),
+
+    ('force_stop',
+     {'type'    : 'text',
+      'label'   : 'end (non 0 overrides)',
+      'default' : config_dict['force_stop'],
       'is_child': False}
      ),
 
@@ -400,7 +413,7 @@ motion_param = OrderedDict([
     ('move_type',
      {'type'    : 'choice',
       'label'   : 'move type',
-      'choices' : ['static', 'moving', 'table', 'random', 'jump'],
+      'choices' : ['static', 'moving', 'table', 'random'], #, 'jump'],
       'default' : config_dict['move_type'],
       'is_child': False,
       'children': {
@@ -409,7 +422,7 @@ motion_param = OrderedDict([
           'random': ['speed', 'travel_distance', 'move_seed'],
           'table' : ['table_filename', 'start_dir', 'num_dirs', 'move_delay',
                      'ori_with_dir'],
-          'jump'  : ['num_jumps', 'jump_delay', 'move_seed'],
+          #'jump'  : ['num_jumps', 'jump_delay', 'move_seed'],
       }}
      ),
 
@@ -544,7 +557,7 @@ global_default_param = OrderedDict([
 
     ('trigger_wait',
      {'type'    : 'text',
-      'label'   : 'trigger wait',
+      'label'   : 'start trigger wait',
       'default' : config_dict['trigger_wait'],
       'is_child': False}
      ),
@@ -553,6 +566,13 @@ global_default_param = OrderedDict([
      {'type'    : 'list',
       'label'   : 'background (RGB)',
       'default' : config_dict['background'],
+      'is_child': False}
+     ),
+
+    ('pref_dir',
+     {'type'    : 'text',
+      'label'   : 'preffered dir',
+      'default' : config_dict['pref_dir'],
       'is_child': False}
      ),
 
@@ -602,6 +622,8 @@ class TextCtrlTag(wx.TextCtrl):
         self.tag = kwargs.pop('tag', None)
         # tag2 used in list type parameters
         self.tag2 = kwargs.pop('tag2', None)
+        # check if part of table
+        self.in_table = kwargs.pop('in_table', None)
         wx.TextCtrl.__init__(self, *args, **kwargs)
 
 
@@ -613,6 +635,10 @@ class ChoiceTag(wx.Choice):
     def __init__(self, *args, **kwargs):
         # pop out tag if present from args/kwargs
         self.tag = kwargs.pop('tag', None)
+        # check if part of table
+        self.in_table = kwargs.pop('in_table', None)
+        # pop out value (only textctrl has value
+        self.Value = kwargs.pop('Value', None)
         wx.Choice.__init__(self, *args, **kwargs)
 
 
@@ -712,9 +738,12 @@ class DirPanel(wx.Panel):
 
         # make list of stims queued, rename move type
         to_save = []
-        for stim in my_frame.l1.stim_info_list:
-            params = copy.deepcopy(stim.parameters)
-            params['move_type'] = stim.stim_type
+        stims = my_frame.l1.stim_info_list
+        for i in range(len(stims)):
+            params = copy.deepcopy(stims[i].parameters)
+            params['move_type'] = stims[i].stim_type
+            # add in control list
+            params['control_list'] = my_frame.l1.control_list_list[i]
             to_save.append(params)
 
         # get path and open file to write
@@ -772,20 +801,17 @@ class DirPanel(wx.Panel):
                 print "\nERROR: file not a properly formatted parameter file"
                 return
 
-        # load list, and assign stim stype
+        # load list, and assign stim type
         for stim_param in to_load:
             stim_type = stim_param.pop('move_type')
 
-            if stim_type == 'StaticStim':
-                stim_type = 'static'
-            elif stim_type == 'MovingStim':
-                stim_type = 'moving'
-            elif stim_type == 'RandomlyMovingStim':
-                stim_type = 'random'
-            elif stim_type == 'TableStim':
-                stim_type = 'table'
-            elif stim_type == 'ImageJumpStim':
-                stim_type = 'jump'
+            stim_type = convert_stim_type(stim_type)
+
+            try:
+                my_frame.l1.control_list_list.append(stim_param.pop('control_list'))
+            except KeyError:
+                # if load from log file no control list, so add blank
+                my_frame.l1.control_list_list.append({})
 
             my_frame.l1.add_stim(stim_type, stim_param)
 
@@ -799,10 +825,10 @@ class DirPanel(wx.Panel):
         """
         my_frame = event.GetEventObject().GetParent().GetParent()
 
-        # get path of settings file from browser
+        # get path of params file from browser
         path = self.browser.GetPath()
 
-        # open and read settings
+        # open and read params
         if _platform == 'win32':
             if os.path.dirname(path).split('\\')[-2] == 'logs':
                 os.startfile(path)
@@ -829,7 +855,7 @@ class ListPanel(wx.Panel):
 
         # instance attributes
         self.stim_info_list = []
-        self.index = 0
+        self.control_list_list = []
 
         # title and its sizer
         title = wx.StaticText(self, label="stims to run")
@@ -844,26 +870,45 @@ class ListPanel(wx.Panel):
         # list control widget
         self.list_control = wx.ListCtrl(self, size=(200, -1),
                                         style=wx.LC_REPORT | wx.SUNKEN_BORDER)
-        self.list_control.InsertColumn(0, 'Shape')
-        self.list_control.InsertColumn(1, 'Type')
-        self.list_control.InsertColumn(2, 'Fill')
+        self.list_control.InsertColumn(0, 'Fill')
+        self.list_control.InsertColumn(1, 'Shape')
+        self.list_control.InsertColumn(2, 'Type')
         self.list_control.InsertColumn(3, 'Trigger')
 
         # add to sizer
         sizer_panel.Add(self.list_control, 1, wx.EXPAND)
 
+        # sizer for up and down buttons
+        sizer_up_down_buttons = wx.BoxSizer(wx.HORIZONTAL)
+
+        self.up_button = wx.Button(self, label='Move up')
+        self.down_button = wx.Button(self, label='Move down')
+
+        sizer_up_down_buttons.Add(self.up_button, 1, border=5,
+                               flag=wx.LEFT | wx.RIGHT)
+        sizer_up_down_buttons.Add(self.down_button, 1, border=5,
+                               flag=wx.LEFT | wx.RIGHT)
+
+        sizer_panel.Add(sizer_up_down_buttons, border=5,
+                        flag=wx.TOP | wx.ALIGN_CENTER_HORIZONTAL |
+                        wx.ALIGN_CENTER_VERTICAL)
+
+        # up and down button binders
+        self.Bind(wx.EVT_BUTTON, self.on_up_button, self.up_button)
+        self.Bind(wx.EVT_BUTTON, self.on_down_button, self.down_button)
+
         # sizer for add and remove buttons
-        sizer_buttons = wx.BoxSizer(wx.HORIZONTAL)
+        sizer_add_remove_buttons = wx.BoxSizer(wx.HORIZONTAL)
 
         self.add_button = wx.Button(self, id=wx.ID_ADD)
         self.remove_button = wx.Button(self, id=wx.ID_REMOVE)
 
-        sizer_buttons.Add(self.add_button, 1, border=5,
+        sizer_add_remove_buttons.Add(self.add_button, 1, border=5,
                                flag=wx.LEFT | wx.RIGHT)
-        sizer_buttons.Add(self.remove_button, 1, border=5,
+        sizer_add_remove_buttons.Add(self.remove_button, 1, border=5,
                                flag=wx.LEFT | wx.RIGHT)
 
-        sizer_panel.Add(sizer_buttons, border=5,
+        sizer_panel.Add(sizer_add_remove_buttons, border=5,
                         flag=wx.BOTTOM | wx.TOP | wx.ALIGN_CENTER_HORIZONTAL |
                         wx.ALIGN_CENTER_VERTICAL)
 
@@ -889,48 +934,63 @@ class ListPanel(wx.Panel):
             'default']
 
         # merge
-        param_dict = copy.deepcopy(my_frame.merge_dicts())
+        param_dict, control_list = copy.deepcopy(my_frame.merge_dicts())
+        self.control_list_list.append(control_list)
 
         self.add_stim(stim_type, param_dict)
 
-    def add_stim(self, stim_type, param_dict):
+    def add_stim(self, stim_type, param_dict, insert_pos=None):
         """
-        Adds stim to list of stims to run
+        Adds stim to list of stims to run.
 
         :param stim_type:
         :param param_dict:
+        :param insert_pos: at what position to insert the stim
         """
-        shape = param_dict['shape']
         fill = param_dict['fill_mode']
+        if fill in ['random', 'checkerboard']:
+            shape = 'rectangle'
+        else:
+            shape = param_dict['shape']
         trigger = str(param_dict['trigger'])
 
+        if insert_pos is not None:
+            index = insert_pos
+        else:
+            index = self.list_control.GetItemCount()
+
+
         # add info to list
-        self.list_control.InsertStringItem(self.index, shape)
-        self.list_control.SetStringItem(self.index, 1, stim_type)
-        self.list_control.SetStringItem(self.index, 2, fill)
-        self.list_control.SetStringItem(self.index, 3, trigger)
+        self.list_control.InsertStringItem(index, fill)
+        self.list_control.SetStringItem(index, 1, shape)
+        self.list_control.SetStringItem(index, 2, stim_type)
+        self.list_control.SetStringItem(index, 3, trigger)
         # resize columns to fit
         self.list_control.SetColumnWidth(0, wx.LIST_AUTOSIZE)
         self.list_control.SetColumnWidth(1, wx.LIST_AUTOSIZE)
         self.list_control.SetColumnWidth(2, wx.LIST_AUTOSIZE)
         self.list_control.SetColumnWidth(3, wx.LIST_AUTOSIZE)
 
-        if stim_type == 'static':
-            stim_type = 'StaticStim'
-        elif stim_type == 'moving':
-            stim_type = 'MovingStim'
-        elif stim_type == 'random':
-            stim_type = 'RandomlyMovingStim'
-        elif stim_type == 'table':
-            stim_type = 'TableStim'
-        elif stim_type == 'jump':
-            stim_type = 'ImageJumpStim'
+        stim_type = convert_stim_type(stim_type)
 
         stim_info = StimProgram.StimInfo(stim_type, param_dict,
-                                         self.index + 1)
-        self.stim_info_list.append(stim_info)
+                                         index)
+        if insert_pos is not None:
+            self.stim_info_list.insert(index, stim_info)
+        else:
+            self.stim_info_list.append(stim_info)
 
-        self.index += 1
+        # deselect all so most recently added can be selected
+        while self.list_control.GetSelectedItemCount() != 0:
+            self.list_control.Select(self.list_control.GetFirstSelected(), on=0)
+
+        self.list_control.Select(index)
+
+        # reset stim numbers
+        index = 0
+        for stim in self.stim_info_list:
+            stim.number = index
+            index += 1
 
     def on_remove_button(self, event):
         """
@@ -943,12 +1003,60 @@ class ListPanel(wx.Panel):
                 selected = self.list_control.GetFirstSelected()
                 # print int(selected)
                 self.stim_info_list.pop(selected)
+                self.control_list_list.pop(selected)
                 self.list_control.DeleteItem(selected)
-                self.index -= 1
         else:
             self.list_control.DeleteAllItems()
             del self.stim_info_list[:]
-            self.index = 0
+            del self.control_list_list[:]
+
+        # reset stim numbers
+        index = 0
+        for stim in self.stim_info_list:
+            stim.number = index
+            index += 1
+
+    def on_up_button(self, event):
+        """
+        Moves a stim up in the list
+
+        :param event:
+        :return:
+        """
+        if self.list_control.GetSelectedItemCount() == 1:
+            index = self.list_control.GetFirstSelected()
+            if index > 0:
+                item = self.stim_info_list[index]
+                stim_type = item.stim_type
+
+                stim_type = convert_stim_type(stim_type)
+
+                self.on_remove_button(event)
+                self.add_stim(stim_type, item.parameters, index-1)
+
+                l = self.control_list_list
+                l[index], l[index - 1] = l[index - 1], l[index]
+
+    def on_down_button(self, event):
+        """
+        Moves a stim up in the list
+
+        :param event:
+        :return:
+        """
+        if self.list_control.GetSelectedItemCount() == 1:
+            index = self.list_control.GetFirstSelected()
+            if index < self.list_control.GetItemCount() - 1:
+                item = self.stim_info_list[index]
+                stim_type = item.stim_type
+
+                stim_type = convert_stim_type(stim_type)
+
+                self.on_remove_button(event)
+                self.add_stim(stim_type, item.parameters, index+1)
+
+                l = self.control_list_list
+                l[index], l[index + 1] = l[index + 1], l[index]
 
     def on_double_click(self, event):
         """
@@ -971,16 +1079,7 @@ class ListPanel(wx.Panel):
 
         # re-add stim type
         stim_type = copy.deepcopy(self.stim_info_list[selected].stim_type)
-        if stim_type == 'StaticStim':
-            stim_type = 'static'
-        elif stim_type == 'MovingStim':
-            stim_type = 'moving'
-        elif stim_type == 'RandomlyMovingStim':
-            stim_type = 'random'
-        elif stim_type == 'TableStim':
-            stim_type = 'table'
-        elif stim_type == 'ImageJumpStim':
-            stim_type = 'jump'
+        stim_type = convert_stim_type(stim_type)
 
         param_dict['move_type'] = stim_type
 
@@ -991,7 +1090,7 @@ class ListPanel(wx.Panel):
                 try:
                     panel.set_value(param, param_dict[param])
                 except KeyError:
-                    panel.set_value(param, config_dict[param])
+                    panel.set_value(param, config_default_dict[param])
             for value in panel.sub_panel_dict.itervalues():
                 for subpanel in value.itervalues():
                     for param, control in subpanel.input_dict.iteritems():
@@ -999,7 +1098,7 @@ class ListPanel(wx.Panel):
                         try:
                             subpanel.set_value(param, param_dict[param])
                         except KeyError:
-                            subpanel.set_value(param, config_dict[param])
+                            subpanel.set_value(param, config_default_dict[param])
 
 
         print '\nPARAM LOADED'
@@ -1075,22 +1174,29 @@ class InputPanel(wx.Panel):
                 # various input widgets
                 if v['type'] == 'text':
                     input_dict[k] = (TextCtrlTag(self, size=(120, -1), tag=k,
+                                                 in_table=False,
                                                  value=str(v['default']),
                                                  validator=TextCtrlValidator()))
                     # binds event to method (so input_update() method is called
                     # on each wx.EVT_TEXT event.
                     self.Bind(wx.EVT_TEXT, self.input_update,
                               input_dict[k])
-                    # input_dict[k].Bind(wx.EVT_SET_FOCUS, self.on_focus)
+                    # binder for inputting data in table
+                    self.Bind(wx.EVT_CONTEXT_MENU, self.on_right_click,
+                              input_dict[k])
 
                 elif v['type'] == 'choice':
                     input_dict[k] = (ChoiceTag(self, tag=k,
-                                               choices=v['choices']))
+                                               choices=v['choices'],
+                                               Value=v['default']))
                     # on windows, choices still default to blank, so manually
                     # set selection to default for aesthetics
                     input_dict[k].SetStringSelection(v['default'])
                     # same as above, but for wx.EVT_CHOICE event
                     self.Bind(wx.EVT_CHOICE, self.input_update,
+                              input_dict[k])
+                    # binder for inputting data in table
+                    self.Bind(wx.EVT_CONTEXT_MENU, self.on_right_click,
                               input_dict[k])
 
                 elif v['type'] == 'path':
@@ -1117,12 +1223,16 @@ class InputPanel(wx.Panel):
                         list_list.append(TextCtrlTag(self, tag=k, tag2=i,
                         size=((120 / length - (5 * (length - 1)) / length),
                               -1),  # -1 defaults to appropriate size
+                              in_table=False,
                               value=str(v['default'][i]),
                               validator=TextCtrlValidator()))
                         # add to sizer
                         list_sizer.Add(list_list[i])
                         # bind
                         self.Bind(wx.EVT_TEXT, self.input_update, list_list[i])
+                        # binder for inputting data in table
+                        self.Bind(wx.EVT_CONTEXT_MENU, self.on_right_click,
+                                  list_list[i])
                     # add sizer to input_dict for inclusion in grid
                     input_dict[k] = list_sizer
 
@@ -1224,6 +1334,13 @@ class InputPanel(wx.Panel):
         # get the new value from the widget
         value = event.GetString()
 
+        # skip all if choicectrl and in table
+        if isinstance(event.GetEventObject(), ChoiceTag):
+            if event.GetEventObject().in_table:
+                event.Skip()
+                event.GetEventObject().SetStringSelection('table')
+                return
+
         # attempt to cast to float or int, else leave as is (hopefully string)
         try:
             value = int(value)
@@ -1263,6 +1380,14 @@ class InputPanel(wx.Panel):
             # redraw
             self.Fit()
 
+    def on_right_click(self, event):
+        """Adds param to table and sets it non editable.
+
+        :param event:
+        """
+        ctrl = event.GetEventObject()
+        self.GetTopLevelParent().grid.add_to_grid(ctrl)
+
     def get_param_dict(self):
         """
         Method for returning a dictionary with extra info stripped out,
@@ -1279,16 +1404,7 @@ class InputPanel(wx.Panel):
         # remove move type from dictionary and set as instance attribute
         if 'move_type' in params:
             stim_type = params.pop('move_type')
-            if stim_type == 'static':
-                self.type = 'StaticStim'
-            elif stim_type == 'moving':
-                self.type = 'MovingStim'
-            elif stim_type == 'random':
-                self.type = 'RandomlyMovingStim'
-            elif stim_type == 'table':
-                self.type = 'TableStim'
-            elif stim_type == 'jump':
-                self.type = 'ImageJumpStim'
+            stim_type = convert_stim_type(stim_type)
 
         return params
 
@@ -1298,8 +1414,6 @@ class InputPanel(wx.Panel):
         input and so generates an event, but SetStringSelection() does not,
         so it is necessary to simulate the choice event.
 
-        TODO: SetPath does not simulate event, so path does not get changed.
-
         :param value:
         :param param:
         """
@@ -1308,7 +1422,10 @@ class InputPanel(wx.Panel):
             self.input_dict[param].SetValue(str(value))
 
         elif self.param_dict[param]['type'] == 'path':
+            # manually change it in defaults because SetPath doesn't generate
+            # event, and can't generate own event like for choice
             self.input_dict[param].SetPath(str(value))
+            self.param_dict[param]['default'] = str(value)
 
         elif self.param_dict[param]['type'] == 'radio':
             self.input_dict[param].SetStringSelection(str(value))
@@ -1383,6 +1500,18 @@ class SubPanel(InputPanel):
 
         if self.verbose:
             print "set to {}.".format(self.parent_params[param]['default'])
+            
+    def set_value(self, param, value):
+        """Overrides super in order to change table, since event isn't
+        generated on SetPath, value not changed in proper param dict
+        """
+
+        if self.parent_params[param]['type'] == 'path':
+            # manually change it in defaults because SetPath doesn't generate
+            # event
+            self.parent_params[param]['default'] = str(value)
+
+        super(SubPanel, self).set_value(param, value)
 
 
 class GlobalPanel(InputPanel):
@@ -1552,6 +1681,9 @@ class TextCtrlValidator(wx.PyValidator):
         text_box = self.GetWindow()
         value = text_box.GetValue()
 
+        if value == 'table':
+            return True
+
         try:
             value = int(value)
             text_box.SetBackgroundColour('white')
@@ -1575,6 +1707,233 @@ class TextCtrlValidator(wx.PyValidator):
         return True
 
 
+class MyGrid(wx.Frame):
+    """
+    Class for grid window.
+
+    :param parent: parent of grid
+    """
+    def __init__(self, parent):
+        # necessary call to super
+        super(MyGrid, self).__init__(parent, title='Table')
+
+        # instance attributes
+        self.grid_shown = False
+        self.control_dict = {}
+
+        # panel to hold everything
+        panel = wx.Panel(self)
+
+        # instantiate grid and create
+        self.grid = wx.grid.Grid(panel)
+        self.grid.CreateGrid(0, 0)
+
+        # sizer for grid
+        grid_sizer = wx.BoxSizer(wx.VERTICAL)
+        grid_sizer.Add(self.grid, 1, wx.EXPAND)
+        panel.SetSizer(grid_sizer)
+
+        # bind grid events
+        self.Bind(wx.grid.EVT_GRID_LABEL_RIGHT_CLICK,
+                  self.on_grid_label_right_click)
+        self.Bind(wx.grid.EVT_GRID_CELL_RIGHT_CLICK,
+                  self.on_grid_cell_right_click)
+        self.Bind(wx.grid.EVT_GRID_CELL_CHANGED,
+                  self.on_grid_cell_changed)
+
+        # catch close to only hide grid
+        self.Bind(wx.EVT_CLOSE, self.on_close_button)
+
+    def show_grid(self):
+        """Method to show grid. Unminimizes and brings to front.
+        """
+        self.Iconize(False)
+        self.Show()
+        self.Raise()
+        self.grid_shown = True
+
+    def hide_grid(self):
+        """Method to hide grid.
+        """
+        self.Hide()
+        self.grid_shown = False
+
+    def on_close_button(self, event):
+        """Catches close in order to only hide. Otherwise frame object is
+        deleted and loses all data.
+        """
+        self.Hide()
+        self.grid_shown = False
+
+    def add_to_grid(self, ctrl):
+        """Adds column to table and prevents editing of control.
+
+        :param ctrl: the input box of the parameter being added to the table.
+        """
+
+        try:
+            if ctrl.tag2 is not None:
+                param = ctrl.tag + '[{}]'.format(str(ctrl.tag2))
+            else:
+                param = ctrl.tag
+        except AttributeError:
+            param = ctrl.tag
+
+        in_table = ctrl.in_table
+
+        if not in_table:
+            self.grid.ClearSelection()
+            self.grid.AppendCols(1)
+            self.grid.SetGridCursor(0, self.grid.GetNumberCols()-1)
+            self.grid.SetColLabelValue(self.grid.GetNumberCols()-1, param)
+
+            if self.grid.NumberCols == 1:
+                self.grid.AppendRows(5)
+
+            self.control_dict[param] = ctrl
+            old_val = str(ctrl.Value)
+
+            if isinstance(ctrl, TextCtrlTag):
+                ctrl.ChangeValue('table')
+                ctrl.SetEditable(False)
+
+            if isinstance(ctrl, ChoiceTag):
+                ctrl.Append('table')
+                ctrl.SetStringSelection('table')
+
+            ctrl.value = [None] * 5
+            ctrl.in_table = True
+
+            self.grid.SetCellValue(0, self.grid.GetNumberCols()-1, old_val)
+
+            # try to cast
+            try:
+                old_val = int(old_val)
+            except ValueError:
+                try:
+                    old_val = float(old_val)
+                except ValueError:
+                    pass
+
+            if old_val == 'True':
+                old_val = True
+            elif old_val == 'False':
+                old_val = False
+
+            ctrl.value[0] = old_val
+
+        else:
+            self.grid.ClearSelection()
+
+            for i in range(self.grid.GetNumberCols()):
+                if self.grid.GetColLabelValue(i) == param:
+                    self.grid.SelectCol(i)
+                    self.grid.SetGridCursor(0, i)
+
+        # print self.control_dict
+        self.show_grid()
+
+    def on_grid_cell_changed(self, event):
+        """Updates control value when cell changes.
+
+        :param event:
+        """
+        row = event.GetRow()
+        col = event.GetCol()
+        param = self.grid.GetColLabelValue(col)
+        try:
+            ctrl = self.control_dict[param]
+        except KeyError:
+            param = param[:-3]
+            ctrl = self.control_dict[param]
+
+        value = self.grid.GetCellValue(row, col)
+        if value == '':
+            value = None
+
+        # try to cast
+        try:
+            value = int(value)
+        except ValueError:
+            try:
+                value = float(value)
+            except ValueError:
+                pass
+
+        if value == 'True':
+            value = True
+        elif value == 'False':
+            value = False
+
+        ctrl.value[row] = value
+        # print ctrl.value
+
+    def on_grid_label_right_click(self, event):
+        """If row or column header right clicked, deletes. If top left corner
+        right clicked, adds another 5 rows)
+
+        :param event:
+        """
+        row = event.GetRow()
+        col = event.GetCol()
+
+        if row == -1:
+            if col == -1:
+                self.grid.AppendRows(5)
+                for ctrl in self.control_dict.itervalues():
+                    if ctrl.in_table:
+                        ctrl.value.extend([None] * 5)
+
+            else:
+                param = self.grid.GetColLabelValue(col)
+                try:
+                    ctrl = self.control_dict[param]
+                except KeyError:
+                    param = param[:-3]
+                    ctrl = self.control_dict[param]
+
+                if isinstance(ctrl, TextCtrlTag):
+                    ctrl.SetValue(self.grid.GetCellValue(0, col))
+                    ctrl.SetEditable(True)
+
+                if isinstance(ctrl, ChoiceTag):
+                    ctrl.SetStringSelection(self.grid.GetCellValue(0, col))
+                    ctrl.Delete(ctrl.GetCount()-1)
+
+                self.grid.DeleteCols(col, 1)
+                ctrl.in_table = False
+                del self.control_dict[param]
+
+                if self.grid.NumberCols == 0:
+                    self.grid.DeleteRows(0, numRows=self.grid.NumberRows)
+                    self.Hide()
+
+        elif col == -1:
+            for ctrl in self.control_dict.itervalues():
+                if ctrl.in_table:
+                    del(ctrl.value[row])
+
+            self.grid.DeleteRows(row, 1)
+
+    def on_grid_cell_right_click(self, event):
+        """Removes contents of cell, sets values in list to None.
+
+        :param event:
+        """
+        row = event.GetRow()
+        col = event.GetCol()
+
+        param = self.grid.GetColLabelValue(col)
+        try:
+            ctrl = self.control_dict[param]
+        except KeyError:
+            param = param[:-3]
+            ctrl = self.control_dict[param]
+
+        self.grid.SetCellValue(row, col, '')
+        ctrl.value[row] = None
+
+
 class MyFrame(wx.Frame):
     """
     Class for generating window. Instantiates notebook and panels.
@@ -1586,10 +1945,13 @@ class MyFrame(wx.Frame):
         """
 
         # super initiation
-        super(MyFrame, self).__init__(None)
+        super(MyFrame, self).__init__(None, title="Stimulus Program")
 
         # instance attributes
         self.win_open = False
+
+        # make grid
+        self.grid = MyGrid(self)
 
         # notebook to hold input panels
         self.input_nb = wx.Notebook(self)
@@ -1703,7 +2065,8 @@ class MyFrame(wx.Frame):
         self.Bind(wx.EVT_CHAR_HOOK, self.on_keypress)
 
         # change background color to match panels
-        self.SetBackgroundColour(wx.NullColour)
+        if _platform == 'win32':
+            self.SetBackgroundColour(wx.NullColour)
 
         # draw frame
         self.Show()
@@ -1719,12 +2082,54 @@ class MyFrame(wx.Frame):
         dicts.update(self.panel_fill.get_param_dict())
         dicts.update(self.panel_move.get_param_dict())
 
-        return dicts
+        control_arrays = {}
+
+        # remove trailing Nones from control value
+        for param, ctrl in self.grid.control_dict.iteritems():
+            to_edit = ctrl.value
+            # while not to_edit[-1]:
+            #     to_edit.pop()
+
+            # print param, to_edit
+            # set empty values to be previous ones unless trailing Nones
+            for i in range(len(to_edit)-2, -1, -1):
+                if to_edit[i] is None:
+                    if i == 0:
+                        raise IndexError('First element of table cannot be left blank')
+                    elif to_edit[i+1] is None:
+                        pass
+                    else:
+                        to_edit[i] = to_edit[i - 1]
+
+            control_arrays[param] = to_edit
+
+        return dicts, control_arrays
+
+    def run(self):
+        # try/except, so that errors thrown by StimProgram can be
+        # caught and thrown to avoid hanging.
+        try:
+            self.SetStatusText('running...')
+            fps, time, time_stamp = StimProgram.main(
+                self.l1.stim_info_list)
+
+            if time != 'error':
+                status_text = 'Last run: {0:.2f} fps, '.format(fps) \
+                                   + '{0:.2f} seconds.'.format(time)
+
+                if time_stamp is not None:
+                    status_text += ' Timestamp: {}'.format(time_stamp)
+
+                self.SetStatusText(status_text)
+            else:
+                self.SetStatusText(fps)
+        except:
+            raise
+
 
     def on_run_button(self, event):
         """
-        Method for running stimulus. Makes call to StimProgram.py. Gets
-        necessary params from global panel (g1).
+        Method for running stimulus. Makes call to StimProgram.py.
 
         :param event: event passed by binder
         """
@@ -1733,26 +2138,59 @@ class MyFrame(wx.Frame):
         if len(self.l1.stim_info_list) != 0:
             if self.win_open:
                 self.on_stop_button(event)
-                # try/except, so that errors thrown by StimProgram can be
-                # caught and thrown to avoid hanging.
-                try:
-                    fps, time, time_stamp = StimProgram.main(
-                        self.l1.stim_info_list)
-                    if time != 'error':
-                        status_text = 'Last run: {0:.2f} fps, '.format(fps) \
-                                           + '{0:.2f} seconds.'.format(time)
 
-                        if time_stamp is not None:
-                            status_text += ' Timestamp: {}'.format(time_stamp)
+                maxi = None
 
-                        self.SetStatusText(status_text)
-                    else:
-                        self.SetStatusText(fps)
-                except:
-                    raise
+                if len(self.l1.control_list_list) > 0 and self.l1.control_list_list[0]:
+
+                    maxi = 0
+                    for item in self.l1.control_list_list:
+                        for v in item.itervalues():
+                            length = sum(x is not None for x in v)
+                            if length > maxi:
+                                maxi = length
+
+                if maxi is None:
+                    self.run()
+
+                elif maxi is not None:
+                    for i in range(maxi):
+                        for j in range(len(self.l1.control_list_list)):
+                            for param in self.l1.control_list_list[
+                                    j].iterkeys():
+
+                                if self.l1.control_list_list[j][param][i] is not None:
+
+                                    try:
+                                        if param[-1] == ']':
+                                            k = int(param[-2])
+                                            param_not_list = param[:-3]
+                                            self.l1.stim_info_list[
+                                                j].parameters[param_not_list][k] =\
+                                                self.l1.control_list_list[j][param][i]
+
+                                        elif param == 'move_type':
+
+                                            stim_type = self.l1.control_list_list[j][param][i]
+
+                                            stim_type = convert_stim_type(stim_type)
+
+                                            self.l1.stim_info_list[
+                                                j].stim_type = stim_type
+
+                                        else:
+                                            self.l1.stim_info_list[j].parameters[param] =\
+                                                self.l1.control_list_list[j][param][i]
+
+                                    except IndexError:
+                                        pass
+
+                        self.run()
+
             else:
                 self.on_win_button(event)
                 self.on_run_button(event)
+
         else:
             print "Please add stims."
 
@@ -1818,25 +2256,30 @@ class MyFrame(wx.Frame):
 
         :param event: event passed by binder
         """
-        if event.GetKeyCode() == wx.WXK_ESCAPE:
-            print 'escaped'
-            self.on_stop_button(event)
-            event.Skip()
+        if wx.Window.FindFocus().GetTopLevelParent() == self:
 
-        elif event.GetKeyCode() == wx.WXK_DELETE:
-            if self.win_open:
-                self.on_win_button(event)
-            else:
+            if event.GetKeyCode() == wx.WXK_DELETE:
+                if self.win_open:
+                    self.on_win_button(event)
+                else:
+                    event.Skip()
+
+            elif event.GetKeyCode() in [wx.WXK_RETURN, wx.WXK_NUMPAD_ENTER]:
+                evt = wx.CommandEvent(wx.EVT_BUTTON.typeId,
+                                      self.l1.add_button.Id)
+
+                evt.SetEventObject(self.l1.add_button)
+                evt.SetInt(1)
+                wx.PostEvent(self.l1, evt)
                 event.Skip()
 
-        elif event.GetKeyCode() in [wx.WXK_RETURN, wx.WXK_NUMPAD_ENTER]:
-            evt = wx.CommandEvent(wx.EVT_BUTTON.typeId,
-                                  self.l1.add_button.Id)
+            elif event.GetKeyCode() == wx.WXK_ESCAPE:
+                print 'escaped'
+                self.on_stop_button(event)
+                event.Skip()
 
-            evt.SetEventObject(self.l1.add_button)
-            evt.SetInt(1)
-            wx.PostEvent(self.l1, evt)
-            event.Skip()
+            else:
+                event.Skip()
 
         elif event.GetKeyCode() == 82:  # letter 'r'
             if event.CmdDown():
@@ -1850,8 +2293,48 @@ class MyFrame(wx.Frame):
             else:
                 event.Skip()
 
+        elif event.GetKeyCode() == wx.WXK_F8:
+            if wx.Window.FindFocus().GetTopLevelParent() == self:
+                self.grid.show_grid()
+
+            elif self.grid.grid_shown:
+                self.grid.hide_grid()
+
         else:
             event.Skip()
+
+
+def convert_stim_type(stim_type):
+    """
+    Converts stim_type label to class names and back
+
+    :param stim_type: string to be converted
+    :return: converted string
+    """
+
+    if stim_type == 'StaticStim':
+        stim_type = 'static'
+    elif stim_type == 'MovingStim':
+        stim_type = 'moving'
+    elif stim_type == 'RandomlyMovingStim':
+        stim_type = 'random'
+    elif stim_type == 'TableStim':
+        stim_type = 'table'
+    elif stim_type == 'ImageJumpStim':
+        stim_type = 'jump'
+
+    elif stim_type == 'static':
+        stim_type = 'StaticStim'
+    elif stim_type == 'moving':
+        stim_type = 'MovingStim'
+    elif stim_type == 'random':
+        stim_type = 'RandomlyMovingStim'
+    elif stim_type == 'table':
+        stim_type = 'TableStim'
+    elif stim_type == 'jump':
+        stim_type = 'ImageJumpStim'
+
+    return stim_type
 
 
 def main():

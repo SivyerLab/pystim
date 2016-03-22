@@ -17,7 +17,7 @@ functional.
 ### Documentation
 
 Documentation is included in HTML format in the docs/html/ directory. Further
-documentation on Psychopy can be found at on the psychopy [website](www.psychopy.org).
+documentation on Psychopy can be found on the psychopy [website](www.psychopy.org).
 
 ### Installation
 
@@ -26,8 +26,15 @@ Program requires several libraries, along with their associated dependencies,
 to run. They are listed below:
 
 - psychopy (see psychopy [documentation](http://www.psychopy.org/documentation.html) 
-for required [dependencies](http://www.psychopy.org/installation.html#essential-packages))
+for required [dependencies](http://www.psychopy.org/installation
+.html#essential-packages)). Psychopy is available through:
+
+```
+    pip install psychopy
+```
+
 - [wxPython](http://www.wxpython.org/download.php) (for GUI)
+- sortedcontainers (also available through pip)
 
 Optional libraries:
 
@@ -43,14 +50,10 @@ file for license rights and limitations.
 
 ### Screen Shots (Windows 7)
 
-Main screen:
+Main screen with queued stims:
 
 ![main screen](docs/screenshots/screen1.PNG)
 
-Stims to run:
-
-![stims added](docs/screenshots/screen3.PNG)
-
-Example stimulus:
+Example stimuli:
 
 ![example](docs/screenshots/screen4.PNG)

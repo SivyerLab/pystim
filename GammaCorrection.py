@@ -289,7 +289,7 @@ class GammaValues(object):
 
     def r_correct(self, r):
         """
-        Function to gamma correct red channel
+        Method to gamma correct red channel.
 
         :return: corrected red color
         """
@@ -298,7 +298,7 @@ class GammaValues(object):
 
     def g_correct(self, g):
         """
-        Function to gamma correct green channel
+        Method to gamma correct green channel.
 
         :return: corrected green color
         """
@@ -309,7 +309,7 @@ class GammaValues(object):
 
     def b_correct(self, b):
         """
-        Function to gamma correct blue channel
+        Method to gamma correct blue channel.
 
         :return: corrected blue color
         """
@@ -354,7 +354,7 @@ class GammaValues(object):
                 print 'done'
                 print 'blue correcting....',
                 b = self.b_correct(b)
-                print 'done'
+                print 'done\n'
 
                 if has_alpha:
                     adj_color = numpy.dstack([numpy.split(r, size),
@@ -373,9 +373,15 @@ class GammaValues(object):
                 g = color[1]
                 b = color[2]
 
+                print 'red correcting.....',
                 r_adj = self.r_correct(r)
+                print 'done'
+                print 'green correcting...',
                 g_adj = self.g_correct(g)
+                print 'done'
+                print 'blue correcting....',
                 b_adj = self.b_correct(b)
+                print 'done\n'
 
                 adj_color = color[:]
 
@@ -393,11 +399,17 @@ class GammaValues(object):
         # if single channel
         elif channel is not None:
             if channel == 0:
+                # print 'red correcting.....',
                 adj = self.r_correct(color)
+                # print 'done'
             if channel == 1:
+                # print 'green correcting...',
                 adj = self.g_correct(color)
+                # print 'done'
             if channel == 2:
+                # print 'blue correcting....',
                 adj = self.b_correct(color)
+                # print 'done'
 
             adj_color = adj
 
