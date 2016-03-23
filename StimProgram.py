@@ -20,6 +20,7 @@ import ConfigParser
 import traceback
 import cPickle
 import numpy
+import array
 import copy
 import sys
 import os
@@ -593,18 +594,20 @@ class StaticStim(StimDefaults):
     def make_stim(self):
         """Creates instance of psychopy stim object.
         """
-        self.stim = visual.GratingStim(win=MyWindow.win,
-                                       size=self.gen_size(),
-                                       mask=self.gen_mask(),
-                                       tex=self.gen_texture(),
-                                       pos=self.location,
-                                       phase=self.phase,
-                                       ori=self.orientation)
+        if self.fill_mode != 'image':
+            self.stim = visual.GratingStim(win=MyWindow.win,
+                                           size=self.gen_size(),
+                                           mask=self.gen_mask(),
+                                           tex=self.gen_texture(),
+                                           pos=self.location,
+                                           phase=self.phase,
+                                           ori=self.orientation)
 
-        self.stim.sf *= self.sf
+            self.stim.sf *= self.sf
 
         if self.fill_mode == 'image':
             image = scipy.misc.toimage(numpy.rot90(self.gen_texture(), 2))
+
             self.stim = visual.ImageStim(win=MyWindow.win,
                                          size=self.gen_size(),
                                          mask=self.gen_mask(),
@@ -850,10 +853,10 @@ class StaticStim(StimDefaults):
                     # rescale rgb
                     texture = numpy.asarray(image) / 255.0 * 2 - 1
 
+                    # if only want one color channel, remove others
                     if self.image_channel != 3:
                         for i in range(3):
                             if self.image_channel != i:
-                                print i
                                 texture[:, :, i] = -1
 
                     # gamma correct (slow step)
@@ -868,19 +871,60 @@ class StaticStim(StimDefaults):
                     # add alpha
                     texture = numpy.insert(texture, 3, self.alpha, axis=2)
 
+            # if not gamma correcting
             else:
-                image = Image.open(self.image_filename)
+                _, ext = os.path.splitext(self.image_filename)
+                if ext != '.iml':
+                    image = Image.open(self.image_filename)
 
-                # make smaller for faster correction if possible
-                if max(image.size) > max(self.gen_size()):
-                    image.thumbnail(self.gen_size(), Image.ANTIALIAS)
+                    # make smaller for faster correction if possible
+                    if max(image.size) > max(self.gen_size()):
+                        image.thumbnail(self.gen_size(), Image.ANTIALIAS)
 
-                # turn to array and flip (different because of indexing styles
-                texture = numpy.asarray(image) / 255.0 * 2 - 1
+                    # turn to array
+                    texture = numpy.asarray(image) / 255.0 * 2 - 1
+
+                    # add alpha values
+                    texture = numpy.insert(texture, 3, self.alpha, axis=2)
+
+                # if .iml
+                else:
+                    with open(self.image_filename, 'rb') as raw_image:
+                        image_bytes = raw_image.read()
+
+                    image_array = array.array('H', image_bytes)
+                    image_array.byteswap()
+
+                    image = numpy.array(image_array, dtype='uint16').reshape(
+                        1024, 1536)
+
+                    maxi = image.max()
+                    if maxi <= 4095:
+                        maxi = 4095
+
+                    image = image.astype(numpy.float64)
+
+                    image = image / maxi
+
+                    if self.image_channel != 3:
+                        texture = numpy.zeros((1024, 1536, 3))
+                        texture[:, :, self.image_channel] = image
+
+                        texture = texture * 2 - 1
+
+                    else:
+                        texture = image * 2 - 1
+
+
+
+                # flip because of indexing styles
                 texture = numpy.rot90(texture, 2)
 
-                # add alpha values
-                texture = numpy.insert(texture, 3, self.alpha, axis=2)
+                # if only want one color channel, remove others
+                if self.image_channel != 3:
+                    for i in range(3):
+                        if self.image_channel != i:
+                            texture[:, :, i] = -1
 
         # gamma correct
         if MyWindow.gamma_mon is not None and self.fill_mode not in ['image']:
