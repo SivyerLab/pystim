@@ -844,32 +844,66 @@ class StaticStim(StimDefaults):
 
                 # else save gamma correction for faster future loading
                 else:
-                    image = Image.open(self.image_filename)
+                    if file_ext != '.iml':
+                        image = Image.open(self.image_filename)
 
-                    # make smaller for faster correction if possible
-                    if max(image.size) > max(self.gen_size()):
-                        image.thumbnail(self.gen_size(), Image.ANTIALIAS)
+                        # make smaller for faster correction if possible
+                        if max(image.size) > max(self.gen_size()):
+                            image.thumbnail(self.gen_size(), Image.ANTIALIAS)
 
-                    # rescale rgb
-                    texture = numpy.asarray(image) / 255.0 * 2 - 1
+                        # rescale rgb
+                        texture = numpy.asarray(image) / 255.0 * 2 - 1
 
-                    # if only want one color channel, remove others
-                    if self.image_channel != 3:
-                        for i in range(3):
-                            if self.image_channel != i:
-                                texture[:, :, i] = -1
+                        # if only want one color channel, remove others
+                        if self.image_channel != 3:
+                            for i in range(3):
+                                if self.image_channel != i:
+                                    texture[:, :, i] = -1
 
-                    # gamma correct (slow step)
-                    texture = MyWindow.gamma_mon(texture)
+                        # gamma correct (slow step)
+                        texture = MyWindow.gamma_mon(texture)
 
-                    # save for future
-                    scipy.misc.imsave(savedir, texture)
+                        # save for future
+                        if file_ext != '.iml':
+                            scipy.misc.imsave(savedir, texture)
 
-                    # transform due to different indexing
-                    texture = numpy.rot90(texture, 2)
+                        # transform due to different indexing
+                        texture = numpy.rot90(texture, 2)
 
-                    # add alpha
-                    texture = numpy.insert(texture, 3, self.alpha, axis=2)
+                        # add alpha
+                        texture = numpy.insert(texture, 3, self.alpha, axis=2)
+
+                    else:
+                        with open(self.image_filename, 'rb') as raw_image:
+                            image_bytes = raw_image.read()
+
+                        image_array = array.array('H', image_bytes)
+                        image_array.byteswap()
+
+                        image = numpy.array(image_array, dtype='uint16').reshape(
+                            1024, 1536)
+
+                        maxi = image.max()
+                        if maxi <= 4095:
+                            maxi = 4095
+
+                        image = image.astype(numpy.float64)
+
+                        image = image / maxi
+
+                        if self.image_channel != 3:
+                            texture = numpy.zeros((1024, 1536, 3))
+                            texture[:, :, self.image_channel] = image
+
+                            texture = texture * 2 - 1
+
+                            texture = numpy.rot90(texture, 2)
+
+                            # add alpha values
+                            texture = numpy.insert(texture, 3, self.alpha, axis=2)
+
+                        else:
+                            texture = image * 2 - 1
 
             # if not gamma correcting
             else:
@@ -912,10 +946,11 @@ class StaticStim(StimDefaults):
 
                         texture = texture * 2 - 1
 
+                        # add alpha values
+                        texture = numpy.insert(texture, 3, self.alpha, axis=2)
+
                     else:
                         texture = image * 2 - 1
-
-
 
                 # flip because of indexing styles
                 texture = numpy.rot90(texture, 2)
