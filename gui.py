@@ -522,7 +522,7 @@ global_default_param = OrderedDict([
 
     ('offset',
      {'type'    : 'list',
-      'label'   : 'offset (pix)',
+      'label'   : 'center offset (pix)',
       'default' : config_dict['offset'],
       'is_child': False}
      ),
@@ -856,6 +856,7 @@ class ListPanel(wx.Panel):
         # instance attributes
         self.stim_info_list = []
         self.control_list_list = []
+        self.temp_holder = None
 
         # title and its sizer
         title = wx.StaticText(self, label="stims to run")
@@ -938,6 +939,7 @@ class ListPanel(wx.Panel):
         self.control_list_list.append(control_list)
 
         self.add_stim(stim_type, param_dict)
+        # print self.control_list_list
 
     def add_stim(self, stim_type, param_dict, insert_pos=None):
         """
@@ -1003,7 +1005,9 @@ class ListPanel(wx.Panel):
                 selected = self.list_control.GetFirstSelected()
                 # print int(selected)
                 self.stim_info_list.pop(selected)
-                self.control_list_list.pop(selected)
+
+                self.temp_holder = self.control_list_list.pop(selected)
+
                 self.list_control.DeleteItem(selected)
         else:
             self.list_control.DeleteAllItems()
@@ -1034,8 +1038,7 @@ class ListPanel(wx.Panel):
                 self.on_remove_button(event)
                 self.add_stim(stim_type, item.parameters, index-1)
 
-                l = self.control_list_list
-                l[index], l[index - 1] = l[index - 1], l[index]
+                self.control_list_list.insert(index-1, self.temp_holder)
 
     def on_down_button(self, event):
         """
@@ -1055,8 +1058,7 @@ class ListPanel(wx.Panel):
                 self.on_remove_button(event)
                 self.add_stim(stim_type, item.parameters, index+1)
 
-                l = self.control_list_list
-                l[index], l[index + 1] = l[index + 1], l[index]
+                self.control_list_list.insert(index+1, self.temp_holder)
 
     def on_double_click(self, event):
         """
@@ -1099,6 +1101,7 @@ class ListPanel(wx.Panel):
                             subpanel.set_value(param, param_dict[param])
                         except KeyError:
                             subpanel.set_value(param, config_default_dict[param])
+
 
 
         print '\nPARAM LOADED'
@@ -2139,21 +2142,20 @@ class MyFrame(wx.Frame):
             if self.win_open:
                 self.on_stop_button(event)
 
-                maxi = None
+                maxi = 0
 
-                if len(self.l1.control_list_list) > 0 and self.l1.control_list_list[0]:
+                if len(self.l1.control_list_list) > 0:
 
-                    maxi = 0
                     for item in self.l1.control_list_list:
                         for v in item.itervalues():
                             length = sum(x is not None for x in v)
                             if length > maxi:
                                 maxi = length
 
-                if maxi is None:
+                if maxi == 0:
                     self.run()
 
-                elif maxi is not None:
+                elif maxi != 0:
                     for i in range(maxi):
                         for j in range(len(self.l1.control_list_list)):
                             for param in self.l1.control_list_list[
