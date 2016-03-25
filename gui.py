@@ -1102,7 +1102,23 @@ class ListPanel(wx.Panel):
                         except KeyError:
                             subpanel.set_value(param, config_default_dict[param])
 
+        # post events to grid to simulate removing columns
+        num_cols = my_frame.grid.grid.GetNumberCols()
+        for col in range(num_cols):
+            evt = wx.grid.GridEvent(my_frame.grid.grid.GetId(),
+                                    wx.grid.wxEVT_GRID_LABEL_RIGHT_CLICK,
+                                    my_frame.grid,
+                                    row=-1,
+                                    col=0)
+            wx.PostEvent(my_frame.grid, evt)
 
+        # for key, value in self.control_list_list[selected].iteritems():
+        #     print key, value
+        #     ctrl = my_frame.all_controls[key]
+        #
+        #     evt = wx.CommandEvent(wx.wxEVT_COMMAND_CONTEXT_MENU,
+        #                           ctrl.Id)
+        #     wx.PostEvent(ctrl, evt)
 
         print '\nPARAM LOADED'
 
@@ -1187,6 +1203,8 @@ class InputPanel(wx.Panel):
                     # binder for inputting data in table
                     self.Bind(wx.EVT_CONTEXT_MENU, self.on_right_click,
                               input_dict[k])
+                    # self.Bind(wx.EVT_RIGHT_UP, self.on_right_click,
+                    #           input_dict[k])
 
                 elif v['type'] == 'choice':
                     input_dict[k] = (ChoiceTag(self, tag=k,
@@ -1273,7 +1291,7 @@ class InputPanel(wx.Panel):
                 # v2 is a list of the associated child params
                 for k2, v2 in self.param_dict[k]['children'].iteritems():
                     # instantiate new ordered dict to hold child params to be
-                    # generated on subpanel instantiated
+                    # generated on subpanel instantiating
                     sub_param_dict = OrderedDict()
 
                     # iterates through list of child params and creates
@@ -1952,6 +1970,7 @@ class MyFrame(wx.Frame):
 
         # instance attributes
         self.win_open = False
+        self.all_controls = {}
 
         # make grid
         self.grid = MyGrid(self)
@@ -1970,6 +1989,31 @@ class MyFrame(wx.Frame):
         self.input_nb.AddPage(self.panel_timing, "Time")
         self.input_nb.AddPage(self.panel_fill, " Fill ")
         self.input_nb.AddPage(self.panel_move, "Motion")
+
+        # create dictionary with all the controls in it for accessing from
+        # other classes
+        for panel in self.input_nb.GetChildren():
+            for param, control in panel.input_dict.iteritems():
+                if panel.param_dict[param]['type'] == 'list':
+                    childs = panel.input_dict[param].GetChildren()
+                    for i in range(2):
+                        widgets = childs[i].GetWindow()
+                        self.all_controls[param + '[' + str(i) + ']'] = widgets
+                else:
+                    self.all_controls[param] = control
+            for value in panel.sub_panel_dict.itervalues():
+                for subpanel in value.itervalues():
+                    for param, control in subpanel.input_dict.iteritems():
+                        if subpanel.param_dict[param]['type'] == 'list':
+                            childs = subpanel.input_dict[param].GetChildren()
+                            for i in range(2):
+                                widgets = childs[i].GetWindow()
+                                self.all_controls[param + '[' + str(i) + ']'] = widgets
+                        else:
+                            self.all_controls[param] = control
+
+        # for k in self.all_controls.iterkeys():
+        #     print k
 
         # instantiate global panel
         self.g1 = GlobalPanel(global_default_param, self)
