@@ -1991,6 +1991,7 @@ class MyFrame(wx.Frame):
         # instance attributes
         self.win_open = False
         self.all_controls = {}
+        self.do_break = False
 
         # make grid
         self.grid = MyGrid(self)
@@ -2193,7 +2194,6 @@ class MyFrame(wx.Frame):
         except:
             raise
 
-
     def on_run_button(self, event):
         """
         Method for running stimulus. Makes call to StimProgram.py.
@@ -2205,6 +2205,7 @@ class MyFrame(wx.Frame):
         if len(self.l1.stim_info_list) != 0:
             if self.win_open:
                 self.on_stop_button(event)
+                self.do_break = False
 
                 maxi = 0
 
@@ -2251,6 +2252,10 @@ class MyFrame(wx.Frame):
                                     except IndexError:
                                         pass
 
+                        if self.do_break:
+                            print self.do_break
+                            break
+
                         self.run()
 
             else:
@@ -2296,6 +2301,7 @@ class MyFrame(wx.Frame):
         :param event: event passed by binder
         """
         # TODO: why not stopping on rerun
+        self.do_break = True
         StimProgram.MyWindow.should_break = True
 
     def on_exit_button(self, event):
