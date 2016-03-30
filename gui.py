@@ -961,7 +961,6 @@ class ListPanel(wx.Panel):
         else:
             index = self.list_control.GetItemCount()
 
-
         # add info to list
         self.list_control.InsertStringItem(index, fill)
         self.list_control.SetStringItem(index, 1, shape)
@@ -1094,7 +1093,7 @@ class ListPanel(wx.Panel):
                                     my_frame.grid,
                                     row=-1,
                                     col=0)
-            wx.PostEvent(my_frame.grid, evt)
+            my_frame.grid.GetEventHandler().ProcessEvent(evt)
 
         # load in panels and subpanels
         for panel in my_frame.input_nb.GetChildren():
@@ -1119,25 +1118,28 @@ class ListPanel(wx.Panel):
 
             evt = wx.CommandEvent(wx.EVT_CONTEXT_MENU.typeId,
                                   ctrl.Id)
-
             evt.SetEventObject(ctrl)
-            # evt.SetInt(1)
-            wx.PostEvent(ctrl.GetParent(), evt)
+            ctrl.GetParent().GetEventHandler().ProcessEvent(evt)
 
             for i in range(my_frame.grid.grid.GetNumberCols()):
                 if my_frame.grid.grid.GetColLabelValue(i) == key:
-                    col = copy.copy(i)
+                    col = i
+                    break
 
-            # for j in range(len(values)):
-            #     if values[j] is not None:
-            #         my_frame.grid.grid.SetCellValue(j, col, str(values[j]))
-            #         print str(values[j]), j, col
-
-            # my_frame.grid.grid.SetCellValue(0,0, 'hello')
-        my_frame.grid.grid.BeginBatch()
-        my_frame.grid.grid.SetCellValue(1,0, 'bye')
-        my_frame.grid.grid.EndBatch()
-
+            for j in range(len(values)):
+                if values[j] is not None:
+                    try:
+                        my_frame.grid.grid.SetCellValue(j, col, str(values[j]))
+                        my_frame.grid.control_dict[key].value[j] = values[j]
+                    except wx._core.PyAssertionError:
+                        evt = wx.grid.GridEvent(my_frame.grid.grid.GetId(),
+                                                wx.grid.wxEVT_GRID_LABEL_RIGHT_CLICK,
+                                                my_frame.grid,
+                                                row=-1,
+                                                col=-1)
+                        my_frame.grid.GetEventHandler().ProcessEvent(evt)
+                        my_frame.grid.grid.SetCellValue(j, col, str(values[j]))
+                        my_frame.grid.control_dict[key].value[j] = values[j]
 
         print '\nPARAM LOADED'
 
@@ -1906,7 +1908,6 @@ class MyGrid(wx.Frame):
             value = False
 
         ctrl.value[row] = value
-        # print ctrl.value
 
     def on_grid_label_right_click(self, event):
         """If row or column header right clicked, deletes. If top left corner
