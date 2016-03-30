@@ -1113,7 +1113,6 @@ class ListPanel(wx.Panel):
                             subpanel.set_value(param, config_default_dict[param])
 
         for key, values in self.control_list_list[selected].iteritems():
-            print key, values
             ctrl = my_frame.all_controls[key]
 
             evt = wx.CommandEvent(wx.EVT_CONTEXT_MENU.typeId,
@@ -1138,6 +1137,7 @@ class ListPanel(wx.Panel):
                                                 row=-1,
                                                 col=-1)
                         my_frame.grid.GetEventHandler().ProcessEvent(evt)
+
                         my_frame.grid.grid.SetCellValue(j, col, str(values[j]))
                         my_frame.grid.control_dict[key].value[j] = values[j]
 
@@ -1909,6 +1909,15 @@ class MyGrid(wx.Frame):
 
         ctrl.value[row] = value
 
+        if row == self.grid.GetNumberRows() - 1:
+            evt = wx.grid.GridEvent(self.grid.GetId(),
+                                    wx.grid.wxEVT_GRID_LABEL_RIGHT_CLICK,
+                                    self,
+                                    row=-1,
+                                    col=-1)
+            self.GetEventHandler().ProcessEvent(evt)
+            self.grid.MoveCursorDown(False)
+
     def on_grid_label_right_click(self, event):
         """If row or column header right clicked, deletes. If top left corner
         right clicked, adds another 5 rows)
@@ -2253,7 +2262,6 @@ class MyFrame(wx.Frame):
                                         pass
 
                         if self.do_break:
-                            print self.do_break
                             break
 
                         self.run()
