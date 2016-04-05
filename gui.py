@@ -8,9 +8,11 @@ from sys import platform as _platform
 from collections import OrderedDict
 import ConfigParser
 import StimProgram
+import wx, wx.grid
+import cPickle
 import copy
 import os
-import wx
+
 
 class Model(object):
     """
@@ -1438,13 +1440,74 @@ class DirPanel(wx.Panel):
                              wx.ALIGN_CENTER_VERTICAL)
 
         # event binders
-        # self.Bind(wx.EVT_BUTTON, self.on_save_button, self.save_button)
-        # self.Bind(wx.EVT_BUTTON, self.on_load_button, self.load_button)
-        # self.Bind(wx.EVT_FILECTRL_FILEACTIVATED, self.on_double_click,
-        #           self.browser)
+        self.Bind(wx.EVT_BUTTON, self.on_save_button, self.save_button)
+        self.Bind(wx.EVT_BUTTON, self.on_load_button, self.load_button)
+        self.Bind(wx.EVT_FILECTRL_FILEACTIVATED, self.on_double_click,
+                  self.browser)
 
         # set sizer to panel
         self.SetSizer(panel_sizer)
+
+    def on_save_button(self, event):
+        """
+        Saves current list of stims to text file.
+
+        :param event:
+        """
+        default_dir = os.path.abspath('./psychopy/stims/')
+
+        # popup save dialog
+        save_dialog = wx.FileDialog(self.frame,
+                                    message='File path',
+                                    defaultDir=default_dir,
+                                    wildcard='*.txt',
+                                    style=wx.FD_SAVE | wx.FD_OVERWRITE_PROMPT)
+
+        # to exit out of popup on cancel button
+        if save_dialog.ShowModal() == wx.ID_CANCEL:
+            return
+
+        # get list of stims that need to be saved
+        to_save = []
+        stims = self.frame.list_panel.stims_to_run
+
+        for i, stim in enumerate(stims):
+            params = copy.deepcopy(stim.parameters)
+            # add move type back in to parameters
+            params['move_type'] = stim.stim_type
+            # add to save list
+            to_save.append(params)
+
+        # get path from save dialog
+        path = save_dialog.GetPath()
+
+        # open text file in binary mode to dump
+        with open(path, 'wb') as f:
+            cPickle.dump(to_save, f)
+
+        # refresh file browser to show new saved file
+        # ugly way of doing this
+        self.browser.ShowHidden(True)
+        self.browser.ShowHidden(False)
+
+    def on_load_button(self, event):
+        """
+        Loads stims from text file.
+
+        :param event:
+        """
+        # get path from browser
+        path = self.browser.GetPath()
+
+
+
+    def on_double_click(self, event):
+        """
+        If log file, opens, else loads.
+
+        :param event:
+        """
+        pass
 
 
 class ViewController(wx.Frame):
