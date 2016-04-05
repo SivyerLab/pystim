@@ -1,9 +1,9 @@
 # NEED MUCH MORE COVERAGE
 
-import unittest
 import StimProgram
-import u3
+import unittest
 import numpy
+import u3
 
 
 class TestTrigger(unittest.TestCase):
