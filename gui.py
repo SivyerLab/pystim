@@ -81,7 +81,8 @@ config_default_dict = dict(
     num_jumps=5,
     jump_delay=100,
     force_stop=0,
-    pref_dir=-1)
+    pref_dir=-1,
+    defaults=None)
 
 def get_config_dict(config_file):
     defaults = dict(zip(config_default_dict, map(str,
@@ -100,7 +101,7 @@ def get_config_dict(config_file):
     # add GUI specific settings
     default_config_dict['savedStimDir'] = config.get('GUI', 'savedStimDir')
     default_config_dict['windowPos'] = config.get('GUI', 'windowPos')
-    # default_config_dict['defaults'] = config.get('GUI', 'defaults')
+    default_config_dict['defaults'] = config.get('GUI', 'defaults')
 
     # stab at casting non-strings
     for key, value in default_config_dict.iteritems():
@@ -125,7 +126,11 @@ def get_config_dict(config_file):
                 try:
                     default_config_dict[key] = float(value)
                 except ValueError:
-                    pass
+                    # check if string is 'None'
+                    if default_config_dict[key] == 'None':
+                        default_config_dict[key] = None
+                    else:
+                        pass
 
     return default_config_dict
 
@@ -571,7 +576,7 @@ global_default_param = OrderedDict([
 
     ('pref_dir',
      {'type'    : 'text',
-      'label'   : 'preffered dir',
+      'label'   : 'preferred dir',
       'default' : config_dict['pref_dir'],
       'is_child': False}
      ),
@@ -866,7 +871,8 @@ class ListPanel(wx.Panel):
         # sizer for panel
         sizer_panel = wx.BoxSizer(wx.VERTICAL)
 
-        sizer_panel.Add(title_sizer, flag=wx.BOTTOM | wx.LEFT, border=3)
+        sizer_panel.Add(title_sizer, proportion=0, flag=wx.BOTTOM | wx.LEFT,
+                        border=3)
 
         # list control widget
         self.list_control = wx.ListCtrl(self, size=(200, -1),
@@ -877,7 +883,7 @@ class ListPanel(wx.Panel):
         self.list_control.InsertColumn(3, 'Trigger')
 
         # add to sizer
-        sizer_panel.Add(self.list_control, 1, wx.EXPAND)
+        sizer_panel.Add(self.list_control, proportion=1, flag=wx.EXPAND)
 
         # sizer for up and down buttons
         sizer_up_down_buttons = wx.BoxSizer(wx.HORIZONTAL)
@@ -1422,6 +1428,12 @@ class InputPanel(wx.Panel):
             # redraw
             self.Fit()
 
+        if param == 'background':
+            StimProgram.MyWindow.change_color(self.param_dict[param]['default'])
+
+        if param == 'pref_dir':
+            StimProgram.GlobalDefaults['pref_dir'] = self.param_dict[param]['default']
+
     def on_right_click(self, event):
         """Adds param to table and sets it non editable.
 
@@ -1593,6 +1605,18 @@ class GlobalPanel(InputPanel):
                                        choices=sorted(defaults_list))
         self.Bind(wx.EVT_CHOICE, self.on_default_select, self.which_default)
         self.grid.Add(self.which_default, pos=(0, 1))
+        # if global default in ini, select
+        if config_dict['defaults'] is not None:
+            self.which_default.SetStringSelection(config_dict['defaults'])
+
+            # simulate event, for panel switching
+            event = wx.CommandEvent(wx.wxEVT_COMMAND_CHOICE_SELECTED,
+                                    self.which_default.Id)
+            event.SetEventObject(self.which_default)
+            # event.SetInt(1)
+            event.SetString(config_dict['defaults'])
+            # send event to object
+            wx.PostEvent(self.which_default, event)
 
         # save button
         self.save_default = wx.Button(self, size=(-1,-1), id=wx.ID_SAVE)
@@ -1916,6 +1940,7 @@ class MyGrid(wx.Frame):
                                     row=-1,
                                     col=-1)
             self.GetEventHandler().ProcessEvent(evt)
+
             self.grid.MoveCursorDown(False)
 
     def on_grid_label_right_click(self, event):
@@ -2042,9 +2067,6 @@ class MyFrame(wx.Frame):
                         else:
                             self.all_controls[param] = control
 
-        # for k in self.all_controls.iterkeys():
-        #     print k
-
         # instantiate global panel
         self.g1 = GlobalPanel(global_default_param, self)
 
@@ -2098,7 +2120,7 @@ class MyFrame(wx.Frame):
         self.win_sizer = wx.BoxSizer(wx.HORIZONTAL)
 
         self.win_sizer.Add(self.b1, 1, flag=wx.EXPAND | wx.RIGHT, border=5)
-        self.win_sizer.Add(self.l1, 1, border=5, flag=wx.EXPAND | wx.RIGHT)
+        self.win_sizer.Add(self.l1, 1, flag=wx.EXPAND | wx.RIGHT, border=5)
         self.win_sizer.Add(panel_button_sizer)
 
         # status bar
@@ -2308,7 +2330,6 @@ class MyFrame(wx.Frame):
 
         :param event: event passed by binder
         """
-        # TODO: why not stopping on rerun
         self.do_break = True
         StimProgram.MyWindow.should_break = True
 
