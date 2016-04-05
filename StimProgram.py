@@ -61,6 +61,7 @@ defaults = dict(logsDir='.\\psychopy\\logs\\',
                 monitor='blank')
 config = ConfigParser.ConfigParser()
 config.read(os.path.abspath('./psychopy/config.ini'))
+config.read(os.path.abspath("C:\Users\Alex\PycharmProjects\StimulusProgram\psychopy\config.ini"))
 
 
 class StimInfo(object):
@@ -98,8 +99,11 @@ class StimInfo(object):
 class GlobalDefaultsMeta(type):
     """Metaclass to redefine get item for GlobalDefaults.
     """
-    def __getitem__(self, item):
-        return self.defaults[item]
+    def __getitem__(self, key):
+        return self.defaults[key]
+
+    def __setitem__(self, key, item):
+        self.defaults[key] = item
 
 
 class GlobalDefaults(object):
@@ -298,6 +302,21 @@ class MyWindow(object):
         if has_u3:
             MyWindow.d.close()
         MyWindow.win.close()
+
+    @staticmethod
+    def change_color(color):
+        try:
+            if MyWindow.win is not None:
+                GlobalDefaults['background'] = color
+
+                if MyWindow.gamma_mon is not None:
+                    color = color = MyWindow.gamma_mon(color)
+
+                MyWindow.win.color = color
+                MyWindow.win.flip()
+                MyWindow.win.flip()
+        except (ValueError, AttributeError):
+            pass
 
     @staticmethod
     def send_trigger():
@@ -1904,6 +1923,9 @@ def main(stim_list, verbose=True):
 
                 MyWindow.win.flip()
 
+                # save as movie?
+                # MyWindow.win.getMovieFrame()
+
                 if frame == MyWindow.frame_trigger_list[index]:
                     MyWindow.send_trigger()
                     # print frame, 'triggered'
@@ -1969,6 +1991,9 @@ def main(stim_list, verbose=True):
                                current_time)
 
     fps = (count_reps * num_frames + count_frames) / count_elapsed_time
+
+    # test of saving movies
+    # MyWindow.win.saveMovieFrames('testMGP.mpg')
 
     return fps, count_elapsed_time, time_stamp
 
