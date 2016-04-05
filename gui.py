@@ -26,7 +26,7 @@ class Model(object):
         self.global_default_param = None
 
         # init params
-        config_file = os.path.abspath("C:\Users\Alex\PycharmProjects\StimulusProgram\psychopy\config.ini")
+        config_file = os.path.abspath('.\psychopy\config.ini')
         config_dict = self.read_config_file(config_file)
         self.init_params(config_dict)
 
@@ -656,7 +656,7 @@ class Model(object):
 class TextCtrlTag(wx.TextCtrl):
     """
     Simple subclass of wx.TextCtrl for assigning ID tag to class to keep
-    track when passed back in list.
+    track of which parameter it was assigned to. Also method to set value.
     """
     def __init__(self, *args, **kwargs):
         # pop out tag and tag2 if present from args/kwargs
@@ -679,7 +679,7 @@ class TextCtrlTag(wx.TextCtrl):
 class ChoiceCtrlTag(wx.Choice):
     """
     Simple subclass of wx.Choice for assigning ID tag to class to keep
-    track when passed back in list.
+    track of which parameter it was assigned to. Also method to set value.
     """
     def __init__(self, *args, **kwargs):
         # pop out tag if present from args/kwargs
@@ -705,8 +705,10 @@ class ChoiceCtrlTag(wx.Choice):
 
 class FilePickerCtrlTag(wx.FilePickerCtrl):
     """
-    Simple subclass of wx.GenericDirCtrl for assigning ID tag to class to keep
-    track when passed back in list.
+    Simple subclass of wx.FilePickerCtrl for assigning ID tag to class to keep
+    track of which parameter it was assigned to. Also method to set value,
+    which requires category variable to know which panel control is in to
+    edit model accordingly.
     """
     def __init__(self, *args, **kwargs):
         # pop out tag if present from args/kwargs
@@ -1592,7 +1594,6 @@ class ViewController(wx.Frame):
             self.on_stop_button(event)
             StimProgram.MyWindow.close_win()
         self.Close()
-
 
 
 def main():

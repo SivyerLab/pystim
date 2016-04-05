@@ -57,11 +57,10 @@ __status__  = "Beta"
 # logging.console.setLevel(logging.CRITICAL)
 
 # read ini file
-defaults = dict(logsDir='.\\psychopy\\logs\\',
+defaults = dict(logsDir=os.path.abspath('.\psychopy\logs\\'),
                 monitor='blank')
 config = ConfigParser.ConfigParser()
-config.read(os.path.abspath('./psychopy/config.ini'))
-config.read(os.path.abspath("C:\Users\Alex\PycharmProjects\StimulusProgram\psychopy\config.ini"))
+config.read(os.path.abspath('.\psychopy\config.ini'))
 
 
 class StimInfo(object):
