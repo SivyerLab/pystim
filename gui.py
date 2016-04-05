@@ -25,9 +25,11 @@ class Model(object):
         self.motion_param = None
         self.global_default_param = None
 
+        self.gui_params = None
+
         # init params
         config_file = os.path.abspath('.\psychopy\config.ini')
-        config_dict = self.read_config_file(config_file)
+        self.gui_params, config_dict = self.read_config_file(config_file)
         self.init_params(config_dict)
 
     def read_config_file(self, config_file):
@@ -41,23 +43,21 @@ class Model(object):
         config.read(config_file)
 
         default_config_dict = {}
-
-        options = config.options('Defaults')
+        gui_config_dict = {}
 
         # make dict of options
-        for option in options:
+        for option in config.options('Defaults'):
             default_config_dict[option] = config.get('Defaults', option)
 
-        # add GUI specific settings
-        default_config_dict['savedStimDir'] = config.get('GUI', 'savedStimDir')
-        default_config_dict['windowPos'] = config.get('GUI', 'windowPos')
-        # default_config_dict['defaults'] = config.get('GUI', 'defaults')
+        # make dict of gui options
+        for option in config.options('GUI'):
+            gui_config_dict[option] = config.get('GUI', option)
 
         # cast, so that lists are not strings for proper set up of controls
         for key, value in default_config_dict.iteritems():
             default_config_dict[key] = self.try_cast(value)
 
-        return default_config_dict
+        return gui_config_dict, default_config_dict
 
     def try_cast(self, value):
         """
@@ -140,6 +140,14 @@ class Model(object):
             global_dict[param] = self.global_default_param[param]['default']
 
         return global_dict
+
+    def get_gui_params(self):
+        """
+        Getter
+
+        :return: dictionary of gui settings
+        """
+        return self.gui_params
 
     def get_merged_params(self):
         """
@@ -822,7 +830,10 @@ class InputPanel(wx.Panel):
 
         # nest and place sizers
         panel_sizer = wx.BoxSizer()
-        panel_sizer.Add(self.grid_sizer, 1, wx.ALL | wx.EXPAND, border=10)
+        panel_sizer.Add(self.grid_sizer,
+                        proportion=1,
+                        flag=wx.ALL | wx.EXPAND,
+                        border=10)
 
         # set sizer for panel
         self.SetSizer(panel_sizer)
@@ -956,10 +967,12 @@ class InputPanel(wx.Panel):
 
                 # add panels to subpanel sizer
                 for panel in self.sub_panel_dict[param].itervalues():
-                    subpanel_sizer.Add(panel, 1)
+                    subpanel_sizer.Add(panel, proportion=1)
 
                 # add subpanel sizer to panel sizer, spanning both columns
-                self.grid_sizer.Add(subpanel_sizer, pos=(self.grid_counter, 0), span=(1,2))
+                self.grid_sizer.Add(subpanel_sizer,
+                                    pos=(self.grid_counter, 0),
+                                    span=(1,2))
 
                 # increment grid counter
                 self.grid_counter += 1
@@ -1004,25 +1017,25 @@ class InputPanel(wx.Panel):
 
         # some params need to edit global defaults of StimProgram on the fly
         # instead of at window instantiation
+        global_params = self.model.get_global_params()
+
         if param == 'log':
-            StimProgram.GlobalDefaults['log'] = self.model.get_global_params()[
-                'log']
+            StimProgram.GlobalDefaults['log'] = global_params['log']
 
         if param == 'trigger_wait':
             StimProgram.GlobalDefaults['trigger_wait'] = \
-                self.model.get_global_params()['trigger_wait']
+                global_params['trigger_wait']
 
         if param == 'protocol_reps':
             StimProgram.GlobalDefaults['protocol_reps'] = \
-                self.model.get_global_params()['protocol_reps']
+                global_params['protocol_reps']
 
         if param == 'pref_dir':
             StimProgram.GlobalDefaults['pref_dir'] = \
-                self.model.get_global_params()['pref_dir']
+                global_params['pref_dir']
 
         if param == 'background':
-            StimProgram.MyWindow.change_color(self.model.get_global_params()[
-                                                  'background'])
+            StimProgram.MyWindow.change_color(global_params['background'])
 
 
 class GlobalPanel(InputPanel):
@@ -1120,6 +1133,7 @@ class ListPanel(wx.Panel):
                           proportion=1,
                           flag=wx.LEFT | wx.RIGHT,
                           border=5)
+
         up_down_sizer.Add(self.down_button,
                           proportion=1,
                           flag=wx.LEFT | wx.RIGHT,
@@ -1141,13 +1155,14 @@ class ListPanel(wx.Panel):
 
         # add buttons to sizer
         add_remove_sizer.Add(self.add_button,
-                          proportion=1,
-                          flag=wx.LEFT | wx.RIGHT,
-                          border=5)
+                             proportion=1,
+                             flag=wx.LEFT | wx.RIGHT,
+                             border=5)
+
         add_remove_sizer.Add(self.remove_button,
-                          proportion=1,
-                          flag=wx.LEFT | wx.RIGHT,
-                          border=5)
+                             proportion=1,
+                             flag=wx.LEFT | wx.RIGHT,
+                             border=5)
 
         # add up down sizer to panel sizer
         panel_sizer.Add(add_remove_sizer,
@@ -1365,6 +1380,73 @@ class ListPanel(wx.Panel):
                 pass
 
 
+class DirPanel(wx.Panel):
+    """
+    Class for file browser panel.
+    """
+    def __init__(self, parent):
+        """
+        Constructor.
+
+        :param parent:
+        """
+        # super instantiation
+        super(DirPanel, self).__init__(parent)
+
+        # instance attributes
+        self.frame = parent.GetTopLevelParent()
+        self.model = self.frame.model
+
+        # sizer for panel
+        panel_sizer = wx.BoxSizer(wx.VERTICAL)
+
+        # file browser
+        default_dir = self.frame.gui_params['saved_stim_dir']
+        self.browser = wx.FileCtrl(self,
+                                   wildCard='*.txt',
+                                   size=(200, -1),
+                                   defaultDirectory=default_dir)
+
+        # add browser to panel
+        panel_sizer.Add(self.browser,
+                        proportion=1,
+                        flag=wx.EXPAND)
+
+        # make buttons
+        self.save_button = wx.Button(self, id=wx.ID_SAVE)
+        self.load_button = wx.Button(self, label='Load')
+
+        # button sizer
+        button_sizer = wx.BoxSizer(wx.HORIZONTAL)
+
+        # add buttons to sizer
+        button_sizer.Add(self.save_button,
+                         proportion=1,
+                         flag=wx.LEFT | wx.RIGHT,
+                         border=5)
+
+        button_sizer.Add(self.load_button,
+                         proportion=1,
+                         flag=wx.LEFT | wx.RIGHT,
+                         border=5)
+
+        # add button sizer to panel sizer
+        panel_sizer.Add(button_sizer,
+                        border=5,
+                        flag=wx.BOTTOM | wx.TOP |
+                             wx.ALIGN_CENTER_HORIZONTAL |
+                             wx.ALIGN_CENTER_VERTICAL)
+
+        # event binders
+        # self.Bind(wx.EVT_BUTTON, self.on_save_button, self.save_button)
+        # self.Bind(wx.EVT_BUTTON, self.on_load_button, self.load_button)
+        # self.Bind(wx.EVT_FILECTRL_FILEACTIVATED, self.on_double_click,
+        #           self.browser)
+
+        # set sizer to panel
+        self.SetSizer(panel_sizer)
+
+
 class ViewController(wx.Frame):
     """
     Class for generating frame. Instantiates model, notebook, and panels.
@@ -1380,6 +1462,7 @@ class ViewController(wx.Frame):
 
         # instantiate model
         self.model = Model()
+        self.gui_params = self.model.get_gui_params()
 
         # instance attributes
         self.win_open = False
@@ -1419,8 +1502,8 @@ class ViewController(wx.Frame):
         panel_row = wx.BoxSizer(wx.HORIZONTAL)
 
         # add notebook panel and global panel to sizer
-        panel_row.Add(self.input_nb, 1, wx.EXPAND)
-        panel_row.Add(self.panel_global, 1, wx.EXPAND)
+        panel_row.Add(self.input_nb, proportion=1, flag=wx.EXPAND)
+        panel_row.Add(self.panel_global, proportion=1, flag=wx.EXPAND)
 
         # create buttons
         self.run_button = wx.Button(self, label="Run")
@@ -1438,36 +1521,55 @@ class ViewController(wx.Frame):
         stim_buttons_sizer = wx.BoxSizer(wx.HORIZONTAL)
 
         # add to sizer
-        stim_buttons_sizer.Add(self.run_button, 1, border=5,
+        stim_buttons_sizer.Add(self.run_button,
+                               proportion=1,
+                               border=5,
                                flag=wx.LEFT | wx.RIGHT)
-        stim_buttons_sizer.Add(self.stop_button, 1, border=5,
+
+        stim_buttons_sizer.Add(self.stop_button,
+                               proportion=1,
+                               border=5,
                                flag=wx.LEFT | wx.RIGHT)
-        stim_buttons_sizer.Add(self.win_button, 1, border=5,
+
+        stim_buttons_sizer.Add(self.win_button,
+                               proportion=1,
+                               border=5,
                                flag=wx.LEFT | wx.RIGHT)
-        stim_buttons_sizer.Add(self.exit_button, 1, border=5,
+
+        stim_buttons_sizer.Add(self.exit_button,
+                               proportion=1,
+                               border=5,
                                flag=wx.LEFT | wx.RIGHT)
 
         # sizer for input and global panels and buttons
         panel_button_sizer = wx.BoxSizer(wx.VERTICAL)
 
         # add buttons and panels
-        panel_button_sizer.Add(panel_row, 1, wx.EXPAND)
-        panel_button_sizer.Add(stim_buttons_sizer, border=5,
+        panel_button_sizer.Add(panel_row, proportion=1, flag=wx.EXPAND)
+        panel_button_sizer.Add(stim_buttons_sizer,
+                               border=5,
                                flag=wx.BOTTOM | wx.TOP|
                                     wx.ALIGN_CENTER_HORIZONTAL |
                                     wx.ALIGN_CENTER_VERTICAL)
 
-        # instantiate list panel
+        # instantiate list and dir panel
         self.list_panel = ListPanel(self)
+        self.dir_panel = DirPanel(self)
 
         # frame sizer to hold panel button sizer and list panel
         frame_sizer = wx.BoxSizer(wx.HORIZONTAL)
 
-        # add list panel and panel button sizer to frame sizer
+        # add list and dir panel and panel button sizer to frame sizer
+        frame_sizer.Add(self.dir_panel,
+                        proportion=1,
+                        flag=wx.EXPAND | wx.RIGHT,
+                        border=5)
+
         frame_sizer.Add(self.list_panel,
                         proportion=1,
                         flag=wx.EXPAND | wx.RIGHT,
                         border=5)
+
         frame_sizer.Add(panel_button_sizer)
 
         # status bar
