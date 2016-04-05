@@ -1499,7 +1499,46 @@ class DirPanel(wx.Panel):
         # get path from browser
         path = self.browser.GetPath()
 
+        is_log = os.path.split(os.path.split(os.path.dirname(path))[0])[1] ==\
+                 'logs'
 
+        # if not log file, open and load pickle data
+        if not is_log:
+            with open(path, 'rb') as f:
+                to_load = cPickle.load(f)
+
+        # if log file, need to seek to end to find the pickle data
+        else:
+            try:
+                with open(path, 'rb') as f:
+                    # iterate through lines to look for pickle header
+                    next_is_pickle = False
+                    to_load = ''
+
+                    for line in f:
+                        if next_is_pickle:
+                            to_load += line
+
+                        # need to strip newline character
+                        line = line.rstrip()
+                        if line == '#BEGIN PICKLE#':
+                            next_is_pickle = True
+
+                    to_load = cPickle.loads(to_load)
+
+            except ValueError:
+                print '\nERROR: file not a properly formatted parameter file'
+                return
+
+        # load stims in to list panel
+        for params in to_load:
+            # take back out move type
+            stim_type = params.pop('move_type')
+
+            # convert from StimProgram instance label to stim type
+            stim_type = self.frame.list_panel.convert_stim_type(stim_type)
+
+            self.frame.list_panel.add_to_list(stim_type, params)
 
     def on_double_click(self, event):
         """
@@ -1507,7 +1546,19 @@ class DirPanel(wx.Panel):
 
         :param event:
         """
-        pass
+        path = self.browser.GetPath()
+
+        is_log = os.path.split(os.path.split(os.path.dirname(path))[0])[1] ==\
+                 'logs'
+
+        if is_log:
+            if _platform == 'darwin':
+                os.startfile(path)
+            elif _platform == 'win32':
+                os.system('open ' + path)
+
+        else:
+            self.on_load_button(event)
 
 
 class ViewController(wx.Frame):
