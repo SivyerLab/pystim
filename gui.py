@@ -1133,7 +1133,7 @@ class GlobalPanel(InputPanel):
 
         # if new save, add to dropdown
         if save_name not in global_dict.keys():
-            self.which_default.AppendItems([save_name])
+            self.which_default.Append(save_name)
 
         # switch dropdown to save
         self.which_default.SetStringSelection(save_name)
@@ -1153,7 +1153,33 @@ class GlobalPanel(InputPanel):
         # get which entry is selected
         selected = self.which_default.GetStringSelection()
 
+        if selected != '':
+            # global file
+            globals_file = os.path.abspath('.\psychopy\data\global_defaults.txt')
 
+            # get list of saves from file
+            with open(globals_file, 'rb') as f:
+                global_dict = cPickle.load(f)
+
+            # remove from dict
+            del global_dict[selected]
+
+            # redump dict to file
+            with open(globals_file, 'wb') as f:
+                global_dict = cPickle.dump(global_dict, f)
+
+            # add blank spot in control to switch to
+            self.which_default.Append('')
+            self.which_default.SetStringSelection('')
+
+            # delete from controld deleted item
+            index = self.which_default.GetItems().index(selected)
+            self.which_default.Delete(index)
+
+            # delete blank so it can't be selected. Stays currently selected
+            # though
+            index = self.which_default.GetItems().index('')
+            self.which_default.Delete(index)
 
     def on_default_select(self, event):
         """
@@ -1161,7 +1187,27 @@ class GlobalPanel(InputPanel):
 
         :param event:
         """
-        pass
+        selected = event.GetString()
+
+        # global file
+        globals_file = os.path.abspath('.\psychopy\data\global_defaults.txt')
+
+        # get params to load
+        with open(globals_file, 'rb') as f:
+            params_to_load = cPickle.load(f)[selected]
+
+        for param, control in self.frame.all_controls.iteritems():
+            try:
+                if param[-1] != ']':
+                    control.set_value(params_to_load[param])
+
+                else:
+                    index = int(param[-2])
+                    control.set_value(params_to_load[param][index])
+
+            # if not in either dictionary, leave as is
+            except KeyError:
+                pass
 
 
 class ListPanel(wx.Panel):
