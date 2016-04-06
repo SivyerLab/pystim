@@ -706,6 +706,7 @@ class ChoiceCtrlTag(wx.Choice):
 
         :param value: value to be changed to
         """
+        self.SetStringSelection(str(value))
         evt = wx.CommandEvent(wx.EVT_CHOICE.typeId,
                               self.Id)
         evt.SetEventObject(self)
@@ -1098,7 +1099,50 @@ class GlobalPanel(InputPanel):
 
         :param event:
         """
-        pass
+        # popup dialog to enter save name
+        save_name_dialog = wx.TextEntryDialog(self, 'save name')
+
+        # to exit out of popup on cancel
+        if save_name_dialog.ShowModal() == wx.ID_CANCEL:
+            return
+
+        # get entered save name
+        save_name = save_name_dialog.GetValue()
+
+        # get params from model
+        params_to_save = self.model.get_global_params()
+
+        # data folder
+        data_folder = os.path.abspath('./psychopy/data/')
+
+        # create folder if not present
+        if not os.path.exists(data_folder):
+            os.makedirs(data_folder)
+
+        # global file
+        globals_file = os.path.abspath('.\psychopy\data\global_defaults.txt')
+
+        # get saved globals if present
+        if os.path.exists(globals_file):
+            with open(globals_file, 'rb') as f:
+                global_dict = cPickle.load(f)
+
+        # leave dict empty otherwise
+        else:
+            global_dict = {}
+
+        # if new save, add to dropdown
+        if save_name not in global_dict.keys():
+            self.which_default.AppendItems([save_name])
+
+        # switch dropdown to save
+        self.which_default.SetStringSelection(save_name)
+
+        # add entry to global dict and redump to file
+        global_dict[save_name] = params_to_save
+
+        with open(globals_file, 'wb') as f:
+            cPickle.dump(global_dict, f)
 
     def on_default_delete(self, event):
         """
@@ -1106,7 +1150,10 @@ class GlobalPanel(InputPanel):
 
         :param event:
         """
-        pass
+        # get which entry is selected
+        selected = self.which_default.GetStringSelection()
+
+
 
     def on_default_select(self, event):
         """
