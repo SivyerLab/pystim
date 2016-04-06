@@ -1060,22 +1060,61 @@ class GlobalPanel(InputPanel):
         self.title = wx.StaticText(self, label="Global Defaults")
         self.grid_sizer.Add(self.title, pos=(0, 0))
 
-        defaults_list = []
+        # global file
+        globals_file = os.path.abspath('.\psychopy\data\global_defaults.txt')
+
+        # check if file exists, and if so load different options
+        if os.path.exists(globals_file):
+            with open(globals_file, 'rb') as f:
+                global_dict = cPickle.load(f)
+
+            defaults_list = global_dict.keys()
+
+        else:
+            defaults_list = []
 
         self.which_default = ChoiceCtrlTag(self, tag='defaults',
                                            choices=sorted(defaults_list))
-        # self.Bind(wx.EVT_CHOICE, self.on_default_select, self.which_default)
+        self.Bind(wx.EVT_CHOICE, self.on_default_select, self.which_default)
         self.grid_sizer.Add(self.which_default, pos=(0, 1))
+
+        # if global default in ini, select
+        if self.frame.gui_params['defaults'] is not None:
+            self.which_default.set_value(self.frame.gui_params['defaults'])
 
         # save button
         self.save_default = wx.Button(self, size=(-1,-1), id=wx.ID_SAVE)
-        # self.Bind(wx.EVT_BUTTON, self.on_default_save, self.save_default)
+        self.Bind(wx.EVT_BUTTON, self.on_default_save, self.save_default)
         self.grid_sizer.Add(self.save_default, pos=(1, 0))
 
         # delete button
         self.delete_default = wx.Button(self, size=(-1,-1), label='Delete')
-        # self.Bind(wx.EVT_BUTTON, self.on_default_delete, self.delete_default)
+        self.Bind(wx.EVT_BUTTON, self.on_default_delete, self.delete_default)
         self.grid_sizer.Add(self.delete_default, pos=(1, 1))
+
+    def on_default_save(self, event):
+        """
+        Saves global default parameters.
+
+        :param event:
+        """
+        pass
+
+    def on_default_delete(self, event):
+        """
+        Deletes global default parameters.
+
+        :param event:
+        """
+        pass
+
+    def on_default_select(self, event):
+        """
+        Populates global default panel based on saved globals.
+
+        :param event:
+        """
+        pass
 
 
 class ListPanel(wx.Panel):
