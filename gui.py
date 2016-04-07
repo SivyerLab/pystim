@@ -14,7 +14,7 @@ import cPickle
 import os
 
 
-class Model(object):
+class Parameters(object):
     """
     Model to hold parameter data.
     """
@@ -722,7 +722,7 @@ class FilePickerCtrlTag(wx.FilePickerCtrl):
     Simple subclass of wx.FilePickerCtrl for assigning ID tag to class to keep
     track of which parameter it was assigned to. Also method to set value,
     which requires category variable to know which panel control is in to
-    edit model accordingly.
+    edit parameters accordingly.
     """
     def __init__(self, *args, **kwargs):
         # pop out tag if present from args/kwargs
@@ -738,10 +738,11 @@ class FilePickerCtrlTag(wx.FilePickerCtrl):
         """
         if value is not None:
             self.SetPath(value)
-        # set path does not simulate event, so need to manually change in model
-        self.GetTopLevelParent().model.set_param_value(self.category,
-                                                       self.tag,
-                                                       value)
+        # set path does not simulate event, so need to manually change
+        # in parameters
+        self.GetTopLevelParent().parameters.set_param_value(self.category,
+                                                            self.tag,
+                                                            value)
 
 
 class TextCtrlValidator(wx.PyValidator):
@@ -813,7 +814,7 @@ class InputPanel(wx.Panel):
 
         # instance attributes
         self.frame = parent.GetTopLevelParent()
-        self.model = self.frame.model
+        self.parameters = self.frame.parameters
         self.category = category
         self.params = params
 
@@ -985,7 +986,7 @@ class InputPanel(wx.Panel):
 
     def input_update(self, event):
         """
-        Method for updating model on changes to input controls
+        Method for updating parameters on changes to input controls
 
         :param event: wxPython event, passed by binder
         """
@@ -1005,10 +1006,10 @@ class InputPanel(wx.Panel):
         # tag2 (list index)
         if self.params[param]['type'] == 'list':
             index = event.GetEventObject().tag2
-            self.model.set_param_value(self.category, param, value, index=index)
+            self.parameters.set_param_value(self.category, param, value, index=index)
 
         else:
-            self.model.set_param_value(self.category, param, value)
+            self.parameters.set_param_value(self.category, param, value)
 
         # hide/show panels if necessary
         if 'children' in self.params[param]:
@@ -1023,7 +1024,7 @@ class InputPanel(wx.Panel):
 
         # some params need to edit global defaults of StimProgram on the fly
         # instead of at window instantiation
-        global_params = self.model.get_global_params()
+        global_params = self.parameters.get_global_params()
 
         if param == 'log':
             StimProgram.GlobalDefaults['log'] = global_params['log']
@@ -1052,6 +1053,10 @@ class GlobalPanel(InputPanel):
     def __init__(self, parent, params, category):
         # super initiation
         super(GlobalPanel, self).__init__(parent, params, category)
+
+        # instance variables
+        self.frame = self.GetTopLevelParent()
+        self.parameters = self.frame.parameters
 
         # move items down a few slots to insert spacers and titles
         for item in reversed(self.grid_sizer.GetChildren()):
@@ -1112,8 +1117,8 @@ class GlobalPanel(InputPanel):
         # get entered save name
         save_name = save_name_dialog.GetValue()
 
-        # get params from model
-        params_to_save = self.model.get_global_params()
+        # get params from parameters
+        params_to_save = self.parameters.get_global_params()
 
         # data folder
         data_folder = os.path.abspath('./psychopy/data/')
@@ -1225,7 +1230,7 @@ class ListPanel(wx.Panel):
 
         # instance attributes
         self.frame = parent.GetTopLevelParent()
-        self.model = self.frame.model
+        self.parameters = self.frame.parameters
         self.stims_to_run = []
 
         # panel title and its own sizer for proper border spacing
@@ -1359,7 +1364,7 @@ class ListPanel(wx.Panel):
 
         :param event:
         """
-        param_dict = self.model.get_merged_params()
+        param_dict = self.parameters.get_merged_params()
         stim_type = param_dict.pop('move_type')
 
         self.add_to_list(stim_type, param_dict)
@@ -1530,7 +1535,7 @@ class DirPanel(wx.Panel):
 
         # instance attributes
         self.frame = parent.GetTopLevelParent()
-        self.model = self.frame.model
+        self.parameters = self.frame.parameters
 
         # sizer for panel
         panel_sizer = wx.BoxSizer(wx.VERTICAL)
@@ -1694,9 +1699,9 @@ class DirPanel(wx.Panel):
             self.on_load_button(event)
 
 
-class ViewController(wx.Frame):
+class MyFrame(wx.Frame):
     """
-    Class for generating frame. Instantiates model, notebook, and panels.
+    Class for generating frame. Instantiates parameters, notebook, and panels.
     """
     def __init__(self):
         """
@@ -1705,11 +1710,11 @@ class ViewController(wx.Frame):
         """
 
         # super initiation
-        super(ViewController, self).__init__(None, title="Stimulus Program")
+        super(MyFrame, self).__init__(None, title="Stimulus Program")
 
-        # instantiate model
-        self.model = Model()
-        self.gui_params = self.model.get_gui_params()
+        # instantiate parameters
+        self.parameters = Parameters()
+        self.gui_params = self.parameters.get_gui_params()
 
         # instance attributes
         self.win_open = False
@@ -1720,19 +1725,19 @@ class ViewController(wx.Frame):
         self.input_nb = wx.Notebook(self)
 
         # instantiate panels with notebook as parent
-        self.panel_shape = InputPanel(self.model.get_params('shape'),
+        self.panel_shape = InputPanel(self.parameters.get_params('shape'),
                                       self.input_nb,
                                       'shape')
 
-        self.panel_timing = InputPanel(self.model.timing_param,
+        self.panel_timing = InputPanel(self.parameters.timing_param,
                                        self.input_nb,
                                        'timing')
 
-        self.panel_move = InputPanel(self.model.motion_param,
+        self.panel_move = InputPanel(self.parameters.motion_param,
                                      self.input_nb,
                                      'motion')
 
-        self.panel_fill = InputPanel(self.model.fill_param,
+        self.panel_fill = InputPanel(self.parameters.fill_param,
                                      self.input_nb,
                                      'fill')
 
@@ -1743,7 +1748,7 @@ class ViewController(wx.Frame):
         self.input_nb.AddPage(self.panel_move, "Motion")
 
         # instantiate global panel
-        self.panel_global = GlobalPanel(self.model.global_default_param, self, 'global')
+        self.panel_global = GlobalPanel(self.parameters.global_default_param, self, 'global')
 
         # sizer to hold notebook and global panel
         panel_row = wx.BoxSizer(wx.HORIZONTAL)
@@ -1909,7 +1914,7 @@ class ViewController(wx.Frame):
             self.win_open = False
 
         else:
-            global_defaults = self.model.get_global_params()
+            global_defaults = self.parameters.get_global_params()
             # adjust screen number to zero based index
             global_defaults['screen_num'] -= 1
 
@@ -1953,7 +1958,7 @@ def main():
     global app
     app = wx.App(False)
     # instantiate window
-    frame = ViewController()
+    frame = MyFrame()
     # run app
     app.MainLoop()
 
