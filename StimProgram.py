@@ -4,32 +4,42 @@
 Program for presenting visual stimuli to patch clamped retinal neurons.
 """
 
+# Copyright (C) 2016 Alexander Tomlinson
+# Distributed under the terms of the GNU General Public License (GPL).
+
 from GammaCorrection import GammaValues  # necessary for pickling
 from psychopy.tools.coordinatetools import pol2cart
 from psychopy import visual, core, event, filters
 from time import strftime, localtime
 from random import Random
 from PIL import Image
+
+import scipy, scipy.signal
+import sortedcontainers
 import ConfigParser
+import traceback
 import cPickle
-import scipy
 import numpy
+import array
 import copy
 import sys
 import os
 
+global has_igor
 try:
     from igor import binarywave, packed
     has_igor = True
 except ImportError:
     has_igor = False
 
+global has_tabulate
 try:
     from tabulate import tabulate
     has_tabulate = True
 except ImportError:
     has_tabulate = False
 
+global has_u3
 try:
     import u3
     has_u3 = True
@@ -42,18 +52,20 @@ __version__ = "1.1"
 __email__   = "tomlinsa@ohsu.edu"
 __status__  = "Beta"
 
-# to suppress extra warnings, uncomment next lines
+# to suppress extra warnings, uncomment next 2 lines
 # from psychopy import logging
 # logging.console.setLevel(logging.CRITICAL)
 
 # read ini file
+defaults = dict(logsDir='.\\psychopy\\logs\\',
+                monitor='blank')
 config = ConfigParser.ConfigParser()
-config.read('./psychopy/config.ini')
+config.read(os.path.abspath('./psychopy/config.ini'))
+config.read(os.path.abspath("C:\Users\Alex\PycharmProjects\StimulusProgram\psychopy\config.ini"))
 
 
 class StimInfo(object):
-    """
-    Class for storing type and parameters of a stim.
+    """Class for storing type and parameters of a stim.
 
     :param string stim_type: The move type of the stim, such as static,
      random, table, etc.
@@ -69,8 +81,8 @@ class StimInfo(object):
         self.number = number
 
     def __str__(self):
-        """
-        For printing information about the stim's parameters.
+        """For printing information about the stim's parameters.
+
         :return: formatted string of parameter dictionary
         """
         to_print = '\nStim #{} ({}):\n'.format(self.number, self.stim_type)
@@ -85,18 +97,20 @@ class StimInfo(object):
 
 
 class GlobalDefaultsMeta(type):
+    """Metaclass to redefine get item for GlobalDefaults.
     """
-    Metaclass to redefine get item for GlobalDefaults.
-    """
-    def __getitem__(self, item):
-        return self.defaults[item]
+    def __getitem__(self, key):
+        return self.defaults[key]
+
+    def __setitem__(self, key, item):
+        self.defaults[key] = item
 
 
 class GlobalDefaults(object):
-    """
-    Class with global constants, such as window information. Uses dictionary
-    to simulate 'mutable static class variables' (need better, more pythonic,
-    way to do this).
+    """Class with global constants, such as window information. Uses dictionary
+    to simulate 'mutable static class variables'
+
+    TODO: better, more pythonic, way to do this
 
     :param int frame_rate: Frame rate of monitor.
     :param float pix_per_micron: Number of pixels per micron. Used for unit
@@ -107,6 +121,8 @@ class GlobalDefaults(object):
     :param int protocol_reps: Number of repetitions to cycle through of all
      stims.
     :param list background: RGB list of window background.
+    :param float pref_dir: Cell preferred direction. If not -1, overrides
+     start_dir
     :param bool fullscreen: Boolean, whether or not window should be fullscreen.
     :param int screen_num: On which monitor to display the window.
     :param string gamma_correction: Spline to use for gamma correction. See
@@ -129,6 +145,7 @@ class GlobalDefaults(object):
                     position=[0, 0],
                     protocol_reps=1,
                     background=[-1, 0, -1],
+                    pref_dir=-1,
                     fullscreen=False,
                     log=False,
                     screen_num=1,
@@ -143,6 +160,7 @@ class GlobalDefaults(object):
                  position=None,
                  protocol_reps=None,
                  background=None,
+                 pref_dir=None,
                  fullscreen=None,
                  screen_num=None,
                  trigger_wait=None,
@@ -173,6 +191,9 @@ class GlobalDefaults(object):
         if background is not None:
             self.defaults['background'] = background
 
+        if pref_dir is not None:
+            self.defaults['pref_dir'] = pref_dir
+
         if fullscreen is not None:
             self.defaults['fullscreen'] = fullscreen
 
@@ -180,7 +201,8 @@ class GlobalDefaults(object):
             self.defaults['screen_num'] = screen_num
 
         if screen_num is not None:
-            self.defaults['trigger_wait'] = trigger_wait
+            self.defaults['trigger_wait'] = int(trigger_wait * 1.0 *
+                                                frame_rate + 0.99)
 
         if log is not None:
             self.defaults['log'] = log
@@ -193,8 +215,7 @@ class GlobalDefaults(object):
                                        offset[1]]
 
     def __str__(self):
-        """
-        For pretty printing dictionary of global defaults
+        """For pretty printing dictionary of global defaults.
         """
         to_print = '\nGlobal Parameters: \n'
         for k, v in sorted(GlobalDefaults.defaults.items()):
@@ -208,8 +229,7 @@ class GlobalDefaults(object):
 
 
 class MyWindow(object):
-    """
-    Class with static methods for window management and triggering.
+    """Class with static methods for window management and triggering.
     """
 
     # Class attributes
@@ -221,27 +241,39 @@ class MyWindow(object):
     should_break = False
     #: Labjack U3 instance for triggering.
     d = None
+    #: list of frames to trigger on
+    frame_trigger_list = sortedcontainers.SortedList()
+    frame_trigger_list.add(sys.maxint)  # need an extra last value for index
 
     @staticmethod
     def make_win():
-        """
-        Static method to create window from global parameters. Checks if
+        """Static method to create window from global parameters. Checks if
         gamma correction splines are present. Also instantiates labjack if
         present.
         """
+
         # create labjack instance
+        global has_u3
         if has_u3:
-            MyWindow.d = u3.U3()
+            try:
+                MyWindow.d = u3.U3()
+            except Exception as e:
+                print e
+                print 'Is the labjack connected?'
+                has_u3 = False
 
         # check if gamma splines present
         gamma = GlobalDefaults['gamma_correction']
 
         if gamma != 'default':
-            gamma_file = './psychopy/data/gammaTables.txt'
+            gamma_file = os.path.abspath('./psychopy/data/gammaTables.txt')
 
             if os.path.exists(gamma_file):
                 with open(gamma_file, 'rb') as f:
                     MyWindow.gamma_mon = cPickle.load(f)[gamma]
+
+        else:
+            MyWindow.gamma_mon = None
 
         # gamma correction as necessary
         if MyWindow.gamma_mon is not None:
@@ -265,36 +297,43 @@ class MyWindow(object):
 
     @staticmethod
     def close_win():
-        """
-        Static method to close window.
+        """Static method to close window. Also closes labjack if present.
         """
         if has_u3:
             MyWindow.d.close()
         MyWindow.win.close()
 
     @staticmethod
-    def send_trigger():
-        """
-        Triggers recording device by sending short voltage spike from LabJack
-        U3-HV. Spike last approximately 0.4 ms. Ensure high enough sampling
-        rate to reliably detect triggers.
-        """
-        # flip window to clear stims if wait time after trigger/between triggers
-        if has_u3:
-            if GlobalDefaults['trigger_wait'] != 0:
-                MyWindow.win.flip()
+    def change_color(color):
+        try:
+            if MyWindow.win is not None:
+                GlobalDefaults['background'] = color
 
+                if MyWindow.gamma_mon is not None:
+                    color = color = MyWindow.gamma_mon(color)
+
+                MyWindow.win.color = color
+                MyWindow.win.flip()
+                MyWindow.win.flip()
+        except (ValueError, AttributeError):
+            pass
+
+    @staticmethod
+    def send_trigger():
+        """Triggers recording device by sending short voltage spike from LabJack
+        U3-HV. Spike last approximately 0.4 ms if high speed USB (2.0). Ensure
+        high enough sampling rate to reliably detect triggers.
+        """
+
+        if has_u3:
             # voltage spike; 0 is low, 1 is high, on flexible IO #4
             MyWindow.d.setFIOState(4, 1)
             # reset
             MyWindow.d.setFIOState(4, 0)
-            # wait
-            core.wait(GlobalDefaults['trigger_wait'])
 
 
 class StimDefaults(object):
-    """
-    Super class to hold parameter defaults. GUI passes dictionary of all
+    """Super class to hold parameter defaults. GUI passes dictionary of all
     parameters, whether used to make stim or not.
 
     :param string shape: Shape of the stim, 'circle', 'rectangle, or 'annulus'.
@@ -394,6 +433,9 @@ class StimDefaults(object):
     :param int num_jumps:
 
     :param float jump_delay:
+
+    :param float force_stop: time at which stim should end, overrides all
+     other timing. Useful for moving and table stims.
     """
     def __init__(self,
                  shape='circle',
@@ -412,6 +454,7 @@ class StimDefaults(object):
                  alpha=1,
                  color=None,
                  color_mode='intensity',
+                 image_channel='all',
                  fill_seed=1,
                  move_seed=1,
                  speed=10,
@@ -419,11 +462,12 @@ class StimDefaults(object):
                  start_dir=0,
                  start_radius=300,
                  travel_distance=50,
+                 ori_with_dir=False,
                  intensity_dir='both',
                  sf=1,
                  phase=None,
                  phase_speed=None,
-                 contrast_channel='Green',
+                 contrast_channel='green',
                  movie_filename=None,
                  movie_size=None,
                  period_mod=1,
@@ -433,34 +477,43 @@ class StimDefaults(object):
                  trigger=False,
                  move_delay=0,
                  num_jumps=5,
-                 jump_delay=100):
+                 jump_delay=100,
+                 force_stop=0):
         """
         Default variable constructors; distance and time units converted
         appropriately.
         """
         self.shape = shape
         self.fill_mode = fill_mode
+        self.sf = sf
+        self.intensity_dir = intensity_dir
+        self.color_mode = color_mode
+        self.intensity = intensity
+        self.alpha = alpha
         self.orientation = orientation
         self.num_check = num_check
-        self.timing = timing
-        self.intensity = intensity
         self.fill_seed = fill_seed
+        self.timing = timing
+        self.period_mod = period_mod * 2.0 * duration
         self.move_seed = move_seed
         self.num_dirs = num_dirs
-        self.start_dir = start_dir
-        self.intensity_dir = intensity_dir
-        self.sf = sf
-        self.contrast_channel = ['red', 'green', 'blue'].index(contrast_channel)
+        self.ori_with_dir = ori_with_dir
         self.movie_filename = movie_filename
-        self.period_mod = period_mod
         self.image_filename = image_filename
         self.table_filename = table_filename
         self.trigger = trigger
         self.num_jumps = num_jumps
-        self.color_mode = color_mode
-        self.alpha = alpha
+        self.contrast_channel = ['red', 'green', 'blue'].index(contrast_channel)
+        self.image_channel = ['red', 'green', 'blue', 'all'].index(
+                image_channel)
 
-        # list variables
+        # override start dir with global
+        if GlobalDefaults['pref_dir'] != -1:
+            self.start_dir = GlobalDefaults['pref_dir']
+        else:
+            self.start_dir = start_dir
+
+        # mutable variables
         if color is not None:
             self.color = color
         else:
@@ -485,14 +538,15 @@ class StimDefaults(object):
         # time conversions
         self.delay = delay * GlobalDefaults['frame_rate']
         self.duration = duration * GlobalDefaults['frame_rate']
-        self.move_delay = move_delay * GlobalDefaults['frame_rate']
+        self.move_delay = int(move_delay * GlobalDefaults['frame_rate'])
         self.jump_delay = jump_delay * GlobalDefaults['frame_rate']
+        self.force_stop = force_stop * GlobalDefaults['frame_rate']
 
         # speed conversion
         self.speed = speed * (1.0 * GlobalDefaults['pix_per_micron'] /
-                                    GlobalDefaults['frame_rate'])
+                              GlobalDefaults['frame_rate'])
 
-        # list variable with unit conversion
+        # mutable variables with unit conversion
         if location is not None:
             self.location = [location[0] * GlobalDefaults['pix_per_micron'],
                              location[1] * GlobalDefaults['pix_per_micron']]
@@ -533,14 +587,12 @@ class StimDefaults(object):
 
 
 class StaticStim(StimDefaults):
-    """
-    Class for generic non moving stims. Super class for other stim
+    """Class for generic non moving stims. Super class for other stim
     types. Stim object instantiated in make_stim(), and drawn with calls to
     animate().
     """
     def __init__(self, **kwargs):
-        """
-        Passes parameters up to super class. Seeds randoms.
+        """Passes parameters up to super class. Seeds randoms.
         """
         # pass parameters up to super
         super(StaticStim, self).__init__(**kwargs)
@@ -550,7 +602,6 @@ class StaticStim(StimDefaults):
         self.end_stim = None
         self.draw_duration = None
         self.stim = None
-        self.grating_size = None
         self.contrast_adj_rgb = None
 
         # seed fill and move randoms
@@ -560,65 +611,76 @@ class StaticStim(StimDefaults):
         self.move_random.seed(self.move_seed)
 
     def make_stim(self):
+        """Creates instance of psychopy stim object.
         """
-        Creates instance of psychopy stim object.
-        """
-        self.stim = visual.GratingStim(win=MyWindow.win,
-                                       size=self.gen_size(),
-                                       mask=self.gen_mask(),
-                                       tex=self.gen_texture(),
-                                       pos=self.location,
-                                       phase=self.phase,
-                                       ori=self.orientation)
+        if self.fill_mode != 'image':
+            self.stim = visual.GratingStim(win=MyWindow.win,
+                                           size=self.gen_size(),
+                                           mask=self.gen_mask(),
+                                           tex=self.gen_texture(),
+                                           pos=self.location,
+                                           phase=self.phase,
+                                           ori=self.orientation)
 
-        self.stim.sf *= self.sf
+            self.stim.sf *= self.sf
+
+        if self.fill_mode == 'image':
+            image = scipy.misc.toimage(numpy.rot90(self.gen_texture(), 2))
+
+            self.stim = visual.ImageStim(win=MyWindow.win,
+                                         size=self.gen_size(),
+                                         mask=self.gen_mask(),
+                                         image=image,
+                                         pos=self.location,
+                                         ori=self.orientation)
 
     def draw_times(self):
-        """
-        Determines during which frames stim should be drawn, based on desired
+        """Determines during which frames stim should be drawn, based on desired
         delay and duration times.
 
         :return: last frame number as int
         """
-        self.start_stim = self.delay
+        self.start_stim = int(self.delay + 0.99)
+
+        if self.trigger:
+            if self.start_stim not in MyWindow.frame_trigger_list:
+                MyWindow.frame_trigger_list.add(self.start_stim)
 
         self.end_stim = self.duration
         self.end_stim += self.start_stim
-        self.end_stim = int(self.end_stim + 0.99) - 1
+        self.end_stim = int(self.end_stim + 0.99)
 
         self.draw_duration = self.end_stim - self.start_stim
+
+        if self.force_stop != 0:
+            self.end_stim = self.force_stop
 
         return self.end_stim
 
     def animate(self, frame):
-        """
-        Method for drawing stim objects to back buffer. Checks if object
+        """Method for drawing stim objects to back buffer. Checks if object
         should be drawn. Back buffer is brought to front with calls to flip()
-        on the window. Sends trigger at beginning of animation.
+        on the window.
 
-        :param frame: current frame number
+        :param int frame: current frame number
         """
         # check if within animation range
         if self.start_stim <= frame < self.end_stim:
             # adjust colors based on timing
-            if self.fill_mode not in ['movie']:
+            if self.fill_mode not in ['movie', 'image'] and self.timing != \
+                    'step':
                 self.gen_timing(frame)
 
-            # move phase
-            self.gen_phase()
+                # move phase
+                self.gen_phase()
 
             # draw to back buffer
             self.stim.draw()
 
-            # trigger just before first window flip
-            if self.trigger and self.start_stim == frame:
-                MyWindow.send_trigger()
-
     def gen_rgb(self):
-        """
-        Depending on color mode, calculates necessary values. Texture color is
-        either relative to background by specifying intensity in a certain
-        channel, or passed as RGB values by the user.
+        """Depending on color mode, calculates necessary values. Texture
+        color is either relative to background by specifying intensity in a
+        certain channel, or passed as RGB values by the user.
 
         :return: tuple of high, low, delta, and background
         """
@@ -634,7 +696,7 @@ class StaticStim(StimDefaults):
             low = (numpy.array(GlobalDefaults['background'], dtype='float') +
                    1) / 2
 
-            # add alpha
+            # append alpha
             high = numpy.append(high, self.alpha)
             low = numpy.append(low, self.alpha)
 
@@ -663,13 +725,17 @@ class StaticStim(StimDefaults):
             high = high * 2.0 - 1
             low = low * 2.0 - 1
 
+            # gamma correct high and low
+            if MyWindow.gamma_mon is not None and self.fill_mode not in ['image']:
+                high = MyWindow.gamma_mon(high, channel=self.contrast_channel)
+                low = MyWindow.gamma_mon(low, channel=self.contrast_channel)
+
             color = high, low, delta, background
 
         return color
 
     def gen_size(self):
-        """
-        Calculates sizes of various sims.
+        """Calculates sizes of various sims.
 
         :return: size of stim, as float for circles/annuli and height width
          tuple for other shapes
@@ -686,9 +752,8 @@ class StaticStim(StimDefaults):
         return stim_size
 
     def gen_mask(self):
-        """
-        Determines the mask of the stim object. The mask determines the shape of
-        the stim. See psychopy documentation for more details.
+        """Determines the mask of the stim object. The mask determines the
+        shape of the stim. See psychopy documentation for more details.
 
         :return: mask of the stim object, as a string
         """
@@ -701,18 +766,17 @@ class StaticStim(StimDefaults):
         return stim_mask
 
     def gen_texture(self):
-        """
-        Generates texture for stim object. Textures are 3D numpy arrays (
-        size*size*4). The 3rd dimension is RGB and Alpha (transparency)
+        """Generates texture for stim object. Textures are 3D numpy arrays
+        (size*size*4). The 3rd dimension is RGB and Alpha (transparency)
         values.
 
         :return: texture as numpy array
         """
 
         # make array
-        size = (max(self.gen_size()),) * 2  # make square, largest size
-        texture = numpy.zeros(size+(4,))    # add rgba
-        # turn rgb guns off, set opaque
+        size = (max(self.gen_size()),) * 2  # square tuple of largest size
+        texture = numpy.zeros(size+(4,))    # make array, adding rgba
+        # turn colors off, set alpha
         texture[:, :, ] = [-1, -1, -1, self.alpha]
 
         high, low, delta, background = self.gen_rgb()
@@ -762,64 +826,175 @@ class StaticStim(StimDefaults):
             if MyWindow.gamma_mon is not None:
 
                 # data folder
-                data = './psychopy/data/'
-                pics = './psychopy/data/pics/'
+                data_folder = os.path.abspath('./psychopy/data/')
+                pics_folder = os.path.abspath('./psychopy/data/pics/')
 
                 # create folders if not present
-                if not os.path.exists(data):
-                    os.makedirs(data)
-                if not os.path.exists(pics):
-                    os.makedirs(pics)
+                if not os.path.exists(data_folder):
+                    os.makedirs(data_folder)
+                if not os.path.exists(pics_folder):
+                    os.makedirs(pics_folder)
 
                 pic_name = os.path.basename(self.image_filename)
-                pic_name += '_{}_{}.txt'.format(self.gen_size()[0],
-                                                self.gen_size()[1])
+                filename, file_ext = os.path.splitext(pic_name)
+
+                # insert image specific details into filename
+                pic_name = filename + '_' + \
+                           GlobalDefaults['gamma_correction'] + '_' + \
+                           str(self.image_channel) + \
+                           '_{}_{}'.format(self.gen_size()[0],
+                                           self.gen_size()[1]) + \
+                           file_ext
+
+                savedir = os.path.join(pics_folder, pic_name)
 
                 # if not the first time gamma correcting this image
-                if os.path.exists(pics + pic_name):
-                    with open(pics + pic_name, 'rb') as f:
-                        texture = cPickle.load(f)
-                    print 'loaded'
+                if os.path.exists(savedir):
+                    image = Image.open(savedir)
+
+                    # turn into array and flip (different because of indexing
+                    # styles)
+                    texture = numpy.asarray(image) / \
+                              255.0 * 2 - 1
+                    texture = numpy.rot90(texture, 2)
+
+                    # add alpha values
+                    texture = numpy.insert(texture, 3, self.alpha, axis=2)
 
                 # else save gamma correction for faster future loading
                 else:
+                    if file_ext != '.iml':
+                        image = Image.open(self.image_filename)
+
+                        # make smaller for faster correction if possible
+                        if max(image.size) > max(self.gen_size()):
+                            image.thumbnail(self.gen_size(), Image.ANTIALIAS)
+
+                        # rescale rgb
+                        texture = numpy.asarray(image) / 255.0 * 2 - 1
+
+                        # if only want one color channel, remove others
+                        if self.image_channel != 3:
+                            for i in range(3):
+                                if self.image_channel != i:
+                                    texture[:, :, i] = -1
+
+                        # gamma correct (slow step)
+                        texture = MyWindow.gamma_mon(texture)
+
+                        # save for future
+                        if file_ext != '.iml':
+                            scipy.misc.imsave(savedir, texture)
+
+                        # transform due to different indexing
+                        texture = numpy.rot90(texture, 2)
+
+                        # add alpha
+                        texture = numpy.insert(texture, 3, self.alpha, axis=2)
+
+                    else:
+                        with open(self.image_filename, 'rb') as raw_image:
+                            image_bytes = raw_image.read()
+
+                        image_array = array.array('H', image_bytes)
+                        image_array.byteswap()
+
+                        image = numpy.array(image_array, dtype='uint16').reshape(
+                            1024, 1536)
+
+                        maxi = image.max()
+                        if maxi <= 4095:
+                            maxi = 4095
+
+                        image = image.astype(numpy.float64)
+
+                        image = image / maxi
+
+                        if self.image_channel != 3:
+                            texture = numpy.zeros((1024, 1536, 3))
+                            texture[:, :, self.image_channel] = image
+
+                            texture = texture * 2 - 1
+
+                            texture = numpy.rot90(texture, 2)
+
+                            # add alpha values
+                            texture = numpy.insert(texture, 3, self.alpha, axis=2)
+
+                        else:
+                            texture = image * 2 - 1
+
+            # if not gamma correcting
+            else:
+                _, ext = os.path.splitext(self.image_filename)
+                if ext != '.iml':
                     image = Image.open(self.image_filename)
+
                     # make smaller for faster correction if possible
                     if max(image.size) > max(self.gen_size()):
                         image.thumbnail(self.gen_size(), Image.ANTIALIAS)
+
+                    # turn to array
                     texture = numpy.asarray(image) / 255.0 * 2 - 1
-                    # transform due to different indexing
-                    texture = numpy.rot90(texture, 2)
-                    # add alpha
+
+                    # add alpha values
                     texture = numpy.insert(texture, 3, self.alpha, axis=2)
-                    # gamma correct (slow step)
-                    texture = MyWindow.gamma_mon(texture)
 
-                    print 'first time'
-                    with open(pics + pic_name, 'wb') as f:
-                        cPickle.dump(texture, f)
+                # if .iml
+                else:
+                    with open(self.image_filename, 'rb') as raw_image:
+                        image_bytes = raw_image.read()
 
-            else:
-                image = Image.open(self.image_filename)
+                    image_array = array.array('H', image_bytes)
+                    image_array.byteswap()
 
-                # turn to array and flip (different because of indexing styles
-                texture = numpy.asarray(image) / 255.0 * 2 - 1
+                    image = numpy.array(image_array, dtype='uint16').reshape(
+                        1024, 1536)
+
+                    maxi = image.max()
+                    if maxi <= 4095:
+                        maxi = 4095
+
+                    image = image.astype(numpy.float64)
+
+                    image = image / maxi
+
+                    if self.image_channel != 3:
+                        texture = numpy.zeros((1024, 1536, 3))
+                        texture[:, :, self.image_channel] = image
+
+                        texture = texture * 2 - 1
+
+                        # add alpha values
+                        texture = numpy.insert(texture, 3, self.alpha, axis=2)
+
+                    else:
+                        texture = image * 2 - 1
+
+                # flip because of indexing styles
                 texture = numpy.rot90(texture, 2)
 
-                # add alpha values
-                texture = numpy.insert(texture, 3, self.alpha, axis=2)
+                # if only want one color channel, remove others
+                if self.image_channel != 3:
+                    for i in range(3):
+                        if self.image_channel != i:
+                            texture[:, :, i] = -1
 
         # gamma correct
         if MyWindow.gamma_mon is not None and self.fill_mode not in ['image']:
             texture = MyWindow.gamma_mon(texture)
 
+        # make center see through if annuli
+        if self.shape == 'annulus':
+            radius = filters.makeRadialMatrix(self.outer_diameter, radius=1.0/self.outer_diameter)
+            texture[numpy.where(radius < self.inner_diameter)] = [0, 0, 0, -1]
+
         return texture
 
     def gen_timing(self, frame):
-        """
-        Adjusts alpha values of stims based on desired timing (i.e. as a
-        function of current frame over draw time). Recalculated on every call to
-        animate()
+        """Adjusts color values of stims based on desired timing in desired
+        channel(i.e. as a function of current frame over draw time).
+        Recalculated on every call to animate()
 
         TODO: precompute values
 
@@ -828,44 +1003,69 @@ class StaticStim(StimDefaults):
         """
         stim_frame_num = frame - self.start_stim
         time_fraction = stim_frame_num * 1.0 / self.draw_duration
+        texture = self.stim.tex
 
-        # calculate color factors, which are normalized to oscillate between 0
-        # and 1 to avoid negative contrast values
+        _, _, delta, background = self.gen_rgb()
+
         if self.timing == 'sine':
-            alpha_factor = scipy.sin(self.period_mod * scipy.pi *
-                                     time_fraction - scipy.pi / 2) / 2 + 0.5
+            # adjust color
+            if self.intensity_dir == 'both':
+                color = scipy.sin(self.period_mod * scipy.pi *
+                                  time_fraction) * delta + background
+
+            elif self.intensity_dir == 'single':
+                color = scipy.sin(self.period_mod * scipy.pi *
+                                  time_fraction - scipy.pi / 2) * delta + \
+                        background
 
         elif self.timing == 'square':
-            alpha_factor = (scipy.signal.square(self.period_mod * 2 *
-                                                scipy.pi * time_fraction,
-                                                duty=0.5) + 1) / 2
+            if self.intensity_dir == 'both':
+                color = (scipy.signal.square(self.period_mod * scipy.pi *
+                                             time_fraction, duty=0.5) * 2) / \
+                        2 * delta + background
+
+            if self.intensity_dir == 'single':
+                color = scipy.signal.square(self.period_mod * scipy.pi *
+                                            time_fraction, duty=0.5) * delta\
+                        + background
 
         elif self.timing == 'sawtooth':
-            alpha_factor = (scipy.signal.sawtooth(self.period_mod * 2 *
-                                                  scipy.pi * time_fraction,
-                                                  width=1) + 1) / 2
+            if self.intensity_dir == 'both':
+                color = (scipy.signal.sawtooth(self.period_mod * scipy.pi *
+                                               time_fraction, width=0.5) * 2)\
+                        / 2 * delta + background
+
+            if self.intensity_dir == 'single':
+                color = scipy.signal.sawtooth(self.period_mod * scipy.pi *
+                                              time_fraction, width=0.5) * delta\
+                        + background
 
         elif self.timing == 'linear':
-            alpha_factor = time_fraction
+            # if self.intensity_dir == 'both':
+            color = background + delta * (time_fraction * 2 - 1)
 
-        elif self.timing == 'step':
-            alpha_factor = 1
+            # if self.intensity_dir == 'single':
+            #     color = background + delta * time_fraction
 
-        # set alpha channel
-        adj_texture = self.stim.tex
-        adj_texture[:, :, 3] = alpha_factor * self.alpha
+        # unscale
+        color = color * 2 - 1
 
-        self.stim.tex = adj_texture
+        # gamma correct
+        if MyWindow.gamma_mon is not None and self.fill_mode not in ['image']:
+            color = MyWindow.gamma_mon(color, channel=self.contrast_channel)
+
+        texture[:, :, self.contrast_channel] = color
+
+        # print texture[0][0][1]
+        self.stim.tex = texture
 
     def gen_phase(self):
-        """
-        Changes phase of stim on each frame draw.
+        """Changes phase of stim on each frame draw.
         """
         self.stim.phase += (self.phase_speed[0], self.phase_speed[1])
 
     def set_rgb(self, rgb):
-        """
-        Color setter.
+        """Color setter.
 
         :param rgb: tuple or list of rgb values
         """
@@ -873,12 +1073,11 @@ class StaticStim(StimDefaults):
 
 
 class MovingStim(StaticStim):
+    """Class for stims moving radially inwards. Overrides several methods.
     """
-    Class for stims moving radially inwards. Overrides several classes.
-    """
+
     def __init__(self, **kwargs):
-        """
-        Passes parameters up to super class.
+        """Passes parameters up to super class.
         """
         # pass parameters up to super
         super(MovingStim, self).__init__(**kwargs)
@@ -890,61 +1089,69 @@ class MovingStim(StaticStim):
         self.x_array = None
         self.y_array = None
         self.num_frames = None
-        self.trigger_frames = None
+        self.error_count = 0
 
         # to track random motion positions
         self.log = [[], [0], []]  # angle, frame num, position
 
     def draw_times(self):
-        """
-        Determines during which frames stim should be drawn, based on desired
+        """Determines during which frames stim should be drawn, based on desired
         delay and duration times. Overrides super method.
 
         :return: last frame number as int
         """
-        self.start_stim = self.delay
+        self.start_stim = int(self.delay + 0.99)
 
         # need to generate movement to get number of frames
         self.gen_pos()
 
         self.end_stim = self.num_frames * self.num_dirs
         self.end_stim += self.start_stim
-        self.end_stim = int(self.end_stim + 0.99) - 1
+        self.end_stim = int(self.end_stim + 0.99)
 
         self.draw_duration = self.end_stim - self.start_stim
+
+        if self.trigger:
+            for x in range(self.num_dirs):
+                trigger_frame = self.num_frames * x + self.start_stim
+                if trigger_frame not in MyWindow.frame_trigger_list:
+                    MyWindow.frame_trigger_list.add(trigger_frame)
+
+        if self.force_stop != 0:
+            self.end_stim = self.force_stop
 
         return self.end_stim
 
     def animate(self, frame):
-        """
-        Method for animating moving stims. Moves stims appropriately,
-        then makes call to animate of super. Sends trigger on each
-        recalculation of movements.
+        """Method for animating moving stims. Moves stims appropriately,
+        then makes call to animate of super.
 
         :param frame: current frame number
         """
         # check if within animation range
         if self.start_stim <= frame < self.end_stim:
-            # if next coordinate is calculated, moves stim, else calls
+            # if next coordinate is calculated, moves stim, otherwise calls
             # gen_movement() and retries
             try:
                 x, y = self.get_next_pos()
                 self.set_pos(x, y)
 
-                if self.trigger_frames is not None and \
-                        self.trigger_frames[frame]:
-                    MyWindow.send_trigger()
-
                 super(MovingStim, self).animate(frame)
 
+                # to raise errors to stop recursion
+                self.error_count = 0
+
             except (AttributeError, IndexError, TypeError):
+                self.error_count += 1
+                if self.error_count == 2:
+                    raise
+
+                # make new coordinate array
+                # TODO: don't generate on the fly
                 self.gen_pos()
 
                 # log frame number for RandomlyMovingStim
                 self.log[1].append(frame)
-
-                if self.trigger:
-                    MyWindow.send_trigger()
 
                 # retry
                 self.animate(frame)
@@ -966,10 +1173,19 @@ class MovingStim(StaticStim):
             angle -= 360
 
         # orient shape if not an image and fill is uniform
-        if self.fill_mode not in ['image', 'movie'] and self.fill_mode == \
-                'uniform':
-        # if self.fill_mode not in ['image', 'movie']:
-            self.stim.ori = self.start_dir
+        if self.ori_with_dir:
+            self.stim.ori = self.start_dir + self.orientation
+
+        # set start_dir for next call of gen_pos()
+        self.start_dir += 360 / self.num_dirs
+
+        # start_dir cannot be more than 360
+        if self.start_dir >= 360:
+            self.start_dir -= 360
+
+        # add to log
+        self.log[0].append(angle)
+        self.log[2].append(self.get_pos())
 
         # calculate variables
         travel_distance = ((self.current_x**2 + self.current_y**2) ** 0.5) * 2
@@ -982,30 +1198,23 @@ class MovingStim(StaticStim):
                                                         angle)
 
         # add in move delay by placing stim off screen
-        if len(self.stim.size) > 1:
-            max_size = max(self.stim.size)
-        else:
-            max_size = self.stim.size
+        if self.move_delay > 0:
+            if len(self.stim.size) > 1:
+                max_size = max(self.stim.size)
+            else:
+                max_size = self.stim.size
 
-        off_x = (GlobalDefaults['display_size'][0] + max_size) / 2
-        off_y = (GlobalDefaults['display_size'][1] + max_size) / 2
+            off_x = (GlobalDefaults['display_size'][0] + max_size) / 2
+            off_y = (GlobalDefaults['display_size'][1] + max_size) / 2
 
-        for i in range(self.move_delay):
-            self.x_array = scipy.append(self.x_array, off_x)
-            self.y_array = scipy.append(self.y_array, off_y)
+            for i in range(self.move_delay):
+                self.x_array = scipy.append(self.x_array, off_x)
+                self.y_array = scipy.append(self.y_array, off_y)
 
-        self.num_frames += self.move_delay
-
-        # set start_dir for next call of gen_pos()
-        self.start_dir += 360 / self.num_dirs
-
-        # start_dir cannot be more than 360
-        if self.start_dir >= 360:
-            self.start_dir -= 360
+            self.num_frames += self.move_delay
 
     def gen_start_pos(self, direction):
-        """
-        Calculates starting position in x, y coordinates on the starting
+        """Calculates starting position in x, y coordinates on the starting
         radius based on travel direction.
 
         :param direction: starting position on border of frame based on travel
@@ -1018,8 +1227,7 @@ class MovingStim(StaticStim):
         return start_x, start_y
 
     def gen_pos_array(self, start_x, start_y, num_frames, angle):
-        """
-        Creates 2 arrays for x, y coordinates of stims for each frame.
+        """Creates 2 arrays for x, y coordinates of stims for each frame.
 
         Adapted from code By David L. Morton, used under MIT License. Source:
         https://code.google.com/p/computational-neuroscience/source/browse/trunk/projects/electrophysiology/stimuli/randomly_moving_checkerboard_search.py/#40
@@ -1039,9 +1247,9 @@ class MovingStim(StaticStim):
         return x, y
 
     def get_next_pos(self):
-        """
-        Returns the next coordinate from x, y_array for animate to set the
+        """Returns the next coordinate from x, y_array for animate to set the
         position of the stim for the next frame.
+
         :return: x, y coordinate as tuple
         """
         x = self.x_array[self.frame_counter]
@@ -1053,8 +1261,7 @@ class MovingStim(StaticStim):
         return x, y
 
     def set_pos(self, x, y):
-        """
-        Position setter. Necessary for alternate position setting in subclasses.
+        """Position setter. Necessary for alternate position setting in subclasses.
 
         :param x: x coordinate
         :param y: y coordinate
@@ -1062,36 +1269,44 @@ class MovingStim(StaticStim):
         self.stim.setPos((x, y))
 
     def get_pos(self):
-        """
-        Position getter.
+        """Position getter.
         """
         return self.stim.pos
 
 
 class RandomlyMovingStim(MovingStim):
+    """Class for stims moving randomly. Overrides several classes.
     """
-    Class for stims moving randomly. Overrides several classes.
-    """
+
     def __init__(self, **kwargs):
-        """
-        Passes parameters up to super class.
+        """Passes parameters up to super class.
         """
         # pass parameters up to super
         super(RandomlyMovingStim, self).__init__(**kwargs)
 
     def draw_times(self):
-        """
-        Determines during which frames stim should be drawn, based on desired
-        delay and duration times. Uses StaticStim's method.
+        """Determines during which frames stim should be drawn, based on desired
+        delay and duration times.
 
         :return: last frame number as int
         """
         self.gen_pos()
-        return super(MovingStim, self).draw_times()
+
+        self.end_stim = super(MovingStim, self).draw_times()
+
+        if self.trigger:
+            for x in range(int(self.duration / self.num_frames+0.99)):
+                trigger_frame = self.num_frames * x + self.start_stim
+                if trigger_frame not in MyWindow.frame_trigger_list:
+                    MyWindow.frame_trigger_list.add(trigger_frame)
+
+        if self.force_stop != 0:
+            self.end_stim = self.force_stop
+
+        return self.end_stim
 
     def gen_pos(self):
-        """
-        Makes calls to gen_start_pos() and gen_pos_array() with proper
+        """Makes calls to gen_start_pos() and gen_pos_array() with proper
         variables to get new array of position coordinates. Overrides super.
         """
         # update current position
@@ -1118,15 +1333,14 @@ class RandomlyMovingStim(MovingStim):
 
 
 class TableStim(MovingStim):
-    """
-    Class where stim motion is determined by a table of radial coordinates.
+    """Class where stim motion is determined by a table of radial coordinates.
 
     Table can be a text file with new line separated values, or an Igor file
-    in binary wave or packed experiment format. First column is distance from
+    in binary wave/packed experiment format. First column is distance from
     center of window in micrometers, and second column either 0 or 1,
-    for whether or not to trigger. Trigger will occur right before frame with
-    indicated position is flipped. First coordinate will always trigger (if
-    stim is set to trigger).
+    for whether or not to trigger. Trigger will occur right before frame where
+    indicated position is flipped. First and last coordinate will always
+    trigger (if stim is set to trigger).
 
     For a binary wave file, values must be for coordinates, and triggering
     will only happen on first coordinate. For packed experiment files,
@@ -1134,43 +1348,84 @@ class TableStim(MovingStim):
     'wave1' is whether or not to trigger.
     """
     def __init__(self, **kwargs):
-        """
-        Passes parameters up to super.
+        """Passes parameters up to super.
         """
         super(TableStim, self).__init__(**kwargs)
 
+        # instance attributes
+        self.trigger_frames = None
+
     def draw_times(self):
-        """
-        Determines during which frames stim should be drawn, based on desired
+        """Determines during which frames stim should be drawn, based on desired
         delay and duration times. Overrides super method.
 
         :return: last frame number as int
         """
+
         self.start_stim = self.delay
 
         # need to generate movement to get number of frames
         self.gen_pos()
 
-        self.end_stim = self.num_frames + self.start_stim
+        self.end_stim = self.num_frames * self.num_dirs
+        self.end_stim += self.start_stim
+        self.end_stim = int(self.end_stim + 0.99)
 
         self.draw_duration = self.end_stim - self.start_stim
+
+        if self.trigger_frames is not None:
+            if self.trigger:
+                for j in range(self.num_dirs):
+                    for i in self.trigger_frames:
+                        trigger_frame = i + j * self.num_frames
+                        if trigger_frame not in MyWindow.frame_trigger_list:
+                            MyWindow.frame_trigger_list.add(trigger_frame)
+
+        if self.force_stop != 0:
+            self.end_stim = self.force_stop
 
         return self.end_stim
 
     def gen_pos(self):
-        """
-        Overrides super method. Calls gen_pos_array() and resets frame counter.
+        """Overrides super method. Calls gen_pos_array() and resets frame
+        counter.
         """
         self.frame_counter = 0
         self.x_array, self.y_array = self.gen_pos_array()
 
+        # orient shape if not an image and fill is uniform
+        if self.ori_with_dir:
+            self.stim.ori = self.start_dir + self.orientation
+
+        # add in move delay by placing stim off screen
+        if len(self.stim.size) > 1:
+            max_size = max(self.stim.size)
+        else:
+            max_size = self.stim.size
+
+        off_x = (GlobalDefaults['display_size'][0] + max_size) / 2
+        off_y = (GlobalDefaults['display_size'][1] + max_size) / 2
+
+        for i in range(self.move_delay):
+            self.x_array = scipy.append(self.x_array, off_x)
+            self.y_array = scipy.append(self.y_array, off_y)
+
+        self.num_frames += self.move_delay
+
+        # set start_dir for next call of gen_pos()
+        self.start_dir += 360 / self.num_dirs
+
+        # start_dir cannot be more than 360
+        if self.start_dir >= 360:
+            self.start_dir -= 360
+
     def gen_pos_array(self, *args):
-        """
-        Creates 2 arrays for x, y coordinates of stims for each frame.
+        """Creates 2 arrays for x, y coordinates of stims for each frame.
 
         :return: the x, y coordinates of the stim for every frame as 2 arrays
         :raises ImportError: if attempts to load from an Igor file without
-         having the igor module
+         having the igor module.
+        :raises IOError: raised if file contents not properly formatted.
         """
         table = self.table_filename
         radii = None
@@ -1181,8 +1436,9 @@ class TableStim(MovingStim):
                 lines = [line.strip() for line in f]
 
             radii = [i.split()[0] for i in lines]
-            self.trigger_frames = [i.split()[1] for i in lines]
-            self.trigger_frames[0] = 0
+            trigger_list = [i.split()[1] for i in lines]
+            trigger_list[0] = 1
+            trigger_list[-1] = 1  # trigger on last frame
 
         # if igor binary wave format or packed experiment format
         elif os.path.splitext(table)[1] in ['.ibw', '.pxp']:
@@ -1193,7 +1449,7 @@ class TableStim(MovingStim):
                 elif os.path.splitext(table)[1] == '.pxp':
                     radii = packed.load(table)[1]['root']['wave0'].wave[
                         'wave']['wData']
-                    self.trigger_frames = packed.load(table)[1]['root'][
+                    trigger_list = packed.load(table)[1]['root'][
                         'wave1'].wave['wave']['wData']
 
             elif not has_igor:
@@ -1205,10 +1461,16 @@ class TableStim(MovingStim):
         if radii is not None:
             radii = map(float, radii)
         else:
-            raise IOError('File not a supported format. See docs for '
-                          'reference.')
-        if self.trigger_frames is not None:
-            self.trigger_frames = map(int, self.trigger_frames)
+            raise IOError('File contents not a supported format. See docs for '
+                          'reference. Selected file: {}.'.format(self.table_filename))
+
+        if trigger_list is not None:
+            trigger_list = map(int, trigger_list)
+            self.trigger_frames = []
+
+            for i in range(len(trigger_list)):
+                if trigger_list[i] == 1:
+                    self.trigger_frames.append(i)
 
         self.num_frames = len(radii)
 
@@ -1216,15 +1478,28 @@ class TableStim(MovingStim):
         radii = [r * GlobalDefaults['pix_per_micron'] for r in radii]
 
         # make arrays
-        theta = self.start_dir * -1 + 90  # origins are different in pol/cart
+        theta = self.start_dir * -1 - 90  # origins are different in pol/cart
         x, y = map(list, zip(*[pol2cart(theta, r) for r in radii]))
+
+        return x, y
+
+    def get_next_pos(self):
+        """Returns the next coordinate from x, y_array for animate to set the
+        position of the stim for the next frame.
+
+        :return: x, y coordinate as tuple
+        """
+        x = self.x_array[self.frame_counter]
+        y = self.y_array[self.frame_counter]
+
+        # increment frame counter for next frame
+        self.frame_counter += 1
 
         return x, y
 
 
 class ImageJumpStim(StaticStim):
-    """
-    Class to jump through random areas on a larger image.
+    """Class to jump through random areas on a larger image.
 
     Currently broken.
     """
@@ -1233,8 +1508,7 @@ class ImageJumpStim(StaticStim):
         super(ImageJumpStim, self).__init__(**kwargs)
 
     def make_stim(self):
-        """
-        Creates buffer with rendered images. Images are sampled to size of
+        """Creates buffer with rendered images. Images are sampled to size of
         window.
         """
         image = Image.open(self.image_filename)
@@ -1284,19 +1558,16 @@ class ImageJumpStim(StaticStim):
         :param frame: current frame number
         """
         if self.start_stim <= frame < self.end_stim:
-            # send trigger at just before first frame that stim object is drawn
-            if self.trigger and self.start_stim == frame:
-                MyWindow.send_trigger()
             i = frame - self.delay * GlobalDefaults.defaults['frame_rate']
             # draw to back buffer
             self.stim[i].draw()
 
 
+# function because inheritance is conditional
 def board_texture_class(bases, **kwargs):
 
     class BoardTexture(bases):
-        """
-        Class for checkerboard or random board textures. Rather than grating
+        """Class for checkerboard or random board textures. Rather than grating
         stims, stims are ElementArrayStims and thus need to override several
         methods related to stim creation and positioning, but otherwise
         implement parent methods.
@@ -1313,8 +1584,7 @@ def board_texture_class(bases, **kwargs):
             self.colors = None
 
         def make_stim(self):
-            """
-            Creates instance of psychopy stim object.
+            """Creates instance of psychopy stim object.
             """
             # array of coordinates for each element
             xys = []
@@ -1358,31 +1628,30 @@ def board_texture_class(bases, **kwargs):
                                                 sizes=(self.check_size[0],
                                                        self.check_size[1]))
 
+            self.stim.size = (self.check_size[0] * self.num_check,
+                              self.check_size[1] * self.num_check)
+
         def gen_timing(self, frame):
-            """
-            ElementArrayStim does not support assigning alpha values.
+            """ElementArrayStim does not support assigning alpha values.
 
             :param frame: current frame number
             """
             pass
 
         def gen_phase(self):
-            """
-            ElementArrayStim does not support texture phase.
+            """ElementArrayStim does not support texture phase.
             """
             pass
 
         def set_rgb(self, colors):
-            """
-            Colors setter.
+            """Colors setter.
 
             :param colors: array of rgb values for each element
             """
             self.stim.setColors(colors)
 
         def set_pos(self, x, y):
-            """
-            Position setter. Moves entire array of elements
+            """Position setter. Moves entire array of elements
 
             :param x: x coordinate
             :param y: y coordinate
@@ -1390,8 +1659,7 @@ def board_texture_class(bases, **kwargs):
             self.stim.setFieldPos((x, y))
 
         def get_pos(self):
-            """
-            Position getter.
+            """Position getter.
             """
             return self.stim.fieldPos
 
@@ -1401,20 +1669,17 @@ def board_texture_class(bases, **kwargs):
 def movie_stim_class(bases, **kwargs):
 
     class MovieStim(bases):
-        """
-        Movie stims require a unique animate() method, but are otherwise
+        """Movie stims require a unique animate() method, but are otherwise
         similar to other stims.
         """
         def __init__(self):
-            """
-            Passes parameters up to super class.
+            """Passes parameters up to super class.
             """
             # pass parameters up to super
             super(MovieStim, self).__init__(**kwargs)
 
         def make_stim(self):
-            """
-            Creates instance of psychopy stim object.
+            """Creates instance of psychopy stim object.
             """
             self.stim = visual.MovieStim(win=MyWindow.win,
                                          filename=self.movie_filename,
@@ -1426,7 +1691,7 @@ def movie_stim_class(bases, **kwargs):
             """
             Method for drawing stim objects to back buffer. Checks if object
             should be drawn. Back buffer is brought to front with calls to
-            flip() on the window. Sends trigger at beginning of animation.
+            flip() on the window.
 
             :param frame: current frame number
             """
@@ -1441,8 +1706,7 @@ def movie_stim_class(bases, **kwargs):
 
 def log_stats(count_reps, reps, count_frames, num_frames, elapsed_time,
               stim_list, to_animate, time_at_run):
-    """
-    Function to write information about stims to file.
+    """Function to write information about stims to file.
 
     :param count_reps: Elapsed reps.
     :param reps: Total possible reps.
@@ -1450,6 +1714,7 @@ def log_stats(count_reps, reps, count_frames, num_frames, elapsed_time,
     :param num_frames: Total possible frames.
     :param elapsed_time: Elapsed time
     :param stim_list: List of stims that ran.
+    :param to_animate: List of stims animated (includes annuli)
     :param time_at_run: Time at which stims were run
     """
     current_time = time_at_run
@@ -1489,8 +1754,8 @@ def log_stats(count_reps, reps, count_frames, num_frames, elapsed_time,
                 format(count_reps * num_frames + count_frames, reps *
                        num_frames))
 
-        f.write("Average fps: {0:.2f} hz.".
-                format((count_reps * num_frames + count_frames) / elapsed_time))
+        average_fps = (count_reps * num_frames + count_frames) / elapsed_time
+        f.write("Average fps: {0:.2f} hz.".format(average_fps))
 
         f.write("\nElapsed time: {0:.3f} seconds.\n".format(elapsed_time))
 
@@ -1512,65 +1777,73 @@ def log_stats(count_reps, reps, count_frames, num_frames, elapsed_time,
         f.write(cPickle.dumps(to_write))
 
     for i in range(len(stim_list)):
-        if stim_list[i].stim_type == 'RandomlyMovingStim' and stim_list[
-            i].parameters['shape'] != 'annulus':
+        if stim_list[i].parameters['shape'] != 'annulus':
 
-            file_name = 'Randomlog_' + current_time_string + '_' + '.txt'
-            with open((path+file_name), 'w') as f:
+            if stim_list[i].stim_type == 'RandomlyMovingStim':
+                file_name = 'Randomlog_' + current_time_string + '_' + '.txt'
 
-                if has_tabulate:
-                    # nicer formatting
-                    temp = []
+            if stim_list[i].stim_type == 'MovingStim':
+                file_name = 'Movinglog_' + current_time_string + '_' + '.txt'
+
+            if stim_list[i].stim_type in ['RandomlyMovingStim', 'MovingStim']:
+
+                with open((path+file_name), 'w') as f:
+
+                    if has_tabulate:
+                        # nicer formatting
+                        temp = []
+                        for j in range(len(to_animate[i].log[0])):
+                            temp.append([to_animate[i].log[0][j],
+                                         to_animate[i].log[1][j],
+                                         scipy.around(to_animate[i].log[2][j][0], 2),
+                                         scipy.around(to_animate[i].log[2][j][1], 2)])
+
+                        f.write(tabulate(temp,
+                                         headers=['angle', 'frame', 'pos x', 'pos y'],
+                                         tablefmt="orgtbl"))
+
+                    # ugly formatting
+                    else:
+                        for j in range(len(to_animate[i].log[0])):
+                            f.write('angle: ')
+                            f.write(str(to_animate[i].log[0][j]))
+                            f.write(' frame: ')
+                            f.write(str(to_animate[i].log[1][j]))
+                            f.write(' position: ')
+                            f.write(str(to_animate[i].log[2][j][0]))
+                            f.write(', ')
+                            f.write(str(to_animate[i].log[2][j][1]))
+                            f.write('\n')
+
+                    f.write('\n\nangle list:\n')
+
                     for j in range(len(to_animate[i].log[0])):
-                        temp.append([to_animate[i].log[0][j],
-                                     to_animate[i].log[1][j],
-                                     scipy.around(to_animate[i].log[2][j][0], 2),
-                                     scipy.around(to_animate[i].log[2][j][1], 2)])
-
-                    f.write(tabulate(temp,
-                                     headers=['angle', 'frame', 'pos x', 'pos y'],
-                                     tablefmt="orgtbl"))
-
-                else:
-                    for j in range(len(to_animate[i].log[0])):
-                        f.write('angle: ')
                         f.write(str(to_animate[i].log[0][j]))
-                        f.write(' frame: ')
+                        f.write('\n')
+
+                    f.write('\nframe list:\n')
+
+                    for j in range(len(to_animate[i].log[0])):
                         f.write(str(to_animate[i].log[1][j]))
-                        f.write(' position: ')
+                        f.write('\n')
+
+                    f.write('\nx position list:\n')
+
+                    for j in range(len(to_animate[i].log[0])):
                         f.write(str(to_animate[i].log[2][j][0]))
-                        f.write(', ')
+                        f.write('\n')
+
+                    f.write('\ny position list:\n')
+
+                    for j in range(len(to_animate[i].log[0])):
                         f.write(str(to_animate[i].log[2][j][1]))
                         f.write('\n')
 
-                f.write('\n\nangle list:\n')
-
-                for j in range(len(to_animate[i].log[0])):
-                    f.write(str(to_animate[i].log[0][j]))
-                    f.write('\n')
-
-                f.write('\nframe list:\n')
-
-                for j in range(len(to_animate[i].log[0])):
-                    f.write(str(to_animate[i].log[1][j]))
-                    f.write('\n')
-
-                f.write('\nx position list:\n')
-
-                for j in range(len(to_animate[i].log[0])):
-                    f.write(str(to_animate[i].log[2][j][0]))
-                    f.write('\n')
-
-                f.write('\ny position list:\n')
-
-                for j in range(len(to_animate[i].log[0])):
-                    f.write(str(to_animate[i].log[2][j][1]))
-                    f.write('\n')
+    return current_time_string
 
 
 def main(stim_list, verbose=True):
-    """
-    Function to animate stims. Creates instances of stim types, and makes
+    """Function to animate stims. Creates instances of stim types, and makes
     necessary calls to animate stims and flip window.
 
     :param stim_list: List of StimInfo classes.
@@ -1594,87 +1867,104 @@ def main(stim_list, verbose=True):
     MyWindow.should_break = False
 
     # outer loop for number of reps
-    for x in range(reps):
-        # prep stims
-        to_animate = []
+    try:
+        for x in range(reps):
+            # prep stims
+            to_animate = []
 
-        for stim in stim_list:
-            # checkerboard and movie inheritance depends on motion type,
-            # so instantiate accordingly
-            if stim.parameters['fill_mode'] in ['checkerboard', 'random']:
-                to_animate.append(board_texture_class(globals()[
-                                                          stim.stim_type],
-                                  **stim.parameters))
-            elif stim.parameters['fill_mode'] == 'movie':
-                to_animate.append(movie_stim_class(globals()[stim.stim_type],
-                                  **stim.parameters))
+            for stim in stim_list:
+                # print stim.number
+                # checkerboard and movie inheritance depends on motion type,
+                # so instantiate accordingly
+                if stim.parameters['fill_mode'] in ['checkerboard', 'random']:
+                    to_animate.append(board_texture_class(globals()[
+                                                              stim.stim_type],
+                                      **stim.parameters))
+                elif stim.parameters['fill_mode'] == 'movie':
+                    to_animate.append(movie_stim_class(globals()[stim.stim_type],
+                                      **stim.parameters))
 
-            # all other stims, instantiate by looking up class in globals(), and
-            # pass dictionary of parameters
-            else:
-                to_animate.append(globals()[stim.stim_type](**stim.parameters))
+                # all other stims, instantiate by looking up class in
+                # globals(), and passing dictionary of parameters
+                else:
+                    to_animate.append(globals()[stim.stim_type](**stim.parameters))
 
-            # annuli are handled by creating a duplicate smaller nested
-            # circle within the larger circle, and setting its color to
-            # background and its timing to instant
-            if stim.parameters['shape'] == 'annulus':
-                # make necessary changes
-                stim.parameters['timing'] = 'step'
-                stim.parameters['color'] = GlobalDefaults['background']
-                stim.parameters['intensity'] = 0
-                stim.parameters['fill_mode'] = 'uniform'
-                stim.parameters['outer_diameter'] = stim.parameters[
-                    'inner_diameter']
-
-                # add
-                to_animate.append(globals()[stim.stim_type](**stim.parameters))
-
-        # generate stims
-        for stim in to_animate:
-            stim.make_stim()
-
-        # determine end time of last stim
-        num_frames = max(stim.draw_times() for stim in to_animate)
-        # round up, then subtract 1 because index starts at 0
-        # num_frames = int(num_frames + 0.99) - 1
-
-        # clock for timing
-        elapsed_time = core.MonotonicClock()
-
-        # draw stims and flip window
-        for frame in xrange(num_frames):
+            # generate stims
             for stim in to_animate:
-                stim.animate(frame)
+                stim.make_stim()
+
+            # reset frame trigger times
+            del MyWindow.frame_trigger_list[:-1]
+
+            # determine end time of last stim
+            num_frames = max(stim.draw_times() for stim in to_animate)
+
+            # draw stims and flip window
+            if GlobalDefaults['trigger_wait'] != 0:
+                MyWindow.win.callOnFlip(MyWindow.send_trigger)
+                # print 'trigger'
             MyWindow.win.flip()
 
-            # escape key breaks if focus on window
-            for key in event.getKeys(keyList=['escape']):
-                if key in ['escape']:
-                    MyWindow.should_break = True
+            if GlobalDefaults['trigger_wait'] != 0:
+                for y in xrange(GlobalDefaults['trigger_wait'] - 1):
+                    MyWindow.win.flip()
 
-            # inner break
+            index = 0
+            # clock for timing
+            elapsed_time = core.MonotonicClock()
+
+            win_list = []
+
+            for frame in xrange(num_frames):
+                for stim in to_animate:
+                    stim.animate(frame)
+
+                # win_list.append(visual.BufferImageStim(MyWindow.win).image)
+
+                MyWindow.win.flip()
+
+                # save as movie?
+                # MyWindow.win.getMovieFrame()
+
+                if frame == MyWindow.frame_trigger_list[index]:
+                    MyWindow.send_trigger()
+                    # print frame, 'triggered'
+                    index += 1
+
+                # escape key breaks if focus on window
+                for key in event.getKeys(keyList=['escape']):
+                    if key in ['escape']:
+                        MyWindow.should_break = True
+
+                # inner break
+                if MyWindow.should_break:
+                    count_frames = frame + 1
+                    # count_elapsed_time += elapsed_time.getTime()
+                    break
+
+            # get elapsed time for fps
+            count_elapsed_time += elapsed_time.getTime()
+
+            # stop movies from continuing in background
+            for stim in to_animate:
+                if stim.fill_mode == 'movie':
+                    stim.stim.pause()
+
+            # outer break
             if MyWindow.should_break:
-                count_frames = frame + 1
-                # count_elapsed_time += elapsed_time.getTime()
+                print '\n Interrupt!'
                 break
 
-        # get elapsed time for fps
-        count_elapsed_time += elapsed_time.getTime()
+            count_reps += 1
+    except Exception as e:
+        traceback.print_exc()
+        return str(e), 'error', None
 
-        # stop movies from continuing in background
-        for stim in to_animate:
-            if stim.fill_mode == 'movie':
-                stim.stim.pause()
-
-        # outer break
-        if MyWindow.should_break:
-            print '\n Interrupt!'
-            break
-
-        count_reps += 1
-
-    # one last flip to clear window
-    MyWindow.win.flip()
+    # one last flip to clear window if still open
+    try:
+        MyWindow.win.flip()
+    except AttributeError:
+        pass
 
     # print some stats
     if verbose:
@@ -1686,17 +1976,26 @@ def main(stim_list, verbose=True):
         print "\n{} rep(s) of {} stim(s) generated.". \
             format(reps, len(stim_list))
         print "{}/{} frames displayed.". \
-            format(count_reps * (num_frames+1) + count_frames, reps *
-                   (num_frames+1)),
+            format(count_reps * (num_frames) + count_frames, reps *
+                   (num_frames)),
         print "Average fps: {0:.2f} hz.". \
-            format((count_reps * (num_frames+1) + count_frames) / count_elapsed_time)
+            format((count_reps * (num_frames) + count_frames) / count_elapsed_time)
         print "Elapsed time: {0:.3f} seconds.\n". \
             format(count_elapsed_time)
 
+    time_stamp = None
 
     if GlobalDefaults['log']:
-        log_stats(count_reps, reps, count_frames, num_frames,
-                  count_elapsed_time, stim_list, to_animate, current_time)
+        time_stamp = log_stats(count_reps, reps, count_frames, num_frames,
+                               count_elapsed_time, stim_list, to_animate,
+                               current_time)
+
+    fps = (count_reps * num_frames + count_frames) / count_elapsed_time
+
+    # test of saving movies
+    # MyWindow.win.saveMovieFrames('testMGP.mpg')
+
+    return fps, count_elapsed_time, time_stamp
 
 if __name__ == '__main__':
     pass

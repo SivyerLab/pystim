@@ -46,7 +46,7 @@ def setup():
               windows= [
                   {
                       'script' : 'gui.py',
-                      'icon_resources' : [(1, 'icon1.ico')]
+                      # 'icon_resources' : [(1, 'icon1.ico')]
                   }
               ],
               options={
@@ -93,7 +93,7 @@ def setup():
               options={
                   'py2app': {
                       'packages' : ['PIL'],
-                      'iconfile' : 'icon1.ico',
+                      # 'iconfile' : 'icon1.ico',
                       'includes' : ['scipy.*', 'scipy.integrate',
                                     'scipy.special.*', 'scipy.linalg.*',
                                     'scipy.integrate',

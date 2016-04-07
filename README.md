@@ -3,9 +3,10 @@
 ### What is it?
 
 Stimulus Program uses the [Psychopy](www.psychopy.org) library to create
-various visual stimuli for use with patch clamp retinal cells. It comes with 
+various visual stimuli for use with patch clamped retinal cells. It comes with 
 a GUI for ease of use. The program is capable of running at 60 fps and 
-triggering recording devices (using a LabJack U3).
+triggering recording devices (using a LabJack U3). The GUI uses wx, and so 
+appears with a native theme.
 
 ### Latest Version
 
@@ -15,17 +16,25 @@ functional.
 
 ### Documentation
 
-Documentation is included in HTML format the docs/html/ directory. Further
-documentation on Psychopy can be found at www.psychopy.org.
+Documentation is included in HTML format in the docs/html/ directory. Further
+documentation on Psychopy can be found on the psychopy [website](www.psychopy.org).
 
 ### Installation
 
-Stimulus program is tested and works on both OSX and Windows. Stimulus
-program requires several libraries, along with their associated dependencies,
+Stimulus Program is tested and works on both OSX and Windows. Stimulus
+Program requires several libraries, along with their associated dependencies,
 to run. They are listed below:
 
-- psychopy (see psychopy [documentation](http://www.psychopy.org/documentation.html) for required dependencies)
-- wxPython (for GUI)
+- psychopy (see psychopy [documentation](http://www.psychopy.org/documentation.html) 
+for required [dependencies](http://www.psychopy.org/installation
+.html#essential-packages)). Psychopy is available through:
+
+```
+    pip install psychopy
+```
+
+- [wxPython](http://www.wxpython.org/download.php) (for GUI)
+- sortedcontainers (also available through pip)
 
 Optional libraries:
 
@@ -39,16 +48,12 @@ triggering from LabJack)
 Stimulus Program is licensed under GNU GPL v3.0. See [LICENSE](LICENSE.md)
 file for license rights and limitations.
 
-### Screen Shots
+### Screen Shots (Windows 7)
 
-Main screen:
+Main screen with queued stims:
 
-![main screen](docs/screenshots/screen1.png)
+![main screen](docs/screenshots/screen1.PNG)
 
-Stims to run:
+Example stimuli:
 
-![stims added](docs/screenshots/screen3.png)
-
-Example stimulus:
-
-![example](docs/screenshots/screen4.png)
+![example](docs/screenshots/screen4.PNG)
