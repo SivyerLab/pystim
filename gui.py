@@ -1070,11 +1070,12 @@ class GlobalPanel(InputPanel):
         self.grid_sizer.Add(self.title, pos=(0, 0))
 
         # global file
-        globals_file = os.path.abspath('.\psychopy\data\global_defaults.txt')
+        self.globals_file = os.path.abspath(
+            '.\psychopy\data\global_defaults_new.txt')
 
         # check if file exists, and if so load different options
-        if os.path.exists(globals_file):
-            with open(globals_file, 'rb') as f:
+        if os.path.exists(self.globals_file):
+            with open(self.globals_file, 'rb') as f:
                 global_dict = cPickle.load(f)
 
             defaults_list = global_dict.keys()
@@ -1127,12 +1128,9 @@ class GlobalPanel(InputPanel):
         if not os.path.exists(data_folder):
             os.makedirs(data_folder)
 
-        # global file
-        globals_file = os.path.abspath('.\psychopy\data\global_defaults.txt')
-
         # get saved globals if present
-        if os.path.exists(globals_file):
-            with open(globals_file, 'rb') as f:
+        if os.path.exists(self.globals_file):
+            with open(self.globals_file, 'rb') as f:
                 global_dict = cPickle.load(f)
 
         # leave dict empty otherwise
@@ -1149,7 +1147,7 @@ class GlobalPanel(InputPanel):
         # add entry to global dict and redump to file
         global_dict[save_name] = params_to_save
 
-        with open(globals_file, 'wb') as f:
+        with open(self.globals_file, 'wb') as f:
             cPickle.dump(global_dict, f)
 
     def on_default_delete(self, event):
@@ -1162,18 +1160,16 @@ class GlobalPanel(InputPanel):
         selected = self.which_default.GetStringSelection()
 
         if selected != '':
-            # global file
-            globals_file = os.path.abspath('.\psychopy\data\global_defaults.txt')
 
             # get list of saves from file
-            with open(globals_file, 'rb') as f:
+            with open(self.globals_file, 'rb') as f:
                 global_dict = cPickle.load(f)
 
             # remove from dict
             del global_dict[selected]
 
             # redump dict to file
-            with open(globals_file, 'wb') as f:
+            with open(self.globals_file, 'wb') as f:
                 global_dict = cPickle.dump(global_dict, f)
 
             # add blank spot in control to switch to
@@ -1197,11 +1193,8 @@ class GlobalPanel(InputPanel):
         """
         selected = event.GetString()
 
-        # global file
-        globals_file = os.path.abspath('.\psychopy\data\global_defaults.txt')
-
         # get params to load
-        with open(globals_file, 'rb') as f:
+        with open(self.globals_file, 'rb') as f:
             params_to_load = cPickle.load(f)[selected]
 
         for param, control in self.frame.all_controls.iteritems():
