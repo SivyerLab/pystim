@@ -6,11 +6,11 @@ Test of MVC framework for GUI.
 
 from sys import platform as _platform
 from collections import OrderedDict
+from copy import deepcopy
 import ConfigParser
 import StimProgram
 import wx, wx.grid
 import cPickle
-import copy
 import os
 
 
@@ -59,6 +59,9 @@ class Model(object):
         for key, value in default_config_dict.iteritems():
             default_config_dict[key] = self.try_cast(value)
 
+        for key, value in gui_config_dict.iteritems():
+            gui_config_dict[key] = self.try_cast(value)
+
         return gui_config_dict, default_config_dict
 
     def try_cast(self, value):
@@ -101,7 +104,7 @@ class Model(object):
                             pass
 
         else:
-            print value
+            pass
 
         return value
 
@@ -128,7 +131,7 @@ class Model(object):
         """
         trans = self.trans(category)
 
-        return copy.deepcopy(trans)
+        return deepcopy(trans)
 
     def get_global_params(self):
         """"
@@ -168,8 +171,7 @@ class Model(object):
             for param in param_dict.keys():
                 merged_params[param] = param_dict[param]['default']
 
-        return merged_params
-
+        return deepcopy(merged_params)
 
     def set_param_value(self, category, param, value, index=None):
         """
@@ -188,7 +190,7 @@ class Model(object):
         else:
             trans[param]['default'][index] = value
 
-        print '{} set to {}.'.format(param, repr(trans[param]['default']))
+        # print '{} set to {}.'.format(param, repr(trans[param]['default']))
 
     def get_param_value(self, category, param, index=None):
         """
@@ -697,6 +699,7 @@ class ChoiceCtrlTag(wx.Choice):
         # check if part of table
         self.in_table = kwargs.pop('in_table', None)
         # pop out value (only textctrl has value)
+        # doesn't work if lower case value
         self.Value = kwargs.pop('Value', None)
         wx.Choice.__init__(self, *args, **kwargs)
 
@@ -957,7 +960,7 @@ class InputPanel(wx.Panel):
                     # dict entry found in param dict. Need to make copy or
                     # else changes will make changes wrong dict
                     for child_param in child_params:
-                        child_param_dict[child_param] = copy.deepcopy(
+                        child_param_dict[child_param] = deepcopy(
                             self.params[child_param])
 
                     # iterate through new child param dict and reset is_child
@@ -1198,12 +1201,12 @@ class GlobalPanel(InputPanel):
 
         for param, control in self.frame.all_controls.iteritems():
             try:
+                # if not a list text control
                 if param[-1] != ']':
                     control.set_value(params_to_load[param])
-
                 else:
                     index = int(param[-2])
-                    control.set_value(params_to_load[param][index])
+                    control.set_value(params_to_load[param[:-3]][index])
 
             # if not in either dictionary, leave as is
             except KeyError:
@@ -1492,22 +1495,20 @@ class ListPanel(wx.Panel):
         """
         selected = self.list_control.GetFirstSelected()
         stim = self.stims_to_run[selected]
-        params = stim.parameters
+        # copy so adding move type doesn't affect StimInfo instance
+        params = deepcopy(stim.parameters)
 
         stim_type = self.convert_stim_type(stim.stim_type)
         params['move_type'] = stim_type
 
-        self.frame.all_controls['shape'].set_value(params['shape'])
-        self.frame.all_controls['orientation'].set_value(params['orientation'])
-
         for param, control in self.frame.all_controls.iteritems():
             try:
+                # if not a list text control
                 if param[-1] != ']':
                     control.set_value(params[param])
-
                 else:
                     index = int(param[-2])
-                    control.set_value(params[param][index])
+                    control.set_value(params[param[:-3]][index])
 
             # if not in either dictionary, leave as is
             except KeyError:
@@ -1604,7 +1605,7 @@ class DirPanel(wx.Panel):
         stims = self.frame.list_panel.stims_to_run
 
         for i, stim in enumerate(stims):
-            params = copy.deepcopy(stim.parameters)
+            params = deepcopy(stim.parameters)
             # add move type back in to parameters
             params['move_type'] = stim.stim_type
             # add to save list
