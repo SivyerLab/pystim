@@ -4,7 +4,7 @@
 Test of MVC framework for GUI.
 """
 
-from sys import platform as _platform
+from sys import platform
 from collections import OrderedDict
 from copy import deepcopy
 import ConfigParser
@@ -180,6 +180,7 @@ class Parameters(object):
         :param category: which dictionary the param is in
         :param param: the param to be edited
         :param value: the value the param is being set to
+        :parma index: if a list value param, where in the list
         """
         trans = self.trans(category)
 
@@ -198,6 +199,7 @@ class Parameters(object):
 
         :param category: which dictionary the param is in
         :param param: the param to be returned
+        :parma index: if a list value param, where in the list
         """
         trans = self.trans(category)
 
@@ -345,17 +347,21 @@ class Parameters(object):
             ('fill_mode',
              {'type'    : 'choice',
               'label'   : 'fill mode',
-              'choices' : ['uniform', 'sine', 'square', 'concentric', 'checkerboard',
-                           'random', 'image', 'movie'],
+              'choices' : ['uniform', 'sine', 'square', 'concentric',
+                           'checkerboard', 'random', 'image', 'movie'],
               'default' : config_dict['fill_mode'],
               'is_child': False,
               'children': {
-                  'sine'        : ['intensity_dir', 'sf', 'phase', 'phase_speed'],
-                  'square'      : ['intensity_dir', 'sf', 'phase', 'phase_speed'],
-                  'concentric'  : ['intensity_dir', 'sf', 'phase', 'phase_speed'],
-                  'checkerboard': ['check_size', 'num_check', 'phase', 'intensity_dir'],
-                  'random'      : ['check_size', 'num_check', 'fill_seed', 'phase',
+                  'sine'        : ['intensity_dir', 'sf', 'phase',
+                                   'phase_speed'],
+                  'square'      : ['intensity_dir', 'sf', 'phase',
+                                   'phase_speed'],
+                  'concentric'  : ['intensity_dir', 'sf', 'phase',
+                                   'phase_speed'],
+                  'checkerboard': ['check_size', 'num_check', 'phase',
                                    'intensity_dir'],
+                  'random'      : ['check_size', 'num_check', 'fill_seed',
+                                   'phase', 'intensity_dir'],
                   'movie'       : ['movie_filename', 'movie_size'],
                   'image'       : ['image_filename', 'image_size', 'phase',
                                    'phase_speed', 'image_channel'],
@@ -467,16 +473,16 @@ class Parameters(object):
             ('move_type',
              {'type'    : 'choice',
               'label'   : 'move type',
-              'choices' : ['static', 'moving', 'table', 'random'], #, 'jump'],
+              'choices' : ['static', 'moving', 'table', 'random'],  # , 'jump'],
               'default' : config_dict['move_type'],
               'is_child': False,
               'children': {
                   'moving': ['speed', 'start_dir', 'num_dirs', 'start_radius',
                              'move_delay', 'ori_with_dir'],
                   'random': ['speed', 'travel_distance', 'move_seed'],
-                  'table' : ['table_filename', 'start_dir', 'num_dirs', 'move_delay',
-                             'ori_with_dir'],
-                  #'jump'  : ['num_jumps', 'jump_delay', 'move_seed'],
+                  'table' : ['table_filename', 'start_dir', 'num_dirs',
+                             'move_delay', 'ori_with_dir'],
+                  # 'jump'  : ['num_jumps', 'jump_delay', 'move_seed'],
               }}
              ),
 
@@ -662,7 +668,6 @@ class Parameters(object):
               'is_child': False}
              )
         ])
-
 
 
 class TextCtrlTag(wx.TextCtrl):
@@ -863,10 +868,10 @@ class InputPanel(wx.Panel):
                 # label widget
                 label = wx.StaticText(self, label=param_info['label'] + ':')
 
-                type = param_info['type']
+                param_type = param_info['type']
 
                 # input widgets, depending on type
-                if type == 'text':
+                if param_type == 'text':
                     # make control
                     ctrl = TextCtrlTag(self,
                                        size=(120, -1),
@@ -878,7 +883,7 @@ class InputPanel(wx.Panel):
                     # bind event to method
                     self.Bind(wx.EVT_TEXT, self.input_update, ctrl)
 
-                elif type == 'choice':
+                elif param_type == 'choice':
                     ctrl = ChoiceCtrlTag(self,
                                          tag=param,
                                          choices=param_info['choices'],
@@ -891,17 +896,18 @@ class InputPanel(wx.Panel):
 
                     self.Bind(wx.EVT_CHOICE, self.input_update, ctrl)
 
-                elif type == 'path':
+                elif param_type == 'path':
                     ctrl = FilePickerCtrlTag(self,
                                              tag=param,
                                              category=self.category,
                                              message='Path to file',
-                                             style=wx.FLP_USE_TEXTCTRL | wx.FLP_SMALL)
+                                             style=wx.FLP_USE_TEXTCTRL |
+                                                   wx.FLP_SMALL)
                     self.all_controls[param] = ctrl
                     self.Bind(wx.EVT_FILEPICKER_CHANGED, self.input_update,
                               ctrl)
 
-                elif type == 'list':
+                elif param_type == 'list':
                     # get length of list for sizer and TextCtrl sizing
                     length = len(param_info['default'])
                     # sizer for adding text boxes into grid
@@ -917,8 +923,8 @@ class InputPanel(wx.Panel):
                         ctrl = TextCtrlTag(self,
                                            tag=param,
                                            tag2=i,
-                                           size=((120/length - (5 * (
-                                               length-1)) / length), -1),
+                                           size=((120 / length - (5 * (
+                                               length - 1)) / length), -1),
                                            value=str(param_info['default'][i]),
                                            validator=TextCtrlValidator())
 
@@ -970,7 +976,7 @@ class InputPanel(wx.Panel):
 
                     # make sub panel with new dict
                     self.sub_panel_dict[param][choice] = InputPanel(
-                        child_param_dict,self, category)
+                        child_param_dict, self, category)
 
                 # add panels to subpanel sizer
                 for panel in self.sub_panel_dict[param].itervalues():
@@ -979,7 +985,7 @@ class InputPanel(wx.Panel):
                 # add subpanel sizer to panel sizer, spanning both columns
                 self.grid_sizer.Add(subpanel_sizer,
                                     pos=(self.grid_counter, 0),
-                                    span=(1,2))
+                                    span=(1, 2))
 
                 # increment grid counter
                 self.grid_counter += 1
@@ -1006,7 +1012,8 @@ class InputPanel(wx.Panel):
         # tag2 (list index)
         if self.params[param]['type'] == 'list':
             index = event.GetEventObject().tag2
-            self.parameters.set_param_value(self.category, param, value, index=index)
+            self.parameters.set_param_value(self.category, param, value,
+                                            index=index)
 
         else:
             self.parameters.set_param_value(self.category, param, value)
@@ -1093,12 +1100,12 @@ class GlobalPanel(InputPanel):
             self.which_default.set_value(self.frame.gui_params['defaults'])
 
         # save button
-        self.save_default = wx.Button(self, size=(-1,-1), id=wx.ID_SAVE)
+        self.save_default = wx.Button(self, size=(-1, -1), id=wx.ID_SAVE)
         self.Bind(wx.EVT_BUTTON, self.on_default_save, self.save_default)
         self.grid_sizer.Add(self.save_default, pos=(1, 0))
 
         # delete button
-        self.delete_default = wx.Button(self, size=(-1,-1), label='Delete')
+        self.delete_default = wx.Button(self, size=(-1, -1), label='Delete')
         self.Bind(wx.EVT_BUTTON, self.on_default_delete, self.delete_default)
         self.grid_sizer.Add(self.delete_default, pos=(1, 1))
 
@@ -1170,13 +1177,13 @@ class GlobalPanel(InputPanel):
 
             # redump dict to file
             with open(self.globals_file, 'wb') as f:
-                global_dict = cPickle.dump(global_dict, f)
+                cPickle.dump(global_dict, f)
 
             # add blank spot in control to switch to
             self.which_default.Append('')
             self.which_default.SetStringSelection('')
 
-            # delete from controld deleted item
+            # delete from control deleted item
             index = self.which_default.GetItems().index(selected)
             self.which_default.Delete(index)
 
@@ -1242,7 +1249,7 @@ class ListPanel(wx.Panel):
 
         # list control widget
         self.list_control = wx.ListCtrl(self,
-                                        size=(200,-1),
+                                        size=(200, -1),
                                         style=wx.LC_REPORT | wx.SUNKEN_BORDER)
 
         # add columns to list control
@@ -1412,6 +1419,8 @@ class ListPanel(wx.Panel):
     def on_remove_button(self, event):
         """
         Removes stims from stim list. If none selected, clears all.
+
+        :param event:
         """
         # if any selected, iterate through and delete
         if self.list_control.GetSelectedItemCount() > 0:
@@ -1452,7 +1461,7 @@ class ListPanel(wx.Panel):
                 self.on_remove_button(event)
 
                 # readd
-                self.add_to_list(stim_type, param_dict, index-1)
+                self.add_to_list(stim_type, param_dict, index - 1)
 
                 # reset stim numbers in stims to run
                 for i, stim in enumerate(self.stims_to_run):
@@ -1479,7 +1488,7 @@ class ListPanel(wx.Panel):
                 self.on_remove_button(event)
 
                 # readd
-                self.add_to_list(stim_type, param_dict, index+1)
+                self.add_to_list(stim_type, param_dict, index + 1)
 
                 # reset stim numbers in stims to run
                 for i, stim in enumerate(self.stims_to_run):
@@ -1511,6 +1520,8 @@ class ListPanel(wx.Panel):
             # if not in either dictionary, leave as is
             except KeyError:
                 pass
+
+        print '\nStim params populated'
 
 
 class DirPanel(wx.Panel):
@@ -1635,8 +1646,12 @@ class DirPanel(wx.Panel):
 
         # if not log file, open and load pickle data
         if not is_log:
-            with open(path, 'rb') as f:
-                to_load = cPickle.load(f)
+            try:
+                with open(path, 'rb') as f:
+                    to_load = cPickle.load(f)
+            except IOError:
+                print '\nNo file selected. Please select file.'
+                return
 
         # if log file, need to seek to end to find the pickle data
         else:
@@ -1671,6 +1686,8 @@ class DirPanel(wx.Panel):
 
             self.frame.list_panel.add_to_list(stim_type, params)
 
+        print '\nStim(s) saved'
+
     def on_double_click(self, event):
         """
         If log file, opens, else loads.
@@ -1683,9 +1700,9 @@ class DirPanel(wx.Panel):
                  'logs'
 
         if is_log:
-            if _platform == 'darwin':
+            if platform == 'darwin':
                 os.startfile(path)
-            elif _platform == 'win32':
+            elif platform == 'win32':
                 os.system('open ' + path)
 
         else:
@@ -1741,7 +1758,8 @@ class MyFrame(wx.Frame):
         self.input_nb.AddPage(self.panel_move, "Motion")
 
         # instantiate global panel
-        self.panel_global = GlobalPanel(self.parameters.global_default_param, self, 'global')
+        self.panel_global = GlobalPanel(self.parameters.global_default_param,
+                                        self, 'global')
 
         # sizer to hold notebook and global panel
         panel_row = wx.BoxSizer(wx.HORIZONTAL)
@@ -1793,7 +1811,7 @@ class MyFrame(wx.Frame):
         panel_button_sizer.Add(panel_row, proportion=1, flag=wx.EXPAND)
         panel_button_sizer.Add(stim_buttons_sizer,
                                border=5,
-                               flag=wx.BOTTOM | wx.TOP|
+                               flag=wx.BOTTOM | wx.TOP |
                                     wx.ALIGN_CENTER_HORIZONTAL |
                                     wx.ALIGN_CENTER_VERTICAL)
 
@@ -1821,36 +1839,28 @@ class MyFrame(wx.Frame):
         self.CreateStatusBar(1)
         self.SetStatusText('hi there')
 
-        # HACK FOR PROPER SIZING
-        # TODO: better sizing
-        # (hide all subpanels, then show largest, then fit, then hide,
-        # then finally show appropriate subpanels)
-
         # hide all subpanels
         for panel in self.input_nb.GetChildren():
-            for k in iter(panel.sub_panel_dict.viewkeys()):
-                for k2 in iter(panel.sub_panel_dict[k].viewkeys()):
-                    panel.sub_panel_dict[k][k2].Hide()
-
-        # show largest subpanel
-        self.panel_fill.sub_panel_dict['fill_mode']['random'].Show()
+            for param in panel.sub_panel_dict.iterkeys():
+                for subpanel in panel.sub_panel_dict[param].iterkeys():
+                    panel.sub_panel_dict[param][subpanel].Hide()
 
         # set sizer
         self.SetSizer(frame_sizer)
         frame_sizer.Fit(self)
 
-        # show/hide subpanels
+        # show/hide appropriate subpanels
         for panel in self.input_nb.GetChildren():
-            for k in iter(panel.sub_panel_dict.viewkeys()):
-                for k2 in iter(panel.sub_panel_dict[k].viewkeys()):
-                    if k2 != panel.params[k]['default']:
-                        panel.sub_panel_dict[k][k2].Hide()
+            for param in panel.sub_panel_dict.iterkeys():
+                for subpanel in panel.sub_panel_dict[param].iterkeys():
+                    if subpanel != panel.params[param]['default']:
+                        panel.sub_panel_dict[param][subpanel].Hide()
                     else:
-                        panel.sub_panel_dict[k][k2].Show()
+                        panel.sub_panel_dict[param][subpanel].Show()
                         panel.Fit()
 
         # change background color to match panels on win32
-        if _platform == 'win32':
+        if platform == 'win32':
             self.SetBackgroundColour(wx.NullColour)
 
         # draw frame
@@ -1912,7 +1922,7 @@ class MyFrame(wx.Frame):
             global_defaults['screen_num'] -= 1
 
             # offset needs to be passed as a scale relative to display size
-            global_defaults['offset'] = [float(x)/y*2 for x, y in zip(
+            global_defaults['offset'] = [float(x) / y * 2 for x, y in zip(
                 global_defaults['offset'],
                 global_defaults['display_size'])]
 
