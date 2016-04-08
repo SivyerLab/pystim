@@ -4,9 +4,10 @@
 Test of MVC framework for GUI.
 """
 
-from sys import platform
+from GammaCorrection import GammaValues  # necessary for pickling
 from collections import OrderedDict
 from copy import deepcopy
+from sys import platform
 import ConfigParser
 import StimProgram
 import wx, wx.grid
@@ -122,6 +123,23 @@ class Parameters(object):
                  'global': self.global_default_param}
 
         return trans[category]
+
+    def get_gammas(self):
+        """
+        Getter
+
+        :return: returns list of saved gamma profiles
+        """
+        gamma_file = os.path.abspath('./psychopy/data/gammaTables.txt')
+
+        if os.path.exists(gamma_file):
+            with open(gamma_file, 'rb') as f:
+                gamma_dict = cPickle.load(f)
+            gamma_mons = gamma_dict.keys()
+        else:
+            gamma_mons = []
+
+        return gamma_mons
 
     def get_params(self, category):
         """
@@ -647,7 +665,7 @@ class Parameters(object):
             ('gamma_correction',
              {'type'    : 'choice',
               'label'   : 'gamma monitor',
-              'choices' : ['default'],  # + gamma_mons,
+              'choices' : ['default'] + self.get_gammas(),
               'default' : config_dict['gamma_correction'],
               'is_child': False}
              ),
