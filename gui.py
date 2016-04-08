@@ -1045,6 +1045,14 @@ class InputPanel(wx.Panel):
             # else get the new value from the widget
             value = event.GetString()
 
+        # if in grid, leave choice as table and don't do anything
+        if isinstance(event.GetEventObject(), ChoiceCtrlTag):
+            if param in self.frame.grid.control_dict:
+                event.Skip()
+                event.GetEventObject().SetStringSelection('table')
+                return
+
+
         # if a list type param, change the appropriate list item by getting
         # tag2 (list index)
         if self.params[param]['type'] == 'list':
@@ -1862,9 +1870,28 @@ class MyGrid(wx.Frame):
                 value = self.parameters.get_param_value(
                     ctrl.GetParent().category, param[:-3], index)
 
-            self.control_dict[param] = [value]
+            value = str(value)
+
+            self.control_dict[param] = [None] * 5
+            self.control_dict[param][0] = value
+
+            ctrl.set_editable(False)
+
+            self.grid.SetCellValue(0, self.grid.GetNumberCols()-1, value)
 
             print self.control_dict
+
+        # if already in grid
+        else:
+            self.grid.ClearSelection()
+
+            # highlight column
+            for i in range(self.grid.GetNumberCols()):
+                if self.grid.GetColLabelValue(i) == param:
+                    self.grid.SelectCol(i)
+                    self.grid.SetGridCursor(0, i)
+
+        self.show_grid()
 
     def on_grid_cell_changed(self, event):
         pass
@@ -1900,7 +1927,6 @@ class MyFrame(wx.Frame):
 
         # make grid
         self.grid = MyGrid(self)
-        self.grid.show_grid()
 
         # notebook to hold input panels
         self.input_nb = wx.Notebook(self)
