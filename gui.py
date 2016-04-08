@@ -898,8 +898,9 @@ class InputPanel(wx.Panel):
                                        validator=TextCtrlValidator())
                     # add control to dict of all controls
                     self.all_controls[param] = ctrl
-                    # bind event to method
+                    # bind events to methods
                     self.Bind(wx.EVT_TEXT, self.input_update, ctrl)
+                    self.Bind(wx.EVT_CONTEXT_MENU, self.on_right_click, ctrl)
 
                 elif param_type == 'choice':
                     ctrl = ChoiceCtrlTag(self,
@@ -913,6 +914,7 @@ class InputPanel(wx.Panel):
                     ctrl.SetStringSelection(str(param_info['default']))
 
                     self.Bind(wx.EVT_CHOICE, self.input_update, ctrl)
+                    self.Bind(wx.EVT_CONTEXT_MENU, self.on_right_click, ctrl)
 
                 elif param_type == 'path':
                     ctrl = FilePickerCtrlTag(self,
@@ -952,6 +954,7 @@ class InputPanel(wx.Panel):
                         # add to sizer
                         list_sizer.Add(ctrl)
                         self.Bind(wx.EVT_TEXT, self.input_update, ctrl)
+                        self.Bind(wx.EVT_CONTEXT_MENU, self.on_right_click, ctrl)
 
                     # set ctrl to sizer in order to be added to grid_sizer
                     ctrl = list_sizer
@@ -1068,6 +1071,23 @@ class InputPanel(wx.Panel):
 
         if param == 'background':
             StimProgram.MyWindow.change_color(global_params['background'])
+
+    def on_right_click(self, event):
+        """
+        Method for passing parameter to table to be added.
+
+        :param event:
+        """
+        ctrl = event.GetEventObject()
+        param = ctrl.tag
+
+        try:
+            if ctrl.tag2 is not None:
+                param = param + '[' + str(ctrl.tag2) + ']'
+        except AttributeError:
+            pass
+
+        self.frame.grid.add_to_grid(param)
 
 
 class GlobalPanel(InputPanel):
@@ -1727,6 +1747,102 @@ class DirPanel(wx.Panel):
             self.on_load_button(event)
 
 
+class MyGrid(wx.Frame):
+    """
+    Class for grid window.
+    """
+    def __init__(self, parent):
+        """
+        Constructor.
+
+        :param parent:
+        :return:
+        """
+        # necessary call to super
+        super(MyGrid, self).__init__(parent, title='Table')
+
+        # instance attributes
+        self.frame = self.GetTopLevelParent()
+        self.grid_shown = False
+        self.control_dict = {}
+
+        # panel to hold everything
+        panel = wx.Panel(self)
+
+        # instantiate grid
+        self.grid = wx.grid.Grid(panel)
+        self.grid.CreateGrid(0, 0)
+
+        # sizer for grid
+        grid_sizer = wx.BoxSizer(wx.VERTICAL)
+        grid_sizer.Add(self.grid, proportion=1, flag=wx.EXPAND)
+
+        # set sizer
+        panel.SetSizer(grid_sizer)
+
+        # bind grid events
+        self.Bind(wx.grid.EVT_GRID_LABEL_RIGHT_CLICK,
+                  self.on_grid_label_right_click)
+        self.Bind(wx.grid.EVT_GRID_CELL_RIGHT_CLICK,
+                  self.on_grid_cell_right_click)
+        self.Bind(wx.grid.EVT_GRID_CELL_CHANGED,
+                  self.on_grid_cell_changed)
+
+        # catch close to only hide grid
+        self.Bind(wx.EVT_CLOSE, self.on_close_button)
+
+    def show_grid(self):
+        """
+        Method to show grid. Unminimizes and brings to front.
+        """
+        self.Iconize(False)
+        self.Show()
+        self.Raise()
+        self.grid_shown = True
+
+    def hide_grid(self):
+        """
+        Method to hide grid.
+        """
+        self.Hide()
+        self.grid_shown = False
+
+    def on_close_button(self, event):
+        """
+        Catches close in order to only hide. Otherwise frame object is
+        deleted and loses all data.
+
+        :param event:
+        """
+        self.hide_grid()
+
+    def add_to_grid(self, param):
+        """
+        Adds column to table and prevents editing of control.
+
+        :param param:
+        """
+        if not param in self.control_dict:
+            # add column to grid
+            self.grid.ClearSelection()
+            self.grid.AppendCols(1)
+            self.grid.SetGridCursor(0, self.grid.GetNumberCols()-1)
+            self.grid.SetColLabelValue(self.grid.GetNumberCols()-1, param)
+
+            # if no other rows, add some
+            if self.grid.NumberCols == 1:
+                self.grid.AppendRows(5)
+
+    def on_grid_cell_changed(self, event):
+        pass
+
+    def on_grid_label_right_click(self, event):
+        pass
+
+    def on_grid_cell_right_click(self, event):
+        pass
+
+
 class MyFrame(wx.Frame):
     """
     Class for generating frame. Instantiates parameters, notebook, and panels.
@@ -1748,6 +1864,10 @@ class MyFrame(wx.Frame):
         self.win_open = False
         self.all_controls = {}
         self.do_break = False
+
+        # make grid
+        self.grid = MyGrid(self)
+        self.grid.show_grid()
 
         # notebook to hold input panels
         self.input_nb = wx.Notebook(self)
