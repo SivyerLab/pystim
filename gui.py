@@ -698,8 +698,6 @@ class TextCtrlTag(wx.TextCtrl):
         self.tag = kwargs.pop('tag', None)
         # tag2 used in list type parameters
         self.tag2 = kwargs.pop('tag2', None)
-        # check if part of table
-        self.in_table = kwargs.pop('in_table', None)
         wx.TextCtrl.__init__(self, *args, **kwargs)
 
     def set_value(self, value):
@@ -710,6 +708,18 @@ class TextCtrlTag(wx.TextCtrl):
         """
         self.SetValue(str(value))
 
+    def set_editable(self, toggle, value=None):
+        """
+        Makes control not editable.
+        """
+        if not toggle:
+            self.ChangeValue('table')
+            self.SetEditable(False)
+
+        if toggle:
+            self.SetValue(value)
+            self.SetEditable(True)
+
 
 class ChoiceCtrlTag(wx.Choice):
     """
@@ -719,11 +729,6 @@ class ChoiceCtrlTag(wx.Choice):
     def __init__(self, *args, **kwargs):
         # pop out tag if present from args/kwargs
         self.tag = kwargs.pop('tag', None)
-        # check if part of table
-        self.in_table = kwargs.pop('in_table', None)
-        # pop out value (only textctrl has value)
-        # doesn't work if lower case value
-        self.Value = kwargs.pop('Value', None)
         wx.Choice.__init__(self, *args, **kwargs)
 
     def set_value(self, value):
@@ -738,6 +743,18 @@ class ChoiceCtrlTag(wx.Choice):
         evt.SetEventObject(self)
         evt.SetString(str(value))
         self.GetParent().GetEventHandler().ProcessEvent(evt)
+
+    def set_editable(self, toggle, value=None):
+        """
+        Makes control not editable.
+        """
+        if not toggle:
+            self.Append('table')
+            self.SetStringSelection('table')
+
+        if toggle:
+            self.SetStringSelection(value)
+            self.Delete(self.GetCount() - 1)
 
 
 class FilePickerCtrlTag(wx.FilePickerCtrl):
@@ -905,8 +922,7 @@ class InputPanel(wx.Panel):
                 elif param_type == 'choice':
                     ctrl = ChoiceCtrlTag(self,
                                          tag=param,
-                                         choices=param_info['choices'],
-                                         Value=param_info['default'])
+                                         choices=param_info['choices'])
                     self.all_controls[param] = ctrl
 
                     # on Win32, choice still defaults to blank, so manually
@@ -1762,7 +1778,8 @@ class MyGrid(wx.Frame):
         super(MyGrid, self).__init__(parent, title='Table')
 
         # instance attributes
-        self.frame = self.GetTopLevelParent()
+        self.frame = parent
+        self.parameters = self.frame.parameters
         self.grid_shown = False
         self.control_dict = {}
 
@@ -1822,7 +1839,10 @@ class MyGrid(wx.Frame):
 
         :param param:
         """
-        if not param in self.control_dict:
+        ctrl = self.frame.all_controls[param]
+
+        if param not in self.control_dict and ctrl.GetParent().category != \
+                'global':
             # add column to grid
             self.grid.ClearSelection()
             self.grid.AppendCols(1)
@@ -1832,6 +1852,19 @@ class MyGrid(wx.Frame):
             # if no other rows, add some
             if self.grid.NumberCols == 1:
                 self.grid.AppendRows(5)
+
+            # get value of control
+            try:
+                value = self.parameters.get_param_value(
+                    ctrl.GetParent().category, param)
+            except:
+                index = int(param[-2])
+                value = self.parameters.get_param_value(
+                    ctrl.GetParent().category, param[:-3], index)
+
+            self.control_dict[param] = [value]
+
+            print self.control_dict
 
     def on_grid_cell_changed(self, event):
         pass
