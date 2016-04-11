@@ -17,6 +17,7 @@ from PIL import Image
 import scipy, scipy.signal
 import sortedcontainers
 import ConfigParser
+import subprocess
 import traceback
 import cPickle
 import numpy
@@ -150,7 +151,8 @@ class GlobalDefaults(object):
                     log=False,
                     screen_num=1,
                     gamma_correction='default',
-                    trigger_wait=0.1)
+                    trigger_wait=0.1,
+                    capture=False)
 
     def __init__(self,
                  frame_rate=None,
@@ -166,7 +168,8 @@ class GlobalDefaults(object):
                  trigger_wait=None,
                  log=None,
                  gamma_correction=None,
-                 offset=None):
+                 offset=None,
+                 capture=None):
         """
         Populate defaults if passed; units converted as necessary.
         """
@@ -213,6 +216,9 @@ class GlobalDefaults(object):
         if offset is not None:
             self.defaults['offset'] = [offset[0],
                                        offset[1]]
+
+        if capture is not None:
+            self.defaults['capture'] = capture
 
     def __str__(self):
         """For pretty printing dictionary of global defaults.
@@ -1915,16 +1921,27 @@ def main(stim_list, verbose=True):
 
             win_list = []
 
+            if GlobalDefaults['capture']:
+                capture_dir = os.path.abspath('./psychopy/captures/')
+                current_time_string = strftime('%Y_%m_%d_%H%M%S', current_time)
+                save_dir = 'capture_' + current_time_string + '_' + stim_list[
+                    0].stim_type.lower()
+                save_loc = os.path.join(capture_dir, save_dir)
+                os.makedirs(save_loc)
+
             for frame in xrange(num_frames):
                 for stim in to_animate:
                     stim.animate(frame)
 
-                # win_list.append(visual.BufferImageStim(MyWindow.win).image)
-
                 MyWindow.win.flip()
 
                 # save as movie?
-                # MyWindow.win.getMovieFrame()
+                if GlobalDefaults['capture']:
+                    filename = os.path.join(save_loc,
+                                            'capture_' + str(frame + 1).zfill(5)
+                                            + '.png')
+                    MyWindow.win.getMovieFrame()
+                    MyWindow.win.saveMovieFrames(filename)
 
                 if frame == MyWindow.frame_trigger_list[index]:
                     MyWindow.send_trigger()
@@ -1992,8 +2009,24 @@ def main(stim_list, verbose=True):
 
     fps = (count_reps * num_frames + count_frames) / count_elapsed_time
 
-    # test of saving movies
-    # MyWindow.win.saveMovieFrames('testMGP.mpg')
+    # save movie
+    if GlobalDefaults['capture']:
+        if sys.platform == 'win32':
+            args = ['ffmpeg',
+                    '-f', 'image2',
+                    '-framerate', str(GlobalDefaults['frame_rate']),
+                    '-i', os.path.join(save_loc, 'capture_%05d.png'),
+                    '-vcodec', 'libx264',
+                    '-b:v', '20M',
+                    os.path.join(save_loc, 'capture_video.avi')]
+            # process = subprocess.Popen(args)
+            process = subprocess.Popen(args, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+            stdout, stderr = process.communicate()
+            # delete .pngs
+            to_delete = [f for f in os.listdir(save_loc) if f.endswith('.png')]
+            for f in to_delete:
+                os.remove(os.path.join(save_loc, f))
+            print '\nDONE'
 
     return fps, count_elapsed_time, time_stamp
 
