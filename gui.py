@@ -82,7 +82,8 @@ config_default_dict = dict(
     jump_delay=100,
     force_stop=0,
     pref_dir=-1,
-    defaults=None)
+    defaults=None,
+    capture=False)
 
 def get_config_dict(config_file):
     defaults = dict(zip(config_default_dict, map(str,
@@ -612,6 +613,14 @@ global_default_param = OrderedDict([
       'label'   : 'log',
       'choices' : ['True', 'False'],
       'default' : config_dict['log'],
+      'is_child': False}
+     ),
+
+    ('capture',
+     {'type'    : 'choice',
+      'label'   : 'capture',
+      'choices' : ['True', 'False'],
+      'default' : config_dict['capture'],
       'is_child': False}
      )
 ])
@@ -1433,6 +1442,9 @@ class InputPanel(wx.Panel):
 
         if param == 'pref_dir':
             StimProgram.GlobalDefaults['pref_dir'] = self.param_dict[param]['default']
+
+        if param == 'capture':
+            StimProgram.GlobalDefaults['capture'] = self.param_dict[param]['default']
 
     def on_right_click(self, event):
         """Adds param to table and sets it non editable.
