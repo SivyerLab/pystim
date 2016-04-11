@@ -1857,10 +1857,6 @@ class MyGrid(wx.Frame):
             self.grid.SetGridCursor(0, self.grid.GetNumberCols()-1)
             self.grid.SetColLabelValue(self.grid.GetNumberCols()-1, param)
 
-            # if no other rows, add some
-            if self.grid.NumberCols == 1:
-                self.grid.AppendRows(5)
-
             # get value of control
             try:
                 value = self.parameters.get_param_value(
@@ -1872,7 +1868,13 @@ class MyGrid(wx.Frame):
 
             value = str(value)
 
-            self.control_dict[param] = [None] * 5
+            # if no other rows, add some, and populate control dict
+            if self.grid.NumberCols == 1:
+                self.grid.AppendRows(5)
+                self.control_dict[param] = [None] * 5
+            else:
+                self.control_dict[param] = [None] * (self.grid.GetNumberRows())
+
             self.control_dict[param][0] = value
 
             ctrl.set_editable(False)
@@ -1894,13 +1896,87 @@ class MyGrid(wx.Frame):
         self.show_grid()
 
     def on_grid_cell_changed(self, event):
-        pass
+        """
+        Updates control dict when values in cells are changed.
+
+        :param event:
+        """
+        row = event.GetRow()
+        col = event.GetCol()
+        param = self.grid.GetColLabelValue(col)
+
+        value = self.grid.GetCellValue(row, col)
+        if value == '':
+            value = None
+
+        self.control_dict[param][row] = value
+
+        # if in last row, add more rows
+        if row == self.grid.GetNumberRows() - 1:
+            evt = wx.grid.GridEvent(self.grid.GetId(),
+                                    wx.grid.wxEVT_GRID_LABEL_RIGHT_CLICK,
+                                    self,
+                                    row=-1,
+                                    col=-1)
+            self.GetEventHandler().ProcessEvent(evt)
+
+            self.grid.MoveCursorDown(False)
 
     def on_grid_label_right_click(self, event):
-        pass
+        """
+        Adds more rows if top left corner right clicked. Deletes row/column if
+        row/column header right clicked.
+
+        :param event:
+        """
+        row = event.GetRow()
+        col = event.GetCol()
+
+        # column headers
+        if row == -1:
+            # leftmost column
+            if col == -1:
+                self.grid.AppendRows(5)
+                # add to control dict lists
+                for value in self.control_dict.itervalues():
+                        value.extend([None] * 5)
+
+            # any other column header
+            else:
+                # make control editable and set value
+                param = self.grid.GetColLabelValue(col)
+                old_value = self.control_dict[param][0]
+                self.frame.all_controls[param].set_editable(True, value=old_value)
+
+                # remove column and from control dict
+                self.grid.DeleteCols(col, 1)
+                del self.control_dict[param]
+
+                # if no more columns, delete rows
+                if self.grid.GetNumberCols() == 0:
+                    self.grid.DeleteRows(0, numRows=self.grid.GetNumberRows())
+                    self.Hide()
+
+        # row headers
+        elif col == -1:
+            for value in self.control_dict.itervalues():
+                del value[row]
+
+            self.grid.DeleteRows(row, 1)
 
     def on_grid_cell_right_click(self, event):
-        pass
+        """
+        Removes contents of cell.
+
+        :param event:
+        """
+        row = event.GetRow()
+        col = event.GetCol()
+
+        param = self.grid.GetColLabelValue(col)
+
+        self.Grid.SetCellValue(row, col, '')
+        self.control_dict[param][row] = None
 
 
 class MyFrame(wx.Frame):
