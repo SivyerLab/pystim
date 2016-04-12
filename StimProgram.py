@@ -62,7 +62,7 @@ defaults = dict(logsDir='.\\psychopy\\logs\\',
                 monitor='blank')
 config = ConfigParser.ConfigParser()
 config.read(os.path.abspath('./psychopy/config.ini'))
-config.read(os.path.abspath("C:\Users\Alex\PycharmProjects\StimulusProgram\psychopy\config.ini"))
+# config.read(os.path.abspath("C:\Users\Alex\PycharmProjects\StimulusProgram\psychopy\config.ini"))
 
 
 class StimInfo(object):
@@ -1923,6 +1923,8 @@ def main(stim_list, verbose=True):
 
             if GlobalDefaults['capture']:
                 capture_dir = os.path.abspath('./psychopy/captures/')
+                if not os.path.exists(capture_dir):
+                    os.makedirs(capture_dir)
                 current_time_string = strftime('%Y_%m_%d_%H%M%S', current_time)
                 save_dir = 'capture_' + current_time_string + '_' + stim_list[
                     0].stim_type.lower()
@@ -1933,15 +1935,21 @@ def main(stim_list, verbose=True):
                 for stim in to_animate:
                     stim.animate(frame)
 
-                MyWindow.win.flip()
+                if not GlobalDefaults['capture']:
+                    MyWindow.win.flip()
 
                 # save as movie?
-                if GlobalDefaults['capture']:
+                elif GlobalDefaults['capture']:
                     filename = os.path.join(save_loc,
                                             'capture_' + str(frame + 1).zfill(5)
                                             + '.png')
-                    MyWindow.win.getMovieFrame()
-                    MyWindow.win.saveMovieFrames(filename)
+                    img = MyWindow.win._getRegionOfFrame(buffer='back')
+                    img.save(filename, 'PNG')
+                    sys.stdout.write('\r')
+                    sys.stdout.write(str(int(frame/float(num_frames)*100)+1) +
+                                     '%')
+                    sys.stdout.flush()
+                    MyWindow.win.clearBuffer()
 
                 if frame == MyWindow.frame_trigger_list[index]:
                     MyWindow.send_trigger()
@@ -2011,22 +2019,24 @@ def main(stim_list, verbose=True):
 
     # save movie
     if GlobalDefaults['capture']:
-        if sys.platform == 'win32':
-            args = ['ffmpeg',
-                    '-f', 'image2',
-                    '-framerate', str(GlobalDefaults['frame_rate']),
-                    '-i', os.path.join(save_loc, 'capture_%05d.png'),
-                    '-vcodec', 'libx264',
-                    '-b:v', '20M',
-                    os.path.join(save_loc, 'capture_video.avi')]
-            # process = subprocess.Popen(args)
-            process = subprocess.Popen(args, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-            stdout, stderr = process.communicate()
-            # delete .pngs
-            to_delete = [f for f in os.listdir(save_loc) if f.endswith('.png')]
-            for f in to_delete:
-                os.remove(os.path.join(save_loc, f))
-            print '\nDONE'
+        args = ['ffmpeg',
+                '-f', 'image2',
+                '-framerate', str(GlobalDefaults['frame_rate']),
+                '-i', os.path.join(save_loc, 'capture_%05d.png'),
+                '-vcodec', 'libx264',
+                '-b:v', '20M',
+                os.path.join(save_loc, 'capture_video.avi')]
+
+        # make movie using ffmpeg
+        print 'ffmpeg...'
+        process = subprocess.Popen(args, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        stdout, stderr = process.communicate()
+
+        # delete .pngs
+        # to_delete = [f for f in os.listdir(save_loc) if f.endswith('.png')]
+        # for f in to_delete:
+        #     os.remove(os.path.join(save_loc, f))
+        print '\nDONE'
 
     return fps, count_elapsed_time, time_stamp
 
