@@ -42,6 +42,7 @@ Optional libraries:
 - igor (for parsing tables)
 - [u3](https://labjack.com/support/software/examples/ud/labjackpython) (for 
 triggering from LabJack)
+- ffmpeg for making movies from captured frames
 
 ### Licensing
 
