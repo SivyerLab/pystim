@@ -2043,23 +2043,30 @@ class MyGrid(wx.Frame):
 
         :return:
         """
-        to_edit = {}
+        to_return = {}
+        to_edit = deepcopy(self.control_dict)
 
-        for param, values in self.control_dict.iteritems():
-            for i in range(len(values)-2, -1, -1):
+        for param, values in to_edit.iteritems():
+            if values[0] is None:
+                raise IndexError('First value of table cannot be empty.')
 
+            # get number of terminal Nones
+            for i, value in reversed(list(enumerate(values))):
+                if value is None:
+                    pass
+                else:
+                    where_stop = i
+                    break
+
+            # iterate until terminal nones
+            for i in range(0, where_stop):
                 if values[i] is None:
-                    if i == 0:
-                        raise IndexError('First element of table cannot be left blank')
-                    elif values[i+1] is None:
-                        pass
-                    else:
-                        values[i] = values[i-1]
+                    values[i] = values[i-1]
 
             values = map(self.parameters.try_cast, values)
-            to_edit[param] = values
+            to_return[param] = values
 
-        return to_edit
+        return to_return
 
 
 class MyFrame(wx.Frame):
