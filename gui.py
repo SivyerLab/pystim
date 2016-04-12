@@ -1294,6 +1294,7 @@ class ListPanel(wx.Panel):
         self.frame = parent.GetTopLevelParent()
         self.parameters = self.frame.parameters
         self.stims_to_run = []
+        self.stims_to_run_w_grid = []
 
         # panel title and its own sizer for proper border spacing
         title = wx.StaticText(self, label='stims to run')
@@ -1428,15 +1429,18 @@ class ListPanel(wx.Panel):
         """
         param_dict = self.parameters.get_merged_params()
         stim_type = param_dict.pop('move_type')
+        grid_dict = self.frame.grid.get_grid_dict()
+        print grid_dict
 
-        self.add_to_list(stim_type, param_dict)
+        self.add_to_list(stim_type, param_dict, grid_dict)
 
-    def add_to_list(self, stim_type, param_dict, insert_pos=None):
+    def add_to_list(self, stim_type, param_dict, grid_dict, insert_pos=None):
         """
         Adds stim to list of stims to run, as a bew stiminfo class
 
         :param stim_type:
         :param param_dict:
+        :param grid_dict:
         :param insert_pos: at which position in list to insert stim. Used
         when moving stims up and down
         :return:
@@ -1464,19 +1468,23 @@ class ListPanel(wx.Panel):
         # convert from stim type label to StimProgram instance
         stim_type = self.convert_stim_type(stim_type)
 
-        # stim info instance to store
+        # stim info instance to store and grid control_dict instance to store
         stim_info = StimProgram.StimInfo(stim_type, param_dict, insert_pos)
 
-        # add to list of stims to run
+        # add to list of stims to run along with grid info
         if insert_pos is not None:
             self.stims_to_run.insert(insert_pos, stim_info)
+            self.stims_to_run_w_grid.insert(insert_pos, grid_dict)
         else:
             self.stims_to_run.append(stim_info)
+            self.stims_to_run_w_grid.append(grid_dict)
 
-        # deselect all so most in list and select most recently added
+        # deselect all in list and select most recently added
         while self.list_control.GetSelectedItemCount() != 0:
             self.list_control.Select(self.list_control.GetFirstSelected(), on=0)
         self.list_control.Select(insert_pos)
+
+        print self.stims_to_run_w_grid
 
     def on_remove_button(self, event):
         """
@@ -1490,6 +1498,7 @@ class ListPanel(wx.Panel):
                 selected = self.list_control.GetFirstSelected()
                 # remove from stims to run
                 del self.stims_to_run[selected]
+                del self.stims_to_run_w_grid[selected]
                 # remove from list
                 self.list_control.DeleteItem(selected)
 
@@ -1501,6 +1510,7 @@ class ListPanel(wx.Panel):
             self.list_control.DeleteAllItems()
             # clear stims to run
             del self.stims_to_run[:]
+            del self.stims_to_run_w_grid[:]
 
     def on_up_button(self, event):
         """
@@ -1519,11 +1529,14 @@ class ListPanel(wx.Panel):
                 stim_type = self.convert_stim_type(stim.stim_type)
                 param_dict = stim.parameters
 
+                # get grid dict
+                grid_dict = self.stims_to_run_w_grid[index]
+
                 # remove
                 self.on_remove_button(event)
 
                 # readd
-                self.add_to_list(stim_type, param_dict, index - 1)
+                self.add_to_list(stim_type, param_dict, grid_dict, index - 1)
 
                 # reset stim numbers in stims to run
                 for i, stim in enumerate(self.stims_to_run):
@@ -1546,11 +1559,14 @@ class ListPanel(wx.Panel):
                 stim_type = self.convert_stim_type(stim.stim_type)
                 param_dict = stim.parameters
 
+                # get grid dict
+                grid_dict = self.stims_to_run_w_grid[index]
+
                 # remove
                 self.on_remove_button(event)
 
                 # readd
-                self.add_to_list(stim_type, param_dict, index + 1)
+                self.add_to_list(stim_type, param_dict, grid_dict, index + 1)
 
                 # reset stim numbers in stims to run
                 for i, stim in enumerate(self.stims_to_run):
@@ -1558,18 +1574,32 @@ class ListPanel(wx.Panel):
 
     def on_double_click(self, event):
         """
-        Loads params from list on double click
+        Loads params from list and for grid on double click
 
         :param event:
         """
         selected = self.list_control.GetFirstSelected()
         stim = self.stims_to_run[selected]
+        grid_dict = self.stims_to_run_w_grid[selected]
         # copy so adding move type doesn't affect StimInfo instance
         params = deepcopy(stim.parameters)
 
         stim_type = self.convert_stim_type(stim.stim_type)
         params['move_type'] = stim_type
 
+        grid = self.frame.grid
+
+        # post events to grid to simulate removing columns to clear text and
+        # make controls editable again
+        for col in range(grid.grid.GetNumberCols()):
+            evt = wx.grid.GridEvent(grid.grid.GetId(),
+                                    wx.grid.wxEVT_GRID_LABEL_RIGHT_CLICK,
+                                    grid,
+                                    row=-1,
+                                    col=0)
+            grid.GetEventHandler().ProcessEvent(evt)
+
+        # iterate through params and set values
         for param, control in self.frame.all_controls.iteritems():
             try:
                 # if not a list text control
@@ -1582,6 +1612,37 @@ class ListPanel(wx.Panel):
             # if not in either dictionary, leave as is
             except KeyError:
                 pass
+
+        # iterate through values in grid dict and populate
+        col_index = 0
+        for param, values in grid_dict.iteritems():
+            # simulate adding param to grid
+            ctrl = self.frame.all_controls[param]
+            evt = wx.CommandEvent(wx.EVT_CONTEXT_MENU.typeId,
+                                  ctrl.Id)
+            evt.SetEventObject(ctrl)
+            ctrl.GetParent().GetEventHandler().ProcessEvent(evt)
+
+            # iterate through values and populate column and grid control_dict
+            for i, value in enumerate(values):
+                if value is not None:
+                    try:
+                        grid.grid.SetCellValue(i, col_index, str(values[i]))
+                        grid.control_dict[param][i] = values[i]
+                    # if out of rows, add more
+                    except wx._core.PyAssertionError:
+                        # send add more rows event
+                        evt = wx.grid.GridEvent(grid.grid.GetId(),
+                                                wx.grid.wxEVT_GRID_LABEL_RIGHT_CLICK,
+                                                grid,
+                                                row=-1,
+                                                col=-1)
+                        grid.GetEventHandler().ProcessEvent(evt)
+                        # retry adding
+                        grid.grid.SetCellValue(i, col_index, values[i])
+                        grid.control_dict[param][i] = values[i]
+
+            col_index += 1
 
         print '\nStim params populated'
 
@@ -1881,8 +1942,6 @@ class MyGrid(wx.Frame):
 
             self.grid.SetCellValue(0, self.grid.GetNumberCols()-1, value)
 
-            print self.control_dict
-
         # if already in grid
         else:
             self.grid.ClearSelection()
@@ -1977,6 +2036,28 @@ class MyGrid(wx.Frame):
 
         self.Grid.SetCellValue(row, col, '')
         self.control_dict[param][row] = None
+
+    def get_grid_dict(self):
+        """
+        Getter. Removes trailing Nones and sets middle Nones to previous values.
+
+        :return:
+        """
+        to_edit = deepcopy(self.control_dict)
+
+        for values in to_edit.itervalues():
+            for i in range(len(values)-2, -1, -1):
+                if values[i] is None:
+                    if i == 0:
+                        raise IndexError('First element of table cannot be left blank')
+                    elif values[i+1] is None:
+                        pass
+                    else:
+                        values[i] = values[i - 1]
+
+                values[i] = self.parameters.try_cast(values[i])
+
+        return to_edit
 
 
 class MyFrame(wx.Frame):
@@ -2156,7 +2237,7 @@ class MyFrame(wx.Frame):
         Method for running stims.
         """
         # try/except, so that uncaught errors thrown by StimProgram can be
-        # caught and thrown to avoid hanging.
+        # caught to avoid hanging.
         try:
             self.SetStatusText('running...')
             fps, time, time_stamp = StimProgram.main(
@@ -2164,7 +2245,7 @@ class MyFrame(wx.Frame):
 
             if time != 'error':
                 status_text = 'Last run: {0:.2f} fps, '.format(fps) \
-                                   + '{0:.2f} seconds.'.format(time)
+                              + '{0:.2f} seconds.'.format(time)
 
                 if time_stamp is not None:
                     status_text += ' Timestamp: {}'.format(time_stamp)
