@@ -1484,7 +1484,7 @@ class ListPanel(wx.Panel):
             self.list_control.Select(self.list_control.GetFirstSelected(), on=0)
         self.list_control.Select(insert_pos)
 
-        print self.stims_to_run_w_grid
+        # print self.stims_to_run_w_grid
 
     def on_remove_button(self, event):
         """
@@ -2034,28 +2034,30 @@ class MyGrid(wx.Frame):
 
         param = self.grid.GetColLabelValue(col)
 
-        self.Grid.SetCellValue(row, col, '')
+        self.grid.SetCellValue(row, col, '')
         self.control_dict[param][row] = None
 
     def get_grid_dict(self):
         """
-        Getter. Removes trailing Nones and sets middle Nones to previous values.
+        Getter. Sets middle Nones to previous values.
 
         :return:
         """
-        to_edit = deepcopy(self.control_dict)
+        to_edit = {}
 
-        for values in to_edit.itervalues():
+        for param, values in self.control_dict.iteritems():
             for i in range(len(values)-2, -1, -1):
+
                 if values[i] is None:
                     if i == 0:
                         raise IndexError('First element of table cannot be left blank')
                     elif values[i+1] is None:
                         pass
                     else:
-                        values[i] = values[i - 1]
+                        values[i] = values[i-1]
 
-                values[i] = self.parameters.try_cast(values[i])
+            values = map(self.parameters.try_cast, values)
+            to_edit[param] = values
 
         return to_edit
 
