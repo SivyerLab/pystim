@@ -711,13 +711,16 @@ class TextCtrlTag(wx.TextCtrl):
     def set_editable(self, toggle, value=None):
         """
         Makes control not editable.
+
+        :param toggle:
+        :param value:
         """
         if not toggle:
             self.ChangeValue('table')
             self.SetEditable(False)
 
         if toggle:
-            self.SetValue(value)
+            self.SetValue(str(value))
             self.SetEditable(True)
 
 
@@ -1430,7 +1433,6 @@ class ListPanel(wx.Panel):
         param_dict = self.parameters.get_merged_params()
         stim_type = param_dict.pop('move_type')
         grid_dict = self.frame.grid.get_grid_dict()
-        print grid_dict
 
         self.add_to_list(stim_type, param_dict, grid_dict)
 
@@ -2230,14 +2232,78 @@ class MyFrame(wx.Frame):
         self.Show()
 
     def on_run_button(self, event):
+        """
+        Method for calling run and changing values from grid if necessary.
+
+        :param event:
+        """
         if len(self.list_panel.stims_to_run) != 0:
             if self.win_open:
                 self.on_stop_button(event)
+                self.do_break = False
+
+                # get length of longest list in grid
+                grid_max = 0
+
+                for stim in self.list_panel.stims_to_run_w_grid:
+                    if stim:
+                        for values in stim.itervalues():
+                            length = sum(x is not None for x in values)
+                            grid_max = max(grid_max, length)
+
+                if grid_max == 0:
+                    self.run()
+
+                else:
+                    # run through grid
+                    for i in range(grid_max):
+
+                        # for each stim to be run
+                        for j, stim in \
+                                enumerate(self.list_panel.stims_to_run_w_grid):
+
+                            # for each grid dict
+                            for param, values in stim.iteritems():
+
+                                # set values
+                                value = values[i]
+                                if value is not None:
+
+                                    try:
+                                        # list types
+                                        if param[-1] == ']':
+                                            index = int(param[-2])
+                                            fixed_param = param[:-3]
+
+                                            self.list_panel.stims_to_run[
+                                                j].parameters[
+                                                fixed_param][index] = value
+
+                                        # convert to instances
+                                        elif param == 'move_type':
+                                            value = \
+                                                self.list_panel.convert_stim_type(value)
+
+                                            self.list_panel.stims_to_run[
+                                                j].stim_type = value
+
+                                        else:
+                                            self.list_panel.stims_to_run[
+                                                j].parameters[param] = value
+
+                                    # if reach end of some lists
+                                    except IndexError:
+                                        pass
+
+                        if self.do_break:
+                            break
+
+                        self.run()
 
             else:
                 self.on_win_button(event)
+                self.on_run_button(event)
 
-            self.run()
         else:
             print 'Please add stims.'
 
