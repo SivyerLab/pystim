@@ -1820,7 +1820,13 @@ class DirPanel(wx.Panel):
             # take back out move type
             stim_type = params.pop('move_type')
             # take back out grid dict
-            grid_dict = params.pop('grid_dict')
+            try:
+                grid_dict = params.pop('grid_dict')
+            except KeyError:
+                try:
+                    grid_dict = params.pop('control_list')
+                except KeyError:
+                    grid_dict = {}
 
             # convert from StimProgram instance label to stim type
             stim_type = self.frame.list_panel.convert_stim_type(stim_type)

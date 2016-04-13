@@ -321,6 +321,7 @@ class MyWindow(object):
                 MyWindow.win.color = color
                 MyWindow.win.flip()
                 MyWindow.win.flip()
+
         except (ValueError, AttributeError):
             pass
 
@@ -2036,6 +2037,7 @@ def main(stim_list, verbose=True):
         # to_delete = [f for f in os.listdir(save_loc) if f.endswith('.png')]
         # for f in to_delete:
         #     os.remove(os.path.join(save_loc, f))
+
         print '\nDONE'
 
     return fps, count_elapsed_time, time_stamp
