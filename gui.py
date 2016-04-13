@@ -684,6 +684,14 @@ class Parameters(object):
               'choices' : ['True', 'False'],
               'default' : config_dict['log'],
               'is_child': False}
+             ),
+
+            ('capture',
+             {'type'    : 'choice',
+              'label'   : 'capture',
+              'choices' : ['True', 'False'],
+              'default' : config_dict['capture'],
+              'is_child': False}
              )
         ])
 
@@ -1095,6 +1103,10 @@ class InputPanel(wx.Panel):
         if param == 'pref_dir':
             StimProgram.GlobalDefaults['pref_dir'] = \
                 global_params['pref_dir']
+
+        if param == 'capture':
+            StimProgram.GlobalDefaults['capture'] = \
+                global_params['capture']
 
         if param == 'background':
             StimProgram.MyWindow.change_color(global_params['background'])
