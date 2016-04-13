@@ -1742,6 +1742,8 @@ class DirPanel(wx.Panel):
             params = deepcopy(stim.parameters)
             # add move type back in to parameters
             params['move_type'] = stim.stim_type
+            # add grid dict in to parameters
+            params['grid_dict'] = self.frame.list_panel.stims_to_run_w_grid[i]
             # add to save list
             to_save.append(params)
 
@@ -1805,11 +1807,14 @@ class DirPanel(wx.Panel):
         for params in to_load:
             # take back out move type
             stim_type = params.pop('move_type')
+            # take back out grid dict
+            grid_dict = params.pop('grid_dict')
 
             # convert from StimProgram instance label to stim type
             stim_type = self.frame.list_panel.convert_stim_type(stim_type)
 
-            self.frame.list_panel.add_to_list(stim_type, params)
+            # load
+            self.frame.list_panel.add_to_list(stim_type, params, grid_dict)
 
         print '\nStim(s) saved'
 
@@ -2275,6 +2280,7 @@ class MyFrame(wx.Frame):
                                             index = int(param[-2])
                                             fixed_param = param[:-3]
 
+                                            # change parameter
                                             self.list_panel.stims_to_run[
                                                 j].parameters[
                                                 fixed_param][index] = value
