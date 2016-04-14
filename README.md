@@ -54,7 +54,3 @@ file for license rights and limitations.
 Main screen with queued stims:
 
 ![main screen](docs/screenshots/screen1.PNG)
-
-Example stimuli:
-
-![example](docs/screenshots/screen4.PNG)
