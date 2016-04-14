@@ -4,21 +4,22 @@ import StimProgram
 import unittest
 import mock
 import numpy
+import u3
 
 
 # class TestTrigger(unittest.TestCase):
 #
-#     @mock.patch('u3.U3')
-#     def test_send_trigger(self, mock_u3):
-#         reference = StimProgram.MyWindow()
-#         StimProgram.has_u3 = True
-#         has_u3 = True
-#         reference.d = True
-#
-#         reference.send_trigger()
-#
-#         mock_u3.setFIOState.assert_called_with(4, 0)
-
+    # @mock.path.object(StimProgram.MyWindow, 'make_win')
+    # @mock.patch('u3.U3')
+    # def test_send_trigger(self, mock_U3):
+    #     StimProgram.has_u3 = True
+    #
+    #     reference = StimProgram.MyWindow()
+    #     reference.d = u3.U3()
+    #     print reference.d
+    #     reference.send_trigger()
+    #
+    #     self.assertTrue(mock_U3.called)
 
 
 class TestGenSize(unittest.TestCase):
@@ -38,9 +39,6 @@ class TestGenSize(unittest.TestCase):
                                       outer_diameter=40,
                                       inner_diameter=10)
         self.assertTupleEqual(stim.gen_size(), (40, 40))
-
-    # @mock.path('')
-    # def test_gen_size(self):
 
 
 class TestGenMask(unittest.TestCase):
