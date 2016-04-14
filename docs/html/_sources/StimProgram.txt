@@ -2,6 +2,6 @@ StimProgram module
 ==================
 
 .. automodule:: StimProgram
-    :members:
-    :undoc-members:
-    :show-inheritance:
+   :members:
+   :undoc-members:
+   :show-inheritance:
