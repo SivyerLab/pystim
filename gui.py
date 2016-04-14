@@ -1,7 +1,7 @@
 #!/Library/Frameworks/Python.framework/Versions/2.7/bin/python
 
 """
-Test of MVC framework for GUI.
+GUI for StimProgram
 """
 
 from GammaCorrection import GammaValues  # necessary for pickling
@@ -67,11 +67,11 @@ class Parameters(object):
 
     def try_cast(self, value):
         """
-        helper method to attempt to cast parameters from strings to proper
+        Helper method to attempt to cast parameters from strings to proper
         int/float/bool, or map list values to int or float
 
         :param value: variable being casted, passed from ini file or gui so
-        always string. Skip if string
+         always string. Skip if string
         :return: casted or unchanged variable
         """
         if isinstance(value, basestring) and value != '':
@@ -177,7 +177,7 @@ class Parameters(object):
         Getter.
 
         :return: dictionary of default values from dicts other than global
-        defaults
+         defaults
         """
         merged_params = {}
 
@@ -1456,7 +1456,7 @@ class ListPanel(wx.Panel):
         :param param_dict:
         :param grid_dict:
         :param insert_pos: at which position in list to insert stim. Used
-        when moving stims up and down
+         when moving stims up and down
         :return:
         """
 
