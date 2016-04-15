@@ -1,6 +1,5 @@
-## Stimulus Program
-
-### What is it?
+What is it?
+-----------
 
 Stimulus Program uses the [Psychopy](www.psychopy.org) library to create
 various visual stimuli for use with patch clamped retinal cells. It comes with 
@@ -8,32 +7,31 @@ a GUI for ease of use. The program is capable of running at 60 fps and
 triggering recording devices (using a LabJack U3). The GUI uses wx, and so 
 appears with a native theme.
 
-### Latest Version
+Latest Version
+--------------
 
 The latest version can be found in the master branch on GitHub. The dev 
 branch is experimental, but will usually  contain new features and be mostly
 functional.
 
-### Documentation
+Documentation
+-------------
 
 Documentation is included in HTML format in the docs/html/ directory. Further
 documentation on Psychopy can be found on the psychopy [website](www.psychopy.org).
 
-### Installation
+Installation
+------------
 
 Stimulus Program is tested and works on both OSX and Windows. Stimulus
 Program requires several libraries, along with their associated dependencies,
 to run. They are listed below:
 
-- psychopy (see psychopy [documentation](http://www.psychopy.org/documentation.html) 
-for required [dependencies](http://www.psychopy.org/installation
-.html#essential-packages)). Psychopy is available through:
+- psychopy (see psychopy `documentation <http://www.psychopy.org/documentation.html>`_ for required `dependencies <http://www.psychopy.org/installation.html#essential-packages>`_). Psychopy is available through::
 
-```
     pip install psychopy
-```
 
-- [wxPython](http://www.wxpython.org/download.php) (for GUI)
+- `wxPython <http://www.wxpython.org/download.php)>`_ (for GUI)
 - sortedcontainers (also available through pip)
 - numpy and scipy
 - PIL (use Pillow)
@@ -42,17 +40,18 @@ Optional libraries:
 
 - tabulate (for formatting logs)
 - igor (for parsing tables)
-- [u3](https://labjack.com/support/software/examples/ud/labjackpython) (for 
-triggering from LabJack)
-- ffmpeg for making movies from captured frames
+- `u3 <https://labjack.com/support/software/examples/ud/labjackpython>`_ (for triggering from LabJack)
+- `ffmpeg <https://www.ffmpeg.org/>`_ for making movies from captured frames
 
-### Licensing
+Licensing
+---------
 
 Stimulus Program is licensed under GNU GPL v3.0. See [LICENSE](LICENSE.md)
 file for license rights and limitations.
 
-### Screen Shots (Windows 7)
+Screen Shots
+------------
 
-Main screen with queued stims:
+Main screen with queued stims (Windows 7):
 
-![main screen](docs/screenshots/Screen1.PNG)
+.. image:: ../../docs/screenshots/screens.gif

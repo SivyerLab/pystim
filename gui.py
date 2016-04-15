@@ -1840,7 +1840,7 @@ class DirPanel(wx.Panel):
             # load
             self.frame.list_panel.add_to_list(stim_type, params, grid_dict)
 
-        print '\nStim(s) saved'
+        print '\nStim(s) loaded'
 
     def on_double_click(self, event):
         """
