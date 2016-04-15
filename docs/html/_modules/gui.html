@@ -106,6 +106,7 @@
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Uses ConfigParser to read .ini file where default values for params</span>
 <span class="sd">        are stored.</span>
+
 <span class="sd">        :param config_file: file where defaults are stored</span>
 <span class="sd">        :return: returns dictionary of defaults</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -219,7 +220,7 @@
         <span class="k">return</span> <span class="n">deepcopy</span><span class="p">(</span><span class="n">trans</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="Parameters.get_global_params"><a class="viewcode-back" href="../gui.html#gui.Parameters.get_global_params">[docs]</a>    <span class="k">def</span> <span class="nf">get_global_params</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;&quot;</span>
+        <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Getter.</span>
 
 <span class="sd">        :return: dictionary of default values from global defaults</span>
@@ -265,7 +266,7 @@
 <span class="sd">        :param category: which dictionary the param is in</span>
 <span class="sd">        :param param: the param to be edited</span>
 <span class="sd">        :param value: the value the param is being set to</span>
-<span class="sd">        :parma index: if a list value param, where in the list</span>
+<span class="sd">        :param index: if a list value param, where in the list</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">trans</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">trans</span><span class="p">(</span><span class="n">category</span><span class="p">)</span>
 
@@ -284,7 +285,8 @@
 
 <span class="sd">        :param category: which dictionary the param is in</span>
 <span class="sd">        :param param: the param to be returned</span>
-<span class="sd">        :parma index: if a list value param, where in the list</span>
+<span class="sd">        :param index: if a list value param, where in the list</span>
+<span class="sd">        :return: the currently set parameter value</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">trans</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">trans</span><span class="p">(</span><span class="n">category</span><span class="p">)</span>
 
@@ -766,7 +768,7 @@
 <div class="viewcode-block" id="TextCtrlTag"><a class="viewcode-back" href="../gui.html#gui.TextCtrlTag">[docs]</a><span class="k">class</span> <span class="nc">TextCtrlTag</span><span class="p">(</span><span class="n">wx</span><span class="o">.</span><span class="n">TextCtrl</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Simple subclass of wx.TextCtrl for assigning ID tag to class to keep</span>
-<span class="sd">    track of which parameter it was assigned to. Also method to set value.</span>
+<span class="sd">    track of which parameter it was assigned to. Also has method to set value.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="c1"># pop out tag and tag2 if present from args/kwargs</span>
@@ -785,17 +787,17 @@
 
 <div class="viewcode-block" id="TextCtrlTag.set_editable"><a class="viewcode-back" href="../gui.html#gui.TextCtrlTag.set_editable">[docs]</a>    <span class="k">def</span> <span class="nf">set_editable</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">toggle</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Makes control not editable.</span>
+<span class="sd">        Toggles whether or not control is editable.</span>
 
-<span class="sd">        :param toggle:</span>
-<span class="sd">        :param value:</span>
+<span class="sd">        :param toggle: True or False, whether control is editable.</span>
+<span class="sd">        :param value: When making editable, what to set value to.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">toggle</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">ChangeValue</span><span class="p">(</span><span class="s1">&#39;table&#39;</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">SetEditable</span><span class="p">(</span><span class="bp">False</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="n">toggle</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">SetValue</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">value</span><span class="p">))</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">set_value</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">SetEditable</span><span class="p">(</span><span class="bp">True</span><span class="p">)</span></div></div>
 
 
@@ -824,14 +826,14 @@
 
 <div class="viewcode-block" id="ChoiceCtrlTag.set_editable"><a class="viewcode-back" href="../gui.html#gui.ChoiceCtrlTag.set_editable">[docs]</a>    <span class="k">def</span> <span class="nf">set_editable</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">toggle</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Makes control not editable.</span>
+<span class="sd">        Toggles whether or not control is editable.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">toggle</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">Append</span><span class="p">(</span><span class="s1">&#39;table&#39;</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">SetStringSelection</span><span class="p">(</span><span class="s1">&#39;table&#39;</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="n">toggle</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">SetStringSelection</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">set_value</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">Delete</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">GetCount</span><span class="p">()</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span></div></div>
 
 
@@ -918,14 +920,15 @@
 <div class="viewcode-block" id="InputPanel"><a class="viewcode-back" href="../gui.html#gui.InputPanel">[docs]</a><span class="k">class</span> <span class="nc">InputPanel</span><span class="p">(</span><span class="n">wx</span><span class="o">.</span><span class="n">Panel</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Class for generic panel with input widgets and their labels. Parent class</span>
-<span class="sd">    of SubPanel and GlobalPanel.</span>
+<span class="sd">    of GlobalPanel.</span>
+
+<span class="sd">    :param params: dictionary of parameters</span>
+<span class="sd">    :param parent: parent window of panel (notebook)</span>
+<span class="sd">    :param category: category of parameters</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">params</span><span class="p">,</span> <span class="n">parent</span><span class="p">,</span> <span class="n">category</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Constructor</span>
-<span class="sd">        :param params: dictionary of parameters</span>
-<span class="sd">        :param parent: parent window of panel (notebook)</span>
-<span class="sd">        :param category: category of parameters</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="c1"># super instantiation</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">InputPanel</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="n">parent</span><span class="p">)</span>
@@ -1200,6 +1203,10 @@
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Subclass of InputPanel, contains a few aesthetic changes in its init</span>
 <span class="sd">    since not part of a notebook.</span>
+
+<span class="sd">    :param params: dictionary of parameters</span>
+<span class="sd">    :param parent: parent window of panel (notebook)</span>
+<span class="sd">    :param category: category of parameters</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parent</span><span class="p">,</span> <span class="n">params</span><span class="p">,</span> <span class="n">category</span><span class="p">):</span>
         <span class="c1"># super initiation</span>
@@ -1524,7 +1531,6 @@
 <span class="sd">        :param grid_dict:</span>
 <span class="sd">        :param insert_pos: at which position in list to insert stim. Used</span>
 <span class="sd">         when moving stims up and down</span>
-<span class="sd">        :return:</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="k">if</span> <span class="n">insert_pos</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
@@ -2133,7 +2139,7 @@
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Getter. Sets middle Nones to previous values.</span>
 
-<span class="sd">        :return:</span>
+<span class="sd">        :return: edited dictionary of params and values in grid</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">to_return</span> <span class="o">=</span> <span class="p">{}</span>
         <span class="n">to_edit</span> <span class="o">=</span> <span class="n">deepcopy</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">control_dict</span><span class="p">)</span>
@@ -2429,7 +2435,6 @@
 <span class="sd">        various params from global panel.</span>
 
 <span class="sd">        :param event: event passed by binder</span>
-<span class="sd">        :return:</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">win_open</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">on_stop_button</span><span class="p">(</span><span class="n">event</span><span class="p">)</span>

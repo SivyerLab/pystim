@@ -191,7 +191,7 @@ offset the center of the window.</li>
 <dl class="attribute">
 <dt id="StimProgram.MyWindow.frame_trigger_list">
 <code class="descname">frame_trigger_list</code><em class="property"> = SortedList([2147483647], load=1000)</em><a class="headerlink" href="#StimProgram.MyWindow.frame_trigger_list" title="Permalink to this definition">¶</a></dt>
-<dd><p>list of frames to trigger on</p>
+<dd><p>List of frames to trigger on</p>
 </dd></dl>
 
 <dl class="staticmethod">
@@ -211,14 +211,24 @@ present.</p>
 <dl class="staticmethod">
 <dt id="StimProgram.MyWindow.change_color">
 <em class="property">static </em><code class="descname">change_color</code><span class="sig-paren">(</span><em>color</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/StimProgram.html#MyWindow.change_color"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#StimProgram.MyWindow.change_color" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Static method to live update the background of the window.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>color</strong> &#8211; RGB list used to change global defaults.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
 
 <dl class="staticmethod">
 <dt id="StimProgram.MyWindow.send_trigger">
 <em class="property">static </em><code class="descname">send_trigger</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/StimProgram.html#MyWindow.send_trigger"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#StimProgram.MyWindow.send_trigger" title="Permalink to this definition">¶</a></dt>
 <dd><p>Triggers recording device by sending short voltage spike from LabJack
-U3-HV. Spike last approximately 0.4 ms if high speed USB (2.0). Ensure
-high enough sampling rate to reliably detect triggers.</p>
+U3-HV. Spike last approximately 0.4 ms if connected via high speed USB (
+2.0). Ensure high enough sampling rate to reliably detect triggers.
+Set to use  flexible IO #4.</p>
 </dd></dl>
 
 </dd></dl>

@@ -95,9 +95,17 @@
 <dt id="gui.Parameters.read_config_file">
 <code class="descname">read_config_file</code><span class="sig-paren">(</span><em>config_file</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gui.html#Parameters.read_config_file"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gui.Parameters.read_config_file" title="Permalink to this definition">¶</a></dt>
 <dd><p>Uses ConfigParser to read .ini file where default values for params
-are stored.
-:param config_file: file where defaults are stored
-:return: returns dictionary of defaults</p>
+are stored.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>config_file</strong> &#8211; file where defaults are stored</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">returns dictionary of defaults</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="method">
@@ -165,8 +173,7 @@ always string. Skip if string</td>
 <dl class="method">
 <dt id="gui.Parameters.get_global_params">
 <code class="descname">get_global_params</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/gui.html#Parameters.get_global_params"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gui.Parameters.get_global_params" title="Permalink to this definition">¶</a></dt>
-<dd><p>&#8221;
-Getter.</p>
+<dd><p>Getter.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -214,14 +221,12 @@ defaults</td>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
 <li><strong>category</strong> &#8211; which dictionary the param is in</li>
 <li><strong>param</strong> &#8211; the param to be edited</li>
 <li><strong>value</strong> &#8211; the value the param is being set to</li>
+<li><strong>index</strong> &#8211; if a list value param, where in the list</li>
 </ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Parma index:</th><td class="field-body"><p class="first last">if a list value param, where in the list</p>
 </td>
 </tr>
 </tbody>
@@ -239,10 +244,11 @@ defaults</td>
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
 <li><strong>category</strong> &#8211; which dictionary the param is in</li>
 <li><strong>param</strong> &#8211; the param to be returned</li>
+<li><strong>index</strong> &#8211; if a list value param, where in the list</li>
 </ul>
 </td>
 </tr>
-<tr class="field-even field"><th class="field-name">Parma index:</th><td class="field-body"><p class="first last">if a list value param, where in the list</p>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">the currently set parameter value</p>
 </td>
 </tr>
 </tbody>
@@ -270,7 +276,7 @@ defaults</td>
 <em class="property">class </em><code class="descclassname">gui.</code><code class="descname">TextCtrlTag</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gui.html#TextCtrlTag"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gui.TextCtrlTag" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">wx._controls.TextCtrl</span></code></p>
 <p>Simple subclass of wx.TextCtrl for assigning ID tag to class to keep
-track of which parameter it was assigned to. Also method to set value.</p>
+track of which parameter it was assigned to. Also has method to set value.</p>
 <dl class="method">
 <dt id="gui.TextCtrlTag.set_value">
 <code class="descname">set_value</code><span class="sig-paren">(</span><em>value</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gui.html#TextCtrlTag.set_value"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gui.TextCtrlTag.set_value" title="Permalink to this definition">¶</a></dt>
@@ -288,14 +294,14 @@ track of which parameter it was assigned to. Also method to set value.</p>
 <dl class="method">
 <dt id="gui.TextCtrlTag.set_editable">
 <code class="descname">set_editable</code><span class="sig-paren">(</span><em>toggle</em>, <em>value=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gui.html#TextCtrlTag.set_editable"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gui.TextCtrlTag.set_editable" title="Permalink to this definition">¶</a></dt>
-<dd><p>Makes control not editable.</p>
+<dd><p>Toggles whether or not control is editable.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>toggle</strong> &#8211; </li>
-<li><strong>value</strong> &#8211; </li>
+<li><strong>toggle</strong> &#8211; True or False, whether control is editable.</li>
+<li><strong>value</strong> &#8211; When making editable, what to set value to.</li>
 </ul>
 </td>
 </tr>
@@ -328,7 +334,7 @@ track of which parameter it was assigned to. Also method to set value.</p>
 <dl class="method">
 <dt id="gui.ChoiceCtrlTag.set_editable">
 <code class="descname">set_editable</code><span class="sig-paren">(</span><em>toggle</em>, <em>value=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gui.html#ChoiceCtrlTag.set_editable"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gui.ChoiceCtrlTag.set_editable" title="Permalink to this definition">¶</a></dt>
-<dd><p>Makes control not editable.</p>
+<dd><p>Toggles whether or not control is editable.</p>
 </dd></dl>
 
 </dd></dl>
@@ -400,7 +406,20 @@ method.</p>
 <em class="property">class </em><code class="descclassname">gui.</code><code class="descname">InputPanel</code><span class="sig-paren">(</span><em>params</em>, <em>parent</em>, <em>category</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gui.html#InputPanel"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gui.InputPanel" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">wx._windows.Panel</span></code></p>
 <p>Class for generic panel with input widgets and their labels. Parent class
-of SubPanel and GlobalPanel.</p>
+of GlobalPanel.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>params</strong> &#8211; dictionary of parameters</li>
+<li><strong>parent</strong> &#8211; parent window of panel (notebook)</li>
+<li><strong>category</strong> &#8211; category of parameters</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
 <dl class="method">
 <dt id="gui.InputPanel.create_inputs">
 <code class="descname">create_inputs</code><span class="sig-paren">(</span><em>category</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gui.html#InputPanel.create_inputs"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gui.InputPanel.create_inputs" title="Permalink to this definition">¶</a></dt>
@@ -455,6 +474,19 @@ list (i.e. multiple text fields).</p>
 <dd><p>Bases: <a class="reference internal" href="#gui.InputPanel" title="gui.InputPanel"><code class="xref py py-class docutils literal"><span class="pre">gui.InputPanel</span></code></a></p>
 <p>Subclass of InputPanel, contains a few aesthetic changes in its init
 since not part of a notebook.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>params</strong> &#8211; dictionary of parameters</li>
+<li><strong>parent</strong> &#8211; parent window of panel (notebook)</li>
+<li><strong>category</strong> &#8211; category of parameters</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
 <dl class="method">
 <dt id="gui.GlobalPanel.on_default_save">
 <code class="descname">on_default_save</code><span class="sig-paren">(</span><em>event</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gui.html#GlobalPanel.on_default_save"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gui.GlobalPanel.on_default_save" title="Permalink to this definition">¶</a></dt>
@@ -543,16 +575,13 @@ and up/down buttons.</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
 <li><strong>stim_type</strong> &#8211; </li>
 <li><strong>param_dict</strong> &#8211; </li>
 <li><strong>grid_dict</strong> &#8211; </li>
 <li><strong>insert_pos</strong> &#8211; at which position in list to insert stim. Used
 when moving stims up and down</li>
 </ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last"></p>
 </td>
 </tr>
 </tbody>
@@ -765,7 +794,7 @@ row/column header right clicked.</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"></td>
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">edited dictionary of params and values in grid</td>
 </tr>
 </tbody>
 </table>
@@ -808,8 +837,6 @@ various params from global panel.</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>event</strong> &#8211; event passed by binder</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"></td>
 </tr>
 </tbody>
 </table>

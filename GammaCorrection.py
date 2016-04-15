@@ -32,8 +32,9 @@ The script can be invoked from the command line/terminal::
     python GammaCorrection.py
 
 Psychopy has built in gamma correction. This script provides an alternative
-to that due to difficulties using it on some platforms. See the psychopy
-documentation for information on using that gamma correction.
+to that due to difficulties using it with a second monitor on some platforms.
+See the psychopy documentation for information on using the built in gamma
+correction.
 """
 
 from psychopy import visual, core, event, logging
@@ -50,15 +51,19 @@ import copy_reg, types
 logging.console.setLevel(logging.CRITICAL)
 
 
-def reduce_method(m):
-    return (getattr, (m.__self__, m.__func__.__name__))
-
-copy_reg.pickle(types.MethodType, reduce_method)
+# def reduce_method(m):
+#     """
+#     Method to allow pickling
+#     """
+#     return (getattr, (m.__self__, m.__func__.__name__))
+#
+# copy_reg.pickle(types.MethodType, reduce_method)
 
 
 def gammaCorrect():
     """
-    Main function.
+    Prompts user for inputs. Generates evenly spaced RGB values in each gun
+    if user desires. Gets splines and prompts for saving.
     """
     prompt = True
 
@@ -318,7 +323,8 @@ class GammaValues(object):
 
     def __call__(self, color, channel=None):
         """
-        Calculates adjusted color value.
+        Calculates adjusted color value. Allows getting corrected values by
+        making calls to instance.
 
         :param list color: List of RGB values, scaled from -1 to 1, or color
          from a single channel.

@@ -247,7 +247,7 @@ class MyWindow(object):
     should_break = False
     #: Labjack U3 instance for triggering.
     d = None
-    #: list of frames to trigger on
+    #: List of frames to trigger on
     frame_trigger_list = sortedcontainers.SortedList()
     frame_trigger_list.add(sys.maxint)  # need an extra last value for index
 
@@ -311,6 +311,10 @@ class MyWindow(object):
 
     @staticmethod
     def change_color(color):
+        """Static method to live update the background of the window.
+
+        :param color: RGB list used to change global defaults.
+        """
         try:
             if MyWindow.win is not None:
                 GlobalDefaults['background'] = color
@@ -328,8 +332,9 @@ class MyWindow(object):
     @staticmethod
     def send_trigger():
         """Triggers recording device by sending short voltage spike from LabJack
-        U3-HV. Spike last approximately 0.4 ms if high speed USB (2.0). Ensure
-        high enough sampling rate to reliably detect triggers.
+        U3-HV. Spike last approximately 0.4 ms if connected via high speed USB (
+        2.0). Ensure high enough sampling rate to reliably detect triggers.
+        Set to use  flexible IO #4.
         """
 
         if has_u3:

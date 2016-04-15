@@ -108,17 +108,14 @@ separated by 2 new lines.</p>
 </pre></div>
 </div>
 <p>Psychopy has built in gamma correction. This script provides an alternative
-to that due to difficulties using it on some platforms. See the psychopy
-documentation for information on using that gamma correction.</p>
-<dl class="function">
-<dt id="GammaCorrection.reduce_method">
-<code class="descclassname">GammaCorrection.</code><code class="descname">reduce_method</code><span class="sig-paren">(</span><em>m</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/GammaCorrection.html#reduce_method"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#GammaCorrection.reduce_method" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
+to that due to difficulties using it with a second monitor on some platforms.
+See the psychopy documentation for information on using the built in gamma
+correction.</p>
 <dl class="function">
 <dt id="GammaCorrection.gammaCorrect">
 <code class="descclassname">GammaCorrection.</code><code class="descname">gammaCorrect</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/GammaCorrection.html#gammaCorrect"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#GammaCorrection.gammaCorrect" title="Permalink to this definition">¶</a></dt>
-<dd><p>Main function.</p>
+<dd><p>Prompts user for inputs. Generates evenly spaced RGB values in each gun
+if user desires. Gets splines and prompts for saving.</p>
 </dd></dl>
 
 <dl class="function">
@@ -194,6 +191,29 @@ gammaCorrect, pulled out of text file.</td>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">corrected blue color</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="GammaCorrection.GammaValues.__call__">
+<code class="descname">__call__</code><span class="sig-paren">(</span><em>color</em>, <em>channel=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/GammaCorrection.html#GammaValues.__call__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#GammaCorrection.GammaValues.__call__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculates adjusted color value.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>color</strong> (<a class="reference external" href="https://docs.python.org/library/functions.html#list" title="(in Python v2.7)"><em>list</em></a>) &#8211; List of RGB values, scaled from -1 to 1, or color
+from a single channel.</li>
+<li><strong>channel</strong> (<a class="reference external" href="https://docs.python.org/library/functions.html#int" title="(in Python v2.7)"><em>int</em></a>) &#8211; If color is passed as a single number, channel is
+the color channel.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">Adjusted list of RGB values, or single adjusted color.</p>
+</td>
 </tr>
 </tbody>
 </table>

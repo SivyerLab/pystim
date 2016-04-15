@@ -39,6 +39,7 @@ class Parameters(object):
         """
         Uses ConfigParser to read .ini file where default values for params
         are stored.
+
         :param config_file: file where defaults are stored
         :return: returns dictionary of defaults
         """
@@ -152,7 +153,7 @@ class Parameters(object):
         return deepcopy(trans)
 
     def get_global_params(self):
-        """"
+        """
         Getter.
 
         :return: dictionary of default values from global defaults
@@ -198,7 +199,7 @@ class Parameters(object):
         :param category: which dictionary the param is in
         :param param: the param to be edited
         :param value: the value the param is being set to
-        :parma index: if a list value param, where in the list
+        :param index: if a list value param, where in the list
         """
         trans = self.trans(category)
 
@@ -217,7 +218,8 @@ class Parameters(object):
 
         :param category: which dictionary the param is in
         :param param: the param to be returned
-        :parma index: if a list value param, where in the list
+        :param index: if a list value param, where in the list
+        :return: the currently set parameter value
         """
         trans = self.trans(category)
 
@@ -699,7 +701,7 @@ class Parameters(object):
 class TextCtrlTag(wx.TextCtrl):
     """
     Simple subclass of wx.TextCtrl for assigning ID tag to class to keep
-    track of which parameter it was assigned to. Also method to set value.
+    track of which parameter it was assigned to. Also has method to set value.
     """
     def __init__(self, *args, **kwargs):
         # pop out tag and tag2 if present from args/kwargs
@@ -718,17 +720,17 @@ class TextCtrlTag(wx.TextCtrl):
 
     def set_editable(self, toggle, value=None):
         """
-        Makes control not editable.
+        Toggles whether or not control is editable.
 
-        :param toggle:
-        :param value:
+        :param toggle: True or False, whether control is editable.
+        :param value: When making editable, what to set value to.
         """
         if not toggle:
             self.ChangeValue('table')
             self.SetEditable(False)
 
         if toggle:
-            self.SetValue(str(value))
+            self.set_value(value)
             self.SetEditable(True)
 
 
@@ -757,14 +759,14 @@ class ChoiceCtrlTag(wx.Choice):
 
     def set_editable(self, toggle, value=None):
         """
-        Makes control not editable.
+        Toggles whether or not control is editable.
         """
         if not toggle:
             self.Append('table')
             self.SetStringSelection('table')
 
         if toggle:
-            self.SetStringSelection(value)
+            self.set_value(value)
             self.Delete(self.GetCount() - 1)
 
 
@@ -851,14 +853,15 @@ class TextCtrlValidator(wx.PyValidator):
 class InputPanel(wx.Panel):
     """
     Class for generic panel with input widgets and their labels. Parent class
-    of SubPanel and GlobalPanel.
+    of GlobalPanel.
+
+    :param params: dictionary of parameters
+    :param parent: parent window of panel (notebook)
+    :param category: category of parameters
     """
     def __init__(self, params, parent, category):
         """
         Constructor
-        :param params: dictionary of parameters
-        :param parent: parent window of panel (notebook)
-        :param category: category of parameters
         """
         # super instantiation
         super(InputPanel, self).__init__(parent)
@@ -1133,6 +1136,10 @@ class GlobalPanel(InputPanel):
     """
     Subclass of InputPanel, contains a few aesthetic changes in its init
     since not part of a notebook.
+
+    :param params: dictionary of parameters
+    :param parent: parent window of panel (notebook)
+    :param category: category of parameters
     """
     def __init__(self, parent, params, category):
         # super initiation
@@ -1457,7 +1464,6 @@ class ListPanel(wx.Panel):
         :param grid_dict:
         :param insert_pos: at which position in list to insert stim. Used
          when moving stims up and down
-        :return:
         """
 
         if insert_pos is None:
@@ -2066,7 +2072,7 @@ class MyGrid(wx.Frame):
         """
         Getter. Sets middle Nones to previous values.
 
-        :return:
+        :return: edited dictionary of params and values in grid
         """
         to_return = {}
         to_edit = deepcopy(self.control_dict)
@@ -2362,7 +2368,6 @@ class MyFrame(wx.Frame):
         various params from global panel.
 
         :param event: event passed by binder
-        :return:
         """
         if self.win_open:
             self.on_stop_button(event)
