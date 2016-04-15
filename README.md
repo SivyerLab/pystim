@@ -35,6 +35,8 @@ for required [dependencies](http://www.psychopy.org/installation
 
 - [wxPython](http://www.wxpython.org/download.php) (for GUI)
 - sortedcontainers (also available through pip)
+- numpy and scipy
+- PIL (use Pillow)
 
 Optional libraries:
 

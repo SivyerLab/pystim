@@ -1,0 +1,279 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>StimProgram other classes &mdash; Stimulus Program 1.1 documentation</title>
+    
+    <link rel="stylesheet" href="_static/sphinxdoc.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '1.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="Stimulus Program 1.1 documentation" href="index.html" />
+    <link rel="up" title="StimProgram module" href="StimProgram.html" />
+    <link rel="next" title="StimProgram other functions" href="StimProgramOtherMethods.html" />
+    <link rel="prev" title="Checkerboard Stim" href="BoardTexture.html" /> 
+  </head>
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="StimProgramOtherMethods.html" title="StimProgram other functions"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="BoardTexture.html" title="Checkerboard Stim"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">Stimulus Program 1.1 documentation</a> &raquo;</li>
+          <li class="nav-item nav-item-1"><a href="StimProgram.html" accesskey="U">StimProgram module</a> &raquo;</li> 
+      </ul>
+    </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="BoardTexture.html"
+                        title="previous chapter">Checkerboard Stim</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="StimProgramOtherMethods.html"
+                        title="next chapter">StimProgram other functions</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/StimProgramOther.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="stimprogram-other-classes">
+<h1>StimProgram other classes<a class="headerlink" href="#stimprogram-other-classes" title="Permalink to this headline">¶</a></h1>
+<dl class="class">
+<dt id="StimProgram.StimInfo">
+<em class="property">class </em><code class="descclassname">StimProgram.</code><code class="descname">StimInfo</code><span class="sig-paren">(</span><em>stim_type</em>, <em>parameters</em>, <em>number</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/StimProgram.html#StimInfo"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#StimProgram.StimInfo" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/library/functions.html#object" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">object</span></code></a></p>
+<p>Class for storing type and parameters of a stim.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>stim_type</strong> (<a class="reference external" href="https://docs.python.org/library/string.html#module-string" title="(in Python v2.7)"><em>string</em></a>) &#8211; The move type of the stim, such as static,
+random, table, etc.</li>
+<li><strong>parameters</strong> (<a class="reference external" href="https://docs.python.org/library/stdtypes.html#dict" title="(in Python v2.7)"><em>dict</em></a>) &#8211; Dictionary of parameters passed from GUI.</li>
+<li><strong>number</strong> (<a class="reference external" href="https://docs.python.org/library/functions.html#int" title="(in Python v2.7)"><em>int</em></a>) &#8211; For order of stims.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="class">
+<dt id="StimProgram.GlobalDefaultsMeta">
+<em class="property">class </em><code class="descclassname">StimProgram.</code><code class="descname">GlobalDefaultsMeta</code><a class="reference internal" href="_modules/StimProgram.html#GlobalDefaultsMeta"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#StimProgram.GlobalDefaultsMeta" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/library/functions.html#type" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">type</span></code></a></p>
+<p>Metaclass to redefine get item and set item for GlobalDefaults.</p>
+<dl class="method">
+<dt id="StimProgram.GlobalDefaultsMeta.__getitem__">
+<code class="descname">__getitem__</code><span class="sig-paren">(</span><em>key</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/StimProgram.html#GlobalDefaultsMeta.__getitem__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#StimProgram.GlobalDefaultsMeta.__getitem__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="StimProgram.GlobalDefaultsMeta.__setitem__">
+<code class="descname">__setitem__</code><span class="sig-paren">(</span><em>key</em>, <em>item</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/StimProgram.html#GlobalDefaultsMeta.__setitem__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#StimProgram.GlobalDefaultsMeta.__setitem__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="StimProgram.GlobalDefaults">
+<em class="property">class </em><code class="descclassname">StimProgram.</code><code class="descname">GlobalDefaults</code><span class="sig-paren">(</span><em>frame_rate=None</em>, <em>pix_per_micron=None</em>, <em>scale=None</em>, <em>display_size=None</em>, <em>position=None</em>, <em>protocol_reps=None</em>, <em>background=None</em>, <em>pref_dir=None</em>, <em>fullscreen=None</em>, <em>screen_num=None</em>, <em>trigger_wait=None</em>, <em>log=None</em>, <em>gamma_correction=None</em>, <em>offset=None</em>, <em>capture=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/StimProgram.html#GlobalDefaults"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#StimProgram.GlobalDefaults" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/library/functions.html#object" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">object</span></code></a></p>
+<p>Class with global constants, such as window information. Uses dictionary
+to simulate &#8216;mutable static class variables&#8217;</p>
+<p>TODO: better, more pythonic, way to do this</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>frame_rate</strong> (<a class="reference external" href="https://docs.python.org/library/functions.html#int" title="(in Python v2.7)"><em>int</em></a>) &#8211; Frame rate of monitor.</li>
+<li><strong>pix_per_micron</strong> (<a class="reference external" href="https://docs.python.org/library/functions.html#float" title="(in Python v2.7)"><em>float</em></a>) &#8211; Number of pixels per micron. Used for unit
+conversion.</li>
+<li><strong>scale</strong> (<a class="reference external" href="https://docs.python.org/library/functions.html#float" title="(in Python v2.7)"><em>float</em></a>) &#8211; The factor by which to scale the size of the stimuli.</li>
+<li><strong>display_size</strong> (<a class="reference external" href="https://docs.python.org/library/functions.html#float" title="(in Python v2.7)"><em>float</em></a>) &#8211; List of height and width of the monitor.</li>
+<li><strong>position</strong> (<a class="reference external" href="https://docs.python.org/library/functions.html#list" title="(in Python v2.7)"><em>list</em></a>) &#8211; List of xy coordinates of stim window location.</li>
+<li><strong>protocol_reps</strong> (<a class="reference external" href="https://docs.python.org/library/functions.html#int" title="(in Python v2.7)"><em>int</em></a>) &#8211; Number of repetitions to cycle through of all
+stims.</li>
+<li><strong>background</strong> (<a class="reference external" href="https://docs.python.org/library/functions.html#list" title="(in Python v2.7)"><em>list</em></a>) &#8211; RGB list of window background.</li>
+<li><strong>pref_dir</strong> (<a class="reference external" href="https://docs.python.org/library/functions.html#float" title="(in Python v2.7)"><em>float</em></a>) &#8211; Cell preferred direction. If not -1, overrides
+start_dir</li>
+<li><strong>fullscreen</strong> (<a class="reference external" href="https://docs.python.org/library/functions.html#bool" title="(in Python v2.7)"><em>bool</em></a>) &#8211; Boolean, whether or not window should be fullscreen.</li>
+<li><strong>screen_num</strong> (<a class="reference external" href="https://docs.python.org/library/functions.html#int" title="(in Python v2.7)"><em>int</em></a>) &#8211; On which monitor to display the window.</li>
+<li><strong>gamma_correction</strong> (<a class="reference external" href="https://docs.python.org/library/string.html#module-string" title="(in Python v2.7)"><em>string</em></a>) &#8211; Spline to use for gamma correction. See
+:doc:&#8217;GammaCorrection&#8217; documentation.</li>
+<li><strong>trigger_wait</strong> (<a class="reference external" href="https://docs.python.org/library/functions.html#float" title="(in Python v2.7)"><em>float</em></a>) &#8211; The wait time between the labjack sending a
+pulse and the start of the stims.</li>
+<li><strong>log</strong> (<a class="reference external" href="https://docs.python.org/library/functions.html#bool" title="(in Python v2.7)"><em>bool</em></a>) &#8211; Whether or not to write to a log file.</li>
+<li><strong>offset</strong> (<a class="reference external" href="https://docs.python.org/library/functions.html#list" title="(in Python v2.7)"><em>list</em></a>) &#8211; List of microns in xy coordinates of how much to
+offset the center of the window.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<dl class="attribute">
+<dt id="StimProgram.GlobalDefaults.defaults">
+<code class="descname">defaults</code><em class="property"> = {'capture': False, 'protocol_reps': 1, 'scale': 1, 'log': False, 'fullscreen': False, 'display_size': [400, 400], 'pref_dir': -1, 'background': [-1, 0, -1], 'trigger_wait': 0.1, 'frame_rate': 75, 'offset': [0, 0], 'position': [0, 0], 'gamma_correction': 'default', 'pix_per_micron': 1, 'screen_num': 1}</em><a class="headerlink" href="#StimProgram.GlobalDefaults.defaults" title="Permalink to this definition">¶</a></dt>
+<dd><p>Dictionary of default defaults.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="StimProgram.MyWindow">
+<em class="property">class </em><code class="descclassname">StimProgram.</code><code class="descname">MyWindow</code><a class="reference internal" href="_modules/StimProgram.html#MyWindow"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#StimProgram.MyWindow" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/library/functions.html#object" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">object</span></code></a></p>
+<p>Class with static methods for window management and triggering.</p>
+<dl class="attribute">
+<dt id="StimProgram.MyWindow.win">
+<code class="descname">win</code><em class="property"> = None</em><a class="headerlink" href="#StimProgram.MyWindow.win" title="Permalink to this definition">¶</a></dt>
+<dd><p>Psychopy window instance.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="StimProgram.MyWindow.gamma_mon">
+<code class="descname">gamma_mon</code><em class="property"> = None</em><a class="headerlink" href="#StimProgram.MyWindow.gamma_mon" title="Permalink to this definition">¶</a></dt>
+<dd><p>Gamma correction instance. See GammaCorrection.py.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="StimProgram.MyWindow.should_break">
+<code class="descname">should_break</code><em class="property"> = False</em><a class="headerlink" href="#StimProgram.MyWindow.should_break" title="Permalink to this definition">¶</a></dt>
+<dd><p>Used to break out of animation loop in main().</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="StimProgram.MyWindow.d">
+<code class="descname">d</code><em class="property"> = None</em><a class="headerlink" href="#StimProgram.MyWindow.d" title="Permalink to this definition">¶</a></dt>
+<dd><p>Labjack U3 instance for triggering.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="StimProgram.MyWindow.frame_trigger_list">
+<code class="descname">frame_trigger_list</code><em class="property"> = SortedList([2147483647], load=1000)</em><a class="headerlink" href="#StimProgram.MyWindow.frame_trigger_list" title="Permalink to this definition">¶</a></dt>
+<dd><p>List of frames to trigger on</p>
+</dd></dl>
+
+<dl class="staticmethod">
+<dt id="StimProgram.MyWindow.make_win">
+<em class="property">static </em><code class="descname">make_win</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/StimProgram.html#MyWindow.make_win"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#StimProgram.MyWindow.make_win" title="Permalink to this definition">¶</a></dt>
+<dd><p>Static method to create window from global parameters. Checks if
+gamma correction splines are present. Also instantiates labjack if
+present.</p>
+</dd></dl>
+
+<dl class="staticmethod">
+<dt id="StimProgram.MyWindow.close_win">
+<em class="property">static </em><code class="descname">close_win</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/StimProgram.html#MyWindow.close_win"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#StimProgram.MyWindow.close_win" title="Permalink to this definition">¶</a></dt>
+<dd><p>Static method to close window. Also closes labjack if present.</p>
+</dd></dl>
+
+<dl class="staticmethod">
+<dt id="StimProgram.MyWindow.change_color">
+<em class="property">static </em><code class="descname">change_color</code><span class="sig-paren">(</span><em>color</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/StimProgram.html#MyWindow.change_color"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#StimProgram.MyWindow.change_color" title="Permalink to this definition">¶</a></dt>
+<dd><p>Static method to live update the background of the window.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>color</strong> &#8211; RGB list used to change global defaults.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="staticmethod">
+<dt id="StimProgram.MyWindow.send_trigger">
+<em class="property">static </em><code class="descname">send_trigger</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/StimProgram.html#MyWindow.send_trigger"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#StimProgram.MyWindow.send_trigger" title="Permalink to this definition">¶</a></dt>
+<dd><p>Triggers recording device by sending short voltage spike from LabJack
+U3-HV. Spike last approximately 0.4 ms if connected via high speed USB (
+2.0). Ensure high enough sampling rate to reliably detect triggers.
+Set to use  flexible IO #4.</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="StimProgramOtherMethods.html" title="StimProgram other functions"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="BoardTexture.html" title="Checkerboard Stim"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">Stimulus Program 1.1 documentation</a> &raquo;</li>
+          <li class="nav-item nav-item-1"><a href="StimProgram.html" >StimProgram module</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &copy; Copyright 2016, Alexander Tomlinson.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.3.5.
+    </div>
+  </body>
+</html>

@@ -37,7 +37,7 @@ See the psychopy documentation for information on using the built in gamma
 correction.
 """
 
-from psychopy import visual, core, event, logging
+from psychopy import visual, core, logging
 from psychopy.monitors import Monitor
 from scipy import stats, interpolate, array, ndarray
 import cPickle

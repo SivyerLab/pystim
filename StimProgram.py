@@ -98,7 +98,7 @@ class StimInfo(object):
 
 
 class GlobalDefaultsMeta(type):
-    """Metaclass to redefine get item for GlobalDefaults.
+    """Metaclass to redefine get item and set item for GlobalDefaults.
     """
     def __getitem__(self, key):
         return self.defaults[key]
@@ -1855,11 +1855,11 @@ def log_stats(count_reps, reps, count_frames, num_frames, elapsed_time,
 
 
 def main(stim_list, verbose=True):
-    """Function to animate stims. Creates instances of stim types, and makes
-    necessary calls to animate stims and flip window.
+    """Function to create stims and run program. Creates instances of stim
+    types, and makes necessary calls to animate stims and flip window.
 
-    :param stim_list: List of StimInfo classes.
-    :param verbose: Whether or not to print stim info to console.
+    :param stim_list: list of StimInfo classes.
+    :param verbose: whether or not to print stim info to console.
     """
     current_time = localtime()
 

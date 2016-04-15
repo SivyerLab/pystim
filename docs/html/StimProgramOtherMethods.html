@@ -1,0 +1,165 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>StimProgram other functions &mdash; Stimulus Program 1.1 documentation</title>
+    
+    <link rel="stylesheet" href="_static/sphinxdoc.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '1.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="Stimulus Program 1.1 documentation" href="index.html" />
+    <link rel="up" title="StimProgram module" href="StimProgram.html" />
+    <link rel="next" title="gui module" href="gui.html" />
+    <link rel="prev" title="StimProgram other classes" href="StimProgramOther.html" /> 
+  </head>
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="gui.html" title="gui module"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="StimProgramOther.html" title="StimProgram other classes"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">Stimulus Program 1.1 documentation</a> &raquo;</li>
+          <li class="nav-item nav-item-1"><a href="StimProgram.html" accesskey="U">StimProgram module</a> &raquo;</li> 
+      </ul>
+    </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="StimProgramOther.html"
+                        title="previous chapter">StimProgram other classes</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="gui.html"
+                        title="next chapter">gui module</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/StimProgramOtherMethods.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="stimprogram-other-functions">
+<h1>StimProgram other functions<a class="headerlink" href="#stimprogram-other-functions" title="Permalink to this headline">¶</a></h1>
+<dl class="function">
+<dt id="StimProgram.main">
+<code class="descclassname">StimProgram.</code><code class="descname">main</code><span class="sig-paren">(</span><em>stim_list</em>, <em>verbose=True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/StimProgram.html#main"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#StimProgram.main" title="Permalink to this definition">¶</a></dt>
+<dd><p>Function to animate stims. Creates instances of stim types, and makes
+necessary calls to animate stims and flip window.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>stim_list</strong> &#8211; List of StimInfo classes.</li>
+<li><strong>verbose</strong> &#8211; Whether or not to print stim info to console.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="StimProgram.log_stats">
+<code class="descclassname">StimProgram.</code><code class="descname">log_stats</code><span class="sig-paren">(</span><em>count_reps</em>, <em>reps</em>, <em>count_frames</em>, <em>num_frames</em>, <em>elapsed_time</em>, <em>stim_list</em>, <em>to_animate</em>, <em>time_at_run</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/StimProgram.html#log_stats"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#StimProgram.log_stats" title="Permalink to this definition">¶</a></dt>
+<dd><p>Function to write information about stims to file.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>count_reps</strong> &#8211; Elapsed reps.</li>
+<li><strong>reps</strong> &#8211; Total possible reps.</li>
+<li><strong>count_frames</strong> &#8211; Elapsed frames.</li>
+<li><strong>num_frames</strong> &#8211; Total possible frames.</li>
+<li><strong>elapsed_time</strong> &#8211; Elapsed time</li>
+<li><strong>stim_list</strong> &#8211; List of stims that ran.</li>
+<li><strong>to_animate</strong> &#8211; List of stims animated (includes annuli)</li>
+<li><strong>time_at_run</strong> &#8211; Time at which stims were run</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="gui.html" title="gui module"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="StimProgramOther.html" title="StimProgram other classes"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">Stimulus Program 1.1 documentation</a> &raquo;</li>
+          <li class="nav-item nav-item-1"><a href="StimProgram.html" >StimProgram module</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &copy; Copyright 2016, Alexander Tomlinson.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.3.5.
+    </div>
+  </body>
+</html>

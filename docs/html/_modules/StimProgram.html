@@ -132,7 +132,7 @@
 <span class="c1"># config.read(os.path.abspath(&quot;C:\Users\Alex\PycharmProjects\StimulusProgram\psychopy\config.ini&quot;))</span>
 
 
-<div class="viewcode-block" id="StimInfo"><a class="viewcode-back" href="../StimProgram.html#StimProgram.StimInfo">[docs]</a><span class="k">class</span> <span class="nc">StimInfo</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+<div class="viewcode-block" id="StimInfo"><a class="viewcode-back" href="../StimProgramOther.html#StimProgram.StimInfo">[docs]</a><span class="k">class</span> <span class="nc">StimInfo</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Class for storing type and parameters of a stim.</span>
 
 <span class="sd">    :param string stim_type: The move type of the stim, such as static,</span>
@@ -164,17 +164,17 @@
         <span class="k">return</span> <span class="n">to_print</span></div>
 
 
-<div class="viewcode-block" id="GlobalDefaultsMeta"><a class="viewcode-back" href="../StimProgram.html#StimProgram.GlobalDefaultsMeta">[docs]</a><span class="k">class</span> <span class="nc">GlobalDefaultsMeta</span><span class="p">(</span><span class="nb">type</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Metaclass to redefine get item for GlobalDefaults.</span>
+<div class="viewcode-block" id="GlobalDefaultsMeta"><a class="viewcode-back" href="../StimProgramOther.html#StimProgram.GlobalDefaultsMeta">[docs]</a><span class="k">class</span> <span class="nc">GlobalDefaultsMeta</span><span class="p">(</span><span class="nb">type</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Metaclass to redefine get item and set item for GlobalDefaults.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">def</span> <span class="nf">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">):</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">defaults</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
+<div class="viewcode-block" id="GlobalDefaultsMeta.__getitem__"><a class="viewcode-back" href="../StimProgramOther.html#StimProgram.GlobalDefaultsMeta.__getitem__">[docs]</a>    <span class="k">def</span> <span class="nf">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">defaults</span><span class="p">[</span><span class="n">key</span><span class="p">]</span></div>
 
-    <span class="k">def</span> <span class="nf">__setitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">item</span><span class="p">):</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">defaults</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">item</span></div>
+<div class="viewcode-block" id="GlobalDefaultsMeta.__setitem__"><a class="viewcode-back" href="../StimProgramOther.html#StimProgram.GlobalDefaultsMeta.__setitem__">[docs]</a>    <span class="k">def</span> <span class="nf">__setitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">item</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">defaults</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">item</span></div></div>
 
 
-<div class="viewcode-block" id="GlobalDefaults"><a class="viewcode-back" href="../StimProgram.html#StimProgram.GlobalDefaults">[docs]</a><span class="k">class</span> <span class="nc">GlobalDefaults</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+<div class="viewcode-block" id="GlobalDefaults"><a class="viewcode-back" href="../StimProgramOther.html#StimProgram.GlobalDefaults">[docs]</a><span class="k">class</span> <span class="nc">GlobalDefaults</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Class with global constants, such as window information. Uses dictionary</span>
 <span class="sd">    to simulate &#39;mutable static class variables&#39;</span>
 
@@ -301,7 +301,7 @@
         <span class="k">return</span> <span class="n">to_print</span></div>
 
 
-<div class="viewcode-block" id="MyWindow"><a class="viewcode-back" href="../StimProgram.html#StimProgram.MyWindow">[docs]</a><span class="k">class</span> <span class="nc">MyWindow</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+<div class="viewcode-block" id="MyWindow"><a class="viewcode-back" href="../StimProgramOther.html#StimProgram.MyWindow">[docs]</a><span class="k">class</span> <span class="nc">MyWindow</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Class with static methods for window management and triggering.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
@@ -319,7 +319,7 @@
     <span class="n">frame_trigger_list</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">maxint</span><span class="p">)</span>  <span class="c1"># need an extra last value for index</span>
 
     <span class="nd">@staticmethod</span>
-<div class="viewcode-block" id="MyWindow.make_win"><a class="viewcode-back" href="../StimProgram.html#StimProgram.MyWindow.make_win">[docs]</a>    <span class="k">def</span> <span class="nf">make_win</span><span class="p">():</span>
+<div class="viewcode-block" id="MyWindow.make_win"><a class="viewcode-back" href="../StimProgramOther.html#StimProgram.MyWindow.make_win">[docs]</a>    <span class="k">def</span> <span class="nf">make_win</span><span class="p">():</span>
         <span class="sd">&quot;&quot;&quot;Static method to create window from global parameters. Checks if</span>
 <span class="sd">        gamma correction splines are present. Also instantiates labjack if</span>
 <span class="sd">        present.</span>
@@ -369,7 +369,7 @@
                                                         <span class="s1">&#39;monitor&#39;</span><span class="p">))</span></div>
 
     <span class="nd">@staticmethod</span>
-<div class="viewcode-block" id="MyWindow.close_win"><a class="viewcode-back" href="../StimProgram.html#StimProgram.MyWindow.close_win">[docs]</a>    <span class="k">def</span> <span class="nf">close_win</span><span class="p">():</span>
+<div class="viewcode-block" id="MyWindow.close_win"><a class="viewcode-back" href="../StimProgramOther.html#StimProgram.MyWindow.close_win">[docs]</a>    <span class="k">def</span> <span class="nf">close_win</span><span class="p">():</span>
         <span class="sd">&quot;&quot;&quot;Static method to close window. Also closes labjack if present.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">has_u3</span><span class="p">:</span>
@@ -377,7 +377,7 @@
         <span class="n">MyWindow</span><span class="o">.</span><span class="n">win</span><span class="o">.</span><span class="n">close</span><span class="p">()</span></div>
 
     <span class="nd">@staticmethod</span>
-<div class="viewcode-block" id="MyWindow.change_color"><a class="viewcode-back" href="../StimProgram.html#StimProgram.MyWindow.change_color">[docs]</a>    <span class="k">def</span> <span class="nf">change_color</span><span class="p">(</span><span class="n">color</span><span class="p">):</span>
+<div class="viewcode-block" id="MyWindow.change_color"><a class="viewcode-back" href="../StimProgramOther.html#StimProgram.MyWindow.change_color">[docs]</a>    <span class="k">def</span> <span class="nf">change_color</span><span class="p">(</span><span class="n">color</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Static method to live update the background of the window.</span>
 
 <span class="sd">        :param color: RGB list used to change global defaults.</span>
@@ -397,7 +397,7 @@
             <span class="k">pass</span></div>
 
     <span class="nd">@staticmethod</span>
-<div class="viewcode-block" id="MyWindow.send_trigger"><a class="viewcode-back" href="../StimProgram.html#StimProgram.MyWindow.send_trigger">[docs]</a>    <span class="k">def</span> <span class="nf">send_trigger</span><span class="p">():</span>
+<div class="viewcode-block" id="MyWindow.send_trigger"><a class="viewcode-back" href="../StimProgramOther.html#StimProgram.MyWindow.send_trigger">[docs]</a>    <span class="k">def</span> <span class="nf">send_trigger</span><span class="p">():</span>
         <span class="sd">&quot;&quot;&quot;Triggers recording device by sending short voltage spike from LabJack</span>
 <span class="sd">        U3-HV. Spike last approximately 0.4 ms if connected via high speed USB (</span>
 <span class="sd">        2.0). Ensure high enough sampling rate to reliably detect triggers.</span>
@@ -411,7 +411,7 @@
             <span class="n">MyWindow</span><span class="o">.</span><span class="n">d</span><span class="o">.</span><span class="n">setFIOState</span><span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span></div></div>
 
 
-<div class="viewcode-block" id="StimDefaults"><a class="viewcode-back" href="../StimProgram.html#StimProgram.StimDefaults">[docs]</a><span class="k">class</span> <span class="nc">StimDefaults</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+<div class="viewcode-block" id="StimDefaults"><a class="viewcode-back" href="../StimDefaults.html#StimProgram.StimDefaults">[docs]</a><span class="k">class</span> <span class="nc">StimDefaults</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Super class to hold parameter defaults. GUI passes dictionary of all</span>
 <span class="sd">    parameters, whether used to make stim or not.</span>
 
@@ -665,7 +665,7 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">phase_speed</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span></div>
 
 
-<div class="viewcode-block" id="StaticStim"><a class="viewcode-back" href="../StimProgram.html#StimProgram.StaticStim">[docs]</a><span class="k">class</span> <span class="nc">StaticStim</span><span class="p">(</span><span class="n">StimDefaults</span><span class="p">):</span>
+<div class="viewcode-block" id="StaticStim"><a class="viewcode-back" href="../StaticStim.html#StimProgram.StaticStim">[docs]</a><span class="k">class</span> <span class="nc">StaticStim</span><span class="p">(</span><span class="n">StimDefaults</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Class for generic non moving stims. Super class for other stim</span>
 <span class="sd">    types. Stim object instantiated in make_stim(), and drawn with calls to</span>
 <span class="sd">    animate().</span>
@@ -689,7 +689,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">move_random</span> <span class="o">=</span> <span class="n">Random</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">move_random</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">move_seed</span><span class="p">)</span>
 
-<div class="viewcode-block" id="StaticStim.make_stim"><a class="viewcode-back" href="../StimProgram.html#StimProgram.StaticStim.make_stim">[docs]</a>    <span class="k">def</span> <span class="nf">make_stim</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="StaticStim.make_stim"><a class="viewcode-back" href="../StaticStim.html#StimProgram.StaticStim.make_stim">[docs]</a>    <span class="k">def</span> <span class="nf">make_stim</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Creates instance of psychopy stim object.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">fill_mode</span> <span class="o">!=</span> <span class="s1">&#39;image&#39;</span><span class="p">:</span>
@@ -713,7 +713,7 @@
                                          <span class="n">pos</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">location</span><span class="p">,</span>
                                          <span class="n">ori</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">orientation</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="StaticStim.draw_times"><a class="viewcode-back" href="../StimProgram.html#StimProgram.StaticStim.draw_times">[docs]</a>    <span class="k">def</span> <span class="nf">draw_times</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="StaticStim.draw_times"><a class="viewcode-back" href="../StaticStim.html#StimProgram.StaticStim.draw_times">[docs]</a>    <span class="k">def</span> <span class="nf">draw_times</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Determines during which frames stim should be drawn, based on desired</span>
 <span class="sd">        delay and duration times.</span>
 
@@ -736,7 +736,7 @@
 
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">end_stim</span></div>
 
-<div class="viewcode-block" id="StaticStim.animate"><a class="viewcode-back" href="../StimProgram.html#StimProgram.StaticStim.animate">[docs]</a>    <span class="k">def</span> <span class="nf">animate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">frame</span><span class="p">):</span>
+<div class="viewcode-block" id="StaticStim.animate"><a class="viewcode-back" href="../StaticStim.html#StimProgram.StaticStim.animate">[docs]</a>    <span class="k">def</span> <span class="nf">animate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">frame</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Method for drawing stim objects to back buffer. Checks if object</span>
 <span class="sd">        should be drawn. Back buffer is brought to front with calls to flip()</span>
 <span class="sd">        on the window.</span>
@@ -756,7 +756,7 @@
             <span class="c1"># draw to back buffer</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">stim</span><span class="o">.</span><span class="n">draw</span><span class="p">()</span></div>
 
-<div class="viewcode-block" id="StaticStim.gen_rgb"><a class="viewcode-back" href="../StimProgram.html#StimProgram.StaticStim.gen_rgb">[docs]</a>    <span class="k">def</span> <span class="nf">gen_rgb</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="StaticStim.gen_rgb"><a class="viewcode-back" href="../StaticStim.html#StimProgram.StaticStim.gen_rgb">[docs]</a>    <span class="k">def</span> <span class="nf">gen_rgb</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Depending on color mode, calculates necessary values. Texture</span>
 <span class="sd">        color is either relative to background by specifying intensity in a</span>
 <span class="sd">        certain channel, or passed as RGB values by the user.</span>
@@ -813,7 +813,7 @@
 
         <span class="k">return</span> <span class="n">color</span></div>
 
-<div class="viewcode-block" id="StaticStim.gen_size"><a class="viewcode-back" href="../StimProgram.html#StimProgram.StaticStim.gen_size">[docs]</a>    <span class="k">def</span> <span class="nf">gen_size</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="StaticStim.gen_size"><a class="viewcode-back" href="../StaticStim.html#StimProgram.StaticStim.gen_size">[docs]</a>    <span class="k">def</span> <span class="nf">gen_size</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Calculates sizes of various sims.</span>
 
 <span class="sd">        :return: size of stim, as float for circles/annuli and height width</span>
@@ -830,7 +830,7 @@
 
         <span class="k">return</span> <span class="n">stim_size</span></div>
 
-<div class="viewcode-block" id="StaticStim.gen_mask"><a class="viewcode-back" href="../StimProgram.html#StimProgram.StaticStim.gen_mask">[docs]</a>    <span class="k">def</span> <span class="nf">gen_mask</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="StaticStim.gen_mask"><a class="viewcode-back" href="../StaticStim.html#StimProgram.StaticStim.gen_mask">[docs]</a>    <span class="k">def</span> <span class="nf">gen_mask</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Determines the mask of the stim object. The mask determines the</span>
 <span class="sd">        shape of the stim. See psychopy documentation for more details.</span>
 
@@ -844,7 +844,7 @@
 
         <span class="k">return</span> <span class="n">stim_mask</span></div>
 
-<div class="viewcode-block" id="StaticStim.gen_texture"><a class="viewcode-back" href="../StimProgram.html#StimProgram.StaticStim.gen_texture">[docs]</a>    <span class="k">def</span> <span class="nf">gen_texture</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="StaticStim.gen_texture"><a class="viewcode-back" href="../StaticStim.html#StimProgram.StaticStim.gen_texture">[docs]</a>    <span class="k">def</span> <span class="nf">gen_texture</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Generates texture for stim object. Textures are 3D numpy arrays</span>
 <span class="sd">        (size*size*4). The 3rd dimension is RGB and Alpha (transparency)</span>
 <span class="sd">        values.</span>
@@ -1070,7 +1070,7 @@
 
         <span class="k">return</span> <span class="n">texture</span></div>
 
-<div class="viewcode-block" id="StaticStim.gen_timing"><a class="viewcode-back" href="../StimProgram.html#StimProgram.StaticStim.gen_timing">[docs]</a>    <span class="k">def</span> <span class="nf">gen_timing</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">frame</span><span class="p">):</span>
+<div class="viewcode-block" id="StaticStim.gen_timing"><a class="viewcode-back" href="../StaticStim.html#StimProgram.StaticStim.gen_timing">[docs]</a>    <span class="k">def</span> <span class="nf">gen_timing</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">frame</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Adjusts color values of stims based on desired timing in desired</span>
 <span class="sd">        channel(i.e. as a function of current frame over draw time).</span>
 <span class="sd">        Recalculated on every call to animate()</span>
@@ -1138,12 +1138,12 @@
         <span class="c1"># print texture[0][0][1]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">stim</span><span class="o">.</span><span class="n">tex</span> <span class="o">=</span> <span class="n">texture</span></div>
 
-<div class="viewcode-block" id="StaticStim.gen_phase"><a class="viewcode-back" href="../StimProgram.html#StimProgram.StaticStim.gen_phase">[docs]</a>    <span class="k">def</span> <span class="nf">gen_phase</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="StaticStim.gen_phase"><a class="viewcode-back" href="../StaticStim.html#StimProgram.StaticStim.gen_phase">[docs]</a>    <span class="k">def</span> <span class="nf">gen_phase</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Changes phase of stim on each frame draw.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">stim</span><span class="o">.</span><span class="n">phase</span> <span class="o">+=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">phase_speed</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">phase_speed</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span></div>
 
-<div class="viewcode-block" id="StaticStim.set_rgb"><a class="viewcode-back" href="../StimProgram.html#StimProgram.StaticStim.set_rgb">[docs]</a>    <span class="k">def</span> <span class="nf">set_rgb</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rgb</span><span class="p">):</span>
+<div class="viewcode-block" id="StaticStim.set_rgb"><a class="viewcode-back" href="../StaticStim.html#StimProgram.StaticStim.set_rgb">[docs]</a>    <span class="k">def</span> <span class="nf">set_rgb</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rgb</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Color setter.</span>
 
 <span class="sd">        :param rgb: tuple or list of rgb values</span>
@@ -1151,7 +1151,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">stim</span><span class="o">.</span><span class="n">setColor</span><span class="p">(</span><span class="n">rgb</span><span class="p">)</span></div></div>
 
 
-<div class="viewcode-block" id="MovingStim"><a class="viewcode-back" href="../StimProgram.html#StimProgram.MovingStim">[docs]</a><span class="k">class</span> <span class="nc">MovingStim</span><span class="p">(</span><span class="n">StaticStim</span><span class="p">):</span>
+<div class="viewcode-block" id="MovingStim"><a class="viewcode-back" href="../MovingStim.html#StimProgram.MovingStim">[docs]</a><span class="k">class</span> <span class="nc">MovingStim</span><span class="p">(</span><span class="n">StaticStim</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Class for stims moving radially inwards. Overrides several methods.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
@@ -1173,7 +1173,7 @@
         <span class="c1"># to track random motion positions</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">log</span> <span class="o">=</span> <span class="p">[[],</span> <span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="p">[]]</span>  <span class="c1"># angle, frame num, position</span>
 
-<div class="viewcode-block" id="MovingStim.draw_times"><a class="viewcode-back" href="../StimProgram.html#StimProgram.MovingStim.draw_times">[docs]</a>    <span class="k">def</span> <span class="nf">draw_times</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="MovingStim.draw_times"><a class="viewcode-back" href="../MovingStim.html#StimProgram.MovingStim.draw_times">[docs]</a>    <span class="k">def</span> <span class="nf">draw_times</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Determines during which frames stim should be drawn, based on desired</span>
 <span class="sd">        delay and duration times. Overrides super method.</span>
 
@@ -1201,7 +1201,7 @@
 
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">end_stim</span></div>
 
-<div class="viewcode-block" id="MovingStim.animate"><a class="viewcode-back" href="../StimProgram.html#StimProgram.MovingStim.animate">[docs]</a>    <span class="k">def</span> <span class="nf">animate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">frame</span><span class="p">):</span>
+<div class="viewcode-block" id="MovingStim.animate"><a class="viewcode-back" href="../MovingStim.html#StimProgram.MovingStim.animate">[docs]</a>    <span class="k">def</span> <span class="nf">animate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">frame</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Method for animating moving stims. Moves stims appropriately,</span>
 <span class="sd">        then makes call to animate of super.</span>
 
@@ -1235,7 +1235,7 @@
                 <span class="c1"># retry</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">animate</span><span class="p">(</span><span class="n">frame</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="MovingStim.gen_pos"><a class="viewcode-back" href="../StimProgram.html#StimProgram.MovingStim.gen_pos">[docs]</a>    <span class="k">def</span> <span class="nf">gen_pos</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="MovingStim.gen_pos"><a class="viewcode-back" href="../MovingStim.html#StimProgram.MovingStim.gen_pos">[docs]</a>    <span class="k">def</span> <span class="nf">gen_pos</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Makes calls to gen_start_pos() and gen_pos_array() with proper</span>
 <span class="sd">        variables to get new array of position coordinates.</span>
@@ -1292,7 +1292,7 @@
 
             <span class="bp">self</span><span class="o">.</span><span class="n">num_frames</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">move_delay</span></div>
 
-<div class="viewcode-block" id="MovingStim.gen_start_pos"><a class="viewcode-back" href="../StimProgram.html#StimProgram.MovingStim.gen_start_pos">[docs]</a>    <span class="k">def</span> <span class="nf">gen_start_pos</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">direction</span><span class="p">):</span>
+<div class="viewcode-block" id="MovingStim.gen_start_pos"><a class="viewcode-back" href="../MovingStim.html#StimProgram.MovingStim.gen_start_pos">[docs]</a>    <span class="k">def</span> <span class="nf">gen_start_pos</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">direction</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Calculates starting position in x, y coordinates on the starting</span>
 <span class="sd">        radius based on travel direction.</span>
 
@@ -1305,7 +1305,7 @@
 
         <span class="k">return</span> <span class="n">start_x</span><span class="p">,</span> <span class="n">start_y</span></div>
 
-<div class="viewcode-block" id="MovingStim.gen_pos_array"><a class="viewcode-back" href="../StimProgram.html#StimProgram.MovingStim.gen_pos_array">[docs]</a>    <span class="k">def</span> <span class="nf">gen_pos_array</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">start_x</span><span class="p">,</span> <span class="n">start_y</span><span class="p">,</span> <span class="n">num_frames</span><span class="p">,</span> <span class="n">angle</span><span class="p">):</span>
+<div class="viewcode-block" id="MovingStim.gen_pos_array"><a class="viewcode-back" href="../MovingStim.html#StimProgram.MovingStim.gen_pos_array">[docs]</a>    <span class="k">def</span> <span class="nf">gen_pos_array</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">start_x</span><span class="p">,</span> <span class="n">start_y</span><span class="p">,</span> <span class="n">num_frames</span><span class="p">,</span> <span class="n">angle</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Creates 2 arrays for x, y coordinates of stims for each frame.</span>
 
 <span class="sd">        Adapted from code By David L. Morton, used under MIT License. Source:</span>
@@ -1325,7 +1325,7 @@
 
         <span class="k">return</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span></div>
 
-<div class="viewcode-block" id="MovingStim.get_next_pos"><a class="viewcode-back" href="../StimProgram.html#StimProgram.MovingStim.get_next_pos">[docs]</a>    <span class="k">def</span> <span class="nf">get_next_pos</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="MovingStim.get_next_pos"><a class="viewcode-back" href="../MovingStim.html#StimProgram.MovingStim.get_next_pos">[docs]</a>    <span class="k">def</span> <span class="nf">get_next_pos</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Returns the next coordinate from x, y_array for animate to set the</span>
 <span class="sd">        position of the stim for the next frame.</span>
 
@@ -1339,7 +1339,7 @@
 
         <span class="k">return</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span></div>
 
-<div class="viewcode-block" id="MovingStim.set_pos"><a class="viewcode-back" href="../StimProgram.html#StimProgram.MovingStim.set_pos">[docs]</a>    <span class="k">def</span> <span class="nf">set_pos</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">):</span>
+<div class="viewcode-block" id="MovingStim.set_pos"><a class="viewcode-back" href="../MovingStim.html#StimProgram.MovingStim.set_pos">[docs]</a>    <span class="k">def</span> <span class="nf">set_pos</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Position setter. Necessary for alternate position setting in subclasses.</span>
 
 <span class="sd">        :param x: x coordinate</span>
@@ -1347,13 +1347,13 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">stim</span><span class="o">.</span><span class="n">setPos</span><span class="p">((</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">))</span></div>
 
-<div class="viewcode-block" id="MovingStim.get_pos"><a class="viewcode-back" href="../StimProgram.html#StimProgram.MovingStim.get_pos">[docs]</a>    <span class="k">def</span> <span class="nf">get_pos</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="MovingStim.get_pos"><a class="viewcode-back" href="../MovingStim.html#StimProgram.MovingStim.get_pos">[docs]</a>    <span class="k">def</span> <span class="nf">get_pos</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Position getter.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">stim</span><span class="o">.</span><span class="n">pos</span></div></div>
 
 
-<div class="viewcode-block" id="RandomlyMovingStim"><a class="viewcode-back" href="../StimProgram.html#StimProgram.RandomlyMovingStim">[docs]</a><span class="k">class</span> <span class="nc">RandomlyMovingStim</span><span class="p">(</span><span class="n">MovingStim</span><span class="p">):</span>
+<div class="viewcode-block" id="RandomlyMovingStim"><a class="viewcode-back" href="../RandomlyMovingStim.html#StimProgram.RandomlyMovingStim">[docs]</a><span class="k">class</span> <span class="nc">RandomlyMovingStim</span><span class="p">(</span><span class="n">MovingStim</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Class for stims moving randomly. Overrides several classes.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
@@ -1363,7 +1363,7 @@
         <span class="c1"># pass parameters up to super</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">RandomlyMovingStim</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 
-<div class="viewcode-block" id="RandomlyMovingStim.draw_times"><a class="viewcode-back" href="../StimProgram.html#StimProgram.RandomlyMovingStim.draw_times">[docs]</a>    <span class="k">def</span> <span class="nf">draw_times</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="RandomlyMovingStim.draw_times"><a class="viewcode-back" href="../RandomlyMovingStim.html#StimProgram.RandomlyMovingStim.draw_times">[docs]</a>    <span class="k">def</span> <span class="nf">draw_times</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Determines during which frames stim should be drawn, based on desired</span>
 <span class="sd">        delay and duration times.</span>
 
@@ -1384,7 +1384,7 @@
 
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">end_stim</span></div>
 
-<div class="viewcode-block" id="RandomlyMovingStim.gen_pos"><a class="viewcode-back" href="../StimProgram.html#StimProgram.RandomlyMovingStim.gen_pos">[docs]</a>    <span class="k">def</span> <span class="nf">gen_pos</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="RandomlyMovingStim.gen_pos"><a class="viewcode-back" href="../RandomlyMovingStim.html#StimProgram.RandomlyMovingStim.gen_pos">[docs]</a>    <span class="k">def</span> <span class="nf">gen_pos</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Makes calls to gen_start_pos() and gen_pos_array() with proper</span>
 <span class="sd">        variables to get new array of position coordinates. Overrides super.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -1411,7 +1411,7 @@
                                                         <span class="n">angle</span><span class="p">)</span></div></div>
 
 
-<div class="viewcode-block" id="TableStim"><a class="viewcode-back" href="../StimProgram.html#StimProgram.TableStim">[docs]</a><span class="k">class</span> <span class="nc">TableStim</span><span class="p">(</span><span class="n">MovingStim</span><span class="p">):</span>
+<div class="viewcode-block" id="TableStim"><a class="viewcode-back" href="../TableStim.html#StimProgram.TableStim">[docs]</a><span class="k">class</span> <span class="nc">TableStim</span><span class="p">(</span><span class="n">MovingStim</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Class where stim motion is determined by a table of radial coordinates.</span>
 
 <span class="sd">    Table can be a text file with new line separated values, or an Igor file</span>
@@ -1434,7 +1434,7 @@
         <span class="c1"># instance attributes</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">trigger_frames</span> <span class="o">=</span> <span class="bp">None</span>
 
-<div class="viewcode-block" id="TableStim.draw_times"><a class="viewcode-back" href="../StimProgram.html#StimProgram.TableStim.draw_times">[docs]</a>    <span class="k">def</span> <span class="nf">draw_times</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="TableStim.draw_times"><a class="viewcode-back" href="../TableStim.html#StimProgram.TableStim.draw_times">[docs]</a>    <span class="k">def</span> <span class="nf">draw_times</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Determines during which frames stim should be drawn, based on desired</span>
 <span class="sd">        delay and duration times. Overrides super method.</span>
 
@@ -1465,7 +1465,7 @@
 
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">end_stim</span></div>
 
-<div class="viewcode-block" id="TableStim.gen_pos"><a class="viewcode-back" href="../StimProgram.html#StimProgram.TableStim.gen_pos">[docs]</a>    <span class="k">def</span> <span class="nf">gen_pos</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="TableStim.gen_pos"><a class="viewcode-back" href="../TableStim.html#StimProgram.TableStim.gen_pos">[docs]</a>    <span class="k">def</span> <span class="nf">gen_pos</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Overrides super method. Calls gen_pos_array() and resets frame</span>
 <span class="sd">        counter.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -1498,7 +1498,7 @@
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">start_dir</span> <span class="o">&gt;=</span> <span class="mi">360</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">start_dir</span> <span class="o">-=</span> <span class="mi">360</span></div>
 
-<div class="viewcode-block" id="TableStim.gen_pos_array"><a class="viewcode-back" href="../StimProgram.html#StimProgram.TableStim.gen_pos_array">[docs]</a>    <span class="k">def</span> <span class="nf">gen_pos_array</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">):</span>
+<div class="viewcode-block" id="TableStim.gen_pos_array"><a class="viewcode-back" href="../TableStim.html#StimProgram.TableStim.gen_pos_array">[docs]</a>    <span class="k">def</span> <span class="nf">gen_pos_array</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Creates 2 arrays for x, y coordinates of stims for each frame.</span>
 
 <span class="sd">        :return: the x, y coordinates of the stim for every frame as 2 arrays</span>
@@ -1562,7 +1562,7 @@
 
         <span class="k">return</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span></div>
 
-<div class="viewcode-block" id="TableStim.get_next_pos"><a class="viewcode-back" href="../StimProgram.html#StimProgram.TableStim.get_next_pos">[docs]</a>    <span class="k">def</span> <span class="nf">get_next_pos</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="TableStim.get_next_pos"><a class="viewcode-back" href="../TableStim.html#StimProgram.TableStim.get_next_pos">[docs]</a>    <span class="k">def</span> <span class="nf">get_next_pos</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Returns the next coordinate from x, y_array for animate to set the</span>
 <span class="sd">        position of the stim for the next frame.</span>
 
@@ -1577,7 +1577,7 @@
         <span class="k">return</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span></div></div>
 
 
-<div class="viewcode-block" id="ImageJumpStim"><a class="viewcode-back" href="../StimProgram.html#StimProgram.ImageJumpStim">[docs]</a><span class="k">class</span> <span class="nc">ImageJumpStim</span><span class="p">(</span><span class="n">StaticStim</span><span class="p">):</span>
+<span class="k">class</span> <span class="nc">ImageJumpStim</span><span class="p">(</span><span class="n">StaticStim</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Class to jump through random areas on a larger image.</span>
 
 <span class="sd">    Currently broken.</span>
@@ -1586,7 +1586,7 @@
         <span class="c1"># pass parameters up to super</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">ImageJumpStim</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 
-<div class="viewcode-block" id="ImageJumpStim.make_stim"><a class="viewcode-back" href="../StimProgram.html#StimProgram.ImageJumpStim.make_stim">[docs]</a>    <span class="k">def</span> <span class="nf">make_stim</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">make_stim</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Creates buffer with rendered images. Images are sampled to size of</span>
 <span class="sd">        window.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -1612,9 +1612,9 @@
             <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">jump_delay</span><span class="p">):</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">stim</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">visual</span><span class="o">.</span><span class="n">BufferImageStim</span><span class="p">(</span><span class="n">MyWindow</span><span class="o">.</span><span class="n">win</span><span class="p">))</span>
 
-            <span class="n">MyWindow</span><span class="o">.</span><span class="n">win</span><span class="o">.</span><span class="n">clearBuffer</span><span class="p">()</span></div>
+            <span class="n">MyWindow</span><span class="o">.</span><span class="n">win</span><span class="o">.</span><span class="n">clearBuffer</span><span class="p">()</span>
 
-<div class="viewcode-block" id="ImageJumpStim.get_draw_times"><a class="viewcode-back" href="../StimProgram.html#StimProgram.ImageJumpStim.get_draw_times">[docs]</a>    <span class="k">def</span> <span class="nf">get_draw_times</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">get_draw_times</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Determines frames during which to draw stimulus.</span>
 <span class="sd">        :return: last frame number as int</span>
@@ -1626,9 +1626,9 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">draw_duration</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">end_stim</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">start_stim</span>
 
         <span class="c1"># return end stim time for calculating max frame time</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">end_stim</span></div>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">end_stim</span>
 
-<div class="viewcode-block" id="ImageJumpStim.animate"><a class="viewcode-back" href="../StimProgram.html#StimProgram.ImageJumpStim.animate">[docs]</a>    <span class="k">def</span> <span class="nf">animate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">frame</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">animate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">frame</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Method for drawing stim objects to back buffer. Checks if object</span>
 <span class="sd">        should be drawn. Back buffer is brought to front with calls to flip()</span>
@@ -1639,11 +1639,11 @@
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">start_stim</span> <span class="o">&lt;=</span> <span class="n">frame</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">end_stim</span><span class="p">:</span>
             <span class="n">i</span> <span class="o">=</span> <span class="n">frame</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">delay</span> <span class="o">*</span> <span class="n">GlobalDefaults</span><span class="o">.</span><span class="n">defaults</span><span class="p">[</span><span class="s1">&#39;frame_rate&#39;</span><span class="p">]</span>
             <span class="c1"># draw to back buffer</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">stim</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">draw</span><span class="p">()</span></div></div>
+            <span class="bp">self</span><span class="o">.</span><span class="n">stim</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">draw</span><span class="p">()</span>
 
 
 <span class="c1"># function because inheritance is conditional</span>
-<div class="viewcode-block" id="board_texture_class"><a class="viewcode-back" href="../StimProgram.html#StimProgram.board_texture_class">[docs]</a><span class="k">def</span> <span class="nf">board_texture_class</span><span class="p">(</span><span class="n">bases</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<div class="viewcode-block" id="board_texture_class"><a class="viewcode-back" href="../BoardTexture.html#StimProgram.board_texture_class">[docs]</a><span class="k">def</span> <span class="nf">board_texture_class</span><span class="p">(</span><span class="n">bases</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 
     <span class="k">class</span> <span class="nc">BoardTexture</span><span class="p">(</span><span class="n">bases</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Class for checkerboard or random board textures. Rather than grating</span>
@@ -1745,7 +1745,7 @@
     <span class="k">return</span> <span class="n">BoardTexture</span><span class="p">()</span></div>
 
 
-<div class="viewcode-block" id="movie_stim_class"><a class="viewcode-back" href="../StimProgram.html#StimProgram.movie_stim_class">[docs]</a><span class="k">def</span> <span class="nf">movie_stim_class</span><span class="p">(</span><span class="n">bases</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="k">def</span> <span class="nf">movie_stim_class</span><span class="p">(</span><span class="n">bases</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 
     <span class="k">class</span> <span class="nc">MovieStim</span><span class="p">(</span><span class="n">bases</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Movie stims require a unique animate() method, but are otherwise</span>
@@ -1780,10 +1780,10 @@
 
             <span class="nb">super</span><span class="p">(</span><span class="n">MovieStim</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">animate</span><span class="p">(</span><span class="n">frame</span><span class="p">)</span>
 
-    <span class="k">return</span> <span class="n">MovieStim</span><span class="p">()</span></div>
+    <span class="k">return</span> <span class="n">MovieStim</span><span class="p">()</span>
 
 
-<div class="viewcode-block" id="log_stats"><a class="viewcode-back" href="../StimProgram.html#StimProgram.log_stats">[docs]</a><span class="k">def</span> <span class="nf">log_stats</span><span class="p">(</span><span class="n">count_reps</span><span class="p">,</span> <span class="n">reps</span><span class="p">,</span> <span class="n">count_frames</span><span class="p">,</span> <span class="n">num_frames</span><span class="p">,</span> <span class="n">elapsed_time</span><span class="p">,</span>
+<div class="viewcode-block" id="log_stats"><a class="viewcode-back" href="../StimProgramOtherMethods.html#StimProgram.log_stats">[docs]</a><span class="k">def</span> <span class="nf">log_stats</span><span class="p">(</span><span class="n">count_reps</span><span class="p">,</span> <span class="n">reps</span><span class="p">,</span> <span class="n">count_frames</span><span class="p">,</span> <span class="n">num_frames</span><span class="p">,</span> <span class="n">elapsed_time</span><span class="p">,</span>
               <span class="n">stim_list</span><span class="p">,</span> <span class="n">to_animate</span><span class="p">,</span> <span class="n">time_at_run</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Function to write information about stims to file.</span>
 
@@ -1921,7 +1921,7 @@
     <span class="k">return</span> <span class="n">current_time_string</span></div>
 
 
-<div class="viewcode-block" id="main"><a class="viewcode-back" href="../StimProgram.html#StimProgram.main">[docs]</a><span class="k">def</span> <span class="nf">main</span><span class="p">(</span><span class="n">stim_list</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="bp">True</span><span class="p">):</span>
+<div class="viewcode-block" id="main"><a class="viewcode-back" href="../StimProgramOtherMethods.html#StimProgram.main">[docs]</a><span class="k">def</span> <span class="nf">main</span><span class="p">(</span><span class="n">stim_list</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="bp">True</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Function to animate stims. Creates instances of stim types, and makes</span>
 <span class="sd">    necessary calls to animate stims and flip window.</span>
 

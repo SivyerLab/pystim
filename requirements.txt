@@ -1,0 +1,6 @@
+psychopy
+scipy
+numpy
+sortedcontainers
+pillow
+# wxpython
