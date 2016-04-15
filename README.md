@@ -55,4 +55,4 @@ file for license rights and limitations.
 
 Main screen with queued stims:
 
-![main screen](docs/screenshots/screen1.PNG)
+![main screen](docs/screenshots/Screen1.PNG)
