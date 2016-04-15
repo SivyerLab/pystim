@@ -54,4 +54,4 @@ Screen Shots
 
 Main screen with queued stims (Windows 7):
 
-.. image:: ../../docs/screenshots/screens.gif
+.. image:: ../screenshots/screens.gif
