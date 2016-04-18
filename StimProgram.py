@@ -98,7 +98,7 @@ class StimInfo(object):
 
 
 class GlobalDefaultsMeta(type):
-    """Metaclass to redefine get item and set item for GlobalDefaults.
+    """Metaclass to redefine get item and set item for :py:class:`GlobalDefaults`.
     """
     def __getitem__(self, key):
         return self.defaults[key]
@@ -241,9 +241,9 @@ class MyWindow(object):
     # Class attributes
     #: Psychopy window instance.
     win = None
-    #: Gamma correction instance. See GammaCorrection.py.
+    #: Gamma correction instance. See :py:class:`GammaCorrection`.
     gamma_mon = None
-    #: Used to break out of animation loop in main().
+    #: Used to break out of animation loop in :py:func:`main`.
     should_break = False
     #: Labjack U3 instance for triggering.
     d = None
@@ -342,6 +342,8 @@ class MyWindow(object):
             MyWindow.d.setFIOState(4, 1)
             # reset
             MyWindow.d.setFIOState(4, 0)
+        else:
+            print '\n To trigger, need labjackpython library. See documentation'
 
 
 class StimDefaults(object):
@@ -600,8 +602,8 @@ class StimDefaults(object):
 
 class StaticStim(StimDefaults):
     """Class for generic non moving stims. Super class for other stim
-    types. Stim object instantiated in make_stim(), and drawn with calls to
-    animate().
+    types. Stim object instantiated in :py:func:`.make_stim`, and drawn with
+    calls to animate().
     """
     def __init__(self, **kwargs):
         """Passes parameters up to super class. Seeds randoms.
@@ -1318,8 +1320,9 @@ class RandomlyMovingStim(MovingStim):
         return self.end_stim
 
     def gen_pos(self):
-        """Makes calls to gen_start_pos() and gen_pos_array() with proper
-        variables to get new array of position coordinates. Overrides super.
+        """Makes calls to :py:func:`gen_start_pos` and
+        :py:func:`gen_pos_array` with proper variables to get new array of
+        position coordinates. Overrides super.
         """
         # update current position
         self.current_x, self.current_y = self.get_pos()

@@ -1,6 +1,18 @@
-psychopy
 scipy
 numpy
-sortedcontainers
-pillow
+Pillow
+PsychoPy
+pyglet
+
+## need to be installed manually
 # wxpython
+
+## optional
+# sortedcontainers
+# LabJackPython
+# tabulate
+# igor
+
+# compiled windows binaries of popular python libraries
+# can be found at http://www.lfd.uci.edu/~gohlke/pythonlibs/
+# if having problems installing

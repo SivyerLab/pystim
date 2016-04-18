@@ -165,7 +165,7 @@
 
 
 <div class="viewcode-block" id="GlobalDefaultsMeta"><a class="viewcode-back" href="../StimProgramOther.html#StimProgram.GlobalDefaultsMeta">[docs]</a><span class="k">class</span> <span class="nc">GlobalDefaultsMeta</span><span class="p">(</span><span class="nb">type</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Metaclass to redefine get item and set item for GlobalDefaults.</span>
+    <span class="sd">&quot;&quot;&quot;Metaclass to redefine get item and set item for :py:class:`GlobalDefaults`.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 <div class="viewcode-block" id="GlobalDefaultsMeta.__getitem__"><a class="viewcode-back" href="../StimProgramOther.html#StimProgram.GlobalDefaultsMeta.__getitem__">[docs]</a>    <span class="k">def</span> <span class="nf">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">defaults</span><span class="p">[</span><span class="n">key</span><span class="p">]</span></div>
@@ -308,9 +308,9 @@
     <span class="c1"># Class attributes</span>
     <span class="c1">#: Psychopy window instance.</span>
     <span class="n">win</span> <span class="o">=</span> <span class="bp">None</span>
-    <span class="c1">#: Gamma correction instance. See GammaCorrection.py.</span>
+    <span class="c1">#: Gamma correction instance. See :py:class:`GammaCorrection`.</span>
     <span class="n">gamma_mon</span> <span class="o">=</span> <span class="bp">None</span>
-    <span class="c1">#: Used to break out of animation loop in main().</span>
+    <span class="c1">#: Used to break out of animation loop in :py:func:`main`.</span>
     <span class="n">should_break</span> <span class="o">=</span> <span class="bp">False</span>
     <span class="c1">#: Labjack U3 instance for triggering.</span>
     <span class="n">d</span> <span class="o">=</span> <span class="bp">None</span>
@@ -408,7 +408,9 @@
             <span class="c1"># voltage spike; 0 is low, 1 is high, on flexible IO #4</span>
             <span class="n">MyWindow</span><span class="o">.</span><span class="n">d</span><span class="o">.</span><span class="n">setFIOState</span><span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
             <span class="c1"># reset</span>
-            <span class="n">MyWindow</span><span class="o">.</span><span class="n">d</span><span class="o">.</span><span class="n">setFIOState</span><span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span></div></div>
+            <span class="n">MyWindow</span><span class="o">.</span><span class="n">d</span><span class="o">.</span><span class="n">setFIOState</span><span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">print</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1"> To trigger, need labjackpython library. See documentation&#39;</span></div></div>
 
 
 <div class="viewcode-block" id="StimDefaults"><a class="viewcode-back" href="../StimDefaults.html#StimProgram.StimDefaults">[docs]</a><span class="k">class</span> <span class="nc">StimDefaults</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
@@ -667,8 +669,8 @@
 
 <div class="viewcode-block" id="StaticStim"><a class="viewcode-back" href="../StaticStim.html#StimProgram.StaticStim">[docs]</a><span class="k">class</span> <span class="nc">StaticStim</span><span class="p">(</span><span class="n">StimDefaults</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Class for generic non moving stims. Super class for other stim</span>
-<span class="sd">    types. Stim object instantiated in make_stim(), and drawn with calls to</span>
-<span class="sd">    animate().</span>
+<span class="sd">    types. Stim object instantiated in :py:func:`.make_stim`, and drawn with</span>
+<span class="sd">    calls to animate().</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Passes parameters up to super class. Seeds randoms.</span>
@@ -1385,8 +1387,9 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">end_stim</span></div>
 
 <div class="viewcode-block" id="RandomlyMovingStim.gen_pos"><a class="viewcode-back" href="../RandomlyMovingStim.html#StimProgram.RandomlyMovingStim.gen_pos">[docs]</a>    <span class="k">def</span> <span class="nf">gen_pos</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Makes calls to gen_start_pos() and gen_pos_array() with proper</span>
-<span class="sd">        variables to get new array of position coordinates. Overrides super.</span>
+        <span class="sd">&quot;&quot;&quot;Makes calls to :py:func:`gen_start_pos` and</span>
+<span class="sd">        :py:func:`gen_pos_array` with proper variables to get new array of</span>
+<span class="sd">        position coordinates. Overrides super.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="c1"># update current position</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">current_x</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">current_y</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_pos</span><span class="p">()</span>

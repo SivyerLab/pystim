@@ -1,5 +1,5 @@
-StimProgram other classes
-=========================
+Other classes
+=============
 
 .. autoclass:: StimProgram.StimInfo
    :members:

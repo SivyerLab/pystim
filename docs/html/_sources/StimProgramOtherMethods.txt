@@ -1,5 +1,5 @@
-StimProgram other functions
-===========================
+Other functions
+===============
 
 .. autofunction:: StimProgram.main
 
