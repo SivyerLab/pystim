@@ -1,7 +1,8 @@
 StimProgram module
 ==================
 
-Stim types:
+Stim types
+----------
 
 .. toctree::
    :maxdepth: 2
@@ -13,7 +14,8 @@ Stim types:
    TableStim
    BoardTexture
 
-Other:
+Other
+-----
 
 .. toctree::
    :maxdepth: 1
