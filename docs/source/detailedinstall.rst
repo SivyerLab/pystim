@@ -4,8 +4,8 @@ Detailed install instruction
 Python and required dependencies
 --------------------------------
 
-StimProgram is built and tested on Python 2.7.10. It is not tested on Python
-3 due to incompatible dependencies.
+StimProgram is built and tested on Python 2.7.10 on both Windows and OSX. It is
+not tested on Python 3 due to incompatible dependencies.
 
 To run, StimProgram requires the following (found in ``requirements.txt``):
 
