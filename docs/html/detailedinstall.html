@@ -25,8 +25,8 @@
     <script type="text/javascript" src="_static/doctools.js"></script>
     <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <link rel="top" title="Stimulus Program 1.1 documentation" href="index.html" />
-    <link rel="next" title="License" href="LICENSE.html" />
-    <link rel="prev" title="README" href="readmelink.html" /> 
+    <link rel="next" title="Usage guide" href="usageguide.html" />
+    <link rel="prev" title="Readme" href="readmelink.html" /> 
   </head>
   <body role="document">
     <div class="related" role="navigation" aria-label="related navigation">
@@ -39,10 +39,10 @@
           <a href="py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
         <li class="right" >
-          <a href="LICENSE.html" title="License"
+          <a href="usageguide.html" title="Usage guide"
              accesskey="N">next</a> |</li>
         <li class="right" >
-          <a href="readmelink.html" title="README"
+          <a href="readmelink.html" title="Readme"
              accesskey="P">previous</a> |</li>
         <li class="nav-item nav-item-0"><a href="index.html">Stimulus Program 1.1 documentation</a> &raquo;</li> 
       </ul>
@@ -60,10 +60,10 @@
 
   <h4>Previous topic</h4>
   <p class="topless"><a href="readmelink.html"
-                        title="previous chapter">README</a></p>
+                        title="previous chapter">Readme</a></p>
   <h4>Next topic</h4>
-  <p class="topless"><a href="LICENSE.html"
-                        title="next chapter">License</a></p>
+  <p class="topless"><a href="usageguide.html"
+                        title="next chapter">Usage guide</a></p>
   <div role="note" aria-label="source link">
     <h3>This Page</h3>
     <ul class="this-page-menu">
@@ -96,8 +96,8 @@
 <h1>Detailed install instruction<a class="headerlink" href="#detailed-install-instruction" title="Permalink to this headline">¶</a></h1>
 <div class="section" id="python-and-required-dependencies">
 <h2>Python and required dependencies<a class="headerlink" href="#python-and-required-dependencies" title="Permalink to this headline">¶</a></h2>
-<p>StimProgram is built and tested on Python 2.7.10. It is not tested on Python
-3 due to incompatible dependencies.</p>
+<p>StimProgram is built and tested on Python 2.7.10 on both Windows and OSX. It is
+not tested on Python 3 due to incompatible dependencies.</p>
 <p>To run, StimProgram requires the following (found in <code class="docutils literal"><span class="pre">requirements.txt</span></code>):</p>
 <ul class="simple">
 <li>psychopy (see psychopy <a class="reference external" href="http://www.psychopy.org/documentation.html">documentation</a> for required <a class="reference external" href="http://www.psychopy.org/installation.html#essential-packages">dependencies</a>).</li>
@@ -111,7 +111,7 @@
 <p>Optional libraries:</p>
 <ul class="simple">
 <li>tabulate (for formatting logs)</li>
-<li>igor (for parsing tables)</li>
+<li>igor (for parsing igor tables)</li>
 <li><a class="reference external" href="https://labjack.com/support/software/examples/ud/labjackpython">u3</a> (for triggering from LabJack)</li>
 <li><a class="reference external" href="https://www.ffmpeg.org/">ffmpeg</a> (for making movies from captured frames)</li>
 </ul>
@@ -137,7 +137,7 @@ window, lines 621-625 in:</p>
 622
 623
 624
-625</pre></div></td><td class="code"><div class="highlight"><pre><span class="c1">#GL.glMatrixMode(GL.GL_MODELVIEW)</span>
+625</pre></div></td><td class="code"><div class="highlight"><pre><span class="c1"># GL.glMatrixMode(GL.GL_MODELVIEW)</span>
 <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">viewScale</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
     <span class="n">scale</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">viewScale</span>
 <span class="k">else</span><span class="p">:</span>
@@ -146,8 +146,9 @@ window, lines 621-625 in:</p>
 </td></tr></table></div>
 </li>
 <li><p class="first">In order to allow capturing of window frames to generate screen captures,
-line 950 needs to be updated to be compatible with the latest release of
-PIL. In the same file, <code class="docutils literal"><span class="pre">fromstring()</span></code> needs to be changed to <code class="docutils literal"><span class="pre">frombytes()</span></code>.</p>
+line 950 in the same file needs to be updated to be compatible with the
+latest release of PIL. In the same file, <code class="docutils literal"><span class="pre">fromstring()</span></code> needs to be
+changed to <code class="docutils literal"><span class="pre">frombytes()</span></code>.</p>
 </li>
 </ol>
 </div>
@@ -169,10 +170,10 @@ PIL. In the same file, <code class="docutils literal"><span class="pre">fromstri
           <a href="py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
         <li class="right" >
-          <a href="LICENSE.html" title="License"
+          <a href="usageguide.html" title="Usage guide"
              >next</a> |</li>
         <li class="right" >
-          <a href="readmelink.html" title="README"
+          <a href="readmelink.html" title="Readme"
              >previous</a> |</li>
         <li class="nav-item nav-item-0"><a href="index.html">Stimulus Program 1.1 documentation</a> &raquo;</li> 
       </ul>

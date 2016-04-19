@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>gui &mdash; Stimulus Program 1.1 documentation</title>
+    <title>GUI &mdash; Stimulus Program 1.1 documentation</title>
     
     <link rel="stylesheet" href="../_static/sphinxdoc.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
@@ -64,7 +64,7 @@
         <div class="bodywrapper">
           <div class="body" role="main">
             
-  <h1>Source code for gui</h1><div class="highlight"><pre>
+  <h1>Source code for GUI</h1><div class="highlight"><pre>
 <span class="ch">#!/Library/Frameworks/Python.framework/Versions/2.7/bin/python</span>
 
 <span class="sd">&quot;&quot;&quot;</span>
@@ -82,7 +82,7 @@
 <span class="kn">import</span> <span class="nn">os</span>
 
 
-<div class="viewcode-block" id="Parameters"><a class="viewcode-back" href="../gui.html#gui.Parameters">[docs]</a><span class="k">class</span> <span class="nc">Parameters</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+<div class="viewcode-block" id="Parameters"><a class="viewcode-back" href="../gui.html#GUI.Parameters">[docs]</a><span class="k">class</span> <span class="nc">Parameters</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Model to hold parameter data.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
@@ -102,7 +102,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">gui_params</span><span class="p">,</span> <span class="n">config_dict</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">read_config_file</span><span class="p">(</span><span class="n">config_file</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">init_params</span><span class="p">(</span><span class="n">config_dict</span><span class="p">)</span>
 
-<div class="viewcode-block" id="Parameters.read_config_file"><a class="viewcode-back" href="../gui.html#gui.Parameters.read_config_file">[docs]</a>    <span class="k">def</span> <span class="nf">read_config_file</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config_file</span><span class="p">):</span>
+<div class="viewcode-block" id="Parameters.read_config_file"><a class="viewcode-back" href="../gui.html#GUI.Parameters.read_config_file">[docs]</a>    <span class="k">def</span> <span class="nf">read_config_file</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config_file</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Uses ConfigParser to read .ini file where default values for params</span>
 <span class="sd">        are stored.</span>
@@ -133,7 +133,7 @@
 
         <span class="k">return</span> <span class="n">gui_config_dict</span><span class="p">,</span> <span class="n">default_config_dict</span></div>
 
-<div class="viewcode-block" id="Parameters.try_cast"><a class="viewcode-back" href="../gui.html#gui.Parameters.try_cast">[docs]</a>    <span class="k">def</span> <span class="nf">try_cast</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+<div class="viewcode-block" id="Parameters.try_cast"><a class="viewcode-back" href="../gui.html#GUI.Parameters.try_cast">[docs]</a>    <span class="k">def</span> <span class="nf">try_cast</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Helper method to attempt to cast parameters from strings to proper</span>
 <span class="sd">        int/float/bool, or map list values to int or float</span>
@@ -177,7 +177,7 @@
 
         <span class="k">return</span> <span class="n">value</span></div>
 
-<div class="viewcode-block" id="Parameters.trans"><a class="viewcode-back" href="../gui.html#gui.Parameters.trans">[docs]</a>    <span class="k">def</span> <span class="nf">trans</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">category</span><span class="p">):</span>
+<div class="viewcode-block" id="Parameters.trans"><a class="viewcode-back" href="../gui.html#GUI.Parameters.trans">[docs]</a>    <span class="k">def</span> <span class="nf">trans</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">category</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Helper method to go from category to appropriate dictionary</span>
 
@@ -192,7 +192,7 @@
 
         <span class="k">return</span> <span class="n">trans</span><span class="p">[</span><span class="n">category</span><span class="p">]</span></div>
 
-<div class="viewcode-block" id="Parameters.get_gammas"><a class="viewcode-back" href="../gui.html#gui.Parameters.get_gammas">[docs]</a>    <span class="k">def</span> <span class="nf">get_gammas</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="Parameters.get_gammas"><a class="viewcode-back" href="../gui.html#GUI.Parameters.get_gammas">[docs]</a>    <span class="k">def</span> <span class="nf">get_gammas</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Getter</span>
 
@@ -209,7 +209,7 @@
 
         <span class="k">return</span> <span class="n">gamma_mons</span></div>
 
-<div class="viewcode-block" id="Parameters.get_params"><a class="viewcode-back" href="../gui.html#gui.Parameters.get_params">[docs]</a>    <span class="k">def</span> <span class="nf">get_params</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">category</span><span class="p">):</span>
+<div class="viewcode-block" id="Parameters.get_params"><a class="viewcode-back" href="../gui.html#GUI.Parameters.get_params">[docs]</a>    <span class="k">def</span> <span class="nf">get_params</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">category</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Getter</span>
 
@@ -219,7 +219,7 @@
 
         <span class="k">return</span> <span class="n">deepcopy</span><span class="p">(</span><span class="n">trans</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="Parameters.get_global_params"><a class="viewcode-back" href="../gui.html#gui.Parameters.get_global_params">[docs]</a>    <span class="k">def</span> <span class="nf">get_global_params</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="Parameters.get_global_params"><a class="viewcode-back" href="../gui.html#GUI.Parameters.get_global_params">[docs]</a>    <span class="k">def</span> <span class="nf">get_global_params</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Getter.</span>
 
@@ -232,7 +232,7 @@
 
         <span class="k">return</span> <span class="n">global_dict</span></div>
 
-<div class="viewcode-block" id="Parameters.get_gui_params"><a class="viewcode-back" href="../gui.html#gui.Parameters.get_gui_params">[docs]</a>    <span class="k">def</span> <span class="nf">get_gui_params</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="Parameters.get_gui_params"><a class="viewcode-back" href="../gui.html#GUI.Parameters.get_gui_params">[docs]</a>    <span class="k">def</span> <span class="nf">get_gui_params</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Getter</span>
 
@@ -240,7 +240,7 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">gui_params</span></div>
 
-<div class="viewcode-block" id="Parameters.get_merged_params"><a class="viewcode-back" href="../gui.html#gui.Parameters.get_merged_params">[docs]</a>    <span class="k">def</span> <span class="nf">get_merged_params</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="Parameters.get_merged_params"><a class="viewcode-back" href="../gui.html#GUI.Parameters.get_merged_params">[docs]</a>    <span class="k">def</span> <span class="nf">get_merged_params</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Getter.</span>
 
@@ -259,7 +259,7 @@
 
         <span class="k">return</span> <span class="n">deepcopy</span><span class="p">(</span><span class="n">merged_params</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="Parameters.set_param_value"><a class="viewcode-back" href="../gui.html#gui.Parameters.set_param_value">[docs]</a>    <span class="k">def</span> <span class="nf">set_param_value</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">category</span><span class="p">,</span> <span class="n">param</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+<div class="viewcode-block" id="Parameters.set_param_value"><a class="viewcode-back" href="../gui.html#GUI.Parameters.set_param_value">[docs]</a>    <span class="k">def</span> <span class="nf">set_param_value</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">category</span><span class="p">,</span> <span class="n">param</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Setter</span>
 
@@ -279,7 +279,7 @@
 
         <span class="c1"># print &#39;{} set to {}.&#39;.format(param, repr(trans[param][&#39;default&#39;]))</span>
 
-<div class="viewcode-block" id="Parameters.get_param_value"><a class="viewcode-back" href="../gui.html#gui.Parameters.get_param_value">[docs]</a>    <span class="k">def</span> <span class="nf">get_param_value</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">category</span><span class="p">,</span> <span class="n">param</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+<div class="viewcode-block" id="Parameters.get_param_value"><a class="viewcode-back" href="../gui.html#GUI.Parameters.get_param_value">[docs]</a>    <span class="k">def</span> <span class="nf">get_param_value</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">category</span><span class="p">,</span> <span class="n">param</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Getter</span>
 
@@ -295,7 +295,7 @@
         <span class="k">else</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">trans</span><span class="p">[</span><span class="n">param</span><span class="p">][</span><span class="s1">&#39;default&#39;</span><span class="p">][</span><span class="n">index</span><span class="p">]</span></div>
 
-<div class="viewcode-block" id="Parameters.init_params"><a class="viewcode-back" href="../gui.html#gui.Parameters.init_params">[docs]</a>    <span class="k">def</span> <span class="nf">init_params</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config_dict</span><span class="p">):</span>
+<div class="viewcode-block" id="Parameters.init_params"><a class="viewcode-back" href="../gui.html#GUI.Parameters.init_params">[docs]</a>    <span class="k">def</span> <span class="nf">init_params</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config_dict</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Initializes dictionaries of parameters</span>
 
@@ -765,7 +765,7 @@
         <span class="p">])</span></div></div>
 
 
-<div class="viewcode-block" id="TextCtrlTag"><a class="viewcode-back" href="../gui.html#gui.TextCtrlTag">[docs]</a><span class="k">class</span> <span class="nc">TextCtrlTag</span><span class="p">(</span><span class="n">wx</span><span class="o">.</span><span class="n">TextCtrl</span><span class="p">):</span>
+<div class="viewcode-block" id="TextCtrlTag"><a class="viewcode-back" href="../gui.html#GUI.TextCtrlTag">[docs]</a><span class="k">class</span> <span class="nc">TextCtrlTag</span><span class="p">(</span><span class="n">wx</span><span class="o">.</span><span class="n">TextCtrl</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Simple subclass of wx.TextCtrl for assigning ID tag to class to keep</span>
 <span class="sd">    track of which parameter it was assigned to. Also has method to set value.</span>
@@ -777,7 +777,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">tag2</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;tag2&#39;</span><span class="p">,</span> <span class="bp">None</span><span class="p">)</span>
         <span class="n">wx</span><span class="o">.</span><span class="n">TextCtrl</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 
-<div class="viewcode-block" id="TextCtrlTag.set_value"><a class="viewcode-back" href="../gui.html#gui.TextCtrlTag.set_value">[docs]</a>    <span class="k">def</span> <span class="nf">set_value</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+<div class="viewcode-block" id="TextCtrlTag.set_value"><a class="viewcode-back" href="../gui.html#GUI.TextCtrlTag.set_value">[docs]</a>    <span class="k">def</span> <span class="nf">set_value</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Method to change the value in the control.</span>
 
@@ -785,7 +785,7 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">SetValue</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">value</span><span class="p">))</span></div>
 
-<div class="viewcode-block" id="TextCtrlTag.set_editable"><a class="viewcode-back" href="../gui.html#gui.TextCtrlTag.set_editable">[docs]</a>    <span class="k">def</span> <span class="nf">set_editable</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">toggle</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+<div class="viewcode-block" id="TextCtrlTag.set_editable"><a class="viewcode-back" href="../gui.html#GUI.TextCtrlTag.set_editable">[docs]</a>    <span class="k">def</span> <span class="nf">set_editable</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">toggle</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Toggles whether or not control is editable.</span>
 
@@ -801,7 +801,7 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">SetEditable</span><span class="p">(</span><span class="bp">True</span><span class="p">)</span></div></div>
 
 
-<div class="viewcode-block" id="ChoiceCtrlTag"><a class="viewcode-back" href="../gui.html#gui.ChoiceCtrlTag">[docs]</a><span class="k">class</span> <span class="nc">ChoiceCtrlTag</span><span class="p">(</span><span class="n">wx</span><span class="o">.</span><span class="n">Choice</span><span class="p">):</span>
+<div class="viewcode-block" id="ChoiceCtrlTag"><a class="viewcode-back" href="../gui.html#GUI.ChoiceCtrlTag">[docs]</a><span class="k">class</span> <span class="nc">ChoiceCtrlTag</span><span class="p">(</span><span class="n">wx</span><span class="o">.</span><span class="n">Choice</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Simple subclass of wx.Choice for assigning ID tag to class to keep</span>
 <span class="sd">    track of which parameter it was assigned to. Also method to set value.</span>
@@ -811,7 +811,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">tag</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;tag&#39;</span><span class="p">,</span> <span class="bp">None</span><span class="p">)</span>
         <span class="n">wx</span><span class="o">.</span><span class="n">Choice</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 
-<div class="viewcode-block" id="ChoiceCtrlTag.set_value"><a class="viewcode-back" href="../gui.html#gui.ChoiceCtrlTag.set_value">[docs]</a>    <span class="k">def</span> <span class="nf">set_value</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+<div class="viewcode-block" id="ChoiceCtrlTag.set_value"><a class="viewcode-back" href="../gui.html#GUI.ChoiceCtrlTag.set_value">[docs]</a>    <span class="k">def</span> <span class="nf">set_value</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Method to change the value in the control.</span>
 
@@ -824,7 +824,7 @@
         <span class="n">evt</span><span class="o">.</span><span class="n">SetString</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">value</span><span class="p">))</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">GetParent</span><span class="p">()</span><span class="o">.</span><span class="n">GetEventHandler</span><span class="p">()</span><span class="o">.</span><span class="n">ProcessEvent</span><span class="p">(</span><span class="n">evt</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="ChoiceCtrlTag.set_editable"><a class="viewcode-back" href="../gui.html#gui.ChoiceCtrlTag.set_editable">[docs]</a>    <span class="k">def</span> <span class="nf">set_editable</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">toggle</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+<div class="viewcode-block" id="ChoiceCtrlTag.set_editable"><a class="viewcode-back" href="../gui.html#GUI.ChoiceCtrlTag.set_editable">[docs]</a>    <span class="k">def</span> <span class="nf">set_editable</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">toggle</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Toggles whether or not control is editable.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -837,7 +837,7 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">Delete</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">GetCount</span><span class="p">()</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span></div></div>
 
 
-<div class="viewcode-block" id="FilePickerCtrlTag"><a class="viewcode-back" href="../gui.html#gui.FilePickerCtrlTag">[docs]</a><span class="k">class</span> <span class="nc">FilePickerCtrlTag</span><span class="p">(</span><span class="n">wx</span><span class="o">.</span><span class="n">FilePickerCtrl</span><span class="p">):</span>
+<div class="viewcode-block" id="FilePickerCtrlTag"><a class="viewcode-back" href="../gui.html#GUI.FilePickerCtrlTag">[docs]</a><span class="k">class</span> <span class="nc">FilePickerCtrlTag</span><span class="p">(</span><span class="n">wx</span><span class="o">.</span><span class="n">FilePickerCtrl</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Simple subclass of wx.FilePickerCtrl for assigning ID tag to class to keep</span>
 <span class="sd">    track of which parameter it was assigned to. Also method to set value,</span>
@@ -850,7 +850,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">category</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;category&#39;</span><span class="p">,</span> <span class="bp">None</span><span class="p">)</span>
         <span class="n">wx</span><span class="o">.</span><span class="n">FilePickerCtrl</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 
-<div class="viewcode-block" id="FilePickerCtrlTag.set_value"><a class="viewcode-back" href="../gui.html#gui.FilePickerCtrlTag.set_value">[docs]</a>    <span class="k">def</span> <span class="nf">set_value</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+<div class="viewcode-block" id="FilePickerCtrlTag.set_value"><a class="viewcode-back" href="../gui.html#GUI.FilePickerCtrlTag.set_value">[docs]</a>    <span class="k">def</span> <span class="nf">set_value</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Method to change the value in the control.</span>
 
@@ -865,7 +865,7 @@
                                                             <span class="n">value</span><span class="p">)</span></div></div>
 
 
-<div class="viewcode-block" id="TextCtrlValidator"><a class="viewcode-back" href="../gui.html#gui.TextCtrlValidator">[docs]</a><span class="k">class</span> <span class="nc">TextCtrlValidator</span><span class="p">(</span><span class="n">wx</span><span class="o">.</span><span class="n">PyValidator</span><span class="p">):</span>
+<div class="viewcode-block" id="TextCtrlValidator"><a class="viewcode-back" href="../gui.html#GUI.TextCtrlValidator">[docs]</a><span class="k">class</span> <span class="nc">TextCtrlValidator</span><span class="p">(</span><span class="n">wx</span><span class="o">.</span><span class="n">PyValidator</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Validator class to ensure proper entry of parameters.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
@@ -875,14 +875,14 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">wx</span><span class="o">.</span><span class="n">PyValidator</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
 
-<div class="viewcode-block" id="TextCtrlValidator.Clone"><a class="viewcode-back" href="../gui.html#gui.TextCtrlValidator.Clone">[docs]</a>    <span class="k">def</span> <span class="nf">Clone</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="TextCtrlValidator.Clone"><a class="viewcode-back" href="../gui.html#GUI.TextCtrlValidator.Clone">[docs]</a>    <span class="k">def</span> <span class="nf">Clone</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Standard cloner. All validators are required to implement the Clone()</span>
 <span class="sd">        method.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="n">TextCtrlValidator</span><span class="p">()</span></div>
 
-<div class="viewcode-block" id="TextCtrlValidator.Validate"><a class="viewcode-back" href="../gui.html#gui.TextCtrlValidator.Validate">[docs]</a>    <span class="k">def</span> <span class="nf">Validate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">win</span><span class="p">):</span>
+<div class="viewcode-block" id="TextCtrlValidator.Validate"><a class="viewcode-back" href="../gui.html#GUI.TextCtrlValidator.Validate">[docs]</a>    <span class="k">def</span> <span class="nf">Validate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">win</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Validate contents of given TextCtrl.</span>
 
@@ -910,14 +910,14 @@
                 <span class="n">text_box</span><span class="o">.</span><span class="n">Refresh</span><span class="p">()</span>
                 <span class="k">return</span> <span class="bp">False</span></div>
 
-<div class="viewcode-block" id="TextCtrlValidator.TransferToWindow"><a class="viewcode-back" href="../gui.html#gui.TextCtrlValidator.TransferToWindow">[docs]</a>    <span class="k">def</span> <span class="nf">TransferToWindow</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="TextCtrlValidator.TransferToWindow"><a class="viewcode-back" href="../gui.html#GUI.TextCtrlValidator.TransferToWindow">[docs]</a>    <span class="k">def</span> <span class="nf">TransferToWindow</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">True</span></div>
 
-<div class="viewcode-block" id="TextCtrlValidator.TransferFromWindow"><a class="viewcode-back" href="../gui.html#gui.TextCtrlValidator.TransferFromWindow">[docs]</a>    <span class="k">def</span> <span class="nf">TransferFromWindow</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="TextCtrlValidator.TransferFromWindow"><a class="viewcode-back" href="../gui.html#GUI.TextCtrlValidator.TransferFromWindow">[docs]</a>    <span class="k">def</span> <span class="nf">TransferFromWindow</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">True</span></div></div>
 
 
-<div class="viewcode-block" id="InputPanel"><a class="viewcode-back" href="../gui.html#gui.InputPanel">[docs]</a><span class="k">class</span> <span class="nc">InputPanel</span><span class="p">(</span><span class="n">wx</span><span class="o">.</span><span class="n">Panel</span><span class="p">):</span>
+<div class="viewcode-block" id="InputPanel"><a class="viewcode-back" href="../gui.html#GUI.InputPanel">[docs]</a><span class="k">class</span> <span class="nc">InputPanel</span><span class="p">(</span><span class="n">wx</span><span class="o">.</span><span class="n">Panel</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Class for generic panel with input widgets and their labels. Parent class</span>
 <span class="sd">    of GlobalPanel.</span>
@@ -966,7 +966,7 @@
         <span class="c1"># set sizer for panel</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">SetSizer</span><span class="p">(</span><span class="n">panel_sizer</span><span class="p">)</span>
 
-<div class="viewcode-block" id="InputPanel.create_inputs"><a class="viewcode-back" href="../gui.html#gui.InputPanel.create_inputs">[docs]</a>    <span class="k">def</span> <span class="nf">create_inputs</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">category</span><span class="p">):</span>
+<div class="viewcode-block" id="InputPanel.create_inputs"><a class="viewcode-back" href="../gui.html#GUI.InputPanel.create_inputs">[docs]</a>    <span class="k">def</span> <span class="nf">create_inputs</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">category</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Method to recursively generate label and input widgets.</span>
 <span class="sd">        Checks if param is child of another and only generates</span>
@@ -1108,7 +1108,7 @@
                 <span class="c1"># increment grid counter</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">grid_counter</span> <span class="o">+=</span> <span class="mi">1</span></div>
 
-<div class="viewcode-block" id="InputPanel.input_update"><a class="viewcode-back" href="../gui.html#gui.InputPanel.input_update">[docs]</a>    <span class="k">def</span> <span class="nf">input_update</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">event</span><span class="p">):</span>
+<div class="viewcode-block" id="InputPanel.input_update"><a class="viewcode-back" href="../gui.html#GUI.InputPanel.input_update">[docs]</a>    <span class="k">def</span> <span class="nf">input_update</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">event</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Method for updating parameters on changes to input controls</span>
 
@@ -1181,7 +1181,7 @@
         <span class="k">if</span> <span class="n">param</span> <span class="o">==</span> <span class="s1">&#39;background&#39;</span><span class="p">:</span>
             <span class="n">StimProgram</span><span class="o">.</span><span class="n">MyWindow</span><span class="o">.</span><span class="n">change_color</span><span class="p">(</span><span class="n">global_params</span><span class="p">[</span><span class="s1">&#39;background&#39;</span><span class="p">])</span></div>
 
-<div class="viewcode-block" id="InputPanel.on_right_click"><a class="viewcode-back" href="../gui.html#gui.InputPanel.on_right_click">[docs]</a>    <span class="k">def</span> <span class="nf">on_right_click</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">event</span><span class="p">):</span>
+<div class="viewcode-block" id="InputPanel.on_right_click"><a class="viewcode-back" href="../gui.html#GUI.InputPanel.on_right_click">[docs]</a>    <span class="k">def</span> <span class="nf">on_right_click</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">event</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Method for passing parameter to table to be added.</span>
 
@@ -1199,7 +1199,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">frame</span><span class="o">.</span><span class="n">grid</span><span class="o">.</span><span class="n">add_to_grid</span><span class="p">(</span><span class="n">param</span><span class="p">)</span></div></div>
 
 
-<div class="viewcode-block" id="GlobalPanel"><a class="viewcode-back" href="../gui.html#gui.GlobalPanel">[docs]</a><span class="k">class</span> <span class="nc">GlobalPanel</span><span class="p">(</span><span class="n">InputPanel</span><span class="p">):</span>
+<div class="viewcode-block" id="GlobalPanel"><a class="viewcode-back" href="../gui.html#GUI.GlobalPanel">[docs]</a><span class="k">class</span> <span class="nc">GlobalPanel</span><span class="p">(</span><span class="n">InputPanel</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Subclass of InputPanel, contains a few aesthetic changes in its init</span>
 <span class="sd">    since not part of a notebook.</span>
@@ -1260,7 +1260,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">Bind</span><span class="p">(</span><span class="n">wx</span><span class="o">.</span><span class="n">EVT_BUTTON</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">on_default_delete</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">delete_default</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">grid_sizer</span><span class="o">.</span><span class="n">Add</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">delete_default</span><span class="p">,</span> <span class="n">pos</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
 
-<div class="viewcode-block" id="GlobalPanel.on_default_save"><a class="viewcode-back" href="../gui.html#gui.GlobalPanel.on_default_save">[docs]</a>    <span class="k">def</span> <span class="nf">on_default_save</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">event</span><span class="p">):</span>
+<div class="viewcode-block" id="GlobalPanel.on_default_save"><a class="viewcode-back" href="../gui.html#GUI.GlobalPanel.on_default_save">[docs]</a>    <span class="k">def</span> <span class="nf">on_default_save</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">event</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Saves global default parameters.</span>
 
@@ -1308,7 +1308,7 @@
         <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">globals_file</span><span class="p">,</span> <span class="s1">&#39;wb&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
             <span class="n">cPickle</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">global_dict</span><span class="p">,</span> <span class="n">f</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="GlobalPanel.on_default_delete"><a class="viewcode-back" href="../gui.html#gui.GlobalPanel.on_default_delete">[docs]</a>    <span class="k">def</span> <span class="nf">on_default_delete</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">event</span><span class="p">):</span>
+<div class="viewcode-block" id="GlobalPanel.on_default_delete"><a class="viewcode-back" href="../gui.html#GUI.GlobalPanel.on_default_delete">[docs]</a>    <span class="k">def</span> <span class="nf">on_default_delete</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">event</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Deletes global default parameters.</span>
 
@@ -1343,7 +1343,7 @@
             <span class="n">index</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">which_default</span><span class="o">.</span><span class="n">GetItems</span><span class="p">()</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="s1">&#39;&#39;</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">which_default</span><span class="o">.</span><span class="n">Delete</span><span class="p">(</span><span class="n">index</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="GlobalPanel.on_default_select"><a class="viewcode-back" href="../gui.html#gui.GlobalPanel.on_default_select">[docs]</a>    <span class="k">def</span> <span class="nf">on_default_select</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">event</span><span class="p">):</span>
+<div class="viewcode-block" id="GlobalPanel.on_default_select"><a class="viewcode-back" href="../gui.html#GUI.GlobalPanel.on_default_select">[docs]</a>    <span class="k">def</span> <span class="nf">on_default_select</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">event</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Populates global default panel based on saved globals.</span>
 
@@ -1369,7 +1369,7 @@
                 <span class="k">pass</span></div></div>
 
 
-<div class="viewcode-block" id="ListPanel"><a class="viewcode-back" href="../gui.html#gui.ListPanel">[docs]</a><span class="k">class</span> <span class="nc">ListPanel</span><span class="p">(</span><span class="n">wx</span><span class="o">.</span><span class="n">Panel</span><span class="p">):</span>
+<div class="viewcode-block" id="ListPanel"><a class="viewcode-back" href="../gui.html#GUI.ListPanel">[docs]</a><span class="k">class</span> <span class="nc">ListPanel</span><span class="p">(</span><span class="n">wx</span><span class="o">.</span><span class="n">Panel</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Panel that contains list of stims to run along with add/remove buttons</span>
 <span class="sd">    and up/down buttons.</span>
@@ -1478,7 +1478,7 @@
         <span class="c1"># set panel sizer for panel</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">SetSizer</span><span class="p">(</span><span class="n">panel_sizer</span><span class="p">)</span>
 
-<div class="viewcode-block" id="ListPanel.convert_stim_type"><a class="viewcode-back" href="../gui.html#gui.ListPanel.convert_stim_type">[docs]</a>    <span class="k">def</span> <span class="nf">convert_stim_type</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">stim_type</span><span class="p">):</span>
+<div class="viewcode-block" id="ListPanel.convert_stim_type"><a class="viewcode-back" href="../gui.html#GUI.ListPanel.convert_stim_type">[docs]</a>    <span class="k">def</span> <span class="nf">convert_stim_type</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">stim_type</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Converts stim_type label to class names and back</span>
 
@@ -1510,7 +1510,7 @@
 
         <span class="k">return</span> <span class="n">stim_type</span></div>
 
-<div class="viewcode-block" id="ListPanel.on_add_button"><a class="viewcode-back" href="../gui.html#gui.ListPanel.on_add_button">[docs]</a>    <span class="k">def</span> <span class="nf">on_add_button</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">event</span><span class="p">):</span>
+<div class="viewcode-block" id="ListPanel.on_add_button"><a class="viewcode-back" href="../gui.html#GUI.ListPanel.on_add_button">[docs]</a>    <span class="k">def</span> <span class="nf">on_add_button</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">event</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Makes call to add to list with proper params</span>
 
@@ -1522,7 +1522,7 @@
 
         <span class="bp">self</span><span class="o">.</span><span class="n">add_to_list</span><span class="p">(</span><span class="n">stim_type</span><span class="p">,</span> <span class="n">param_dict</span><span class="p">,</span> <span class="n">grid_dict</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="ListPanel.add_to_list"><a class="viewcode-back" href="../gui.html#gui.ListPanel.add_to_list">[docs]</a>    <span class="k">def</span> <span class="nf">add_to_list</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">stim_type</span><span class="p">,</span> <span class="n">param_dict</span><span class="p">,</span> <span class="n">grid_dict</span><span class="p">,</span> <span class="n">insert_pos</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+<div class="viewcode-block" id="ListPanel.add_to_list"><a class="viewcode-back" href="../gui.html#GUI.ListPanel.add_to_list">[docs]</a>    <span class="k">def</span> <span class="nf">add_to_list</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">stim_type</span><span class="p">,</span> <span class="n">param_dict</span><span class="p">,</span> <span class="n">grid_dict</span><span class="p">,</span> <span class="n">insert_pos</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Adds stim to list of stims to run, as a bew stiminfo class</span>
 
@@ -1573,7 +1573,7 @@
 
         <span class="c1"># print self.stims_to_run_w_grid</span>
 
-<div class="viewcode-block" id="ListPanel.on_remove_button"><a class="viewcode-back" href="../gui.html#gui.ListPanel.on_remove_button">[docs]</a>    <span class="k">def</span> <span class="nf">on_remove_button</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">event</span><span class="p">):</span>
+<div class="viewcode-block" id="ListPanel.on_remove_button"><a class="viewcode-back" href="../gui.html#GUI.ListPanel.on_remove_button">[docs]</a>    <span class="k">def</span> <span class="nf">on_remove_button</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">event</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Removes stims from stim list. If none selected, clears all.</span>
 
@@ -1599,7 +1599,7 @@
             <span class="k">del</span> <span class="bp">self</span><span class="o">.</span><span class="n">stims_to_run</span><span class="p">[:]</span>
             <span class="k">del</span> <span class="bp">self</span><span class="o">.</span><span class="n">stims_to_run_w_grid</span><span class="p">[:]</span></div>
 
-<div class="viewcode-block" id="ListPanel.on_up_button"><a class="viewcode-back" href="../gui.html#gui.ListPanel.on_up_button">[docs]</a>    <span class="k">def</span> <span class="nf">on_up_button</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">event</span><span class="p">):</span>
+<div class="viewcode-block" id="ListPanel.on_up_button"><a class="viewcode-back" href="../gui.html#GUI.ListPanel.on_up_button">[docs]</a>    <span class="k">def</span> <span class="nf">on_up_button</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">event</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Moves a stim up in the list by removing it and reinserting it into</span>
 <span class="sd">        proper position.</span>
@@ -1629,7 +1629,7 @@
                 <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">stim</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">stims_to_run</span><span class="p">):</span>
                     <span class="n">stim</span><span class="o">.</span><span class="n">number</span> <span class="o">=</span> <span class="n">i</span></div>
 
-<div class="viewcode-block" id="ListPanel.on_down_button"><a class="viewcode-back" href="../gui.html#gui.ListPanel.on_down_button">[docs]</a>    <span class="k">def</span> <span class="nf">on_down_button</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">event</span><span class="p">):</span>
+<div class="viewcode-block" id="ListPanel.on_down_button"><a class="viewcode-back" href="../gui.html#GUI.ListPanel.on_down_button">[docs]</a>    <span class="k">def</span> <span class="nf">on_down_button</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">event</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Moves a stim down in the list by removing it and reinserting it into</span>
 <span class="sd">        proper position.</span>
@@ -1659,7 +1659,7 @@
                 <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">stim</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">stims_to_run</span><span class="p">):</span>
                     <span class="n">stim</span><span class="o">.</span><span class="n">number</span> <span class="o">=</span> <span class="n">i</span></div>
 
-<div class="viewcode-block" id="ListPanel.on_double_click"><a class="viewcode-back" href="../gui.html#gui.ListPanel.on_double_click">[docs]</a>    <span class="k">def</span> <span class="nf">on_double_click</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">event</span><span class="p">):</span>
+<div class="viewcode-block" id="ListPanel.on_double_click"><a class="viewcode-back" href="../gui.html#GUI.ListPanel.on_double_click">[docs]</a>    <span class="k">def</span> <span class="nf">on_double_click</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">event</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Loads params from list and for grid on double click</span>
 
@@ -1734,7 +1734,7 @@
         <span class="k">print</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">Stim params populated&#39;</span></div></div>
 
 
-<div class="viewcode-block" id="DirPanel"><a class="viewcode-back" href="../gui.html#gui.DirPanel">[docs]</a><span class="k">class</span> <span class="nc">DirPanel</span><span class="p">(</span><span class="n">wx</span><span class="o">.</span><span class="n">Panel</span><span class="p">):</span>
+<div class="viewcode-block" id="DirPanel"><a class="viewcode-back" href="../gui.html#GUI.DirPanel">[docs]</a><span class="k">class</span> <span class="nc">DirPanel</span><span class="p">(</span><span class="n">wx</span><span class="o">.</span><span class="n">Panel</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Class for file browser panel.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
@@ -1800,7 +1800,7 @@
         <span class="c1"># set sizer to panel</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">SetSizer</span><span class="p">(</span><span class="n">panel_sizer</span><span class="p">)</span>
 
-<div class="viewcode-block" id="DirPanel.on_save_button"><a class="viewcode-back" href="../gui.html#gui.DirPanel.on_save_button">[docs]</a>    <span class="k">def</span> <span class="nf">on_save_button</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">event</span><span class="p">):</span>
+<div class="viewcode-block" id="DirPanel.on_save_button"><a class="viewcode-back" href="../gui.html#GUI.DirPanel.on_save_button">[docs]</a>    <span class="k">def</span> <span class="nf">on_save_button</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">event</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Saves current list of stims to text file.</span>
 
@@ -1844,7 +1844,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">browser</span><span class="o">.</span><span class="n">ShowHidden</span><span class="p">(</span><span class="bp">True</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">browser</span><span class="o">.</span><span class="n">ShowHidden</span><span class="p">(</span><span class="bp">False</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="DirPanel.on_load_button"><a class="viewcode-back" href="../gui.html#gui.DirPanel.on_load_button">[docs]</a>    <span class="k">def</span> <span class="nf">on_load_button</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">event</span><span class="p">):</span>
+<div class="viewcode-block" id="DirPanel.on_load_button"><a class="viewcode-back" href="../gui.html#GUI.DirPanel.on_load_button">[docs]</a>    <span class="k">def</span> <span class="nf">on_load_button</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">event</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Loads stims from text file.</span>
 
@@ -1909,7 +1909,7 @@
 
         <span class="k">print</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">Stim(s) loaded&#39;</span></div>
 
-<div class="viewcode-block" id="DirPanel.on_double_click"><a class="viewcode-back" href="../gui.html#gui.DirPanel.on_double_click">[docs]</a>    <span class="k">def</span> <span class="nf">on_double_click</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">event</span><span class="p">):</span>
+<div class="viewcode-block" id="DirPanel.on_double_click"><a class="viewcode-back" href="../gui.html#GUI.DirPanel.on_double_click">[docs]</a>    <span class="k">def</span> <span class="nf">on_double_click</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">event</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        If log file, opens, else loads.</span>
 
@@ -1930,7 +1930,7 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">on_load_button</span><span class="p">(</span><span class="n">event</span><span class="p">)</span></div></div>
 
 
-<div class="viewcode-block" id="MyGrid"><a class="viewcode-back" href="../gui.html#gui.MyGrid">[docs]</a><span class="k">class</span> <span class="nc">MyGrid</span><span class="p">(</span><span class="n">wx</span><span class="o">.</span><span class="n">Frame</span><span class="p">):</span>
+<div class="viewcode-block" id="MyGrid"><a class="viewcode-back" href="../gui.html#GUI.MyGrid">[docs]</a><span class="k">class</span> <span class="nc">MyGrid</span><span class="p">(</span><span class="n">wx</span><span class="o">.</span><span class="n">Frame</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Class for grid window.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
@@ -1975,7 +1975,7 @@
         <span class="c1"># catch close to only hide grid</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">Bind</span><span class="p">(</span><span class="n">wx</span><span class="o">.</span><span class="n">EVT_CLOSE</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">on_close_button</span><span class="p">)</span>
 
-<div class="viewcode-block" id="MyGrid.show_grid"><a class="viewcode-back" href="../gui.html#gui.MyGrid.show_grid">[docs]</a>    <span class="k">def</span> <span class="nf">show_grid</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="MyGrid.show_grid"><a class="viewcode-back" href="../gui.html#GUI.MyGrid.show_grid">[docs]</a>    <span class="k">def</span> <span class="nf">show_grid</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Method to show grid. Unminimizes and brings to front.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -1984,14 +1984,14 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">Raise</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">grid_shown</span> <span class="o">=</span> <span class="bp">True</span></div>
 
-<div class="viewcode-block" id="MyGrid.hide_grid"><a class="viewcode-back" href="../gui.html#gui.MyGrid.hide_grid">[docs]</a>    <span class="k">def</span> <span class="nf">hide_grid</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="MyGrid.hide_grid"><a class="viewcode-back" href="../gui.html#GUI.MyGrid.hide_grid">[docs]</a>    <span class="k">def</span> <span class="nf">hide_grid</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Method to hide grid.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">Hide</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">grid_shown</span> <span class="o">=</span> <span class="bp">False</span></div>
 
-<div class="viewcode-block" id="MyGrid.on_close_button"><a class="viewcode-back" href="../gui.html#gui.MyGrid.on_close_button">[docs]</a>    <span class="k">def</span> <span class="nf">on_close_button</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">event</span><span class="p">):</span>
+<div class="viewcode-block" id="MyGrid.on_close_button"><a class="viewcode-back" href="../gui.html#GUI.MyGrid.on_close_button">[docs]</a>    <span class="k">def</span> <span class="nf">on_close_button</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">event</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Catches close in order to only hide. Otherwise frame object is</span>
 <span class="sd">        deleted and loses all data.</span>
@@ -2000,7 +2000,7 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">hide_grid</span><span class="p">()</span></div>
 
-<div class="viewcode-block" id="MyGrid.add_to_grid"><a class="viewcode-back" href="../gui.html#gui.MyGrid.add_to_grid">[docs]</a>    <span class="k">def</span> <span class="nf">add_to_grid</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">param</span><span class="p">):</span>
+<div class="viewcode-block" id="MyGrid.add_to_grid"><a class="viewcode-back" href="../gui.html#GUI.MyGrid.add_to_grid">[docs]</a>    <span class="k">def</span> <span class="nf">add_to_grid</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">param</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Adds column to table and prevents editing of control.</span>
 
@@ -2052,7 +2052,7 @@
 
         <span class="bp">self</span><span class="o">.</span><span class="n">show_grid</span><span class="p">()</span></div>
 
-<div class="viewcode-block" id="MyGrid.on_grid_cell_changed"><a class="viewcode-back" href="../gui.html#gui.MyGrid.on_grid_cell_changed">[docs]</a>    <span class="k">def</span> <span class="nf">on_grid_cell_changed</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">event</span><span class="p">):</span>
+<div class="viewcode-block" id="MyGrid.on_grid_cell_changed"><a class="viewcode-back" href="../gui.html#GUI.MyGrid.on_grid_cell_changed">[docs]</a>    <span class="k">def</span> <span class="nf">on_grid_cell_changed</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">event</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Updates control dict when values in cells are changed.</span>
 
@@ -2079,7 +2079,7 @@
 
             <span class="bp">self</span><span class="o">.</span><span class="n">grid</span><span class="o">.</span><span class="n">MoveCursorDown</span><span class="p">(</span><span class="bp">False</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="MyGrid.on_grid_label_right_click"><a class="viewcode-back" href="../gui.html#gui.MyGrid.on_grid_label_right_click">[docs]</a>    <span class="k">def</span> <span class="nf">on_grid_label_right_click</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">event</span><span class="p">):</span>
+<div class="viewcode-block" id="MyGrid.on_grid_label_right_click"><a class="viewcode-back" href="../gui.html#GUI.MyGrid.on_grid_label_right_click">[docs]</a>    <span class="k">def</span> <span class="nf">on_grid_label_right_click</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">event</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Adds more rows if top left corner right clicked. Deletes row/column if</span>
 <span class="sd">        row/column header right clicked.</span>
@@ -2121,7 +2121,7 @@
 
             <span class="bp">self</span><span class="o">.</span><span class="n">grid</span><span class="o">.</span><span class="n">DeleteRows</span><span class="p">(</span><span class="n">row</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="MyGrid.on_grid_cell_right_click"><a class="viewcode-back" href="../gui.html#gui.MyGrid.on_grid_cell_right_click">[docs]</a>    <span class="k">def</span> <span class="nf">on_grid_cell_right_click</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">event</span><span class="p">):</span>
+<div class="viewcode-block" id="MyGrid.on_grid_cell_right_click"><a class="viewcode-back" href="../gui.html#GUI.MyGrid.on_grid_cell_right_click">[docs]</a>    <span class="k">def</span> <span class="nf">on_grid_cell_right_click</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">event</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Removes contents of cell.</span>
 
@@ -2135,7 +2135,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">grid</span><span class="o">.</span><span class="n">SetCellValue</span><span class="p">(</span><span class="n">row</span><span class="p">,</span> <span class="n">col</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">control_dict</span><span class="p">[</span><span class="n">param</span><span class="p">][</span><span class="n">row</span><span class="p">]</span> <span class="o">=</span> <span class="bp">None</span></div>
 
-<div class="viewcode-block" id="MyGrid.get_grid_dict"><a class="viewcode-back" href="../gui.html#gui.MyGrid.get_grid_dict">[docs]</a>    <span class="k">def</span> <span class="nf">get_grid_dict</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="MyGrid.get_grid_dict"><a class="viewcode-back" href="../gui.html#GUI.MyGrid.get_grid_dict">[docs]</a>    <span class="k">def</span> <span class="nf">get_grid_dict</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Getter. Sets middle Nones to previous values.</span>
 
@@ -2167,7 +2167,7 @@
         <span class="k">return</span> <span class="n">to_return</span></div></div>
 
 
-<div class="viewcode-block" id="MyFrame"><a class="viewcode-back" href="../gui.html#gui.MyFrame">[docs]</a><span class="k">class</span> <span class="nc">MyFrame</span><span class="p">(</span><span class="n">wx</span><span class="o">.</span><span class="n">Frame</span><span class="p">):</span>
+<div class="viewcode-block" id="MyFrame"><a class="viewcode-back" href="../gui.html#GUI.MyFrame">[docs]</a><span class="k">class</span> <span class="nc">MyFrame</span><span class="p">(</span><span class="n">wx</span><span class="o">.</span><span class="n">Frame</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Class for generating frame. Instantiates parameters, notebook, and panels.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
@@ -2327,7 +2327,7 @@
         <span class="c1"># draw frame</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">Show</span><span class="p">()</span>
 
-<div class="viewcode-block" id="MyFrame.on_run_button"><a class="viewcode-back" href="../gui.html#gui.MyFrame.on_run_button">[docs]</a>    <span class="k">def</span> <span class="nf">on_run_button</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">event</span><span class="p">):</span>
+<div class="viewcode-block" id="MyFrame.on_run_button"><a class="viewcode-back" href="../gui.html#GUI.MyFrame.on_run_button">[docs]</a>    <span class="k">def</span> <span class="nf">on_run_button</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">event</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Method for calling run and changing values from grid if necessary.</span>
 
@@ -2404,7 +2404,7 @@
         <span class="k">else</span><span class="p">:</span>
             <span class="k">print</span> <span class="s1">&#39;Please add stims.&#39;</span></div>
 
-<div class="viewcode-block" id="MyFrame.run"><a class="viewcode-back" href="../gui.html#gui.MyFrame.run">[docs]</a>    <span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="MyFrame.run"><a class="viewcode-back" href="../gui.html#GUI.MyFrame.run">[docs]</a>    <span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Method for running stims.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -2429,7 +2429,7 @@
         <span class="k">except</span><span class="p">:</span>
             <span class="k">raise</span></div>
 
-<div class="viewcode-block" id="MyFrame.on_win_button"><a class="viewcode-back" href="../gui.html#gui.MyFrame.on_win_button">[docs]</a>    <span class="k">def</span> <span class="nf">on_win_button</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">event</span><span class="p">):</span>
+<div class="viewcode-block" id="MyFrame.on_win_button"><a class="viewcode-back" href="../gui.html#GUI.MyFrame.on_win_button">[docs]</a>    <span class="k">def</span> <span class="nf">on_win_button</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">event</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Method for toggling stim window. Makes call to StimProgram. Gets</span>
 <span class="sd">        various params from global panel.</span>
@@ -2457,7 +2457,7 @@
             <span class="c1"># make window</span>
             <span class="n">StimProgram</span><span class="o">.</span><span class="n">MyWindow</span><span class="o">.</span><span class="n">make_win</span><span class="p">()</span></div>
 
-<div class="viewcode-block" id="MyFrame.on_stop_button"><a class="viewcode-back" href="../gui.html#gui.MyFrame.on_stop_button">[docs]</a>    <span class="k">def</span> <span class="nf">on_stop_button</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">event</span><span class="p">):</span>
+<div class="viewcode-block" id="MyFrame.on_stop_button"><a class="viewcode-back" href="../gui.html#GUI.MyFrame.on_stop_button">[docs]</a>    <span class="k">def</span> <span class="nf">on_stop_button</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">event</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Method for stopping stim. Makes call to StimProgram.</span>
 
@@ -2466,7 +2466,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">do_break</span> <span class="o">=</span> <span class="bp">True</span>
         <span class="n">StimProgram</span><span class="o">.</span><span class="n">MyWindow</span><span class="o">.</span><span class="n">should_break</span> <span class="o">=</span> <span class="bp">True</span></div>
 
-<div class="viewcode-block" id="MyFrame.on_exit_button"><a class="viewcode-back" href="../gui.html#gui.MyFrame.on_exit_button">[docs]</a>    <span class="k">def</span> <span class="nf">on_exit_button</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">event</span><span class="p">):</span>
+<div class="viewcode-block" id="MyFrame.on_exit_button"><a class="viewcode-back" href="../gui.html#GUI.MyFrame.on_exit_button">[docs]</a>    <span class="k">def</span> <span class="nf">on_exit_button</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">event</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Closes application.</span>
 
@@ -2478,7 +2478,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">Close</span><span class="p">()</span></div></div>
 
 
-<div class="viewcode-block" id="main"><a class="viewcode-back" href="../gui.html#gui.main">[docs]</a><span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
+<div class="viewcode-block" id="main"><a class="viewcode-back" href="../gui.html#GUI.main">[docs]</a><span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Main function to start GUI.</span>
 <span class="sd">    &quot;&quot;&quot;</span>

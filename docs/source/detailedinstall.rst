@@ -20,7 +20,7 @@ To run, StimProgram requires the following (found in ``requirements.txt``):
 Optional libraries:
 
 - tabulate (for formatting logs)
-- igor (for parsing tables)
+- igor (for parsing igor tables)
 - `u3 <https://labjack.com/support/software/examples/ud/labjackpython>`_ (for triggering from LabJack)
 - `ffmpeg <https://www.ffmpeg.org/>`_ (for making movies from captured frames)
 
@@ -49,7 +49,7 @@ releases. Psychopy source can be found in the python site-packages folder.
    .. code-block:: python
       :lineno-start: 621
 
-      #GL.glMatrixMode(GL.GL_MODELVIEW)
+      # GL.glMatrixMode(GL.GL_MODELVIEW)
       if self.viewScale is not None:
           scale = self.viewScale
       else:
@@ -57,5 +57,6 @@ releases. Psychopy source can be found in the python site-packages folder.
 
 
 2. In order to allow capturing of window frames to generate screen captures,
-   line 950 needs to be updated to be compatible with the latest release of
-   PIL. In the same file, ``fromstring()`` needs to be changed to ``frombytes()``.
+   line 950 in the same file needs to be updated to be compatible with the
+   latest release of PIL. In the same file, ``fromstring()`` needs to be
+   changed to ``frombytes()``.

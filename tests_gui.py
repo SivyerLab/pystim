@@ -1,7 +1,7 @@
 # NEED MUCH MORE COVERAGE
 
 from GammaCorrection import GammaValues
-import gui
+import GUI
 import unittest
 import os
 
@@ -9,7 +9,7 @@ import os
 class TestParameters(unittest.TestCase):
 
     def setUp(self):
-        self.params = gui.Parameters()
+        self.params = GUI.Parameters()
 
     def test_read_config_file(self):
         a, b, = self.params.read_config_file(os.path.abspath(

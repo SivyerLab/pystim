@@ -26,7 +26,7 @@
     <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <link rel="top" title="Stimulus Program 1.1 documentation" href="index.html" />
     <link rel="next" title="GammaCorrection module" href="GammaCorrection.html" />
-    <link rel="prev" title="StimProgram other functions" href="StimProgramOtherMethods.html" /> 
+    <link rel="prev" title="Other functions" href="StimProgramOtherMethods.html" /> 
   </head>
   <body role="document">
     <div class="related" role="navigation" aria-label="related navigation">
@@ -42,7 +42,7 @@
           <a href="GammaCorrection.html" title="GammaCorrection module"
              accesskey="N">next</a> |</li>
         <li class="right" >
-          <a href="StimProgramOtherMethods.html" title="StimProgram other functions"
+          <a href="StimProgramOtherMethods.html" title="Other functions"
              accesskey="P">previous</a> |</li>
         <li class="nav-item nav-item-0"><a href="index.html">Stimulus Program 1.1 documentation</a> &raquo;</li> 
       </ul>
@@ -51,7 +51,7 @@
         <div class="sphinxsidebarwrapper">
   <h4>Previous topic</h4>
   <p class="topless"><a href="StimProgramOtherMethods.html"
-                        title="previous chapter">StimProgram other functions</a></p>
+                        title="previous chapter">Other functions</a></p>
   <h4>Next topic</h4>
   <p class="topless"><a href="GammaCorrection.html"
                         title="next chapter">GammaCorrection module</a></p>
@@ -83,17 +83,17 @@
         <div class="bodywrapper">
           <div class="body" role="main">
             
-  <div class="section" id="module-gui">
-<span id="gui-module"></span><h1>gui module<a class="headerlink" href="#module-gui" title="Permalink to this headline">¶</a></h1>
+  <div class="section" id="module-GUI">
+<span id="gui-module"></span><h1>gui module<a class="headerlink" href="#module-GUI" title="Permalink to this headline">¶</a></h1>
 <p>GUI for StimProgram</p>
 <dl class="class">
-<dt id="gui.Parameters">
-<em class="property">class </em><code class="descclassname">gui.</code><code class="descname">Parameters</code><a class="reference internal" href="_modules/gui.html#Parameters"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gui.Parameters" title="Permalink to this definition">¶</a></dt>
+<dt id="GUI.Parameters">
+<em class="property">class </em><code class="descclassname">GUI.</code><code class="descname">Parameters</code><a class="reference internal" href="_modules/GUI.html#Parameters"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#GUI.Parameters" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference external" href="https://docs.python.org/library/functions.html#object" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">object</span></code></a></p>
 <p>Model to hold parameter data.</p>
 <dl class="method">
-<dt id="gui.Parameters.read_config_file">
-<code class="descname">read_config_file</code><span class="sig-paren">(</span><em>config_file</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gui.html#Parameters.read_config_file"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gui.Parameters.read_config_file" title="Permalink to this definition">¶</a></dt>
+<dt id="GUI.Parameters.read_config_file">
+<code class="descname">read_config_file</code><span class="sig-paren">(</span><em>config_file</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/GUI.html#Parameters.read_config_file"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#GUI.Parameters.read_config_file" title="Permalink to this definition">¶</a></dt>
 <dd><p>Uses ConfigParser to read .ini file where default values for params
 are stored.</p>
 <table class="docutils field-list" frame="void" rules="none">
@@ -109,8 +109,8 @@ are stored.</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="gui.Parameters.try_cast">
-<code class="descname">try_cast</code><span class="sig-paren">(</span><em>value</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gui.html#Parameters.try_cast"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gui.Parameters.try_cast" title="Permalink to this definition">¶</a></dt>
+<dt id="GUI.Parameters.try_cast">
+<code class="descname">try_cast</code><span class="sig-paren">(</span><em>value</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/GUI.html#Parameters.try_cast"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#GUI.Parameters.try_cast" title="Permalink to this definition">¶</a></dt>
 <dd><p>Helper method to attempt to cast parameters from strings to proper
 int/float/bool, or map list values to int or float</p>
 <table class="docutils field-list" frame="void" rules="none">
@@ -127,8 +127,8 @@ always string. Skip if string</td>
 </dd></dl>
 
 <dl class="method">
-<dt id="gui.Parameters.trans">
-<code class="descname">trans</code><span class="sig-paren">(</span><em>category</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gui.html#Parameters.trans"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gui.Parameters.trans" title="Permalink to this definition">¶</a></dt>
+<dt id="GUI.Parameters.trans">
+<code class="descname">trans</code><span class="sig-paren">(</span><em>category</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/GUI.html#Parameters.trans"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#GUI.Parameters.trans" title="Permalink to this definition">¶</a></dt>
 <dd><p>Helper method to go from category to appropriate dictionary</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -143,8 +143,8 @@ always string. Skip if string</td>
 </dd></dl>
 
 <dl class="method">
-<dt id="gui.Parameters.get_gammas">
-<code class="descname">get_gammas</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/gui.html#Parameters.get_gammas"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gui.Parameters.get_gammas" title="Permalink to this definition">¶</a></dt>
+<dt id="GUI.Parameters.get_gammas">
+<code class="descname">get_gammas</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/GUI.html#Parameters.get_gammas"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#GUI.Parameters.get_gammas" title="Permalink to this definition">¶</a></dt>
 <dd><p>Getter</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -157,8 +157,8 @@ always string. Skip if string</td>
 </dd></dl>
 
 <dl class="method">
-<dt id="gui.Parameters.get_params">
-<code class="descname">get_params</code><span class="sig-paren">(</span><em>category</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gui.html#Parameters.get_params"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gui.Parameters.get_params" title="Permalink to this definition">¶</a></dt>
+<dt id="GUI.Parameters.get_params">
+<code class="descname">get_params</code><span class="sig-paren">(</span><em>category</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/GUI.html#Parameters.get_params"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#GUI.Parameters.get_params" title="Permalink to this definition">¶</a></dt>
 <dd><p>Getter</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -171,8 +171,8 @@ always string. Skip if string</td>
 </dd></dl>
 
 <dl class="method">
-<dt id="gui.Parameters.get_global_params">
-<code class="descname">get_global_params</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/gui.html#Parameters.get_global_params"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gui.Parameters.get_global_params" title="Permalink to this definition">¶</a></dt>
+<dt id="GUI.Parameters.get_global_params">
+<code class="descname">get_global_params</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/GUI.html#Parameters.get_global_params"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#GUI.Parameters.get_global_params" title="Permalink to this definition">¶</a></dt>
 <dd><p>Getter.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -185,8 +185,8 @@ always string. Skip if string</td>
 </dd></dl>
 
 <dl class="method">
-<dt id="gui.Parameters.get_gui_params">
-<code class="descname">get_gui_params</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/gui.html#Parameters.get_gui_params"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gui.Parameters.get_gui_params" title="Permalink to this definition">¶</a></dt>
+<dt id="GUI.Parameters.get_gui_params">
+<code class="descname">get_gui_params</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/GUI.html#Parameters.get_gui_params"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#GUI.Parameters.get_gui_params" title="Permalink to this definition">¶</a></dt>
 <dd><p>Getter</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -199,8 +199,8 @@ always string. Skip if string</td>
 </dd></dl>
 
 <dl class="method">
-<dt id="gui.Parameters.get_merged_params">
-<code class="descname">get_merged_params</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/gui.html#Parameters.get_merged_params"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gui.Parameters.get_merged_params" title="Permalink to this definition">¶</a></dt>
+<dt id="GUI.Parameters.get_merged_params">
+<code class="descname">get_merged_params</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/GUI.html#Parameters.get_merged_params"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#GUI.Parameters.get_merged_params" title="Permalink to this definition">¶</a></dt>
 <dd><p>Getter.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -214,8 +214,8 @@ defaults</td>
 </dd></dl>
 
 <dl class="method">
-<dt id="gui.Parameters.set_param_value">
-<code class="descname">set_param_value</code><span class="sig-paren">(</span><em>category</em>, <em>param</em>, <em>value</em>, <em>index=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gui.html#Parameters.set_param_value"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gui.Parameters.set_param_value" title="Permalink to this definition">¶</a></dt>
+<dt id="GUI.Parameters.set_param_value">
+<code class="descname">set_param_value</code><span class="sig-paren">(</span><em>category</em>, <em>param</em>, <em>value</em>, <em>index=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/GUI.html#Parameters.set_param_value"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#GUI.Parameters.set_param_value" title="Permalink to this definition">¶</a></dt>
 <dd><p>Setter</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -234,8 +234,8 @@ defaults</td>
 </dd></dl>
 
 <dl class="method">
-<dt id="gui.Parameters.get_param_value">
-<code class="descname">get_param_value</code><span class="sig-paren">(</span><em>category</em>, <em>param</em>, <em>index=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gui.html#Parameters.get_param_value"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gui.Parameters.get_param_value" title="Permalink to this definition">¶</a></dt>
+<dt id="GUI.Parameters.get_param_value">
+<code class="descname">get_param_value</code><span class="sig-paren">(</span><em>category</em>, <em>param</em>, <em>index=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/GUI.html#Parameters.get_param_value"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#GUI.Parameters.get_param_value" title="Permalink to this definition">¶</a></dt>
 <dd><p>Getter</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -256,8 +256,8 @@ defaults</td>
 </dd></dl>
 
 <dl class="method">
-<dt id="gui.Parameters.init_params">
-<code class="descname">init_params</code><span class="sig-paren">(</span><em>config_dict</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gui.html#Parameters.init_params"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gui.Parameters.init_params" title="Permalink to this definition">¶</a></dt>
+<dt id="GUI.Parameters.init_params">
+<code class="descname">init_params</code><span class="sig-paren">(</span><em>config_dict</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/GUI.html#Parameters.init_params"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#GUI.Parameters.init_params" title="Permalink to this definition">¶</a></dt>
 <dd><p>Initializes dictionaries of parameters</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -272,14 +272,14 @@ defaults</td>
 </dd></dl>
 
 <dl class="class">
-<dt id="gui.TextCtrlTag">
-<em class="property">class </em><code class="descclassname">gui.</code><code class="descname">TextCtrlTag</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gui.html#TextCtrlTag"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gui.TextCtrlTag" title="Permalink to this definition">¶</a></dt>
+<dt id="GUI.TextCtrlTag">
+<em class="property">class </em><code class="descclassname">GUI.</code><code class="descname">TextCtrlTag</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/GUI.html#TextCtrlTag"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#GUI.TextCtrlTag" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">wx._controls.TextCtrl</span></code></p>
 <p>Simple subclass of wx.TextCtrl for assigning ID tag to class to keep
 track of which parameter it was assigned to. Also has method to set value.</p>
 <dl class="method">
-<dt id="gui.TextCtrlTag.set_value">
-<code class="descname">set_value</code><span class="sig-paren">(</span><em>value</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gui.html#TextCtrlTag.set_value"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gui.TextCtrlTag.set_value" title="Permalink to this definition">¶</a></dt>
+<dt id="GUI.TextCtrlTag.set_value">
+<code class="descname">set_value</code><span class="sig-paren">(</span><em>value</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/GUI.html#TextCtrlTag.set_value"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#GUI.TextCtrlTag.set_value" title="Permalink to this definition">¶</a></dt>
 <dd><p>Method to change the value in the control.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -292,8 +292,8 @@ track of which parameter it was assigned to. Also has method to set value.</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="gui.TextCtrlTag.set_editable">
-<code class="descname">set_editable</code><span class="sig-paren">(</span><em>toggle</em>, <em>value=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gui.html#TextCtrlTag.set_editable"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gui.TextCtrlTag.set_editable" title="Permalink to this definition">¶</a></dt>
+<dt id="GUI.TextCtrlTag.set_editable">
+<code class="descname">set_editable</code><span class="sig-paren">(</span><em>toggle</em>, <em>value=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/GUI.html#TextCtrlTag.set_editable"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#GUI.TextCtrlTag.set_editable" title="Permalink to this definition">¶</a></dt>
 <dd><p>Toggles whether or not control is editable.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -312,14 +312,14 @@ track of which parameter it was assigned to. Also has method to set value.</p>
 </dd></dl>
 
 <dl class="class">
-<dt id="gui.ChoiceCtrlTag">
-<em class="property">class </em><code class="descclassname">gui.</code><code class="descname">ChoiceCtrlTag</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gui.html#ChoiceCtrlTag"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gui.ChoiceCtrlTag" title="Permalink to this definition">¶</a></dt>
+<dt id="GUI.ChoiceCtrlTag">
+<em class="property">class </em><code class="descclassname">GUI.</code><code class="descname">ChoiceCtrlTag</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/GUI.html#ChoiceCtrlTag"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#GUI.ChoiceCtrlTag" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">wx._controls.Choice</span></code></p>
 <p>Simple subclass of wx.Choice for assigning ID tag to class to keep
 track of which parameter it was assigned to. Also method to set value.</p>
 <dl class="method">
-<dt id="gui.ChoiceCtrlTag.set_value">
-<code class="descname">set_value</code><span class="sig-paren">(</span><em>value</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gui.html#ChoiceCtrlTag.set_value"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gui.ChoiceCtrlTag.set_value" title="Permalink to this definition">¶</a></dt>
+<dt id="GUI.ChoiceCtrlTag.set_value">
+<code class="descname">set_value</code><span class="sig-paren">(</span><em>value</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/GUI.html#ChoiceCtrlTag.set_value"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#GUI.ChoiceCtrlTag.set_value" title="Permalink to this definition">¶</a></dt>
 <dd><p>Method to change the value in the control.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -332,24 +332,24 @@ track of which parameter it was assigned to. Also method to set value.</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="gui.ChoiceCtrlTag.set_editable">
-<code class="descname">set_editable</code><span class="sig-paren">(</span><em>toggle</em>, <em>value=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gui.html#ChoiceCtrlTag.set_editable"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gui.ChoiceCtrlTag.set_editable" title="Permalink to this definition">¶</a></dt>
+<dt id="GUI.ChoiceCtrlTag.set_editable">
+<code class="descname">set_editable</code><span class="sig-paren">(</span><em>toggle</em>, <em>value=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/GUI.html#ChoiceCtrlTag.set_editable"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#GUI.ChoiceCtrlTag.set_editable" title="Permalink to this definition">¶</a></dt>
 <dd><p>Toggles whether or not control is editable.</p>
 </dd></dl>
 
 </dd></dl>
 
 <dl class="class">
-<dt id="gui.FilePickerCtrlTag">
-<em class="property">class </em><code class="descclassname">gui.</code><code class="descname">FilePickerCtrlTag</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gui.html#FilePickerCtrlTag"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gui.FilePickerCtrlTag" title="Permalink to this definition">¶</a></dt>
+<dt id="GUI.FilePickerCtrlTag">
+<em class="property">class </em><code class="descclassname">GUI.</code><code class="descname">FilePickerCtrlTag</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/GUI.html#FilePickerCtrlTag"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#GUI.FilePickerCtrlTag" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">wx._controls.FilePickerCtrl</span></code></p>
 <p>Simple subclass of wx.FilePickerCtrl for assigning ID tag to class to keep
 track of which parameter it was assigned to. Also method to set value,
 which requires category variable to know which panel control is in to
 edit parameters accordingly.</p>
 <dl class="method">
-<dt id="gui.FilePickerCtrlTag.set_value">
-<code class="descname">set_value</code><span class="sig-paren">(</span><em>value</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gui.html#FilePickerCtrlTag.set_value"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gui.FilePickerCtrlTag.set_value" title="Permalink to this definition">¶</a></dt>
+<dt id="GUI.FilePickerCtrlTag.set_value">
+<code class="descname">set_value</code><span class="sig-paren">(</span><em>value</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/GUI.html#FilePickerCtrlTag.set_value"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#GUI.FilePickerCtrlTag.set_value" title="Permalink to this definition">¶</a></dt>
 <dd><p>Method to change the value in the control.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -364,20 +364,20 @@ edit parameters accordingly.</p>
 </dd></dl>
 
 <dl class="class">
-<dt id="gui.TextCtrlValidator">
-<em class="property">class </em><code class="descclassname">gui.</code><code class="descname">TextCtrlValidator</code><a class="reference internal" href="_modules/gui.html#TextCtrlValidator"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gui.TextCtrlValidator" title="Permalink to this definition">¶</a></dt>
+<dt id="GUI.TextCtrlValidator">
+<em class="property">class </em><code class="descclassname">GUI.</code><code class="descname">TextCtrlValidator</code><a class="reference internal" href="_modules/GUI.html#TextCtrlValidator"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#GUI.TextCtrlValidator" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">wx._core.PyValidator</span></code></p>
 <p>Validator class to ensure proper entry of parameters.</p>
 <dl class="method">
-<dt id="gui.TextCtrlValidator.Clone">
-<code class="descname">Clone</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/gui.html#TextCtrlValidator.Clone"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gui.TextCtrlValidator.Clone" title="Permalink to this definition">¶</a></dt>
+<dt id="GUI.TextCtrlValidator.Clone">
+<code class="descname">Clone</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/GUI.html#TextCtrlValidator.Clone"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#GUI.TextCtrlValidator.Clone" title="Permalink to this definition">¶</a></dt>
 <dd><p>Standard cloner. All validators are required to implement the Clone()
 method.</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="gui.TextCtrlValidator.Validate">
-<code class="descname">Validate</code><span class="sig-paren">(</span><em>win</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gui.html#TextCtrlValidator.Validate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gui.TextCtrlValidator.Validate" title="Permalink to this definition">¶</a></dt>
+<dt id="GUI.TextCtrlValidator.Validate">
+<code class="descname">Validate</code><span class="sig-paren">(</span><em>win</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/GUI.html#TextCtrlValidator.Validate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#GUI.TextCtrlValidator.Validate" title="Permalink to this definition">¶</a></dt>
 <dd><p>Validate contents of given TextCtrl.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -390,20 +390,20 @@ method.</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="gui.TextCtrlValidator.TransferToWindow">
-<code class="descname">TransferToWindow</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/gui.html#TextCtrlValidator.TransferToWindow"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gui.TextCtrlValidator.TransferToWindow" title="Permalink to this definition">¶</a></dt>
+<dt id="GUI.TextCtrlValidator.TransferToWindow">
+<code class="descname">TransferToWindow</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/GUI.html#TextCtrlValidator.TransferToWindow"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#GUI.TextCtrlValidator.TransferToWindow" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
-<dt id="gui.TextCtrlValidator.TransferFromWindow">
-<code class="descname">TransferFromWindow</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/gui.html#TextCtrlValidator.TransferFromWindow"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gui.TextCtrlValidator.TransferFromWindow" title="Permalink to this definition">¶</a></dt>
+<dt id="GUI.TextCtrlValidator.TransferFromWindow">
+<code class="descname">TransferFromWindow</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/GUI.html#TextCtrlValidator.TransferFromWindow"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#GUI.TextCtrlValidator.TransferFromWindow" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
 
 <dl class="class">
-<dt id="gui.InputPanel">
-<em class="property">class </em><code class="descclassname">gui.</code><code class="descname">InputPanel</code><span class="sig-paren">(</span><em>params</em>, <em>parent</em>, <em>category</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gui.html#InputPanel"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gui.InputPanel" title="Permalink to this definition">¶</a></dt>
+<dt id="GUI.InputPanel">
+<em class="property">class </em><code class="descclassname">GUI.</code><code class="descname">InputPanel</code><span class="sig-paren">(</span><em>params</em>, <em>parent</em>, <em>category</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/GUI.html#InputPanel"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#GUI.InputPanel" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">wx._windows.Panel</span></code></p>
 <p>Class for generic panel with input widgets and their labels. Parent class
 of GlobalPanel.</p>
@@ -421,8 +421,8 @@ of GlobalPanel.</p>
 </tbody>
 </table>
 <dl class="method">
-<dt id="gui.InputPanel.create_inputs">
-<code class="descname">create_inputs</code><span class="sig-paren">(</span><em>category</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gui.html#InputPanel.create_inputs"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gui.InputPanel.create_inputs" title="Permalink to this definition">¶</a></dt>
+<dt id="GUI.InputPanel.create_inputs">
+<code class="descname">create_inputs</code><span class="sig-paren">(</span><em>category</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/GUI.html#InputPanel.create_inputs"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#GUI.InputPanel.create_inputs" title="Permalink to this definition">¶</a></dt>
 <dd><p>Method to recursively generate label and input widgets.
 Checks if param is child of another and only generates
 parent params, then generates subpanel with associated child
@@ -439,8 +439,8 @@ list (i.e. multiple text fields).</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="gui.InputPanel.input_update">
-<code class="descname">input_update</code><span class="sig-paren">(</span><em>event</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gui.html#InputPanel.input_update"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gui.InputPanel.input_update" title="Permalink to this definition">¶</a></dt>
+<dt id="GUI.InputPanel.input_update">
+<code class="descname">input_update</code><span class="sig-paren">(</span><em>event</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/GUI.html#InputPanel.input_update"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#GUI.InputPanel.input_update" title="Permalink to this definition">¶</a></dt>
 <dd><p>Method for updating parameters on changes to input controls</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -453,8 +453,8 @@ list (i.e. multiple text fields).</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="gui.InputPanel.on_right_click">
-<code class="descname">on_right_click</code><span class="sig-paren">(</span><em>event</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gui.html#InputPanel.on_right_click"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gui.InputPanel.on_right_click" title="Permalink to this definition">¶</a></dt>
+<dt id="GUI.InputPanel.on_right_click">
+<code class="descname">on_right_click</code><span class="sig-paren">(</span><em>event</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/GUI.html#InputPanel.on_right_click"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#GUI.InputPanel.on_right_click" title="Permalink to this definition">¶</a></dt>
 <dd><p>Method for passing parameter to table to be added.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -469,9 +469,9 @@ list (i.e. multiple text fields).</p>
 </dd></dl>
 
 <dl class="class">
-<dt id="gui.GlobalPanel">
-<em class="property">class </em><code class="descclassname">gui.</code><code class="descname">GlobalPanel</code><span class="sig-paren">(</span><em>parent</em>, <em>params</em>, <em>category</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gui.html#GlobalPanel"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gui.GlobalPanel" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#gui.InputPanel" title="gui.InputPanel"><code class="xref py py-class docutils literal"><span class="pre">gui.InputPanel</span></code></a></p>
+<dt id="GUI.GlobalPanel">
+<em class="property">class </em><code class="descclassname">GUI.</code><code class="descname">GlobalPanel</code><span class="sig-paren">(</span><em>parent</em>, <em>params</em>, <em>category</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/GUI.html#GlobalPanel"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#GUI.GlobalPanel" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#GUI.InputPanel" title="GUI.InputPanel"><code class="xref py py-class docutils literal"><span class="pre">GUI.InputPanel</span></code></a></p>
 <p>Subclass of InputPanel, contains a few aesthetic changes in its init
 since not part of a notebook.</p>
 <table class="docutils field-list" frame="void" rules="none">
@@ -488,8 +488,8 @@ since not part of a notebook.</p>
 </tbody>
 </table>
 <dl class="method">
-<dt id="gui.GlobalPanel.on_default_save">
-<code class="descname">on_default_save</code><span class="sig-paren">(</span><em>event</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gui.html#GlobalPanel.on_default_save"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gui.GlobalPanel.on_default_save" title="Permalink to this definition">¶</a></dt>
+<dt id="GUI.GlobalPanel.on_default_save">
+<code class="descname">on_default_save</code><span class="sig-paren">(</span><em>event</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/GUI.html#GlobalPanel.on_default_save"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#GUI.GlobalPanel.on_default_save" title="Permalink to this definition">¶</a></dt>
 <dd><p>Saves global default parameters.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -502,8 +502,8 @@ since not part of a notebook.</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="gui.GlobalPanel.on_default_delete">
-<code class="descname">on_default_delete</code><span class="sig-paren">(</span><em>event</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gui.html#GlobalPanel.on_default_delete"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gui.GlobalPanel.on_default_delete" title="Permalink to this definition">¶</a></dt>
+<dt id="GUI.GlobalPanel.on_default_delete">
+<code class="descname">on_default_delete</code><span class="sig-paren">(</span><em>event</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/GUI.html#GlobalPanel.on_default_delete"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#GUI.GlobalPanel.on_default_delete" title="Permalink to this definition">¶</a></dt>
 <dd><p>Deletes global default parameters.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -516,8 +516,8 @@ since not part of a notebook.</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="gui.GlobalPanel.on_default_select">
-<code class="descname">on_default_select</code><span class="sig-paren">(</span><em>event</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gui.html#GlobalPanel.on_default_select"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gui.GlobalPanel.on_default_select" title="Permalink to this definition">¶</a></dt>
+<dt id="GUI.GlobalPanel.on_default_select">
+<code class="descname">on_default_select</code><span class="sig-paren">(</span><em>event</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/GUI.html#GlobalPanel.on_default_select"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#GUI.GlobalPanel.on_default_select" title="Permalink to this definition">¶</a></dt>
 <dd><p>Populates global default panel based on saved globals.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -532,14 +532,14 @@ since not part of a notebook.</p>
 </dd></dl>
 
 <dl class="class">
-<dt id="gui.ListPanel">
-<em class="property">class </em><code class="descclassname">gui.</code><code class="descname">ListPanel</code><span class="sig-paren">(</span><em>parent</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gui.html#ListPanel"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gui.ListPanel" title="Permalink to this definition">¶</a></dt>
+<dt id="GUI.ListPanel">
+<em class="property">class </em><code class="descclassname">GUI.</code><code class="descname">ListPanel</code><span class="sig-paren">(</span><em>parent</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/GUI.html#ListPanel"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#GUI.ListPanel" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">wx._windows.Panel</span></code></p>
 <p>Panel that contains list of stims to run along with add/remove buttons
 and up/down buttons.</p>
 <dl class="method">
-<dt id="gui.ListPanel.convert_stim_type">
-<code class="descname">convert_stim_type</code><span class="sig-paren">(</span><em>stim_type</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gui.html#ListPanel.convert_stim_type"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gui.ListPanel.convert_stim_type" title="Permalink to this definition">¶</a></dt>
+<dt id="GUI.ListPanel.convert_stim_type">
+<code class="descname">convert_stim_type</code><span class="sig-paren">(</span><em>stim_type</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/GUI.html#ListPanel.convert_stim_type"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#GUI.ListPanel.convert_stim_type" title="Permalink to this definition">¶</a></dt>
 <dd><p>Converts stim_type label to class names and back</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -554,8 +554,8 @@ and up/down buttons.</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="gui.ListPanel.on_add_button">
-<code class="descname">on_add_button</code><span class="sig-paren">(</span><em>event</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gui.html#ListPanel.on_add_button"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gui.ListPanel.on_add_button" title="Permalink to this definition">¶</a></dt>
+<dt id="GUI.ListPanel.on_add_button">
+<code class="descname">on_add_button</code><span class="sig-paren">(</span><em>event</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/GUI.html#ListPanel.on_add_button"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#GUI.ListPanel.on_add_button" title="Permalink to this definition">¶</a></dt>
 <dd><p>Makes call to add to list with proper params</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -568,8 +568,8 @@ and up/down buttons.</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="gui.ListPanel.add_to_list">
-<code class="descname">add_to_list</code><span class="sig-paren">(</span><em>stim_type</em>, <em>param_dict</em>, <em>grid_dict</em>, <em>insert_pos=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gui.html#ListPanel.add_to_list"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gui.ListPanel.add_to_list" title="Permalink to this definition">¶</a></dt>
+<dt id="GUI.ListPanel.add_to_list">
+<code class="descname">add_to_list</code><span class="sig-paren">(</span><em>stim_type</em>, <em>param_dict</em>, <em>grid_dict</em>, <em>insert_pos=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/GUI.html#ListPanel.add_to_list"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#GUI.ListPanel.add_to_list" title="Permalink to this definition">¶</a></dt>
 <dd><p>Adds stim to list of stims to run, as a bew stiminfo class</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -589,8 +589,8 @@ when moving stims up and down</li>
 </dd></dl>
 
 <dl class="method">
-<dt id="gui.ListPanel.on_remove_button">
-<code class="descname">on_remove_button</code><span class="sig-paren">(</span><em>event</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gui.html#ListPanel.on_remove_button"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gui.ListPanel.on_remove_button" title="Permalink to this definition">¶</a></dt>
+<dt id="GUI.ListPanel.on_remove_button">
+<code class="descname">on_remove_button</code><span class="sig-paren">(</span><em>event</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/GUI.html#ListPanel.on_remove_button"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#GUI.ListPanel.on_remove_button" title="Permalink to this definition">¶</a></dt>
 <dd><p>Removes stims from stim list. If none selected, clears all.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -603,8 +603,8 @@ when moving stims up and down</li>
 </dd></dl>
 
 <dl class="method">
-<dt id="gui.ListPanel.on_up_button">
-<code class="descname">on_up_button</code><span class="sig-paren">(</span><em>event</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gui.html#ListPanel.on_up_button"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gui.ListPanel.on_up_button" title="Permalink to this definition">¶</a></dt>
+<dt id="GUI.ListPanel.on_up_button">
+<code class="descname">on_up_button</code><span class="sig-paren">(</span><em>event</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/GUI.html#ListPanel.on_up_button"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#GUI.ListPanel.on_up_button" title="Permalink to this definition">¶</a></dt>
 <dd><p>Moves a stim up in the list by removing it and reinserting it into
 proper position.</p>
 <table class="docutils field-list" frame="void" rules="none">
@@ -618,8 +618,8 @@ proper position.</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="gui.ListPanel.on_down_button">
-<code class="descname">on_down_button</code><span class="sig-paren">(</span><em>event</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gui.html#ListPanel.on_down_button"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gui.ListPanel.on_down_button" title="Permalink to this definition">¶</a></dt>
+<dt id="GUI.ListPanel.on_down_button">
+<code class="descname">on_down_button</code><span class="sig-paren">(</span><em>event</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/GUI.html#ListPanel.on_down_button"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#GUI.ListPanel.on_down_button" title="Permalink to this definition">¶</a></dt>
 <dd><p>Moves a stim down in the list by removing it and reinserting it into
 proper position.</p>
 <table class="docutils field-list" frame="void" rules="none">
@@ -633,8 +633,8 @@ proper position.</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="gui.ListPanel.on_double_click">
-<code class="descname">on_double_click</code><span class="sig-paren">(</span><em>event</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gui.html#ListPanel.on_double_click"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gui.ListPanel.on_double_click" title="Permalink to this definition">¶</a></dt>
+<dt id="GUI.ListPanel.on_double_click">
+<code class="descname">on_double_click</code><span class="sig-paren">(</span><em>event</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/GUI.html#ListPanel.on_double_click"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#GUI.ListPanel.on_double_click" title="Permalink to this definition">¶</a></dt>
 <dd><p>Loads params from list and for grid on double click</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -649,13 +649,13 @@ proper position.</p>
 </dd></dl>
 
 <dl class="class">
-<dt id="gui.DirPanel">
-<em class="property">class </em><code class="descclassname">gui.</code><code class="descname">DirPanel</code><span class="sig-paren">(</span><em>parent</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gui.html#DirPanel"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gui.DirPanel" title="Permalink to this definition">¶</a></dt>
+<dt id="GUI.DirPanel">
+<em class="property">class </em><code class="descclassname">GUI.</code><code class="descname">DirPanel</code><span class="sig-paren">(</span><em>parent</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/GUI.html#DirPanel"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#GUI.DirPanel" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">wx._windows.Panel</span></code></p>
 <p>Class for file browser panel.</p>
 <dl class="method">
-<dt id="gui.DirPanel.on_save_button">
-<code class="descname">on_save_button</code><span class="sig-paren">(</span><em>event</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gui.html#DirPanel.on_save_button"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gui.DirPanel.on_save_button" title="Permalink to this definition">¶</a></dt>
+<dt id="GUI.DirPanel.on_save_button">
+<code class="descname">on_save_button</code><span class="sig-paren">(</span><em>event</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/GUI.html#DirPanel.on_save_button"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#GUI.DirPanel.on_save_button" title="Permalink to this definition">¶</a></dt>
 <dd><p>Saves current list of stims to text file.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -668,8 +668,8 @@ proper position.</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="gui.DirPanel.on_load_button">
-<code class="descname">on_load_button</code><span class="sig-paren">(</span><em>event</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gui.html#DirPanel.on_load_button"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gui.DirPanel.on_load_button" title="Permalink to this definition">¶</a></dt>
+<dt id="GUI.DirPanel.on_load_button">
+<code class="descname">on_load_button</code><span class="sig-paren">(</span><em>event</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/GUI.html#DirPanel.on_load_button"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#GUI.DirPanel.on_load_button" title="Permalink to this definition">¶</a></dt>
 <dd><p>Loads stims from text file.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -682,8 +682,8 @@ proper position.</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="gui.DirPanel.on_double_click">
-<code class="descname">on_double_click</code><span class="sig-paren">(</span><em>event</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gui.html#DirPanel.on_double_click"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gui.DirPanel.on_double_click" title="Permalink to this definition">¶</a></dt>
+<dt id="GUI.DirPanel.on_double_click">
+<code class="descname">on_double_click</code><span class="sig-paren">(</span><em>event</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/GUI.html#DirPanel.on_double_click"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#GUI.DirPanel.on_double_click" title="Permalink to this definition">¶</a></dt>
 <dd><p>If log file, opens, else loads.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -698,25 +698,25 @@ proper position.</p>
 </dd></dl>
 
 <dl class="class">
-<dt id="gui.MyGrid">
-<em class="property">class </em><code class="descclassname">gui.</code><code class="descname">MyGrid</code><span class="sig-paren">(</span><em>parent</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gui.html#MyGrid"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gui.MyGrid" title="Permalink to this definition">¶</a></dt>
+<dt id="GUI.MyGrid">
+<em class="property">class </em><code class="descclassname">GUI.</code><code class="descname">MyGrid</code><span class="sig-paren">(</span><em>parent</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/GUI.html#MyGrid"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#GUI.MyGrid" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">wx._windows.Frame</span></code></p>
 <p>Class for grid window.</p>
 <dl class="method">
-<dt id="gui.MyGrid.show_grid">
-<code class="descname">show_grid</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/gui.html#MyGrid.show_grid"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gui.MyGrid.show_grid" title="Permalink to this definition">¶</a></dt>
+<dt id="GUI.MyGrid.show_grid">
+<code class="descname">show_grid</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/GUI.html#MyGrid.show_grid"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#GUI.MyGrid.show_grid" title="Permalink to this definition">¶</a></dt>
 <dd><p>Method to show grid. Unminimizes and brings to front.</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="gui.MyGrid.hide_grid">
-<code class="descname">hide_grid</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/gui.html#MyGrid.hide_grid"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gui.MyGrid.hide_grid" title="Permalink to this definition">¶</a></dt>
+<dt id="GUI.MyGrid.hide_grid">
+<code class="descname">hide_grid</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/GUI.html#MyGrid.hide_grid"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#GUI.MyGrid.hide_grid" title="Permalink to this definition">¶</a></dt>
 <dd><p>Method to hide grid.</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="gui.MyGrid.on_close_button">
-<code class="descname">on_close_button</code><span class="sig-paren">(</span><em>event</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gui.html#MyGrid.on_close_button"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gui.MyGrid.on_close_button" title="Permalink to this definition">¶</a></dt>
+<dt id="GUI.MyGrid.on_close_button">
+<code class="descname">on_close_button</code><span class="sig-paren">(</span><em>event</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/GUI.html#MyGrid.on_close_button"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#GUI.MyGrid.on_close_button" title="Permalink to this definition">¶</a></dt>
 <dd><p>Catches close in order to only hide. Otherwise frame object is
 deleted and loses all data.</p>
 <table class="docutils field-list" frame="void" rules="none">
@@ -730,8 +730,8 @@ deleted and loses all data.</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="gui.MyGrid.add_to_grid">
-<code class="descname">add_to_grid</code><span class="sig-paren">(</span><em>param</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gui.html#MyGrid.add_to_grid"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gui.MyGrid.add_to_grid" title="Permalink to this definition">¶</a></dt>
+<dt id="GUI.MyGrid.add_to_grid">
+<code class="descname">add_to_grid</code><span class="sig-paren">(</span><em>param</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/GUI.html#MyGrid.add_to_grid"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#GUI.MyGrid.add_to_grid" title="Permalink to this definition">¶</a></dt>
 <dd><p>Adds column to table and prevents editing of control.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -744,8 +744,8 @@ deleted and loses all data.</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="gui.MyGrid.on_grid_cell_changed">
-<code class="descname">on_grid_cell_changed</code><span class="sig-paren">(</span><em>event</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gui.html#MyGrid.on_grid_cell_changed"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gui.MyGrid.on_grid_cell_changed" title="Permalink to this definition">¶</a></dt>
+<dt id="GUI.MyGrid.on_grid_cell_changed">
+<code class="descname">on_grid_cell_changed</code><span class="sig-paren">(</span><em>event</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/GUI.html#MyGrid.on_grid_cell_changed"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#GUI.MyGrid.on_grid_cell_changed" title="Permalink to this definition">¶</a></dt>
 <dd><p>Updates control dict when values in cells are changed.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -758,8 +758,8 @@ deleted and loses all data.</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="gui.MyGrid.on_grid_label_right_click">
-<code class="descname">on_grid_label_right_click</code><span class="sig-paren">(</span><em>event</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gui.html#MyGrid.on_grid_label_right_click"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gui.MyGrid.on_grid_label_right_click" title="Permalink to this definition">¶</a></dt>
+<dt id="GUI.MyGrid.on_grid_label_right_click">
+<code class="descname">on_grid_label_right_click</code><span class="sig-paren">(</span><em>event</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/GUI.html#MyGrid.on_grid_label_right_click"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#GUI.MyGrid.on_grid_label_right_click" title="Permalink to this definition">¶</a></dt>
 <dd><p>Adds more rows if top left corner right clicked. Deletes row/column if
 row/column header right clicked.</p>
 <table class="docutils field-list" frame="void" rules="none">
@@ -773,8 +773,8 @@ row/column header right clicked.</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="gui.MyGrid.on_grid_cell_right_click">
-<code class="descname">on_grid_cell_right_click</code><span class="sig-paren">(</span><em>event</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gui.html#MyGrid.on_grid_cell_right_click"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gui.MyGrid.on_grid_cell_right_click" title="Permalink to this definition">¶</a></dt>
+<dt id="GUI.MyGrid.on_grid_cell_right_click">
+<code class="descname">on_grid_cell_right_click</code><span class="sig-paren">(</span><em>event</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/GUI.html#MyGrid.on_grid_cell_right_click"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#GUI.MyGrid.on_grid_cell_right_click" title="Permalink to this definition">¶</a></dt>
 <dd><p>Removes contents of cell.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -787,8 +787,8 @@ row/column header right clicked.</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="gui.MyGrid.get_grid_dict">
-<code class="descname">get_grid_dict</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/gui.html#MyGrid.get_grid_dict"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gui.MyGrid.get_grid_dict" title="Permalink to this definition">¶</a></dt>
+<dt id="GUI.MyGrid.get_grid_dict">
+<code class="descname">get_grid_dict</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/GUI.html#MyGrid.get_grid_dict"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#GUI.MyGrid.get_grid_dict" title="Permalink to this definition">¶</a></dt>
 <dd><p>Getter. Sets middle Nones to previous values.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -803,13 +803,13 @@ row/column header right clicked.</p>
 </dd></dl>
 
 <dl class="class">
-<dt id="gui.MyFrame">
-<em class="property">class </em><code class="descclassname">gui.</code><code class="descname">MyFrame</code><a class="reference internal" href="_modules/gui.html#MyFrame"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gui.MyFrame" title="Permalink to this definition">¶</a></dt>
+<dt id="GUI.MyFrame">
+<em class="property">class </em><code class="descclassname">GUI.</code><code class="descname">MyFrame</code><a class="reference internal" href="_modules/GUI.html#MyFrame"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#GUI.MyFrame" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">wx._windows.Frame</span></code></p>
 <p>Class for generating frame. Instantiates parameters, notebook, and panels.</p>
 <dl class="method">
-<dt id="gui.MyFrame.on_run_button">
-<code class="descname">on_run_button</code><span class="sig-paren">(</span><em>event</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gui.html#MyFrame.on_run_button"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gui.MyFrame.on_run_button" title="Permalink to this definition">¶</a></dt>
+<dt id="GUI.MyFrame.on_run_button">
+<code class="descname">on_run_button</code><span class="sig-paren">(</span><em>event</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/GUI.html#MyFrame.on_run_button"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#GUI.MyFrame.on_run_button" title="Permalink to this definition">¶</a></dt>
 <dd><p>Method for calling run and changing values from grid if necessary.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -822,14 +822,14 @@ row/column header right clicked.</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="gui.MyFrame.run">
-<code class="descname">run</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/gui.html#MyFrame.run"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gui.MyFrame.run" title="Permalink to this definition">¶</a></dt>
+<dt id="GUI.MyFrame.run">
+<code class="descname">run</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/GUI.html#MyFrame.run"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#GUI.MyFrame.run" title="Permalink to this definition">¶</a></dt>
 <dd><p>Method for running stims.</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="gui.MyFrame.on_win_button">
-<code class="descname">on_win_button</code><span class="sig-paren">(</span><em>event</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gui.html#MyFrame.on_win_button"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gui.MyFrame.on_win_button" title="Permalink to this definition">¶</a></dt>
+<dt id="GUI.MyFrame.on_win_button">
+<code class="descname">on_win_button</code><span class="sig-paren">(</span><em>event</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/GUI.html#MyFrame.on_win_button"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#GUI.MyFrame.on_win_button" title="Permalink to this definition">¶</a></dt>
 <dd><p>Method for toggling stim window. Makes call to StimProgram. Gets
 various params from global panel.</p>
 <table class="docutils field-list" frame="void" rules="none">
@@ -843,8 +843,8 @@ various params from global panel.</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="gui.MyFrame.on_stop_button">
-<code class="descname">on_stop_button</code><span class="sig-paren">(</span><em>event</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gui.html#MyFrame.on_stop_button"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gui.MyFrame.on_stop_button" title="Permalink to this definition">¶</a></dt>
+<dt id="GUI.MyFrame.on_stop_button">
+<code class="descname">on_stop_button</code><span class="sig-paren">(</span><em>event</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/GUI.html#MyFrame.on_stop_button"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#GUI.MyFrame.on_stop_button" title="Permalink to this definition">¶</a></dt>
 <dd><p>Method for stopping stim. Makes call to StimProgram.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -857,8 +857,8 @@ various params from global panel.</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="gui.MyFrame.on_exit_button">
-<code class="descname">on_exit_button</code><span class="sig-paren">(</span><em>event</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gui.html#MyFrame.on_exit_button"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gui.MyFrame.on_exit_button" title="Permalink to this definition">¶</a></dt>
+<dt id="GUI.MyFrame.on_exit_button">
+<code class="descname">on_exit_button</code><span class="sig-paren">(</span><em>event</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/GUI.html#MyFrame.on_exit_button"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#GUI.MyFrame.on_exit_button" title="Permalink to this definition">¶</a></dt>
 <dd><p>Closes application.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -873,8 +873,8 @@ various params from global panel.</p>
 </dd></dl>
 
 <dl class="function">
-<dt id="gui.main">
-<code class="descclassname">gui.</code><code class="descname">main</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/gui.html#main"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gui.main" title="Permalink to this definition">¶</a></dt>
+<dt id="GUI.main">
+<code class="descclassname">GUI.</code><code class="descname">main</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/GUI.html#main"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#GUI.main" title="Permalink to this definition">¶</a></dt>
 <dd><p>Main function to start GUI.</p>
 </dd></dl>
 
@@ -899,7 +899,7 @@ various params from global panel.</p>
           <a href="GammaCorrection.html" title="GammaCorrection module"
              >next</a> |</li>
         <li class="right" >
-          <a href="StimProgramOtherMethods.html" title="StimProgram other functions"
+          <a href="StimProgramOtherMethods.html" title="Other functions"
              >previous</a> |</li>
         <li class="nav-item nav-item-0"><a href="index.html">Stimulus Program 1.1 documentation</a> &raquo;</li> 
       </ul>
