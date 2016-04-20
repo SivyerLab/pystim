@@ -402,6 +402,11 @@ class GammaValues(object):
                     elif adj_color[i] <= -1:
                          adj_color[i] = -1.0
 
+            # if grayscale image
+            elif len(numpy.shape(color)) == 2:
+                print '\nWARNING: Cannot gamma correct grayscale .iml images.'
+                adj_color = color
+
         # if single channel
         elif channel is not None:
             if channel == 0:
