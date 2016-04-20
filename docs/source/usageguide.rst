@@ -115,3 +115,14 @@ To add more rows, right click the top left corner of the table. To remove a
 cell, row, or column, right click either the cell or the column/row header.
 Removing a row removes that parameter from the table and makes the parameters
 editable again.
+
+.. _triggering_ref:
+
+Triggering
+----------
+
+TODO: Triggering details go here.
+- moving
+- table
+- trigger wait
+- etc.
