@@ -61,8 +61,8 @@ __status__  = "Beta"
 defaults = dict(logsDir='.\\psychopy\\logs\\',
                 monitor='blank')
 config = ConfigParser.ConfigParser()
-config.read(os.path.abspath('./psychopy/config.ini'))
-# config.read(os.path.abspath("C:\Users\Alex\PycharmProjects\StimulusProgram\psychopy\config.ini"))
+# config.read(os.path.abspath('./psychopy/config.ini'))
+config.read(os.path.abspath("C:\Users\Alex\PycharmProjects\StimulusProgram\psychopy\config.ini"))
 
 
 class StimInfo(object):
@@ -151,7 +151,7 @@ class GlobalDefaults(object):
                     log=False,
                     screen_num=1,
                     gamma_correction='default',
-                    trigger_wait=0.1,
+                    trigger_wait=0,
                     capture=False)
 
     def __init__(self,
@@ -272,7 +272,8 @@ class MyWindow(object):
         gamma = GlobalDefaults['gamma_correction']
 
         if gamma != 'default':
-            gamma_file = os.path.abspath('./psychopy/data/gammaTables.txt')
+            # gamma_file = os.path.abspath('./psychopy/data/gammaTables.txt')
+            gamma_file = os.path.abspath("C:/Users/Alex/PycharmProjects/StimulusProgram/psychopy/data/gammaTables.txt")
 
             if os.path.exists(gamma_file):
                 with open(gamma_file, 'rb') as f:
@@ -372,6 +373,10 @@ class StimDefaults(object):
 
     :param float delay: The time to between the first frame and the stim
      appearing on screen. Rounds up to the nearest frame.
+
+    :param float end_delay: The time to between the last frame stim
+     appearing on screen and the end of frames flipping. Rounds up to the
+     nearest frame.
 
     :param float duration: The duration for which the stim will animated.
      Rounds up to the nearest frame.
@@ -492,7 +497,8 @@ class StimDefaults(object):
                  move_delay=0,
                  num_jumps=5,
                  jump_delay=100,
-                 force_stop=0):
+                 force_stop=0,
+                 end_delay=0):
         """
         Default variable constructors; distance and time units converted
         appropriately.
@@ -551,6 +557,7 @@ class StimDefaults(object):
 
         # time conversions
         self.delay = delay * GlobalDefaults['frame_rate']
+        self.end_delay = end_delay * GlobalDefaults['frame_rate']
         self.duration = duration * GlobalDefaults['frame_rate']
         self.move_delay = int(move_delay * GlobalDefaults['frame_rate'])
         self.jump_delay = jump_delay * GlobalDefaults['frame_rate']
@@ -663,13 +670,15 @@ class StaticStim(StimDefaults):
         self.end_stim = self.duration
         self.end_stim += self.start_stim
         self.end_stim = int(self.end_stim + 0.99)
+        self.end_delay = int(self.end_delay + 0.99)
 
         self.draw_duration = self.end_stim - self.start_stim
 
         if self.force_stop != 0:
-            self.end_stim = self.force_stop
+            self.end_stim = int(self.force_stop + 0.99)
+            self.end_delay = 0
 
-        return self.end_stim
+        return self.end_stim + self.end_delay
 
     def animate(self, frame):
         """Method for drawing stim objects to back buffer. Checks if object
@@ -789,9 +798,11 @@ class StaticStim(StimDefaults):
 
         # make array
         size = (max(self.gen_size()),) * 2  # square tuple of largest size
-        texture = numpy.zeros(size+(4,))    # make array, adding rgba
-        # turn colors off, set alpha
-        texture[:, :, ] = [-1, -1, -1, self.alpha]
+        # not needed for images
+        if self.fill_mode != 'image':
+            texture = numpy.zeros(size+(4,))    # make array, adding rgba
+            # turn colors off, set alpha
+            texture[:, :, ] = [-1, -1, -1, self.alpha]
 
         high, low, delta, background = self.gen_rgb()
 
@@ -837,162 +848,78 @@ class StaticStim(StimDefaults):
             texture[:, :, self.contrast_channel] = color
 
         elif self.fill_mode == 'image':
-            if MyWindow.gamma_mon is not None:
 
-                # data folder
-                data_folder = os.path.abspath('./psychopy/data/')
-                pics_folder = os.path.abspath('./psychopy/data/pics/')
+            pic_name = os.path.basename(self.image_filename)
+            filename, file_ext = os.path.splitext(pic_name)
 
-                # create folders if not present
-                if not os.path.exists(data_folder):
-                    os.makedirs(data_folder)
-                if not os.path.exists(pics_folder):
-                    os.makedirs(pics_folder)
+            if file_ext != '.iml':
+                image = Image.open(self.image_filename)
 
-                pic_name = os.path.basename(self.image_filename)
-                filename, file_ext = os.path.splitext(pic_name)
+                # make smaller for faster correction if possible
+                if max(image.size) > max(self.gen_size()):
+                    image.thumbnail(self.gen_size(), Image.ANTIALIAS)
 
-                # insert image specific details into filename
-                pic_name = filename + '_' + \
-                           GlobalDefaults['gamma_correction'] + '_' + \
-                           str(self.image_channel) + \
-                           '_{}_{}'.format(self.gen_size()[0],
-                                           self.gen_size()[1]) + \
-                           file_ext
-
-                savedir = os.path.join(pics_folder, pic_name)
-
-                # if not the first time gamma correcting this image
-                if os.path.exists(savedir):
-                    image = Image.open(savedir)
-
-                    # turn into array and flip (different because of indexing
-                    # styles)
-                    texture = numpy.asarray(image) / \
-                              255.0 * 2 - 1
-                    texture = numpy.rot90(texture, 2)
-
-                    # add alpha values
-                    texture = numpy.insert(texture, 3, self.alpha, axis=2)
-
-                # else save gamma correction for faster future loading
-                else:
-                    if file_ext != '.iml':
-                        image = Image.open(self.image_filename)
-
-                        # make smaller for faster correction if possible
-                        if max(image.size) > max(self.gen_size()):
-                            image.thumbnail(self.gen_size(), Image.ANTIALIAS)
-
-                        # rescale rgb
-                        texture = numpy.asarray(image) / 255.0 * 2 - 1
-
-                        # if only want one color channel, remove others
-                        if self.image_channel != 3:
-                            for i in range(3):
-                                if self.image_channel != i:
-                                    texture[:, :, i] = -1
-
-                        # gamma correct (slow step)
-                        texture = MyWindow.gamma_mon(texture)
-
-                        # save for future
-                        if file_ext != '.iml':
-                            scipy.misc.imsave(savedir, texture)
-
-                        # transform due to different indexing
-                        texture = numpy.rot90(texture, 2)
-
-                        # add alpha
-                        texture = numpy.insert(texture, 3, self.alpha, axis=2)
-
-                    else:
-                        with open(self.image_filename, 'rb') as raw_image:
-                            image_bytes = raw_image.read()
-
-                        image_array = array.array('H', image_bytes)
-                        image_array.byteswap()
-
-                        image = numpy.array(image_array, dtype='uint16').reshape(
-                            1024, 1536)
-
-                        maxi = image.max()
-                        if maxi <= 4095:
-                            maxi = 4095
-
-                        image = image.astype(numpy.float64)
-
-                        image = image / maxi
-
-                        if self.image_channel != 3:
-                            texture = numpy.zeros((1024, 1536, 3))
-                            texture[:, :, self.image_channel] = image
-
-                            texture = texture * 2 - 1
-
-                            texture = numpy.rot90(texture, 2)
-
-                            # add alpha values
-                            texture = numpy.insert(texture, 3, self.alpha, axis=2)
-
-                        else:
-                            texture = image * 2 - 1
-
-            # if not gamma correcting
-            else:
-                _, ext = os.path.splitext(self.image_filename)
-                if ext != '.iml':
-                    image = Image.open(self.image_filename)
-
-                    # make smaller for faster correction if possible
-                    if max(image.size) > max(self.gen_size()):
-                        image.thumbnail(self.gen_size(), Image.ANTIALIAS)
-
-                    # turn to array
-                    texture = numpy.asarray(image) / 255.0 * 2 - 1
-
-                    # add alpha values
-                    texture = numpy.insert(texture, 3, self.alpha, axis=2)
-
-                # if .iml
-                else:
-                    with open(self.image_filename, 'rb') as raw_image:
-                        image_bytes = raw_image.read()
-
-                    image_array = array.array('H', image_bytes)
-                    image_array.byteswap()
-
-                    image = numpy.array(image_array, dtype='uint16').reshape(
-                        1024, 1536)
-
-                    maxi = image.max()
-                    if maxi <= 4095:
-                        maxi = 4095
-
-                    image = image.astype(numpy.float64)
-
-                    image = image / maxi
-
-                    if self.image_channel != 3:
-                        texture = numpy.zeros((1024, 1536, 3))
-                        texture[:, :, self.image_channel] = image
-
-                        texture = texture * 2 - 1
-
-                        # add alpha values
-                        texture = numpy.insert(texture, 3, self.alpha, axis=2)
-
-                    else:
-                        texture = image * 2 - 1
-
-                # flip because of indexing styles
-                texture = numpy.rot90(texture, 2)
+                # rescale rgb
+                texture = numpy.asarray(image) / 255.0 * 2 - 1
 
                 # if only want one color channel, remove others
                 if self.image_channel != 3:
                     for i in range(3):
                         if self.image_channel != i:
                             texture[:, :, i] = -1
+
+                # add alpha
+                texture = numpy.insert(texture, 3, self.alpha, axis=2)
+
+            # if .iml
+            else:
+                with open(self.image_filename, 'rb') as raw_image:
+                    image_bytes = raw_image.read()
+
+                image_array = array.array('H', image_bytes)
+                image_array.byteswap()
+
+                image = numpy.array(image_array, dtype='uint16').reshape(
+                    1024, 1536)
+
+                maxi = image.max()
+                if maxi <= 4095:
+                    maxi = 4095
+
+                image = image.astype(numpy.float64)
+
+                image = image / maxi
+
+                if self.image_channel != 3:
+                    texture = numpy.zeros((1024, 1536, 3))
+                    texture[:, :, self.image_channel] = image
+
+                    texture = texture * 2 - 1
+
+                    # add alpha values
+                    # texture = numpy.insert(texture, 3, self.alpha, axis=2)
+                    a = numpy.empty(1572864)
+                    a.fill(self.alpha)
+                    size=1024
+                    r,g,b = numpy.split(texture, 3, axis=2)
+                    r.flatten()
+                    g.flatten()
+                    b.flatten()
+                    texture = numpy.dstack([numpy.split(r, size),
+                                            numpy.split(g, size),
+                                            numpy.split(b, size),
+                                            numpy.split(a, size)])
+
+
+
+                # .iml are grayscale by default
+                else:
+                    texture = image * 2 - 1
+
+            if MyWindow.gamma_mon is not None:
+                texture = MyWindow.gamma_mon(texture)
+
+            texture = numpy.rot90(texture, 2)
 
         # gamma correct
         if MyWindow.gamma_mon is not None and self.fill_mode not in ['image']:
@@ -1122,6 +1049,7 @@ class MovingStim(StaticStim):
         self.end_stim = self.num_frames * self.num_dirs
         self.end_stim += self.start_stim
         self.end_stim = int(self.end_stim + 0.99)
+        self.end_delay = int(self.end_delay + 0.99)
 
         self.draw_duration = self.end_stim - self.start_stim
 
@@ -1133,8 +1061,9 @@ class MovingStim(StaticStim):
 
         if self.force_stop != 0:
             self.end_stim = self.force_stop
+            self.end_delay = 0
 
-        return self.end_stim
+        return self.end_stim + self.end_delay
 
     def animate(self, frame):
         """Method for animating moving stims. Moves stims appropriately,
@@ -1306,7 +1235,7 @@ class RandomlyMovingStim(MovingStim):
         """
         self.gen_pos()
 
-        self.end_stim = super(MovingStim, self).draw_times()
+        self.end_stim = super(MovingStim, self).draw_times() - self.end_delay
 
         if self.trigger:
             for x in range(int(self.duration / self.num_frames+0.99)):
@@ -1314,10 +1243,7 @@ class RandomlyMovingStim(MovingStim):
                 if trigger_frame not in MyWindow.frame_trigger_list:
                     MyWindow.frame_trigger_list.add(trigger_frame)
 
-        if self.force_stop != 0:
-            self.end_stim = self.force_stop
-
-        return self.end_stim
+        return self.end_stim + self.end_delay
 
     def gen_pos(self):
         """Makes calls to :py:func:`gen_start_pos` and
