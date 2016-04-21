@@ -375,7 +375,7 @@ class Parameters(object):
              {'type'    : 'choice',
               'label'   : 'fill mode',
               'choices' : ['uniform', 'sine', 'square', 'concentric',
-                           'checkerboard', 'random', 'image', 'movie'],
+                           'checkerboard', 'image', 'movie'],
               'default' : config_dict['fill_mode'],
               'is_child': False,
               'children': {
@@ -386,9 +386,7 @@ class Parameters(object):
                   'concentric'  : ['intensity_dir', 'sf', 'phase',
                                    'phase_speed'],
                   'checkerboard': ['check_size', 'num_check', 'phase',
-                                   'intensity_dir'],
-                  'random'      : ['check_size', 'num_check', 'fill_seed',
-                                   'intensity_dir'],
+                                   'fill_seed', 'check_type', 'intensity_dir'],
                   'movie'       : ['movie_filename', 'movie_size'],
                   'image'       : ['image_filename', 'image_size', 'phase',
                                    'phase_speed', 'image_channel'],
@@ -407,6 +405,14 @@ class Parameters(object):
               'label'   : 'contrast dir',
               'choices' : ['single', 'both'],
               'default' : config_dict['intensity_dir'],
+              'is_child': True}
+             ),
+
+            ('check_type',
+             {'type'    : 'choice',
+              'label'   : 'fill type',
+              'choices' : ['board', 'random', 'noise'],
+              'default' : config_dict['check_type'],
               'is_child': True}
              ),
 
@@ -757,6 +763,7 @@ class ChoiceCtrlTag(wx.Choice):
 
         :param value: value to be changed to
         """
+        # print 'set choice'
         self.SetStringSelection(str(value))
         evt = wx.CommandEvent(wx.EVT_CHOICE.typeId,
                               self.Id)
@@ -935,7 +942,10 @@ class InputPanel(wx.Panel):
                                        value=str(param_info['default']),
                                        validator=TextCtrlValidator())
                     # add control to dict of all controls
-                    self.all_controls[param] = ctrl
+                    if param in self.all_controls.keys():
+                        self.all_controls[param].append(ctrl)
+                    else:
+                        self.all_controls[param] = [ctrl]
                     # bind events to methods
                     self.Bind(wx.EVT_TEXT, self.input_update, ctrl)
                     self.Bind(wx.EVT_CONTEXT_MENU, self.on_right_click, ctrl)
@@ -944,7 +954,11 @@ class InputPanel(wx.Panel):
                     ctrl = ChoiceCtrlTag(self,
                                          tag=param,
                                          choices=param_info['choices'])
-                    self.all_controls[param] = ctrl
+                    # add control to dict of all controls
+                    if param in self.all_controls.keys():
+                        self.all_controls[param].append(ctrl)
+                    else:
+                        self.all_controls[param] = [ctrl]
 
                     # on Win32, choice still defaults to blank, so manually
                     # set selection to default for aesthetic reasons
@@ -960,7 +974,12 @@ class InputPanel(wx.Panel):
                                              message='Path to file',
                                              style=wx.FLP_USE_TEXTCTRL |
                                                    wx.FLP_SMALL)
-                    self.all_controls[param] = ctrl
+                    # add control to dict of all controls
+                    if param in self.all_controls.keys():
+                        self.all_controls[param].append(ctrl)
+                    else:
+                        self.all_controls[param] = [ctrl]
+
                     self.Bind(wx.EVT_FILEPICKER_CHANGED, self.input_update,
                               ctrl)
 
@@ -986,7 +1005,12 @@ class InputPanel(wx.Panel):
                                            validator=TextCtrlValidator())
 
                         ctrl_name = param + '[' + str(i) + ']'
-                        self.all_controls[ctrl_name] = ctrl
+
+                        # add control to dict of all controls
+                        if param in self.all_controls.keys():
+                            self.all_controls[ctrl_name].append(ctrl)
+                        else:
+                            self.all_controls[ctrl_name] = [ctrl]
 
                         # add to sizer
                         list_sizer.Add(ctrl)
@@ -1627,18 +1651,19 @@ class ListPanel(wx.Panel):
             grid.GetEventHandler().ProcessEvent(evt)
 
         # iterate through params and set values
-        for param, control in self.frame.all_controls.iteritems():
-            try:
-                # if not a list text control
-                if param[-1] != ']':
-                    control.set_value(params[param])
-                else:
-                    index = int(param[-2])
-                    control.set_value(params[param[:-3]][index])
+        for param, controls in self.frame.all_controls.iteritems():
+            for control in controls:
+                try:
+                    # if not a list text control
+                    if param[-1] != ']':
+                        control.set_value(params[param])
+                    else:
+                        index = int(param[-2])
+                        control.set_value(params[param[:-3]][index])
 
-            # if not in either dictionary, leave as is
-            except KeyError:
-                pass
+                # if not in either dictionary, leave as is
+                except KeyError:
+                    pass
 
         # iterate through values in grid dict and populate
         col_index = 0
@@ -1946,9 +1971,9 @@ class MyGrid(wx.Frame):
 
         :param param:
         """
-        ctrl = self.frame.all_controls[param]
+        ctrls = self.frame.all_controls[param]
 
-        if param not in self.control_dict and ctrl.GetParent().category != \
+        if param not in self.control_dict and ctrls[0].GetParent().category != \
                 'global':
             # add column to grid
             self.grid.ClearSelection()
@@ -1959,11 +1984,11 @@ class MyGrid(wx.Frame):
             # get value of control
             try:
                 value = self.parameters.get_param_value(
-                    ctrl.GetParent().category, param)
+                    ctrls[0].GetParent().category, param)
             except:
                 index = int(param[-2])
                 value = self.parameters.get_param_value(
-                    ctrl.GetParent().category, param[:-3], index)
+                    ctrls[0].GetParent().category, param[:-3], index)
 
             value = str(value)
 
@@ -1976,7 +2001,8 @@ class MyGrid(wx.Frame):
 
             self.control_dict[param][0] = value
 
-            ctrl.set_editable(False)
+            for ctrl in ctrls:
+                ctrl.set_editable(False)
 
             self.grid.SetCellValue(0, self.grid.GetNumberCols()-1, value)
 
@@ -2043,7 +2069,8 @@ class MyGrid(wx.Frame):
                 # make control editable and set value
                 param = self.grid.GetColLabelValue(col)
                 old_value = self.control_dict[param][0]
-                self.frame.all_controls[param].set_editable(True, value=old_value)
+                for ctrl in self.frame.all_controls[param]:
+                    ctrl.set_editable(True, value=old_value)
 
                 # remove column and from control dict
                 self.grid.DeleteCols(col, 1)
