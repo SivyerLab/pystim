@@ -465,6 +465,7 @@ class StimDefaults(object):
                  inner_diameter=40,
                  check_size=None,
                  num_check=64,
+                 check_type='board',
                  delay=0,
                  duration=0.5,
                  location=None,
@@ -512,6 +513,7 @@ class StimDefaults(object):
         self.alpha = alpha
         self.orientation = orientation
         self.num_check = num_check
+        self.check_type = check_type
         self.fill_seed = fill_seed
         self.timing = timing
         self.period_mod = period_mod * 2.0 * duration
@@ -1525,28 +1527,35 @@ def board_texture_class(bases, **kwargs):
             # get colors
             high, low, _, _ = self.gen_rgb()
 
-            # array of rgbs for each element
-            self.colors = numpy.ndarray((self.num_check ** 2, 3))
-            self.colors[::] = [-1, -1, -1]
-            self.colors[:, self.contrast_channel] = low
+            # array of rgbs for each element (2D)
+            self.colors = numpy.full((self.num_check ** 2, 3), -1,
+                                     dtype=numpy.float)
 
-            # index to know how to color elements in array
-            self.index = numpy.zeros((self.num_check, self.num_check))
+            if self.check_type in ['board', 'random']:
+                self.colors[:, self.contrast_channel] = low
 
-            # populate every other for a checkerboard
-            if self.fill_mode == 'checkerboard':
-                self.index[0::2, 0::2] = 1
-                self.index[1::2, 1::2] = 1
-                self.index = numpy.concatenate(self.index[:])
+                # index to know how to color elements in array
+                self.index = numpy.zeros((self.num_check, self.num_check))
 
-            # randomly populate for a random checkerboard
-            elif self.fill_mode == 'random':
-                self.index = numpy.concatenate(self.index[:])
-                for i in range(len(self.index)):
-                    self.index[i] = self.fill_random.randint(0, 1)
+                # populate every other for a checkerboard
+                if self.check_type == 'board':
+                    self.index[0::2, 0::2] = 1
+                    self.index[1::2, 1::2] = 1
+                    self.index = numpy.concatenate(self.index[:])
 
-            # use index to assign colors
-            self.colors[numpy.where(self.index), self.contrast_channel] = high
+                # randomly populate for a random checkerboard
+                elif self.check_type == 'random':
+                    self.index = numpy.concatenate(self.index[:])
+                    for i in range(len(self.index)):
+                        self.index[i] = self.fill_random.randint(0, 1)
+
+                # use index to assign colors for board and random
+                self.colors[numpy.where(self.index), self.contrast_channel] = high
+
+            elif self.check_type == 'noise':
+                numpy.random.seed(self.fill_seed)
+                self.colors[:, self.contrast_channel] = numpy.random.uniform(
+                    low=low, high=high, size=self.num_check**2)
 
             self.stim = visual.ElementArrayStim(MyWindow.win,
                                                 xys=xys,
@@ -1805,7 +1814,7 @@ def main(stim_list, verbose=True):
                 # print stim.number
                 # checkerboard and movie inheritance depends on motion type,
                 # so instantiate accordingly
-                if stim.parameters['fill_mode'] in ['checkerboard', 'random']:
+                if stim.parameters['fill_mode'] == 'checkerboard':
                     to_animate.append(board_texture_class(globals()[
                                                               stim.stim_type],
                                       **stim.parameters))
