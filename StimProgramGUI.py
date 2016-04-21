@@ -388,7 +388,7 @@ class Parameters(object):
                   'checkerboard': ['check_size', 'num_check', 'phase',
                                    'intensity_dir'],
                   'random'      : ['check_size', 'num_check', 'fill_seed',
-                                   'phase', 'intensity_dir'],
+                                   'intensity_dir'],
                   'movie'       : ['movie_filename', 'movie_size'],
                   'image'       : ['image_filename', 'image_size', 'phase',
                                    'phase_speed', 'image_channel'],
@@ -773,8 +773,8 @@ class ChoiceCtrlTag(wx.Choice):
             self.SetStringSelection('table')
 
         if toggle:
-            self.set_value(value)
             self.Delete(self.GetCount() - 1)
+            self.set_value(value)
 
 
 class FilePickerCtrlTag(wx.FilePickerCtrl):
