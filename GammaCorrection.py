@@ -339,38 +339,36 @@ class GammaValues(object):
 
                 adj_color = numpy.copy(color)
 
-                size = adj_color.shape[0]
+                size_x = adj_color.shape[0]
+                size_y = adj_color.shape[1]
 
                 if has_alpha:
-                    r, g, b, a = numpy.split(adj_color, 4, axis=2)
+                    r, g, b, a = numpy.dsplit(adj_color, 4)
                 else:
-                    r, g, b = numpy.split(adj_color, 3, axis=2)
+                    r, g, b = numpy.dsplit(adj_color, 3)
 
                 r = r.flatten()
                 g = g.flatten()
                 b = b.flatten()
-                if has_alpha:
-                    a = a.flatten()
 
-                print 'red correcting.....',
+                # print 'red correcting.....',
                 r = self.r_correct(r)
-                print 'done'
-                print 'green correcting...',
+                # print 'done'
+                # print 'green correcting...',
                 g = self.g_correct(g)
-                print 'done'
-                print 'blue correcting....',
+                # print 'done'
+                # print 'blue correcting....',
                 b = self.b_correct(b)
-                print 'done\n'
+                # print 'done\n'
+
+                r = r.reshape(size_x, size_y, 1)
+                g = g.reshape(size_x, size_y, 1)
+                b = b.reshape(size_x, size_y, 1)
 
                 if has_alpha:
-                    adj_color = numpy.dstack([numpy.split(r, size),
-                                              numpy.split(g, size),
-                                              numpy.split(b, size),
-                                              numpy.split(a, size)])
+                    adj_color = numpy.dstack([r,g,b,a])
                 else:
-                    adj_color = numpy.dstack([numpy.split(r, size),
-                                              numpy.split(g, size),
-                                              numpy.split(b, size)])
+                    adj_color = numpy.dstack([r,g,b])
 
             # if single color
             elif len(numpy.shape(color)) == 1:
@@ -379,15 +377,15 @@ class GammaValues(object):
                 g = color[1]
                 b = color[2]
 
-                print 'red correcting.....',
+                # print 'red correcting.....',
                 r_adj = self.r_correct(r)
-                print 'done'
-                print 'green correcting...',
+                # print 'done'
+                # print 'green correcting...',
                 g_adj = self.g_correct(g)
-                print 'done'
-                print 'blue correcting....',
+                # print 'done'
+                # print 'blue correcting....',
                 b_adj = self.b_correct(b)
-                print 'done\n'
+                # print 'done\n'
 
                 adj_color = color[:]
 

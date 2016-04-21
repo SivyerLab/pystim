@@ -138,7 +138,7 @@ class GlobalDefaults(object):
     __metaclass__ = GlobalDefaultsMeta
 
     #: Dictionary of default defaults.
-    defaults = dict(frame_rate=75,
+    defaults = dict(frame_rate=60,
                     pix_per_micron=1,
                     scale=1,
                     offset=[0, 0],
@@ -203,7 +203,7 @@ class GlobalDefaults(object):
         if screen_num is not None:
             self.defaults['screen_num'] = screen_num
 
-        if screen_num is not None:
+        if trigger_wait is not None:
             self.defaults['trigger_wait'] = int(trigger_wait * 1.0 *
                                                 frame_rate + 0.99)
 
@@ -800,9 +800,10 @@ class StaticStim(StimDefaults):
         size = (max(self.gen_size()),) * 2  # square tuple of largest size
         # not needed for images
         if self.fill_mode != 'image':
-            texture = numpy.zeros(size+(4,))    # make array, adding rgba
+            texture = numpy.full(size+(4,), -1, dtype=numpy.float)    # make
+            # array, adding rgba
             # turn colors off, set alpha
-            texture[:, :, ] = [-1, -1, -1, self.alpha]
+            texture[:, :, 3] = self.alpha
 
         high, low, delta, background = self.gen_rgb()
 
@@ -897,20 +898,7 @@ class StaticStim(StimDefaults):
                     texture = texture * 2 - 1
 
                     # add alpha values
-                    # texture = numpy.insert(texture, 3, self.alpha, axis=2)
-                    a = numpy.empty(1572864)
-                    a.fill(self.alpha)
-                    size=1024
-                    r,g,b = numpy.split(texture, 3, axis=2)
-                    r.flatten()
-                    g.flatten()
-                    b.flatten()
-                    texture = numpy.dstack([numpy.split(r, size),
-                                            numpy.split(g, size),
-                                            numpy.split(b, size),
-                                            numpy.split(a, size)])
-
-
+                    texture = numpy.insert(texture, 3, self.alpha, axis=2)
 
                 # .iml are grayscale by default
                 else:
