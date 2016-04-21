@@ -4,7 +4,8 @@ What is it?
 Stimulus Program uses the `Psychopy <www.psychopy.org>`_ library to create
 visual stimuli for use in a range of visual neuroscience experiments. It
 includes a GUI for ease of use. The program is capable of running at a
-minimum of 60 fps and triggering recording devices (using a LabJack U3).
+minimum of 60 fps for moderately sized stimuli and triggering recording devices
+(using a LabJack U3).
 
 Latest Version
 --------------
