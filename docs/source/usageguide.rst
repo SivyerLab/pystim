@@ -121,8 +121,19 @@ editable again.
 Triggering
 ----------
 
-TODO: Triggering details go here.
-- moving
-- table
-- trigger wait
-- etc.
+Triggering is achieved via a LabJack U3, using port FIO4. When a trigger
+command a set, the LabJack briefly sends a voltage spike. If connected via
+high speed USB (2.0+), the spike will last approximately 0.4 ms. Ensure a
+high enough sampling rate or spikes could go undetected (~ 2.5 kHz).
+
+Triggering is turned out for each individual stim in the timing panel.
+Different stims have different triggering behaviors. If set to trigger, all
+stims will send a trigger the moment before the first frame in which they
+are animated.
+
+Moving stims and randomly moving stims will also trigger at the beginning of
+each new direction. :doc:`Table stims <TableStim>` will trigger on the first
+and last frames, and also at any other frames set to trigger. In the global
+defaults panel, if trigger wait is not zero, then when the run button is
+pressed, a trigger will be sent, the trigger wait period will elapse, then
+stims will start as normal and trigger and begin their animations.

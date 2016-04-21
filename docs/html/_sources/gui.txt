@@ -1,7 +1,7 @@
 gui module
 ==========
 
-.. automodule:: GUI
+.. automodule:: StimProgramGUI
    :members:
    :undoc-members:
    :show-inheritance:
