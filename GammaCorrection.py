@@ -400,10 +400,32 @@ class GammaValues(object):
                     elif adj_color[i] <= -1:
                          adj_color[i] = -1.0
 
-            # if grayscale image
             elif len(numpy.shape(color)) == 2:
-                print '\nWARNING: Cannot gamma correct grayscale .iml images.'
-                adj_color = color
+
+                # if grayscale image
+                if numpy.shape(color)[1] != 3:
+                    print '\nWARNING: Cannot gamma correct grayscale .iml images.'
+                    adj_color = color
+
+                # if noise checkerboard
+                elif numpy.shape(color)[1] == 3:
+                    r, g, b = numpy.hsplit(color, 3)
+
+                    r = r.flatten()
+                    g = g.flatten()
+                    b = b.flatten()
+
+                    # print 'red correcting.....',
+                    r = self.r_correct(r)
+                    # print 'done'
+                    # print 'green correcting...',
+                    g = self.g_correct(g)
+                    # print 'done'
+                    # print 'blue correcting....',
+                    b = self.b_correct(b)
+                    # print 'done\n'
+
+                    adj_color = numpy.dstack([r, g, b])[0]
 
         # if single channel
         elif channel is not None:

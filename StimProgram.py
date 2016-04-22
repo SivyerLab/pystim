@@ -750,11 +750,6 @@ class StaticStim(StimDefaults):
             high = high * 2.0 - 1
             low = low * 2.0 - 1
 
-            # gamma correct high and low
-            if MyWindow.gamma_mon is not None and self.fill_mode not in ['image']:
-                high = MyWindow.gamma_mon(high, channel=self.contrast_channel)
-                low = MyWindow.gamma_mon(low, channel=self.contrast_channel)
-
             color = high, low, delta, background
 
         return color
@@ -851,7 +846,7 @@ class StaticStim(StimDefaults):
             texture[:, :, self.contrast_channel] = color
 
         elif self.fill_mode == 'image':
-
+            # get pic from file
             pic_name = os.path.basename(self.image_filename)
             filename, file_ext = os.path.splitext(pic_name)
 
@@ -902,17 +897,14 @@ class StaticStim(StimDefaults):
                     # add alpha values
                     texture = numpy.insert(texture, 3, self.alpha, axis=2)
 
-                # .iml are grayscale by default
+                # .iml are gray scale by default
                 else:
                     texture = image * 2 - 1
-
-            if MyWindow.gamma_mon is not None:
-                texture = MyWindow.gamma_mon(texture)
 
             texture = numpy.rot90(texture, 2)
 
         # gamma correct
-        if MyWindow.gamma_mon is not None and self.fill_mode not in ['image']:
+        if MyWindow.gamma_mon is not None:
             texture = MyWindow.gamma_mon(texture)
 
         # make center see through if annuli
@@ -1532,6 +1524,12 @@ def board_texture_class(bases, **kwargs):
                                      dtype=numpy.float)
 
             if self.check_type in ['board', 'random']:
+
+                # gamma correct high and low
+                if MyWindow.gamma_mon is not None:
+                    high = MyWindow.gamma_mon(high, channel=self.contrast_channel)
+                    low = MyWindow.gamma_mon(low, channel=self.contrast_channel)
+
                 self.colors[:, self.contrast_channel] = low
 
                 # index to know how to color elements in array
@@ -1556,6 +1554,10 @@ def board_texture_class(bases, **kwargs):
                 numpy.random.seed(self.fill_seed)
                 self.colors[:, self.contrast_channel] = numpy.random.uniform(
                     low=low, high=high, size=self.num_check**2)
+
+                # gamma correct
+                if MyWindow.gamma_mon is not None:
+                    self.colors = MyWindow.gamma_mon(self.colors)
 
             self.stim = visual.ElementArrayStim(MyWindow.win,
                                                 xys=xys,
