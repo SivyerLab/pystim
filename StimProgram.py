@@ -1987,6 +1987,18 @@ def main(stim_list, verbose=True):
         process = subprocess.Popen(args, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         stdout, stderr = process.communicate()
 
+        args2 = ['ffmpeg',
+                 '-i', os.path.join(save_loc, 'capture_video.avi'),
+                 '-vf', 'format=gray',
+                 '-qscale', '0',
+                 os.path.join(save_loc, 'capture_video_gray.avi')]
+
+        print '\ngrayscale conversion...'
+
+        process = subprocess.Popen(args2, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        stdout, stderr = process.communicate()
+        # print stdout, stderr
+
         # delete .pngs
         # to_delete = [f for f in os.listdir(save_loc) if f.endswith('.png')]
         # for f in to_delete:
