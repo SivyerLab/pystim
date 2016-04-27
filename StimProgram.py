@@ -61,8 +61,8 @@ __status__  = "Beta"
 defaults = dict(logsDir='.\\psychopy\\logs\\',
                 monitor='blank')
 config = ConfigParser.ConfigParser()
-# config.read(os.path.abspath('./psychopy/config.ini'))
-config.read(os.path.abspath("C:\Users\Alex\PycharmProjects\StimulusProgram\psychopy\config.ini"))
+config.read(os.path.abspath('./psychopy/config.ini'))
+# config.read(os.path.abspath("C:\Users\Alex\PycharmProjects\StimulusProgram\psychopy\config.ini"))
 
 
 class StimInfo(object):
@@ -98,7 +98,7 @@ class StimInfo(object):
 
 
 class GlobalDefaultsMeta(type):
-    """Metaclass to redefine get item and set item for :py:class:`GlobalDefaults`.
+    """Metaclass to redefine get item for GlobalDefaults.
     """
     def __getitem__(self, key):
         return self.defaults[key]
@@ -138,7 +138,7 @@ class GlobalDefaults(object):
     __metaclass__ = GlobalDefaultsMeta
 
     #: Dictionary of default defaults.
-    defaults = dict(frame_rate=60,
+    defaults = dict(frame_rate=75,
                     pix_per_micron=1,
                     scale=1,
                     offset=[0, 0],
@@ -151,7 +151,7 @@ class GlobalDefaults(object):
                     log=False,
                     screen_num=1,
                     gamma_correction='default',
-                    trigger_wait=0,
+                    trigger_wait=0.1,
                     capture=False)
 
     def __init__(self,
@@ -203,7 +203,7 @@ class GlobalDefaults(object):
         if screen_num is not None:
             self.defaults['screen_num'] = screen_num
 
-        if trigger_wait is not None:
+        if screen_num is not None:
             self.defaults['trigger_wait'] = int(trigger_wait * 1.0 *
                                                 frame_rate + 0.99)
 
@@ -241,13 +241,13 @@ class MyWindow(object):
     # Class attributes
     #: Psychopy window instance.
     win = None
-    #: Gamma correction instance. See :py:class:`GammaCorrection`.
+    #: Gamma correction instance. See GammaCorrection.py.
     gamma_mon = None
-    #: Used to break out of animation loop in :py:func:`main`.
+    #: Used to break out of animation loop in main().
     should_break = False
     #: Labjack U3 instance for triggering.
     d = None
-    #: List of frames to trigger on
+    #: list of frames to trigger on
     frame_trigger_list = sortedcontainers.SortedList()
     frame_trigger_list.add(sys.maxint)  # need an extra last value for index
 
@@ -272,8 +272,7 @@ class MyWindow(object):
         gamma = GlobalDefaults['gamma_correction']
 
         if gamma != 'default':
-            # gamma_file = os.path.abspath('./psychopy/data/gammaTables.txt')
-            gamma_file = os.path.abspath("C:/Users/Alex/PycharmProjects/StimulusProgram/psychopy/data/gammaTables.txt")
+            gamma_file = os.path.abspath('./psychopy/data/gammaTables.txt')
 
             if os.path.exists(gamma_file):
                 with open(gamma_file, 'rb') as f:
@@ -312,10 +311,6 @@ class MyWindow(object):
 
     @staticmethod
     def change_color(color):
-        """Static method to live update the background of the window.
-
-        :param color: RGB list used to change global defaults.
-        """
         try:
             if MyWindow.win is not None:
                 GlobalDefaults['background'] = color
@@ -326,16 +321,14 @@ class MyWindow(object):
                 MyWindow.win.color = color
                 MyWindow.win.flip()
                 MyWindow.win.flip()
-
         except (ValueError, AttributeError):
             pass
 
     @staticmethod
     def send_trigger():
         """Triggers recording device by sending short voltage spike from LabJack
-        U3-HV. Spike last approximately 0.4 ms if connected via high speed USB (
-        2.0). Ensure high enough sampling rate to reliably detect triggers.
-        Set to use  flexible IO #4.
+        U3-HV. Spike last approximately 0.4 ms if high speed USB (2.0). Ensure
+        high enough sampling rate to reliably detect triggers.
         """
 
         if has_u3:
@@ -343,8 +336,6 @@ class MyWindow(object):
             MyWindow.d.setFIOState(4, 1)
             # reset
             MyWindow.d.setFIOState(4, 0)
-        else:
-            print '\n To trigger, need labjackpython library. See documentation'
 
 
 class StimDefaults(object):
@@ -373,10 +364,6 @@ class StimDefaults(object):
 
     :param float delay: The time to between the first frame and the stim
      appearing on screen. Rounds up to the nearest frame.
-
-    :param float end_delay: The time to between the last frame stim
-     appearing on screen and the end of frames flipping. Rounds up to the
-     nearest frame.
 
     :param float duration: The duration for which the stim will animated.
      Rounds up to the nearest frame.
@@ -465,7 +452,6 @@ class StimDefaults(object):
                  inner_diameter=40,
                  check_size=None,
                  num_check=64,
-                 check_type='board',
                  delay=0,
                  duration=0.5,
                  location=None,
@@ -498,8 +484,7 @@ class StimDefaults(object):
                  move_delay=0,
                  num_jumps=5,
                  jump_delay=100,
-                 force_stop=0,
-                 end_delay=0):
+                 force_stop=0):
         """
         Default variable constructors; distance and time units converted
         appropriately.
@@ -513,7 +498,6 @@ class StimDefaults(object):
         self.alpha = alpha
         self.orientation = orientation
         self.num_check = num_check
-        self.check_type = check_type
         self.fill_seed = fill_seed
         self.timing = timing
         self.period_mod = period_mod * 2.0 * duration
@@ -559,7 +543,6 @@ class StimDefaults(object):
 
         # time conversions
         self.delay = delay * GlobalDefaults['frame_rate']
-        self.end_delay = end_delay * GlobalDefaults['frame_rate']
         self.duration = duration * GlobalDefaults['frame_rate']
         self.move_delay = int(move_delay * GlobalDefaults['frame_rate'])
         self.jump_delay = jump_delay * GlobalDefaults['frame_rate']
@@ -611,8 +594,8 @@ class StimDefaults(object):
 
 class StaticStim(StimDefaults):
     """Class for generic non moving stims. Super class for other stim
-    types. Stim object instantiated in :py:func:`.make_stim`, and drawn with
-    calls to animate().
+    types. Stim object instantiated in make_stim(), and drawn with calls to
+    animate().
     """
     def __init__(self, **kwargs):
         """Passes parameters up to super class. Seeds randoms.
@@ -674,15 +657,13 @@ class StaticStim(StimDefaults):
         self.end_stim = self.duration
         self.end_stim += self.start_stim
         self.end_stim = int(self.end_stim + 0.99)
-        self.end_delay = int(self.end_delay + 0.99)
 
         self.draw_duration = self.end_stim - self.start_stim
 
         if self.force_stop != 0:
-            self.end_stim = int(self.force_stop + 0.99)
-            self.end_delay = 0
+            self.end_stim = self.force_stop
 
-        return self.end_stim + self.end_delay
+        return self.end_stim
 
     def animate(self, frame):
         """Method for drawing stim objects to back buffer. Checks if object
@@ -752,6 +733,11 @@ class StaticStim(StimDefaults):
             high = high * 2.0 - 1
             low = low * 2.0 - 1
 
+            # gamma correct high and low
+            if MyWindow.gamma_mon is not None and self.fill_mode not in ['image']:
+                high = MyWindow.gamma_mon(high, channel=self.contrast_channel)
+                low = MyWindow.gamma_mon(low, channel=self.contrast_channel)
+
             color = high, low, delta, background
 
         return color
@@ -797,12 +783,10 @@ class StaticStim(StimDefaults):
 
         # make array
         size = (max(self.gen_size()),) * 2  # square tuple of largest size
-        # not needed for images
         if self.fill_mode != 'image':
-            texture = numpy.full(size+(4,), -1, dtype=numpy.float)    # make
-            # array, adding rgba
+            texture = numpy.zeros(size+(4,))    # make array, adding rgba
             # turn colors off, set alpha
-            texture[:, :, 3] = self.alpha
+            texture[:, :, ] = [-1, -1, -1, self.alpha]
 
         high, low, delta, background = self.gen_rgb()
 
@@ -848,19 +832,156 @@ class StaticStim(StimDefaults):
             texture[:, :, self.contrast_channel] = color
 
         elif self.fill_mode == 'image':
-            # get pic from file
-            pic_name = os.path.basename(self.image_filename)
-            filename, file_ext = os.path.splitext(pic_name)
+            if MyWindow.gamma_mon is not None:
 
-            if file_ext != '.iml':
-                image = Image.open(self.image_filename)
+                # data folder
+                data_folder = os.path.abspath('./psychopy/data/')
+                pics_folder = os.path.abspath('./psychopy/data/pics/')
 
-                # make smaller for faster correction if possible
-                if max(image.size) > max(self.gen_size()):
-                    image.thumbnail(self.gen_size(), Image.ANTIALIAS)
+                # create folders if not present
+                if not os.path.exists(data_folder):
+                    os.makedirs(data_folder)
+                if not os.path.exists(pics_folder):
+                    os.makedirs(pics_folder)
 
-                # rescale rgb
-                texture = numpy.asarray(image) / 255.0 * 2 - 1
+                pic_name = os.path.basename(self.image_filename)
+                filename, file_ext = os.path.splitext(pic_name)
+
+                # insert image specific details into filename
+                pic_name = filename + '_' + \
+                           GlobalDefaults['gamma_correction'] + '_' + \
+                           str(self.image_channel) + \
+                           '_{}_{}'.format(self.gen_size()[0],
+                                           self.gen_size()[1]) + \
+                           file_ext
+
+                savedir = os.path.join(pics_folder, pic_name)
+
+                # if not the first time gamma correcting this image
+                if os.path.exists(savedir):
+                    image = Image.open(savedir)
+
+                    # turn into array and flip (different because of indexing
+                    # styles)
+                    texture = numpy.asarray(image) / \
+                              255.0 * 2 - 1
+                    texture = numpy.rot90(texture, 2)
+
+                    # add alpha values
+                    texture = numpy.insert(texture, 3, self.alpha, axis=2)
+
+                # else save gamma correction for faster future loading
+                else:
+                    if file_ext != '.iml':
+                        image = Image.open(self.image_filename)
+
+                        # make smaller for faster correction if possible
+                        if max(image.size) > max(self.gen_size()):
+                            image.thumbnail(self.gen_size(), Image.ANTIALIAS)
+
+                        # rescale rgb
+                        texture = numpy.asarray(image) / 255.0 * 2 - 1
+
+                        # if only want one color channel, remove others
+                        if self.image_channel != 3:
+                            for i in range(3):
+                                if self.image_channel != i:
+                                    texture[:, :, i] = -1
+
+                        # gamma correct (slow step)
+                        texture = MyWindow.gamma_mon(texture)
+
+                        # save for future
+                        if file_ext != '.iml':
+                            scipy.misc.imsave(savedir, texture)
+
+                        # transform due to different indexing
+                        texture = numpy.rot90(texture, 2)
+
+                        # add alpha
+                        texture = numpy.insert(texture, 3, self.alpha, axis=2)
+
+                    else:
+                        with open(self.image_filename, 'rb') as raw_image:
+                            image_bytes = raw_image.read()
+
+                        image_array = array.array('H', image_bytes)
+                        image_array.byteswap()
+
+                        image = numpy.array(image_array, dtype='uint16').reshape(
+                            1024, 1536)
+
+                        maxi = image.max()
+                        if maxi <= 4095:
+                            maxi = 4095
+
+                        image = image.astype(numpy.float64)
+
+                        image = image / maxi
+
+                        if self.image_channel != 3:
+                            texture = numpy.zeros((1024, 1536, 3))
+                            texture[:, :, self.image_channel] = image
+
+                            texture = texture * 2 - 1
+
+                            texture = numpy.rot90(texture, 2)
+
+                            # add alpha values
+                            texture = numpy.insert(texture, 3, self.alpha, axis=2)
+
+                        else:
+                            texture = image * 2 - 1
+
+            # if not gamma correcting
+            else:
+                _, ext = os.path.splitext(self.image_filename)
+                if ext != '.iml':
+                    image = Image.open(self.image_filename)
+
+                    # make smaller for faster correction if possible
+                    if max(image.size) > max(self.gen_size()):
+                        image.thumbnail(self.gen_size(), Image.ANTIALIAS)
+
+                    # turn to array
+                    texture = numpy.asarray(image) / 255.0 * 2 - 1
+
+                    # add alpha values
+                    texture = numpy.insert(texture, 3, self.alpha, axis=2)
+
+                # if .iml
+                else:
+                    with open(self.image_filename, 'rb') as raw_image:
+                        image_bytes = raw_image.read()
+
+                    image_array = array.array('H', image_bytes)
+                    image_array.byteswap()
+
+                    image = numpy.array(image_array, dtype='uint16').reshape(
+                        1024, 1536)
+
+                    maxi = image.max()
+                    if maxi <= 4095:
+                        maxi = 4095
+
+                    image = image.astype(numpy.float64)
+
+                    image = image / maxi
+
+                    if self.image_channel != 3:
+                        texture = numpy.zeros((1024, 1536, 3))
+                        texture[:, :, self.image_channel] = image
+
+                        texture = texture * 2 - 1
+
+                        # add alpha values
+                        texture = numpy.insert(texture, 3, self.alpha, axis=2)
+
+                    else:
+                        texture = image * 2 - 1
+
+                # flip because of indexing styles
+                texture = numpy.rot90(texture, 2)
 
                 # if only want one color channel, remove others
                 if self.image_channel != 3:
@@ -868,45 +989,8 @@ class StaticStim(StimDefaults):
                         if self.image_channel != i:
                             texture[:, :, i] = -1
 
-                # add alpha
-                texture = numpy.insert(texture, 3, self.alpha, axis=2)
-
-            # if .iml
-            else:
-                with open(self.image_filename, 'rb') as raw_image:
-                    image_bytes = raw_image.read()
-
-                image_array = array.array('H', image_bytes)
-                image_array.byteswap()
-
-                image = numpy.array(image_array, dtype='uint16').reshape(
-                    1024, 1536)
-
-                maxi = image.max()
-                if maxi <= 4095:
-                    maxi = 4095
-
-                image = image.astype(numpy.float64)
-
-                image = image / maxi
-
-                if self.image_channel != 3:
-                    texture = numpy.zeros((1024, 1536, 3))
-                    texture[:, :, self.image_channel] = image
-
-                    texture = texture * 2 - 1
-
-                    # add alpha values
-                    texture = numpy.insert(texture, 3, self.alpha, axis=2)
-
-                # .iml are gray scale by default
-                else:
-                    texture = image * 2 - 1
-
-            texture = numpy.rot90(texture, 2)
-
         # gamma correct
-        if MyWindow.gamma_mon is not None:
+        if MyWindow.gamma_mon is not None and self.fill_mode not in ['image']:
             texture = MyWindow.gamma_mon(texture)
 
         # make center see through if annuli
@@ -1033,7 +1117,6 @@ class MovingStim(StaticStim):
         self.end_stim = self.num_frames * self.num_dirs
         self.end_stim += self.start_stim
         self.end_stim = int(self.end_stim + 0.99)
-        self.end_delay = int(self.end_delay + 0.99)
 
         self.draw_duration = self.end_stim - self.start_stim
 
@@ -1045,9 +1128,8 @@ class MovingStim(StaticStim):
 
         if self.force_stop != 0:
             self.end_stim = self.force_stop
-            self.end_delay = 0
 
-        return self.end_stim + self.end_delay
+        return self.end_stim
 
     def animate(self, frame):
         """Method for animating moving stims. Moves stims appropriately,
@@ -1219,7 +1301,7 @@ class RandomlyMovingStim(MovingStim):
         """
         self.gen_pos()
 
-        self.end_stim = super(MovingStim, self).draw_times() - self.end_delay
+        self.end_stim = super(MovingStim, self).draw_times()
 
         if self.trigger:
             for x in range(int(self.duration / self.num_frames+0.99)):
@@ -1227,12 +1309,14 @@ class RandomlyMovingStim(MovingStim):
                 if trigger_frame not in MyWindow.frame_trigger_list:
                     MyWindow.frame_trigger_list.add(trigger_frame)
 
-        return self.end_stim + self.end_delay
+        if self.force_stop != 0:
+            self.end_stim = self.force_stop
+
+        return self.end_stim
 
     def gen_pos(self):
-        """Makes calls to :py:func:`gen_start_pos` and
-        :py:func:`gen_pos_array` with proper variables to get new array of
-        position coordinates. Overrides super.
+        """Makes calls to gen_start_pos() and gen_pos_array() with proper
+        variables to get new array of position coordinates. Overrides super.
         """
         # update current position
         self.current_x, self.current_y = self.get_pos()
@@ -1520,48 +1604,29 @@ def board_texture_class(bases, **kwargs):
 
             # get colors
             high, low, _, _ = self.gen_rgb()
-            self.high = high
-            self.low = low
 
-            # array of rgbs for each element (2D)
-            self.colors = numpy.full((self.num_check ** 2, 3), -1,
-                                     dtype=numpy.float)
+            # array of rgbs for each element
+            self.colors = numpy.ndarray((self.num_check ** 2, 3))
+            self.colors[::] = [-1, -1, -1]
+            self.colors[:, self.contrast_channel] = low
 
-            if self.check_type in ['board', 'random']:
+            # index to know how to color elements in array
+            self.index = numpy.zeros((self.num_check, self.num_check))
 
-                # gamma correct high and low
-                if MyWindow.gamma_mon is not None:
-                    high = MyWindow.gamma_mon(high, channel=self.contrast_channel)
-                    low = MyWindow.gamma_mon(low, channel=self.contrast_channel)
+            # populate every other for a checkerboard
+            if self.fill_mode == 'checkerboard':
+                self.index[0::2, 0::2] = 1
+                self.index[1::2, 1::2] = 1
+                self.index = numpy.concatenate(self.index[:])
 
-                self.colors[:, self.contrast_channel] = low
+            # randomly populate for a random checkerboard
+            elif self.fill_mode == 'random':
+                self.index = numpy.concatenate(self.index[:])
+                for i in range(len(self.index)):
+                    self.index[i] = self.fill_random.randint(0, 1)
 
-                # index to know how to color elements in array
-                self.index = numpy.zeros((self.num_check, self.num_check))
-
-                # populate every other for a checkerboard
-                if self.check_type == 'board':
-                    self.index[0::2, 0::2] = 1
-                    self.index[1::2, 1::2] = 1
-                    self.index = numpy.concatenate(self.index[:])
-
-                # randomly populate for a random checkerboard
-                elif self.check_type == 'random':
-                    self.index = numpy.concatenate(self.index[:])
-                    for i in range(len(self.index)):
-                        self.index[i] = self.fill_random.randint(0, 1)
-
-                # use index to assign colors for board and random
-                self.colors[numpy.where(self.index), self.contrast_channel] = high
-
-            elif self.check_type in ['noise', 'noisy noise']:
-                numpy.random.seed(self.fill_seed)
-                self.colors[:, self.contrast_channel] = numpy.random.uniform(
-                    low=low, high=high, size=self.num_check**2)
-
-                # gamma correct
-                if MyWindow.gamma_mon is not None:
-                    self.colors = MyWindow.gamma_mon(self.colors)
+            # use index to assign colors
+            self.colors[numpy.where(self.index), self.contrast_channel] = high
 
             self.stim = visual.ElementArrayStim(MyWindow.win,
                                                 xys=xys,
@@ -1581,15 +1646,7 @@ def board_texture_class(bases, **kwargs):
 
             :param frame: current frame number
             """
-            if self.check_type == 'noisy noise':
-                self.colors[:, self.contrast_channel] = numpy.random.uniform(
-                    low=self.low, high=self.high, size=self.num_check**2)
-
-                # gamma correct
-                if MyWindow.gamma_mon is not None:
-                    self.colors = MyWindow.gamma_mon(self.colors)
-
-                self.stim.setColors(self.colors)
+            pass
 
         def gen_phase(self):
             """ElementArrayStim does not support texture phase.
@@ -1796,14 +1853,11 @@ def log_stats(count_reps, reps, count_frames, num_frames, elapsed_time,
 
 
 def main(stim_list, verbose=True):
-    """Function to create stims and run program. Creates instances of stim
-    types, and makes necessary calls to animate stims and flip window.
+    """Function to animate stims. Creates instances of stim types, and makes
+    necessary calls to animate stims and flip window.
 
-    :param stim_list: list of StimInfo classes.
-    :param verbose: whether or not to print stim info to console.
-    :return fps, count_elapsed_time, time_stamp: return stats about last run.
-     If error was raised, fps is the error string, and count_elapsed_time is
-     'error'.
+    :param stim_list: List of StimInfo classes.
+    :param verbose: Whether or not to print stim info to console.
     """
     current_time = localtime()
 
@@ -1832,7 +1886,7 @@ def main(stim_list, verbose=True):
                 # print stim.number
                 # checkerboard and movie inheritance depends on motion type,
                 # so instantiate accordingly
-                if stim.parameters['fill_mode'] == 'checkerboard':
+                if stim.parameters['fill_mode'] in ['checkerboard', 'random']:
                     to_animate.append(board_texture_class(globals()[
                                                               stim.stim_type],
                                       **stim.parameters))
@@ -1881,8 +1935,6 @@ def main(stim_list, verbose=True):
                 save_loc = os.path.join(capture_dir, save_dir)
                 os.makedirs(save_loc)
 
-            MyWindow.win.recordFrameIntervals = True
-
             for frame in xrange(num_frames):
                 for stim in to_animate:
                     stim.animate(frame)
@@ -1921,9 +1973,6 @@ def main(stim_list, verbose=True):
 
             # get elapsed time for fps
             count_elapsed_time += elapsed_time.getTime()
-
-            MyWindow.win.recordFrameIntervals = False
-            MyWindow.win.saveFrameIntervals()
 
             # stop movies from continuing in background
             for stim in to_animate:
@@ -1974,25 +2023,59 @@ def main(stim_list, verbose=True):
 
     # save movie
     if GlobalDefaults['capture']:
-        args = ['ffmpeg',
-                '-f', 'image2',
-                '-framerate', str(GlobalDefaults['frame_rate']),
-                '-i', os.path.join(save_loc, 'capture_%05d.png'),
-                '-vcodec', 'libx264',
-                '-b:v', '20M',
-                os.path.join(save_loc, 'capture_video.avi')]
+        if sys.platform == 'win32':
+            args = ['ffmpeg',
+                    '-f', 'image2',
+                    '-framerate', str(GlobalDefaults['frame_rate']),
+                    '-i', os.path.join(save_loc, 'capture_%05d.png'),
+                    '-vcodec', 'libx264',
+                    '-b:v', '20M',
+                    os.path.join(save_loc, 'capture_video.avi')]
 
-        # make movie using ffmpeg
-        print 'ffmpeg...'
-        process = subprocess.Popen(args, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-        stdout, stderr = process.communicate()
+            # make movie using ffmpeg
+            print 'ffmpeg...'
+            process = subprocess.Popen(args, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+            stdout, stderr = process.communicate()
+            print stdout, stderr
 
-        # delete .pngs
-        # to_delete = [f for f in os.listdir(save_loc) if f.endswith('.png')]
-        # for f in to_delete:
-        #     os.remove(os.path.join(save_loc, f))
+            # delete .pngs
+            # to_delete = [f for f in os.listdir(save_loc) if f.endswith('.png')]
+            # for f in to_delete:
+            #     os.remove(os.path.join(save_loc, f))
+            print '\nDONE'
 
-        print '\nDONE'
+        if sys.platform == 'darwin':
+            args = ['ffmpeg',
+                    '-f', 'image2',
+                    '-framerate', str(GlobalDefaults['frame_rate']),
+                    '-i', os.path.join(save_loc, 'capture_%05d.png'),
+                    '-vcodec', 'libx264',
+                    '-b:v', '20M',
+                    os.path.join(save_loc, 'capture_video.avi')]
+
+            # make movie using ffmpeg
+            print 'ffmpeg...'
+            process = subprocess.Popen(args, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+            stdout, stderr = process.communicate()
+
+            args2 = ['ffmpeg',
+                     '-i', os.path.join(save_loc, 'capture_video.avi'),
+                     '-vf', 'format=gray',
+                     '-qscale', '0',
+                     os.path.join(save_loc, 'capture_video_gray.avi')]
+
+            print '\ngrayscale conversion...'
+
+            process = subprocess.Popen(args2, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+            stdout, stderr = process.communicate()
+
+            #print stdout, stderr
+
+            # delete .pngs
+            # to_delete = [f for f in os.listdir(save_loc) if f.endswith('.png')]
+            # for f in to_delete:
+            #     os.remove(os.path.join(save_loc, f))
+            print '\nDONE'
 
     return fps, count_elapsed_time, time_stamp
 
