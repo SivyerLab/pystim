@@ -100,8 +100,8 @@ def get_config_dict(config_file):
         default_config_dict[option] = config.get('Defaults', option)
 
     # add GUI specific settings
-    default_config_dict['savedStimDir'] = config.get('GUI', 'savedStimDir')
-    default_config_dict['windowPos'] = config.get('GUI', 'windowPos')
+    default_config_dict['saved_stim_dir'] = config.get('GUI', 'saved_stim_dir')
+    default_config_dict['window_pos'] = config.get('GUI', 'window_pos')
     default_config_dict['defaults'] = config.get('GUI', 'defaults')
 
     # stab at casting non-strings
@@ -135,15 +135,15 @@ def get_config_dict(config_file):
 
     return default_config_dict
 
-config_file = os.path.abspath('./psychopy/config.ini')
-#config_file = os.path.abspath("C:\Users\Alex\PycharmProjects\StimulusProgram"
-#                              "\psychopy\config.ini")
+# config_file = os.path.abspath('./psychopy/config.ini')
+config_file = os.path.abspath("C:\Users\Alex\PycharmProjects\StimulusProgram"
+                              "\psychopy\config.ini")
 
 config_dict = get_config_dict(config_file)
 
-gamma_file = os.path.abspath('./psychopy/data/gammaTables.txt')
-#gamma_file = os.path.abspath("C:\Users\Alex\PycharmProjects\StimulusProgram"
-#                             "\psychopy\data\gammaTables.txt")
+# gamma_file = os.path.abspath('./psychopy/data/gammaTables.txt')
+gamma_file = os.path.abspath("C:\Users\Alex\PycharmProjects\StimulusProgram"
+                             "\psychopy\data\gammaTables.txt")
 
 if os.path.exists(gamma_file):
     with open(gamma_file, 'rb') as f:
@@ -699,7 +699,7 @@ class DirPanel(wx.Panel):
 
         # file browser
         self.browser = wx.FileCtrl(self, wildCard='*.txt', size=(200, -1),
-            defaultDirectory=config_dict['savedStimDir'])
+            defaultDirectory=config_dict['saved_stim_dir'])
 
         # add to sizer
         sizer_panel.Add(self.browser, 1,wx.EXPAND)
@@ -1606,7 +1606,8 @@ class GlobalPanel(InputPanel):
         # default_sizer = wx.GridSizer(rows=1, cols=2, hgap=5)
 
         # default selector
-        globals_file = os.path.abspath('./psychopy/data/global_defaults.txt')
+        globals_file = os.path.abspath(
+            './psychopy/data/global_defaults_mac.txt')
 
         if os.path.exists(globals_file):
             with open(globals_file, 'rb') as f:
@@ -2142,7 +2143,7 @@ class MyFrame(wx.Frame):
         self.SetStatusText('hi there')
 
         # place on monitor (arbitrary, from ini)
-        pos = config_dict['windowPos'][0], config_dict['windowPos'][1]
+        pos = config_dict['window_pos'][0], config_dict['window_pos'][1]
         self.SetPosition(pos)
 
         # HACK FOR PROPER SIZING
