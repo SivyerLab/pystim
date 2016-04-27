@@ -643,7 +643,8 @@ class StaticStim(StimDefaults):
                                            tex=self.gen_texture(),
                                            pos=self.location,
                                            phase=self.phase,
-                                           ori=self.orientation)
+                                           ori=self.orientation,
+                                           autoLog=False)
 
             self.stim.sf *= self.sf
 
@@ -655,7 +656,8 @@ class StaticStim(StimDefaults):
                                          mask=self.gen_mask(),
                                          image=image,
                                          pos=self.location,
-                                         ori=self.orientation)
+                                         ori=self.orientation,
+                                         autoLog=False)
 
     def draw_times(self):
         """Determines during which frames stim should be drawn, based on desired
@@ -1518,6 +1520,8 @@ def board_texture_class(bases, **kwargs):
 
             # get colors
             high, low, _, _ = self.gen_rgb()
+            self.high = high
+            self.low = low
 
             # array of rgbs for each element (2D)
             self.colors = numpy.full((self.num_check ** 2, 3), -1,
@@ -1550,7 +1554,7 @@ def board_texture_class(bases, **kwargs):
                 # use index to assign colors for board and random
                 self.colors[numpy.where(self.index), self.contrast_channel] = high
 
-            elif self.check_type == 'noise':
+            elif self.check_type in ['noise', 'noisy noise']:
                 numpy.random.seed(self.fill_seed)
                 self.colors[:, self.contrast_channel] = numpy.random.uniform(
                     low=low, high=high, size=self.num_check**2)
@@ -1566,7 +1570,8 @@ def board_texture_class(bases, **kwargs):
                                                 elementMask=None,
                                                 elementTex=None,
                                                 sizes=(self.check_size[0],
-                                                       self.check_size[1]))
+                                                       self.check_size[1]),
+                                                autoLog=False)
 
             self.stim.size = (self.check_size[0] * self.num_check,
                               self.check_size[1] * self.num_check)
@@ -1576,7 +1581,15 @@ def board_texture_class(bases, **kwargs):
 
             :param frame: current frame number
             """
-            pass
+            if self.check_type == 'noisy noise':
+                self.colors[:, self.contrast_channel] = numpy.random.uniform(
+                    low=self.low, high=self.high, size=self.num_check**2)
+
+                # gamma correct
+                if MyWindow.gamma_mon is not None:
+                    self.colors = MyWindow.gamma_mon(self.colors)
+
+                self.stim.setColors(self.colors)
 
         def gen_phase(self):
             """ElementArrayStim does not support texture phase.
@@ -1788,6 +1801,9 @@ def main(stim_list, verbose=True):
 
     :param stim_list: list of StimInfo classes.
     :param verbose: whether or not to print stim info to console.
+    :return fps, count_elapsed_time, time_stamp: return stats about last run.
+     If error was raised, fps is the error string, and count_elapsed_time is
+     'error'.
     """
     current_time = localtime()
 

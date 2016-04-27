@@ -411,7 +411,7 @@ class Parameters(object):
             ('check_type',
              {'type'    : 'choice',
               'label'   : 'fill type',
-              'choices' : ['board', 'random', 'noise'],
+              'choices' : ['board', 'random', 'noise', 'noisy noise'],
               'default' : config_dict['check_type'],
               'is_child': True}
              ),
@@ -1319,18 +1319,19 @@ class GlobalPanel(InputPanel):
         with open(self.globals_file, 'rb') as f:
             params_to_load = cPickle.load(f)[selected]
 
-        for param, control in self.frame.all_controls.iteritems():
-            try:
-                # if not a list text control
-                if param[-1] != ']':
-                    control.set_value(params_to_load[param])
-                else:
-                    index = int(param[-2])
-                    control.set_value(params_to_load[param[:-3]][index])
+        for param, controls in self.frame.all_controls.iteritems():
+            for control in controls:
+                try:
+                    # if not a list text control
+                    if param[-1] != ']':
+                        control.set_value(params_to_load[param])
+                    else:
+                        index = int(param[-2])
+                        control.set_value(params_to_load[param[:-3]][index])
 
-            # if not in either dictionary, leave as is
-            except KeyError:
-                pass
+                # if not in either dictionary, leave as is
+                except KeyError:
+                    pass
 
 
 class ListPanel(wx.Panel):
