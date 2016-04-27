@@ -1642,6 +1642,14 @@ class ListPanel(wx.Panel):
         stim_type = self.convert_stim_type(stim.stim_type)
         params['move_type'] = stim_type
 
+        # compatibility for old checkerboards
+        if 'check_type' not in params.iterkeys():
+            if params['fill_mode'] == 'random':
+                params['fill_mode'] = 'checkerboard'
+                params['check_type'] = 'random'
+            elif params['fill_mode'] == 'checkerboard':
+                params['check_type'] = 'checkerboard'
+
         grid = self.frame.grid
 
         # post events to grid to simulate removing columns to clear text and
