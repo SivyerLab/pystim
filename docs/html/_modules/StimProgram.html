@@ -532,6 +532,7 @@
                  <span class="n">inner_diameter</span><span class="o">=</span><span class="mi">40</span><span class="p">,</span>
                  <span class="n">check_size</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
                  <span class="n">num_check</span><span class="o">=</span><span class="mi">64</span><span class="p">,</span>
+                 <span class="n">check_type</span><span class="o">=</span><span class="s1">&#39;board&#39;</span><span class="p">,</span>
                  <span class="n">delay</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
                  <span class="n">duration</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span>
                  <span class="n">location</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
@@ -579,6 +580,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">alpha</span> <span class="o">=</span> <span class="n">alpha</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">orientation</span> <span class="o">=</span> <span class="n">orientation</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">num_check</span> <span class="o">=</span> <span class="n">num_check</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">check_type</span> <span class="o">=</span> <span class="n">check_type</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">fill_seed</span> <span class="o">=</span> <span class="n">fill_seed</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">timing</span> <span class="o">=</span> <span class="n">timing</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">period_mod</span> <span class="o">=</span> <span class="n">period_mod</span> <span class="o">*</span> <span class="mf">2.0</span> <span class="o">*</span> <span class="n">duration</span>
@@ -815,11 +817,6 @@
             <span class="n">high</span> <span class="o">=</span> <span class="n">high</span> <span class="o">*</span> <span class="mf">2.0</span> <span class="o">-</span> <span class="mi">1</span>
             <span class="n">low</span> <span class="o">=</span> <span class="n">low</span> <span class="o">*</span> <span class="mf">2.0</span> <span class="o">-</span> <span class="mi">1</span>
 
-            <span class="c1"># gamma correct high and low</span>
-            <span class="k">if</span> <span class="n">MyWindow</span><span class="o">.</span><span class="n">gamma_mon</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">fill_mode</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;image&#39;</span><span class="p">]:</span>
-                <span class="n">high</span> <span class="o">=</span> <span class="n">MyWindow</span><span class="o">.</span><span class="n">gamma_mon</span><span class="p">(</span><span class="n">high</span><span class="p">,</span> <span class="n">channel</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">contrast_channel</span><span class="p">)</span>
-                <span class="n">low</span> <span class="o">=</span> <span class="n">MyWindow</span><span class="o">.</span><span class="n">gamma_mon</span><span class="p">(</span><span class="n">low</span><span class="p">,</span> <span class="n">channel</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">contrast_channel</span><span class="p">)</span>
-
             <span class="n">color</span> <span class="o">=</span> <span class="n">high</span><span class="p">,</span> <span class="n">low</span><span class="p">,</span> <span class="n">delta</span><span class="p">,</span> <span class="n">background</span>
 
         <span class="k">return</span> <span class="n">color</span></div>
@@ -867,7 +864,8 @@
         <span class="n">size</span> <span class="o">=</span> <span class="p">(</span><span class="nb">max</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">gen_size</span><span class="p">()),)</span> <span class="o">*</span> <span class="mi">2</span>  <span class="c1"># square tuple of largest size</span>
         <span class="c1"># not needed for images</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">fill_mode</span> <span class="o">!=</span> <span class="s1">&#39;image&#39;</span><span class="p">:</span>
-            <span class="n">texture</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">full</span><span class="p">(</span><span class="n">size</span><span class="o">+</span><span class="p">(</span><span class="mi">4</span><span class="p">,),</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span>    <span class="c1"># make array, adding rgba</span>
+            <span class="n">texture</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">full</span><span class="p">(</span><span class="n">size</span><span class="o">+</span><span class="p">(</span><span class="mi">4</span><span class="p">,),</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">numpy</span><span class="o">.</span><span class="n">float</span><span class="p">)</span>    <span class="c1"># make</span>
+            <span class="c1"># array, adding rgba</span>
             <span class="c1"># turn colors off, set alpha</span>
             <span class="n">texture</span><span class="p">[:,</span> <span class="p">:,</span> <span class="mi">3</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">alpha</span>
 
@@ -915,7 +913,7 @@
             <span class="n">texture</span><span class="p">[:,</span> <span class="p">:,</span> <span class="bp">self</span><span class="o">.</span><span class="n">contrast_channel</span><span class="p">]</span> <span class="o">=</span> <span class="n">color</span>
 
         <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">fill_mode</span> <span class="o">==</span> <span class="s1">&#39;image&#39;</span><span class="p">:</span>
-
+            <span class="c1"># get pic from file</span>
             <span class="n">pic_name</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">image_filename</span><span class="p">)</span>
             <span class="n">filename</span><span class="p">,</span> <span class="n">file_ext</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">splitext</span><span class="p">(</span><span class="n">pic_name</span><span class="p">)</span>
 
@@ -966,17 +964,14 @@
                     <span class="c1"># add alpha values</span>
                     <span class="n">texture</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="n">texture</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">alpha</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
 
-                <span class="c1"># .iml are grayscale by default</span>
+                <span class="c1"># .iml are gray scale by default</span>
                 <span class="k">else</span><span class="p">:</span>
                     <span class="n">texture</span> <span class="o">=</span> <span class="n">image</span> <span class="o">*</span> <span class="mi">2</span> <span class="o">-</span> <span class="mi">1</span>
-
-            <span class="k">if</span> <span class="n">MyWindow</span><span class="o">.</span><span class="n">gamma_mon</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
-                <span class="n">texture</span> <span class="o">=</span> <span class="n">MyWindow</span><span class="o">.</span><span class="n">gamma_mon</span><span class="p">(</span><span class="n">texture</span><span class="p">)</span>
 
             <span class="n">texture</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">rot90</span><span class="p">(</span><span class="n">texture</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
 
         <span class="c1"># gamma correct</span>
-        <span class="k">if</span> <span class="n">MyWindow</span><span class="o">.</span><span class="n">gamma_mon</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">fill_mode</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;image&#39;</span><span class="p">]:</span>
+        <span class="k">if</span> <span class="n">MyWindow</span><span class="o">.</span><span class="n">gamma_mon</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
             <span class="n">texture</span> <span class="o">=</span> <span class="n">MyWindow</span><span class="o">.</span><span class="n">gamma_mon</span><span class="p">(</span><span class="n">texture</span><span class="p">)</span>
 
         <span class="c1"># make center see through if annuli</span>
@@ -1591,28 +1586,45 @@
             <span class="c1"># get colors</span>
             <span class="n">high</span><span class="p">,</span> <span class="n">low</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">gen_rgb</span><span class="p">()</span>
 
-            <span class="c1"># array of rgbs for each element</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">colors</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">ndarray</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">num_check</span> <span class="o">**</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">))</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">colors</span><span class="p">[::]</span> <span class="o">=</span> <span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">]</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">colors</span><span class="p">[:,</span> <span class="bp">self</span><span class="o">.</span><span class="n">contrast_channel</span><span class="p">]</span> <span class="o">=</span> <span class="n">low</span>
+            <span class="c1"># array of rgbs for each element (2D)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">colors</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">full</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">num_check</span> <span class="o">**</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">),</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span>
+                                     <span class="n">dtype</span><span class="o">=</span><span class="n">numpy</span><span class="o">.</span><span class="n">float</span><span class="p">)</span>
 
-            <span class="c1"># index to know how to color elements in array</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">index</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">num_check</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">num_check</span><span class="p">))</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">check_type</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;board&#39;</span><span class="p">,</span> <span class="s1">&#39;random&#39;</span><span class="p">]:</span>
 
-            <span class="c1"># populate every other for a checkerboard</span>
-            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">fill_mode</span> <span class="o">==</span> <span class="s1">&#39;checkerboard&#39;</span><span class="p">:</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">index</span><span class="p">[</span><span class="mi">0</span><span class="p">::</span><span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">::</span><span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">index</span><span class="p">[</span><span class="mi">1</span><span class="p">::</span><span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">::</span><span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">index</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">concatenate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">index</span><span class="p">[:])</span>
+                <span class="c1"># gamma correct high and low</span>
+                <span class="k">if</span> <span class="n">MyWindow</span><span class="o">.</span><span class="n">gamma_mon</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+                    <span class="n">high</span> <span class="o">=</span> <span class="n">MyWindow</span><span class="o">.</span><span class="n">gamma_mon</span><span class="p">(</span><span class="n">high</span><span class="p">,</span> <span class="n">channel</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">contrast_channel</span><span class="p">)</span>
+                    <span class="n">low</span> <span class="o">=</span> <span class="n">MyWindow</span><span class="o">.</span><span class="n">gamma_mon</span><span class="p">(</span><span class="n">low</span><span class="p">,</span> <span class="n">channel</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">contrast_channel</span><span class="p">)</span>
 
-            <span class="c1"># randomly populate for a random checkerboard</span>
-            <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">fill_mode</span> <span class="o">==</span> <span class="s1">&#39;random&#39;</span><span class="p">:</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">index</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">concatenate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">index</span><span class="p">[:])</span>
-                <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">index</span><span class="p">)):</span>
-                    <span class="bp">self</span><span class="o">.</span><span class="n">index</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fill_random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">colors</span><span class="p">[:,</span> <span class="bp">self</span><span class="o">.</span><span class="n">contrast_channel</span><span class="p">]</span> <span class="o">=</span> <span class="n">low</span>
 
-            <span class="c1"># use index to assign colors</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">colors</span><span class="p">[</span><span class="n">numpy</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">index</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">contrast_channel</span><span class="p">]</span> <span class="o">=</span> <span class="n">high</span>
+                <span class="c1"># index to know how to color elements in array</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">index</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">num_check</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">num_check</span><span class="p">))</span>
+
+                <span class="c1"># populate every other for a checkerboard</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">check_type</span> <span class="o">==</span> <span class="s1">&#39;board&#39;</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">index</span><span class="p">[</span><span class="mi">0</span><span class="p">::</span><span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">::</span><span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">index</span><span class="p">[</span><span class="mi">1</span><span class="p">::</span><span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">::</span><span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">index</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">concatenate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">index</span><span class="p">[:])</span>
+
+                <span class="c1"># randomly populate for a random checkerboard</span>
+                <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">check_type</span> <span class="o">==</span> <span class="s1">&#39;random&#39;</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">index</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">concatenate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">index</span><span class="p">[:])</span>
+                    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">index</span><span class="p">)):</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">index</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fill_random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+
+                <span class="c1"># use index to assign colors for board and random</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">colors</span><span class="p">[</span><span class="n">numpy</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">index</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">contrast_channel</span><span class="p">]</span> <span class="o">=</span> <span class="n">high</span>
+
+            <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">check_type</span> <span class="o">==</span> <span class="s1">&#39;noise&#39;</span><span class="p">:</span>
+                <span class="n">numpy</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">fill_seed</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">colors</span><span class="p">[:,</span> <span class="bp">self</span><span class="o">.</span><span class="n">contrast_channel</span><span class="p">]</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">uniform</span><span class="p">(</span>
+                    <span class="n">low</span><span class="o">=</span><span class="n">low</span><span class="p">,</span> <span class="n">high</span><span class="o">=</span><span class="n">high</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">num_check</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span>
+
+                <span class="c1"># gamma correct</span>
+                <span class="k">if</span> <span class="n">MyWindow</span><span class="o">.</span><span class="n">gamma_mon</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">colors</span> <span class="o">=</span> <span class="n">MyWindow</span><span class="o">.</span><span class="n">gamma_mon</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">colors</span><span class="p">)</span>
 
             <span class="bp">self</span><span class="o">.</span><span class="n">stim</span> <span class="o">=</span> <span class="n">visual</span><span class="o">.</span><span class="n">ElementArrayStim</span><span class="p">(</span><span class="n">MyWindow</span><span class="o">.</span><span class="n">win</span><span class="p">,</span>
                                                 <span class="n">xys</span><span class="o">=</span><span class="n">xys</span><span class="p">,</span>
@@ -1843,6 +1855,9 @@
 
 <span class="sd">    :param stim_list: list of StimInfo classes.</span>
 <span class="sd">    :param verbose: whether or not to print stim info to console.</span>
+<span class="sd">    :return fps, count_elapsed_time, time_stamp: return stats about last run.</span>
+<span class="sd">     If error was raised, fps is the error string, and count_elapsed_time is</span>
+<span class="sd">     &#39;error&#39;.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">current_time</span> <span class="o">=</span> <span class="n">localtime</span><span class="p">()</span>
 
@@ -1871,7 +1886,7 @@
                 <span class="c1"># print stim.number</span>
                 <span class="c1"># checkerboard and movie inheritance depends on motion type,</span>
                 <span class="c1"># so instantiate accordingly</span>
-                <span class="k">if</span> <span class="n">stim</span><span class="o">.</span><span class="n">parameters</span><span class="p">[</span><span class="s1">&#39;fill_mode&#39;</span><span class="p">]</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;checkerboard&#39;</span><span class="p">,</span> <span class="s1">&#39;random&#39;</span><span class="p">]:</span>
+                <span class="k">if</span> <span class="n">stim</span><span class="o">.</span><span class="n">parameters</span><span class="p">[</span><span class="s1">&#39;fill_mode&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;checkerboard&#39;</span><span class="p">:</span>
                     <span class="n">to_animate</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">board_texture_class</span><span class="p">(</span><span class="nb">globals</span><span class="p">()[</span>
                                                               <span class="n">stim</span><span class="o">.</span><span class="n">stim_type</span><span class="p">],</span>
                                       <span class="o">**</span><span class="n">stim</span><span class="o">.</span><span class="n">parameters</span><span class="p">))</span>

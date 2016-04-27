@@ -96,10 +96,16 @@ types, and makes necessary calls to animate stims and flip window.</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
 <li><strong>stim_list</strong> &#8211; list of StimInfo classes.</li>
 <li><strong>verbose</strong> &#8211; whether or not to print stim info to console.</li>
 </ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name" colspan="2">Return fps, count_elapsed_time, time_stamp:</th></tr>
+<tr class="field-even field"><td>&nbsp;</td><td class="field-body"><p class="first last">return stats about last run.
+If error was raised, fps is the error string, and count_elapsed_time is
+&#8216;error&#8217;.</p>
 </td>
 </tr>
 </tbody>

@@ -467,10 +467,32 @@
                     <span class="k">elif</span> <span class="n">adj_color</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span>
                          <span class="n">adj_color</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span><span class="mf">1.0</span>
 
-            <span class="c1"># if grayscale image</span>
             <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="n">numpy</span><span class="o">.</span><span class="n">shape</span><span class="p">(</span><span class="n">color</span><span class="p">))</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
-                <span class="k">print</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">WARNING: Cannot gamma correct grayscale .iml images.&#39;</span>
-                <span class="n">adj_color</span> <span class="o">=</span> <span class="n">color</span>
+
+                <span class="c1"># if grayscale image</span>
+                <span class="k">if</span> <span class="n">numpy</span><span class="o">.</span><span class="n">shape</span><span class="p">(</span><span class="n">color</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span> <span class="o">!=</span> <span class="mi">3</span><span class="p">:</span>
+                    <span class="k">print</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">WARNING: Cannot gamma correct grayscale .iml images.&#39;</span>
+                    <span class="n">adj_color</span> <span class="o">=</span> <span class="n">color</span>
+
+                <span class="c1"># if noise checkerboard</span>
+                <span class="k">elif</span> <span class="n">numpy</span><span class="o">.</span><span class="n">shape</span><span class="p">(</span><span class="n">color</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="mi">3</span><span class="p">:</span>
+                    <span class="n">r</span><span class="p">,</span> <span class="n">g</span><span class="p">,</span> <span class="n">b</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">hsplit</span><span class="p">(</span><span class="n">color</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
+
+                    <span class="n">r</span> <span class="o">=</span> <span class="n">r</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span>
+                    <span class="n">g</span> <span class="o">=</span> <span class="n">g</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span>
+                    <span class="n">b</span> <span class="o">=</span> <span class="n">b</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span>
+
+                    <span class="c1"># print &#39;red correcting.....&#39;,</span>
+                    <span class="n">r</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">r_correct</span><span class="p">(</span><span class="n">r</span><span class="p">)</span>
+                    <span class="c1"># print &#39;done&#39;</span>
+                    <span class="c1"># print &#39;green correcting...&#39;,</span>
+                    <span class="n">g</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">g_correct</span><span class="p">(</span><span class="n">g</span><span class="p">)</span>
+                    <span class="c1"># print &#39;done&#39;</span>
+                    <span class="c1"># print &#39;blue correcting....&#39;,</span>
+                    <span class="n">b</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">b_correct</span><span class="p">(</span><span class="n">b</span><span class="p">)</span>
+                    <span class="c1"># print &#39;done\n&#39;</span>
+
+                    <span class="n">adj_color</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">dstack</span><span class="p">([</span><span class="n">r</span><span class="p">,</span> <span class="n">g</span><span class="p">,</span> <span class="n">b</span><span class="p">])[</span><span class="mi">0</span><span class="p">]</span>
 
         <span class="c1"># if single channel</span>
         <span class="k">elif</span> <span class="n">channel</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
