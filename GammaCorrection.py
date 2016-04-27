@@ -40,6 +40,7 @@ correction.
 from psychopy import visual, core, logging
 from psychopy.monitors import Monitor
 from scipy import stats, interpolate, array, ndarray
+from multiprocessing import Process, Queue
 import cPickle
 import os.path
 import numpy
@@ -292,16 +293,20 @@ class GammaValues(object):
         self.b_slope = b[1]
         self.b_int = b[2]
 
-    def r_correct(self, r):
+    def r_correct(self, r, q=None):
         """
         Method to gamma correct red channel.
 
         :return: corrected red color
         """
         r_adj = self.r_spline(r * self.r_slope + self.r_int)
-        return r_adj
 
-    def g_correct(self, g):
+        if q is None:
+            return r_adj
+        else:
+            q.put(r_adj)
+
+    def g_correct(self, g, q=None):
         """
         Method to gamma correct green channel.
 
@@ -310,16 +315,24 @@ class GammaValues(object):
         # print g
         # print type(g)
         g_adj = self.g_spline(g * self.g_slope + self.g_int)
-        return g_adj
 
-    def b_correct(self, b):
+        if q is None:
+            return g_adj
+        else:
+            q.put(g_adj)
+
+    def b_correct(self, b, q=None):
         """
         Method to gamma correct blue channel.
 
         :return: corrected blue color
         """
         b_adj = self.b_spline(b * self.b_slope + self.b_int)
-        return b_adj
+
+        if q is None:
+            return b_adj
+        else:
+            q.put(b_adj)
 
     def __call__(self, color, channel=None):
         """
@@ -350,7 +363,6 @@ class GammaValues(object):
                 r = r.flatten()
                 g = g.flatten()
                 b = b.flatten()
-
                 # print 'red correcting.....',
                 r = self.r_correct(r)
                 # print 'done'
@@ -360,6 +372,24 @@ class GammaValues(object):
                 # print 'blue correcting....',
                 b = self.b_correct(b)
                 # print 'done\n'
+
+                '''
+                q = Queue()
+                r_proc = Process(target=self.r_correct, args=(r, q))
+                r_proc.start()
+                g_proc = Process(target=self.g_correct, args=(g, q))
+                g_proc.start()
+                b_proc = Process(target=self.b_correct, args=(b, q))
+                b_proc.start()
+
+                r = q.get()
+                g = q.get()
+                b = q.get()
+
+                r_proc.join()
+                g_proc.join()
+                b_proc.join()
+                '''
 
                 r = r.reshape(size_x, size_y, 1)
                 g = g.reshape(size_x, size_y, 1)
