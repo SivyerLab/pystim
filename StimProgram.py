@@ -1881,6 +1881,8 @@ def main(stim_list, verbose=True):
                 save_loc = os.path.join(capture_dir, save_dir)
                 os.makedirs(save_loc)
 
+            MyWindow.win.recordFrameIntervals = True
+
             for frame in xrange(num_frames):
                 for stim in to_animate:
                     stim.animate(frame)
@@ -1919,6 +1921,9 @@ def main(stim_list, verbose=True):
 
             # get elapsed time for fps
             count_elapsed_time += elapsed_time.getTime()
+
+            MyWindow.win.recordFrameIntervals = False
+            MyWindow.win.saveFrameIntervals()
 
             # stop movies from continuing in background
             for stim in to_animate:
