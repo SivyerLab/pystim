@@ -2082,13 +2082,16 @@ def main(stim_list, verbose=True):
 
     # save movie
     if GlobalDefaults['capture']:
+        current_time_string = strftime('%Y_%m_%d_%H%M%S', current_time)
+        save_name = 'capture_video' + current_time_string + '.mpg'
+        gray_save_name = 'capture_video' + current_time_string + '_gray.mpg'
+
         args = ['ffmpeg',
                 '-f', 'image2',
                 '-framerate', str(GlobalDefaults['frame_rate']),
                 '-i', os.path.join(save_loc, 'capture_%05d.png'),
-                '-vcodec', 'libx264',
                 '-b:v', '20M',
-                os.path.join(save_loc, 'capture_video.avi')]
+                os.path.join(save_loc, save_name)]
 
         # make movie using ffmpeg
         print 'ffmpeg...'
@@ -2096,10 +2099,10 @@ def main(stim_list, verbose=True):
         stdout, stderr = process.communicate()
 
         args2 = ['ffmpeg',
-                 '-i', os.path.join(save_loc, 'capture_video.avi'),
+                 '-i', os.path.join(save_loc, save_name),
                  '-vf', 'format=gray',
                  '-qscale', '0',
-                 os.path.join(save_loc, 'capture_video_gray.avi')]
+                 os.path.join(save_loc, gray_save_name)]
 
         print '\ngrayscale conversion...'
 
