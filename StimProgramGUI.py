@@ -7,6 +7,11 @@ GUI for StimProgram
 # Copyright (C) 2016 Alexander Tomlinson
 # Distributed under the terms of the GNU General Public License (GPL).
 
+# must first turn pyglet shadow windows off to avoid conflict beteween wxPython
+# and psychopy.visual on OSX
+import pyglet
+pyglet.options['shadow_window'] = False
+
 from GammaCorrection import GammaValues  # necessary for pickling
 from collections import OrderedDict
 from copy import deepcopy
