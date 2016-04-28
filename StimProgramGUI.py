@@ -1641,6 +1641,7 @@ class ListPanel(wx.Panel):
 
         stim_type = self.convert_stim_type(stim.stim_type)
         params['move_type'] = stim_type
+
         # compatibility for old checkerboards
         if 'check_type' not in params.iterkeys():
             if params['fill_mode'] == 'random':
@@ -1876,6 +1877,14 @@ class DirPanel(wx.Panel):
                     grid_dict = params.pop('control_list')
                 except KeyError:
                     grid_dict = {}
+
+            # compatibility for old checkerboards
+            if 'check_type' not in params.iterkeys():
+                if params['fill_mode'] == 'random':
+                    params['fill_mode'] = 'checkerboard'
+                    params['check_type'] = 'random'
+                elif params['fill_mode'] == 'checkerboard':
+                    params['check_type'] = 'checkerboard'
 
             # convert from StimProgram instance label to stim type
             stim_type = self.frame.list_panel.convert_stim_type(stim_type)
@@ -2381,6 +2390,7 @@ class MyFrame(wx.Frame):
 
         else:
             print 'Please add stims.'
+            self.SetStatusText('Please add stims.')
 
     def run(self):
         """
