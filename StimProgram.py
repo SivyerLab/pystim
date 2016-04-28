@@ -264,8 +264,9 @@ class MyWindow(object):
             try:
                 MyWindow.d = u3.U3()
             except Exception as e:
-                print e
-                print 'Is the labjack connected?'
+                print 'LabJack error:',
+                print e,
+                print "(ignore if don't desire triggering)"
                 has_u3 = False
 
         # check if gamma splines present
@@ -300,6 +301,8 @@ class MyWindow(object):
                                      screen=GlobalDefaults['screen_num'],
                                      monitor=config.get('StimProgram',
                                                         'monitor'))
+
+        MyWindow.win.mouseVisible = True,
 
     @staticmethod
     def close_win():
@@ -338,12 +341,18 @@ class MyWindow(object):
         """
 
         if has_u3:
-            # voltage spike; 0 is low, 1 is high, on flexible IO #4
-            MyWindow.d.setFIOState(4, 1)
-            # reset
-            MyWindow.d.setFIOState(4, 0)
+            try:
+                # voltage spike; 0 is low, 1 is high, on flexible IO #4
+                MyWindow.d.setFIOState(4, 1)
+                # reset
+                MyWindow.d.setFIOState(4, 0)
+            except Exception as e:
+                print 'Triggering Error:',
+                print str(e)
+
+
         else:
-            print '\n To trigger, need labjackpython library. See documentation'
+            print '\nTo trigger, need labjackpython library. See documentation'
 
 
 class StimDefaults(object):
@@ -2085,7 +2094,6 @@ def main(stim_list, verbose=True):
         print 'ffmpeg...'
         process = subprocess.Popen(args, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         stdout, stderr = process.communicate()
-        # print stdout, stderr
 
         args2 = ['ffmpeg',
                  '-i', os.path.join(save_loc, 'capture_video.avi'),
