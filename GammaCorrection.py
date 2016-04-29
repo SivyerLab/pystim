@@ -38,14 +38,15 @@ correction.
 """
 
 from psychopy import visual, core, logging
-from psychopy.monitors import Monitor
+# from psychopy.monitors import Monitor
 from scipy import stats, interpolate, array, ndarray
-from multiprocessing import Process, Queue
+# from multiprocessing import Process, Queue
+import ConfigParser
 import cPickle
 import os.path
 import numpy
-import sys
-import copy_reg, types
+# import sys
+# import copy_reg, types
 # import matplotlib.pyplot as plt
 
 # suppress extra warnings
@@ -189,7 +190,12 @@ def gammaCorrect():
 
     should_save = raw_input('\nSave? Y, N: ')
 
-    gamma_file = './psychopy/data/gammaTables.txt'
+    # save dir
+    config = ConfigParser.ConfigParser()
+    config.read(os.path.abspath('./psychopy/config.ini'))
+    data_dir = config.get('GUI', 'data_dir')
+    # gamma file
+    gamma_file = os.path.join(data_dir, 'gammaTables.txt')
 
     if should_save == 'Y':
         if os.path.exists(gamma_file):
