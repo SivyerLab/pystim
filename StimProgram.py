@@ -2084,7 +2084,7 @@ def main(stim_list, verbose=True):
     if GlobalDefaults['capture']:
         current_time_string = strftime('%Y_%m_%d_%H%M%S', current_time)
         save_name = 'capture_video' + current_time_string + '.mpg'
-        gray_save_name = 'capture_video' + current_time_string + '_gray.mpg'
+        save_name_gray = 'capture_video' + current_time_string + '_gray.mpg'
 
         args = ['ffmpeg',
                 '-f', 'image2',
@@ -2102,7 +2102,7 @@ def main(stim_list, verbose=True):
                  '-i', os.path.join(save_loc, save_name),
                  '-vf', 'format=gray',
                  '-qscale', '0',
-                 os.path.join(save_loc, gray_save_name)]
+                 os.path.join(save_loc, save_name_gray)]
 
         print '\ngrayscale conversion...'
 
