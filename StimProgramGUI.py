@@ -39,7 +39,7 @@ class Parameters(object):
         self.gui_params = None
 
         # init params
-        config_file = os.path.abspath('.\psychopy\config.ini')
+        config_file = os.path.abspath('./psychopy/config.ini')
         self.gui_params, config_dict = self.read_config_file(config_file)
         self.init_params(config_dict)
 
@@ -521,8 +521,8 @@ class Parameters(object):
                   'moving': ['speed', 'start_dir', 'num_dirs', 'start_radius',
                              'move_delay', 'ori_with_dir'],
                   'random': ['speed', 'travel_distance', 'move_seed'],
-                  'table' : ['table_filename', 'start_dir', 'num_dirs',
-                             'move_delay', 'ori_with_dir'],
+                  'table' : ['table_filename', 'table_type', 'start_dir',
+                             'num_dirs', 'move_delay', 'ori_with_dir'],
                   # 'jump'  : ['num_jumps', 'jump_delay', 'move_seed'],
               }}
              ),
@@ -588,6 +588,14 @@ class Parameters(object):
              {'type'    : 'path',
               'label'   : 'filename',
               'default' : config_dict['table_filename'],
+              'is_child': True}
+             ),
+
+            ('table_type',
+             {'type'    : 'choice',
+              'label'   : 'table type',
+              'choices' : ['polar', 'coordinate', 'directions'],
+              'default' : config_dict['table_type'],
               'is_child': True}
              ),
 
@@ -1200,8 +1208,8 @@ class GlobalPanel(InputPanel):
         self.grid_sizer.Add(self.title, pos=(0, 0))
 
         # global file
-        self.globals_file = os.path.abspath(
-            '.\psychopy\data\global_defaults_new.txt')
+        self.globals_file = os.path.abspath(os.path.join(
+            self.frame.gui_params['data_dir'], 'global_defaults_new.txt'))
 
         # check if file exists, and if so load different options
         if os.path.exists(self.globals_file):
@@ -1252,7 +1260,7 @@ class GlobalPanel(InputPanel):
         params_to_save = self.parameters.get_global_params()
 
         # data folder
-        data_folder = os.path.abspath('./psychopy/data/')
+        data_folder = os.path.abspath(self.frame.gui_params['data_dir'])
 
         # create folder if not present
         if not os.path.exists(data_folder):
@@ -2316,6 +2324,9 @@ class MyFrame(wx.Frame):
         if platform == 'win32':
             self.SetBackgroundColour(wx.NullColour)
 
+        # location
+        self.SetPosition(self.gui_params['window_pos'])
+
         # draw frame
         self.Show()
 
@@ -2416,6 +2427,7 @@ class MyFrame(wx.Frame):
                     status_text += ' Timestamp: {}'.format(time_stamp)
 
                 self.SetStatusText(status_text)
+            # if error
             else:
                 self.SetStatusText(fps)
 
