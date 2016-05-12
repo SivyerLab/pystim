@@ -521,8 +521,8 @@ class Parameters(object):
                   'moving': ['speed', 'start_dir', 'num_dirs', 'start_radius',
                              'move_delay', 'ori_with_dir'],
                   'random': ['speed', 'travel_distance', 'move_seed'],
-                  'table' : ['table_filename', 'start_dir', 'num_dirs',
-                             'move_delay', 'ori_with_dir'],
+                  'table' : ['table_filename', 'table_type', 'start_dir',
+                             'num_dirs', 'move_delay', 'ori_with_dir'],
                   # 'jump'  : ['num_jumps', 'jump_delay', 'move_seed'],
               }}
              ),
@@ -588,6 +588,14 @@ class Parameters(object):
              {'type'    : 'path',
               'label'   : 'filename',
               'default' : config_dict['table_filename'],
+              'is_child': True}
+             ),
+
+            ('table_type',
+             {'type'    : 'choice',
+              'label'   : 'table type',
+              'choices' : ['polar', 'coordinate', 'directions'],
+              'default' : config_dict['table_type'],
               'is_child': True}
              ),
 

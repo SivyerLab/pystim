@@ -502,6 +502,7 @@ class StimDefaults(object):
                  image_size=None,
                  image_filename=None,
                  table_filename=None,
+                 table_type='polar',
                  trigger=False,
                  move_delay=0,
                  num_jumps=5,
@@ -531,6 +532,7 @@ class StimDefaults(object):
         self.movie_filename = movie_filename
         self.image_filename = image_filename
         self.table_filename = table_filename
+        self.table_type = table_type
         self.trigger = trigger
         self.num_jumps = num_jumps
         self.contrast_channel = ['red', 'green', 'blue'].index(contrast_channel)
@@ -1290,7 +1292,7 @@ class MovingStim(StaticStim):
         x = self.x_array[self.frame_counter]
         y = self.y_array[self.frame_counter]
 
-        # increment frame counter
+        # increment frame counter for next frame
         self.frame_counter += 1
 
         return x, y
@@ -1369,16 +1371,19 @@ class TableStim(MovingStim):
     """Class where stim motion is determined by a table of radial coordinates.
 
     Table can be a text file with new line separated values, or an Igor file
-    in binary wave/packed experiment format. First column is distance from
-    center of window in micrometers, and second column either 0 or 1,
-    for whether or not to trigger. Trigger will occur right before frame where
-    indicated position is flipped. First and last coordinate will always
-    trigger (if stim is set to trigger).
+    in binary wave/packed experiment format. If polar, first column is distance
+    from center of window in micrometers, and second column is either 0 or 1,
+    for whether or not to trigger. If xy, first and second column are xy
+    coordinates, respectively, and third column is whether or not to trigger.
+    Trigger will occur right before frame where indicated position is
+    flipped. First and last coordinate will always trigger (if stim is set to
+    trigger).
 
     For a binary wave file, values must be for coordinates, and triggering
     will only happen on first coordinate. For packed experiment files,
     leave wave names as 'wave0' and 'wave1', where 'wave0' is coordinates and
-    'wave1' is whether or not to trigger.
+    'wave1' is whether or not to trigger (if polar), or as 'wave0', 'wave1',
+    'wave2' (if xy).
     """
     def __init__(self, **kwargs):
         """Passes parameters up to super.
@@ -1462,37 +1467,106 @@ class TableStim(MovingStim):
         """
         table = self.table_filename
         radii = None
+        x = None
+
+        if table is None:
+            raise IOError('No table file selected')
 
         # if text file
         if os.path.splitext(table)[1] == '.txt':
             with open(table, 'r') as f:
                 lines = [line.strip() for line in f]
 
-            radii = [i.split()[0] for i in lines]
-            trigger_list = [i.split()[1] for i in lines]
-            trigger_list[0] = 1
+            if self.table_type == 'polar':
+                radii = [i.split()[0] for i in lines]
+                trigger_list = [i.split()[1] for i in lines]
+
+            elif self.table_type == 'coordinate':
+                x = [i.split()[0] for i in lines]
+                y = [i.split()[1] for i in lines]
+                try:
+                    trigger_list = [i.split()[2] for i in lines]
+                except IndexError:
+                    raise IOError('File contents not a supported format. See docs for '
+                                  'reference. Selected file: {}.'.format(self.table_filename))
+
+            elif self.table_type == 'directions':
+
+                x = numpy.array([])
+                y = numpy.array([])
+                trigger_list = []
+
+                for line in lines:
+                    if len(x) == 0:
+                        start_x = self.location[0]
+                        start_y = self.location[1]
+                    else:
+                        start_x = x[-1]
+                        start_y = y[-1]
+
+                    speed = float(line.split()[0])
+                    dir = float(line.split()[1])
+                    dur = float(line.split()[2])
+
+                    num_frames = int(GlobalDefaults['frame_rate'] * dur + 0.99)
+                    trigger_list.append(1)
+                    trigger_list.extend([0] * (num_frames - 1))
+                    self.speed = speed * (1.0 * GlobalDefaults['pix_per_micron'] / GlobalDefaults['frame_rate'])
+
+                    x_to_app, y_to_app = super(TableStim,
+                                               self).gen_pos_array(start_x,
+                                                                   start_y,
+                                                                   num_frames,
+                                                                   dir)
+
+                    x = numpy.append(x, x_to_app)
+                    y = numpy.append(y, y_to_app)
+
+            trigger_list[0] = 1   # trigger on first frame
             trigger_list[-1] = 1  # trigger on last frame
 
         # if igor binary wave format or packed experiment format
         elif os.path.splitext(table)[1] in ['.ibw', '.pxp']:
             if has_igor:
                 if os.path.splitext(table)[1] == '.ibw':
-                    radii = binarywave.load(table)['wave']['wData']
+                    if self.table_type == 'polar':
+                        radii = binarywave.load(table)['wave']['wData']
+                    else:
+                        raise IOError('.ibw format does not support '
+                                      'coordinate table type')
 
                 elif os.path.splitext(table)[1] == '.pxp':
-                    radii = packed.load(table)[1]['root']['wave0'].wave[
-                        'wave']['wData']
-                    trigger_list = packed.load(table)[1]['root'][
-                        'wave1'].wave['wave']['wData']
+                    if self.table_type == 'polar':
+                        radii = packed.load(table)[1]['root']['wave0'].wave[
+                            'wave']['wData']
+                        trigger_list = packed.load(table)[1]['root'][
+                            'wave1'].wave['wave']['wData']
+
+                    if self.table_type == 'coordinate':
+                        x = packed.load(table)[1]['root']['wave0'].wave[
+                            'wave']['wData']
+                        y = packed.load(table)[1]['root']['wave1'].wave[
+                            'wave']['wData']
+                        trigger_list = packed.load(table)[1]['root'][
+                            'wave2'].wave['wave']['wData']
+
+                    trigger_list[0] = 1   # trigger on first frame
+                    trigger_list[-1] = 1  # trigger on last frame
 
             elif not has_igor:
                 raise ImportError('Need igor python module to load \'.ibw\' '
                                   'or \'.pxp\' formats. Install module with '
                                   '\'pip install igor\'.')
 
-        # convert strings to floats
+        # convert strings to floats, and convert to pix to micrometers
         if radii is not None:
             radii = map(float, radii)
+            radii = [r * GlobalDefaults['pix_per_micron'] for r in radii]
+        elif x is not None:
+            x = map(float, x)
+            y = map(float, y)
+            x = [i * GlobalDefaults['pix_per_micron'] for i in x]
+            y = [i * GlobalDefaults['pix_per_micron'] for i in y]
         else:
             raise IOError('File contents not a supported format. See docs for '
                           'reference. Selected file: {}.'.format(self.table_filename))
@@ -1505,28 +1579,12 @@ class TableStim(MovingStim):
                 if trigger_list[i] == 1:
                     self.trigger_frames.append(i)
 
-        self.num_frames = len(radii)
+        self.num_frames = len(radii) if radii is not None else len(x)
 
-        # convert pix to micrometers
-        radii = [r * GlobalDefaults['pix_per_micron'] for r in radii]
-
-        # make arrays
-        theta = self.start_dir * -1 - 90  # origins are different in pol/cart
-        x, y = map(list, zip(*[pol2cart(theta, r) for r in radii]))
-
-        return x, y
-
-    def get_next_pos(self):
-        """Returns the next coordinate from x, y_array for animate to set the
-        position of the stim for the next frame.
-
-        :return: x, y coordinate as tuple
-        """
-        x = self.x_array[self.frame_counter]
-        y = self.y_array[self.frame_counter]
-
-        # increment frame counter for next frame
-        self.frame_counter += 1
+        # make arrays if polar
+        if self.table_type == 'polar':
+            theta = self.start_dir * -1 - 90  # origins are different in pol/cart
+            x, y = map(list, zip(*[pol2cart(theta, r) for r in radii]))
 
         return x, y
 
