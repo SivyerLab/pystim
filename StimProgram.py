@@ -1514,6 +1514,11 @@ class TableStim(MovingStim):
                                 dir = GlobalDefaults['pref_dir']
                             elif GlobalDefaults['pref_dir'] == -1:
                                 dir = 0
+                        elif line.split()[1] == '-$':
+                            if GlobalDefaults['pref_dir'] != -1:
+                                dir = GlobalDefaults['pref_dir'] + 180
+                            elif GlobalDefaults['pref_dir'] == -1:
+                                dir = 0
 
                     num_frames = int(GlobalDefaults['frame_rate'] * dur + 0.99)
                     trigger_list.append(1)

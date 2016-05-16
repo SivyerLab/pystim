@@ -2167,6 +2167,28 @@ class MyGrid(wx.Frame):
         return to_return
 
 
+class MyStatusBar(wx.StatusBar):
+    """
+    Class for custom status bar to color background on errors.
+    """
+    def __init__(self, parent):
+        super(MyStatusBar, self).__init__(parent, 1)
+
+        self.SetFieldsCount(1)
+        self.text_box = wx.StaticText(self, -1, 'hello')
+
+        if platform == 'win32':
+            field_rect = self.GetFieldRect(0)
+            field_rect.y += 3
+            self.text_box.SetRect(field_rect)
+
+    def set_status_text(self, text):
+        self.text_box.SetLabel(text)
+
+    def set_background(self, color):
+        self.text_box.SetBackgroundColour(color)
+
+
 class MyFrame(wx.Frame):
     """
     Class for generating frame. Instantiates parameters, notebook, and panels.
@@ -2297,8 +2319,10 @@ class MyFrame(wx.Frame):
         frame_sizer.Add(panel_button_sizer)
 
         # status bar
-        self.CreateStatusBar(1)
-        self.SetStatusText('hi there')
+        # self.CreateStatusBar(1)
+        # self.SetStatusText('hi there')
+        self.status_bar = MyStatusBar(self)
+        self.SetStatusBar(self.status_bar)
 
         # hide all subpanels
         for panel in self.input_nb.GetChildren():
@@ -2415,7 +2439,8 @@ class MyFrame(wx.Frame):
         # try/except, so that uncaught errors thrown by StimProgram can be
         # caught to avoid hanging.
         try:
-            self.SetStatusText('running...')
+            self.status_bar.set_background(wx.NullColour)
+            self.status_bar.set_status_text('running...')
             fps, time, time_stamp = StimProgram.main(
                 self.list_panel.stims_to_run)
 
@@ -2426,10 +2451,11 @@ class MyFrame(wx.Frame):
                 if time_stamp is not None:
                     status_text += ' Timestamp: {}'.format(time_stamp)
 
-                self.SetStatusText(status_text)
+                self.status_bar.set_status_text(status_text)
             # if error
             else:
-                self.SetStatusText(fps)
+                self.status_bar.set_status_text(fps)
+                self.status_bar.set_background(wx.BLUE)
 
         except:
             raise
