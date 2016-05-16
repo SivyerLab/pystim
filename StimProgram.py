@@ -1505,8 +1505,15 @@ class TableStim(MovingStim):
                         start_y = y[-1]
 
                     speed = float(line.split()[0])
-                    dir = float(line.split()[1])
-                    dur = float(line.split()[2])
+                    dur = float(line.split()[2]) / 1000
+                    try:
+                        dir = float(line.split()[1])
+                    except ValueError:
+                        if line.split()[1] == '$':
+                            if GlobalDefaults['pref_dir'] != -1:
+                                dir = GlobalDefaults['pref_dir']
+                            elif GlobalDefaults['pref_dir'] == -1:
+                                dir = 0
 
                     num_frames = int(GlobalDefaults['frame_rate'] * dur + 0.99)
                     trigger_list.append(1)
