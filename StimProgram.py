@@ -1472,6 +1472,9 @@ class TableStim(MovingStim):
         if table is None:
             raise IOError('No table file selected')
 
+        if not os.path.exists(table):
+            raise IOError('No such table file: {}'.format(table))
+
         # if text file
         if os.path.splitext(table)[1] == '.txt':
             with open(table, 'r') as f:
@@ -1505,18 +1508,18 @@ class TableStim(MovingStim):
                         start_y = y[-1]
 
                     speed = float(line.split()[0])
-                    dur = float(line.split()[2]) / 1000
+                    dur = float(line.split()[2]) / 1000  # convert ms to sec
                     try:
                         dir = float(line.split()[1])
                     except ValueError:
                         if line.split()[1] == '$':
                             if GlobalDefaults['pref_dir'] != -1:
-                                dir = GlobalDefaults['pref_dir']
+                                dir = GlobalDefaults['pref_dir'] + 180
                             elif GlobalDefaults['pref_dir'] == -1:
                                 dir = 0
                         elif line.split()[1] == '-$':
                             if GlobalDefaults['pref_dir'] != -1:
-                                dir = GlobalDefaults['pref_dir'] + 180
+                                dir = GlobalDefaults['pref_dir']
                             elif GlobalDefaults['pref_dir'] == -1:
                                 dir = 0
 
@@ -1740,6 +1743,9 @@ def board_texture_class(bases, **kwargs):
                 # gamma correct
                 if MyWindow.gamma_mon is not None:
                     self.colors = MyWindow.gamma_mon(self.colors)
+
+                # set timing to 'sine' so tex updated between frames
+                self.timing = 'sine'
 
             self.stim = visual.ElementArrayStim(MyWindow.win,
                                                 xys=xys,

@@ -1694,7 +1694,7 @@ class ListPanel(wx.Panel):
         col_index = 0
         for param, values in grid_dict.iteritems():
             # simulate adding param to grid
-            ctrl = self.frame.all_controls[param]
+            ctrl = self.frame.all_controls[param][0]
             evt = wx.CommandEvent(wx.EVT_CONTEXT_MENU.typeId,
                                   ctrl.Id)
             evt.SetEventObject(ctrl)
@@ -1716,7 +1716,7 @@ class ListPanel(wx.Panel):
                                                 col=-1)
                         grid.GetEventHandler().ProcessEvent(evt)
                         # retry adding
-                        grid.grid.SetCellValue(i, col_index, values[i])
+                        grid.grid.SetCellValue(i, col_index, str(values[i]))
                         grid.control_dict[param][i] = values[i]
 
             col_index += 1
@@ -2188,6 +2188,9 @@ class MyStatusBar(wx.StatusBar):
     def set_background(self, color):
         self.text_box.SetBackgroundColour(color)
 
+    def set_text_color(self, color):
+        self.text_box.SetForegroundColour(color)
+
 
 class MyFrame(wx.Frame):
     """
@@ -2440,6 +2443,7 @@ class MyFrame(wx.Frame):
         # caught to avoid hanging.
         try:
             self.status_bar.set_background(wx.NullColour)
+            self.status_bar.set_text_color(wx.BLACK)
             self.status_bar.set_status_text('running...')
             fps, time, time_stamp = StimProgram.main(
                 self.list_panel.stims_to_run)
@@ -2454,8 +2458,9 @@ class MyFrame(wx.Frame):
                 self.status_bar.set_status_text(status_text)
             # if error
             else:
-                self.status_bar.set_status_text(fps)
+                self.status_bar.set_status_text('Error: {}'.format(fps))
                 self.status_bar.set_background(wx.BLUE)
+                self.status_bar.set_text_color(wx.WHITE)
 
         except:
             raise
