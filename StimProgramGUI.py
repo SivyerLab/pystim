@@ -959,6 +959,7 @@ class InputPanel(wx.Panel):
                                        validator=TextCtrlValidator())
                     # add control to dict of all controls
                     if param in self.all_controls.keys():
+                        # append because duplicates of some controls
                         self.all_controls[param].append(ctrl)
                     else:
                         self.all_controls[param] = [ctrl]
@@ -976,7 +977,7 @@ class InputPanel(wx.Panel):
                     else:
                         self.all_controls[param] = [ctrl]
 
-                    # on Win32, choice still defaults to blank, so manually
+                    # on win32, choice still defaults to blank, so manually
                     # set selection to default for aesthetic reasons
                     ctrl.SetStringSelection(str(param_info['default']))
 
