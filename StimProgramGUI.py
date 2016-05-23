@@ -1145,7 +1145,8 @@ class InputPanel(wx.Panel):
 
         if param == 'trigger_wait':
             StimProgram.GlobalDefaults['trigger_wait'] = \
-                global_params['trigger_wait']
+                int(global_params['trigger_wait'] * 1.0 * global_params[
+                    'frame_rate'] + 0.99)
 
         if param == 'protocol_reps':
             StimProgram.GlobalDefaults['protocol_reps'] = \
