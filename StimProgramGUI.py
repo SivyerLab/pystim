@@ -709,6 +709,14 @@ class Parameters(object):
               'is_child': False}
              ),
 
+            ('small_win',
+             {'type'    : 'choice',
+              'label'   : 'mirror window',
+              'choices' : ['True', 'False'],
+              'default' : config_dict['small_win'],
+              'is_child': False}
+             ),
+
             ('log',
              {'type'    : 'choice',
               'label'   : 'log',

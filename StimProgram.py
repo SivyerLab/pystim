@@ -152,7 +152,8 @@ class GlobalDefaults(object):
                     screen_num=1,
                     gamma_correction='default',
                     trigger_wait=0.1,
-                    capture=False)
+                    capture=False,
+                    small_win=False)
 
     def __init__(self,
                  frame_rate=None,
@@ -169,7 +170,8 @@ class GlobalDefaults(object):
                  log=None,
                  gamma_correction=None,
                  offset=None,
-                 capture=None):
+                 capture=None,
+                 small_win=None):
         """
         Populate defaults if passed; units converted as necessary.
         """
@@ -220,6 +222,9 @@ class GlobalDefaults(object):
         if capture is not None:
             self.defaults['capture'] = capture
 
+        if small_win is not None:
+            self.defaults['small_win'] = small_win
+
     def __str__(self):
         """For pretty printing dictionary of global defaults.
         """
@@ -239,8 +244,9 @@ class MyWindow(object):
     """
 
     # Class attributes
-    #: Psychopy window instance.
+    #: Psychopy window instances.
     win = None
+    small_win = None
     #: Gamma correction instance. See :py:class:`GammaCorrection`.
     gamma_mon = None
     #: Used to break out of animation loop in :py:func:`main`.
@@ -303,6 +309,8 @@ class MyWindow(object):
                                                         'monitor'))
 
         MyWindow.win.mouseVisible = True,
+        if GlobalDefaults['small_win']:
+            MyWindow.make_small_win()
 
     @staticmethod
     def close_win():
@@ -311,6 +319,10 @@ class MyWindow(object):
         if has_u3:
             MyWindow.d.close()
         MyWindow.win.close()
+
+        if MyWindow.small_win is not None:
+            MyWindow.small_win.close()
+            MyWindow.small_win = None
 
     @staticmethod
     def change_color(color):
@@ -326,11 +338,61 @@ class MyWindow(object):
                     color = color = MyWindow.gamma_mon(color)
 
                 MyWindow.win.color = color
-                MyWindow.win.flip()
-                MyWindow.win.flip()
+                if MyWindow.small_win is not None:
+                    MyWindow.small_win.color = color
+                MyWindow.flip()
 
         except (ValueError, AttributeError):
             pass
+
+    @staticmethod
+    def make_small_win():
+        """
+        Makes a small window to see what's being show on the projector
+        """
+        if GlobalDefaults['display_size'][0] > GlobalDefaults[
+            'display_size'][1]:
+            scaled_size = [400.0,
+                           400.0 / GlobalDefaults['display_size'][0] *
+                           GlobalDefaults['display_size'][1]]
+        else:
+            scaled_size = [400.0 / GlobalDefaults['display_size'][1] *
+                           GlobalDefaults['display_size'][0],
+                           400.0]
+
+
+        scaled_scale = [scaled_size[0] / GlobalDefaults['display_size'][0] *
+                        GlobalDefaults['scale'][0],
+                        scaled_size[1] / GlobalDefaults['display_size'][1]*
+                        GlobalDefaults['scale'][1]]
+
+        MyWindow.small_win = visual.Window(units='pix',
+                                     colorSpace='rgb',
+                                     winType='pyglet',
+                                     allowGUI=True,
+                                     color=GlobalDefaults['background'],
+                                     size=scaled_size,
+                                     pos=[0, 0],
+                                     fullscr=False,
+                                     # viewPos=GlobalDefaults['offset'],
+                                     viewScale=scaled_scale,
+                                     screen=0,
+                                     monitor=config.get('StimProgram',
+                                                        'monitor'),
+                                     waitBlanking=False,
+                                     do_vsync=False)
+
+
+
+    @staticmethod
+    def flip():
+        """Makes proper calls to flip windows
+        """
+        if MyWindow.win is not None:
+            MyWindow.win.flip()
+            if MyWindow.small_win is not None:
+                MyWindow.small_win.flip()
+
 
     @staticmethod
     def send_trigger():
@@ -635,6 +697,7 @@ class StaticStim(StimDefaults):
         self.end_stim = None
         self.draw_duration = None
         self.stim = None
+        self.small_stim = None
         self.contrast_adj_rgb = None
 
         # seed fill and move randoms
@@ -654,9 +717,22 @@ class StaticStim(StimDefaults):
                                            pos=self.location,
                                            phase=self.phase,
                                            ori=self.orientation,
-                                           autoLog=False)
+                                           autoLog=False,
+                                           texRes=2**10)
 
             self.stim.sf *= self.sf
+
+            if MyWindow.small_win is not None:
+                self.small_stim = visual.GratingStim(win=MyWindow.small_win,
+                                           size=self.stim.size,
+                                           mask=self.stim.mask,
+                                           tex=self.stim.tex,
+                                           pos=self.location,
+                                           phase=self.phase,
+                                           ori=self.orientation,
+                                           autoLog=False)
+
+                self.small_stim.sf *= self.sf
 
         if self.fill_mode == 'image':
             image = scipy.misc.toimage(numpy.rot90(self.gen_texture(), 2))
@@ -668,6 +744,15 @@ class StaticStim(StimDefaults):
                                          pos=self.location,
                                          ori=self.orientation,
                                          autoLog=False)
+
+            if MyWindow.small_win is not None:
+                self.small_stim = visual.ImageStim(win=MyWindow.small_win,
+                                           size=self.stim.size,
+                                           mask=self.stim.mask,
+                                           image=image,
+                                           pos=self.location,
+                                           ori=self.orientation,
+                                           autoLog=False)
 
     def draw_times(self):
         """Determines during which frames stim should be drawn, based on desired
@@ -713,6 +798,8 @@ class StaticStim(StimDefaults):
 
             # draw to back buffer
             self.stim.draw()
+            if self.small_stim is not None:
+                self.small_stim.draw()
 
     def gen_rgb(self):
         """Depending on color mode, calculates necessary values. Texture
@@ -819,6 +906,7 @@ class StaticStim(StimDefaults):
         if self.fill_mode == 'uniform':
             if self.color_mode == 'rgb':
                 # unscale
+                print high
                 color = high * 2 - 1
                 # color array
                 texture[:, :, ] = color
@@ -1094,6 +1182,9 @@ class StaticStim(StimDefaults):
         # print texture[0][0][1]
         self.stim.tex = texture
 
+        if self.small_stim is not None:
+            self.small_stim.tex = texture
+
     def gen_phase(self):
         """Changes phase of stim on each frame draw.
         """
@@ -1304,6 +1395,8 @@ class MovingStim(StaticStim):
         :param y: y coordinate
         """
         self.stim.setPos((x, y))
+        if self.small_stim is not None:
+            self.small_stim.setPos((x, y))
 
     def get_pos(self):
         """Position getter.
@@ -1526,7 +1619,7 @@ class TableStim(MovingStim):
                     num_frames = int(GlobalDefaults['frame_rate'] * dur + 0.99)
                     trigger_list.append(1)
                     trigger_list.extend([0] * (num_frames - 1))
-                    self.speed = speed * (1.0 * GlobalDefaults['pix_per_micron'] / GlobalDefaults['frame_rate'])
+                    self.speed = speed * (1.0 / GlobalDefaults['frame_rate'])
 
                     x_to_app, y_to_app = super(TableStim,
                                                self).gen_pos_array(start_x,
@@ -1701,6 +1794,7 @@ def board_texture_class(bases, **kwargs):
 
             # get colors
             high, low, _, _ = self.gen_rgb()
+            print high, low
             self.high = high
             self.low = low
 
@@ -1744,9 +1838,6 @@ def board_texture_class(bases, **kwargs):
                 if MyWindow.gamma_mon is not None:
                     self.colors = MyWindow.gamma_mon(self.colors)
 
-                # set timing to 'sine' so tex updated between frames
-                self.timing = 'sine'
-
             self.stim = visual.ElementArrayStim(MyWindow.win,
                                                 xys=xys,
                                                 colors=self.colors,
@@ -1759,6 +1850,22 @@ def board_texture_class(bases, **kwargs):
 
             self.stim.size = (self.check_size[0] * self.num_check,
                               self.check_size[1] * self.num_check)
+
+            if MyWindow.small_win is not None:
+
+                self.small_stim = visual.ElementArrayStim(MyWindow.small_win,
+                                                    xys=xys,
+                                                    colors=self.colors,
+                                                    nElements=self.num_check**2,
+                                                    elementMask=None,
+                                                    elementTex=None,
+                                                    sizes=(self.check_size[0],
+                                                           self.check_size[1]),
+                                                    autoLog=False)
+
+                self.small_stim.size = (self.check_size[0] * self.num_check,
+                                  self.check_size[1] * self.num_check)
+
 
         def gen_timing(self, frame):
             """ElementArrayStim does not support assigning alpha values.
@@ -1786,6 +1893,8 @@ def board_texture_class(bases, **kwargs):
             :param colors: array of rgb values for each element
             """
             self.stim.setColors(colors)
+            if self.small_stim is not None:
+                self.small_stim.setColors(colors)
 
         def set_pos(self, x, y):
             """Position setter. Moves entire array of elements
@@ -1794,6 +1903,8 @@ def board_texture_class(bases, **kwargs):
             :param y: y coordinate
             """
             self.stim.setFieldPos((x, y))
+            if self.small_stim is not None:
+                self.small_stim.setFieldPos((x, y))
 
         def get_pos(self):
             """Position getter.
@@ -2043,11 +2154,11 @@ def main(stim_list, verbose=True):
             if GlobalDefaults['trigger_wait'] != 0:
                 MyWindow.win.callOnFlip(MyWindow.send_trigger)
                 # print 'trigger'
-            MyWindow.win.flip()
+            MyWindow.flip()
 
             if GlobalDefaults['trigger_wait'] != 0:
                 for y in xrange(GlobalDefaults['trigger_wait'] - 1):
-                    MyWindow.win.flip()
+                    MyWindow.flip()
 
             index = 0
             # clock for timing
@@ -2072,7 +2183,7 @@ def main(stim_list, verbose=True):
                     stim.animate(frame)
 
                 if not GlobalDefaults['capture']:
-                    MyWindow.win.flip()
+                    MyWindow.flip()
 
                 # save as movie?
                 elif GlobalDefaults['capture']:
@@ -2126,7 +2237,7 @@ def main(stim_list, verbose=True):
 
     # one last flip to clear window if still open
     try:
-        MyWindow.win.flip()
+        MyWindow.flip()
     except AttributeError:
         pass
 
