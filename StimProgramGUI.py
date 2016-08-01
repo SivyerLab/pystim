@@ -514,7 +514,7 @@ class Parameters(object):
             ('move_type',
              {'type'    : 'choice',
               'label'   : 'move type',
-              'choices' : ['static', 'moving', 'table', 'random'],  # , 'jump'],
+              'choices' : ['static', 'moving', 'table', 'random', 'jump'],
               'default' : config_dict['move_type'],
               'is_child': False,
               'children': {
@@ -523,7 +523,7 @@ class Parameters(object):
                   'random': ['speed', 'travel_distance', 'move_seed'],
                   'table' : ['table_filename', 'table_type', 'start_dir',
                              'num_dirs', 'move_delay', 'ori_with_dir'],
-                  # 'jump'  : ['num_jumps', 'jump_delay', 'move_seed'],
+                  'jump'  : ['num_jumps', 'move_delay', 'move_seed', 'shuffle'],
               }}
              ),
 
@@ -606,12 +606,20 @@ class Parameters(object):
               'is_child': True}
              ),
 
-            ('jump_delay',
-             {'type'    : 'text',
-              'label'   : 'jump delay (frames)',
-              'default' : config_dict['jump_delay'],
+            ('shuffle',
+             {'type'    : 'choice',
+              'label'   : 'shuffle',
+              'choices' : ['True', 'False'],
+              'default' : config_dict['shuffle'],
               'is_child': True}
-             )
+             ),
+
+            # ('jump_delay',
+            #  {'type'    : 'text',
+            #   'label'   : 'jump delay (frames)',
+            #   'default' : config_dict['jump_delay'],
+            #   'is_child': True}
+            #  )
         ])
 
         self.global_default_param = OrderedDict([
