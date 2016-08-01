@@ -151,7 +151,7 @@ class GlobalDefaults(object):
                     log=False,
                     screen_num=1,
                     gamma_correction='default',
-                    trigger_wait=0.1,
+                    trigger_wait=6,
                     capture=False,
                     small_win=False)
 
@@ -255,7 +255,7 @@ class MyWindow(object):
     d = None
     #: List of frames to trigger on
     frame_trigger_list = sortedcontainers.SortedList()
-    frame_trigger_list.add(sys.maxint)  # need an extra last value for index
+    frame_trigger_list.add(sys.maxint)  # need an extra last value for indexing
 
     @staticmethod
     def make_win():
@@ -338,8 +338,11 @@ class MyWindow(object):
                     color = color = MyWindow.gamma_mon(color)
 
                 MyWindow.win.color = color
+
                 if MyWindow.small_win is not None:
                     MyWindow.small_win.color = color
+
+                MyWindow.flip()
                 MyWindow.flip()
 
         except (ValueError, AttributeError):
@@ -568,7 +571,7 @@ class StimDefaults(object):
                  trigger=False,
                  move_delay=0,
                  num_jumps=5,
-                 jump_delay=100,
+                 shuffle=False,
                  force_stop=0,
                  end_delay=0):
         """
@@ -597,6 +600,7 @@ class StimDefaults(object):
         self.table_type = table_type
         self.trigger = trigger
         self.num_jumps = num_jumps
+        self.shuffle = shuffle
         self.contrast_channel = ['red', 'green', 'blue'].index(contrast_channel)
         self.image_channel = ['red', 'green', 'blue', 'all'].index(
                 image_channel)
@@ -634,7 +638,7 @@ class StimDefaults(object):
         self.end_delay = end_delay * GlobalDefaults['frame_rate']
         self.duration = duration * GlobalDefaults['frame_rate']
         self.move_delay = int(move_delay * GlobalDefaults['frame_rate'])
-        self.jump_delay = jump_delay * GlobalDefaults['frame_rate']
+        # self.jump_delay = jump_delay * GlobalDefaults['frame_rate']
         self.force_stop = force_stop * GlobalDefaults['frame_rate']
 
         # speed conversion
@@ -709,7 +713,8 @@ class StaticStim(StimDefaults):
     def make_stim(self):
         """Creates instance of psychopy stim object.
         """
-        if self.fill_mode != 'image':
+        # if self.fill_mode != 'image':
+        if True:
             self.stim = visual.GratingStim(win=MyWindow.win,
                                            size=self.gen_size(),
                                            mask=self.gen_mask(),
@@ -734,7 +739,7 @@ class StaticStim(StimDefaults):
 
                 self.small_stim.sf *= self.sf
 
-        if self.fill_mode == 'image':
+        elif self.fill_mode == 'image':
             image = scipy.misc.toimage(numpy.rot90(self.gen_texture(), 2))
 
             self.stim = visual.ImageStim(win=MyWindow.win,
@@ -1093,6 +1098,8 @@ class StaticStim(StimDefaults):
 
                     else:
                         texture = image * 2 - 1
+                        # numpy.random.shuffle(texture.flat)
+                        # print texture.shape, texture[0][0]
 
                 # flip because of indexing styles
                 texture = numpy.rot90(texture, 2)
@@ -1706,60 +1713,164 @@ class ImageJumpStim(StaticStim):
         # pass parameters up to super
         super(ImageJumpStim, self).__init__(**kwargs)
 
-    def make_stim(self):
-        """Creates buffer with rendered images. Images are sampled to size of
-        window.
+        self.orig_tex = None
+        self.slice_index = 0
+        self.slice_list = []
+        self.jumpstim_list = []
+
+    def gen_texture(self):
         """
-        image = Image.open(self.image_filename)
-        cropped_list = []
-        self.stim = []
+        Keeps copy of og texture
+        :return:
+        """
+        tex = super(ImageJumpStim, self).gen_texture()
+        self.orig_tex = tex
 
-        mon_x = GlobalDefaults.defaults['display_size'][0]
-        mon_y = GlobalDefaults.defaults['display_size'][1]
+        self.gen_slice_list()
 
-        for i in range(self.num_jumps):
-            x = self.move_random.randint(0, image.size[0] - mon_x)
-            y = self.move_random.randint(0, image.size[1] - mon_y)
+        # pushing textures is slow, so preload textures and instead switch stims
+        for slice in self.slice_list:
+            if self.shuffle:
+                temp_stim = visual.GratingStim(win=MyWindow.win,
+                                               size=self.gen_size(),
+                                               mask=self.gen_mask(),
+                                               tex=slice,
+                                               pos=self.location,
+                                               phase=self.phase,
+                                               ori=self.orientation,
+                                               autoLog=False,
+                                               texRes=2**10)
 
-            cropped = image.crop((x, y, x + mon_x, y + mon_y))
-            cropped_list.append(cropped)
-            cropped.show()
+                # want to shuffle scaled tex, so draw to back and pull then
+                # shuffle that
+                temp_stim.draw()
+                image = MyWindow.win._getRegionOfFrame(buffer='back')
+                MyWindow.win.clearBuffer()
+                cap = numpy.asarray(image) / 255.0 * 2 - 1
 
-            pic = visual.SimpleImageStim(win=MyWindow.win,
-                                         image=cropped)
-            pic.draw()
+                shuf = numpy.array(cap.reshape(-1, cap.shape[-1]))
+                numpy.random.shuffle(shuf)
+                shuf = shuf.reshape(cap.shape[0],
+                                    cap.shape[1],
+                                    cap.shape[2])
+                slice = shuf
 
-            for j in range(self.jump_delay):
-                self.stim.append(visual.BufferImageStim(MyWindow.win))
+            self.jumpstim_list.append(visual.GratingStim(win=MyWindow.win,
+                                           size=self.gen_size(),
+                                           mask=self.gen_mask(),
+                                           tex=slice,
+                                           pos=self.location,
+                                           phase=self.phase,
+                                           ori=self.orientation,
+                                           autoLog=False,
+                                           texRes=2**10)
+                                      )
 
-            MyWindow.win.clearBuffer()
+        return tex
 
-    def get_draw_times(self):
+    def gen_size(self):
+        """
+        Overrides sizing
+        :return:
+        """
+        size = [GlobalDefaults['display_size'][0],
+                GlobalDefaults['display_size'][1]]
+
+        return size
+
+    def draw_times(self):
         """
         Determines frames during which to draw stimulus.
         :return: last frame number as int
         """
-        self.start_stim = self.delay * GlobalDefaults.defaults['frame_rate']
 
-        self.end_stim = len(self.stim) + self.start_stim
+        self.start_stim = self.delay
+
+        self.end_stim = self.num_jumps * self.move_delay
+        self.end_stim += self.start_stim
+        self.end_stim = int(self.end_stim + 0.99)
 
         self.draw_duration = self.end_stim - self.start_stim
 
-        # return end stim time for calculating max frame time
+        if self.trigger:
+            for i in range(self.num_jumps):
+                trigger_frame = i * self.move_delay + self.delay
+                if trigger_frame not in MyWindow.frame_trigger_list:
+                    MyWindow.frame_trigger_list.add(trigger_frame)
+
+        if self.force_stop != 0:
+            self.end_stim = self.force_stop
+
         return self.end_stim
 
     def animate(self, frame):
-        """
-        Method for drawing stim objects to back buffer. Checks if object
-        should be drawn. Back buffer is brought to front with calls to flip()
-        on the window.
+        """Method for animating moving stims. Pulls pixels drawn,
+        then makes call to animate of super.
 
         :param frame: current frame number
         """
+        # check if within animation range
         if self.start_stim <= frame < self.end_stim:
-            i = frame - self.delay * GlobalDefaults.defaults['frame_rate']
-            # draw to back buffer
-            self.stim[i].draw()
+
+            if frame % self.move_delay == 0:
+                # pixels = MyWindow.win._getRegionOfFrame(buffer='back')
+                # print type(pixels), repr(pixels)
+                # texture = numpy.asarray(pixels)
+
+                # self.stim.tex = self.slice_list[self.slice_index]
+                self.stim = self.jumpstim_list[self.slice_index]
+                self.slice_index += 1
+
+            super(ImageJumpStim, self).animate(frame)
+
+    def gen_slice(self, *args):
+        """Creates 2 arrays for x, y coordinates of stims for each frame.
+
+        :return: the x, y coordinates of the stim for every frame as 2 arrays
+        """
+        if self.image_size[0] >= GlobalDefaults['display_size'][0] and \
+            self.image_size[1] >= GlobalDefaults['display_size'][1]:
+
+            x_factor = GlobalDefaults['display_size'][0] / float(self.image_size[0]) * self.orig_tex.shape[1]
+            y_factor = GlobalDefaults['display_size'][1] / float(self.image_size[1]) * self.orig_tex.shape[0]
+
+            max_x = self.orig_tex.shape[1] - int(x_factor)
+            max_y = self.orig_tex.shape[0] - int(y_factor)
+
+            x_low = self.move_random.randint(0, max_x)
+            y_low = self.move_random.randint(0, max_y)
+
+            x_high = int(x_low + x_factor)
+            y_high = int(y_low + y_factor)
+
+            tex = self.orig_tex[y_low:y_high,
+                                x_low:x_high]
+
+            # if self.shuffle:
+            #     if len(tex.shape) == 2:
+            #         numpy.random.shuffle(tex.flat)
+            #     else:
+            #         shuf = tex.reshape(-1, tex.shape[-1])
+            #         print shuf.flags
+            #         numpy.random.shuffle(shuf)
+            #         shuf = shuf.reshape(tex.shape[0], tex.shape[1],
+            #                             tex.shape[2])
+            #         tex = shuf
+
+            # print numpy.mean(tex)
+            return tex
+
+        else:
+            raise AssertionError('Image drawn size must be larger than window size (can\'t jump around otherwise...)')
+
+    def gen_slice_list(self):
+        """
+        Generates slices for jumping around.
+        """
+        for i in range(self.num_jumps):
+            self.slice_list.append(self.gen_slice())
+            print 'Slicing {}/{}'.format(i+1, self.num_jumps)
+        print "Done."
 
 
 # function because inheritance is conditional
@@ -1794,7 +1905,7 @@ def board_texture_class(bases, **kwargs):
 
             # get colors
             high, low, _, _ = self.gen_rgb()
-            print high, low
+            # print high, low
             self.high = high
             self.low = low
 
