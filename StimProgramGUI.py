@@ -523,7 +523,8 @@ class Parameters(object):
                   'random': ['speed', 'travel_distance', 'move_seed'],
                   'table' : ['table_filename', 'table_type', 'start_dir',
                              'num_dirs', 'move_delay', 'ori_with_dir'],
-                  'jump'  : ['num_jumps', 'move_delay', 'move_seed', 'shuffle'],
+                  'jump'  : ['num_jumps', 'move_delay', 'move_seed',
+                             'shuffle', 'blend_jumps'],
               }}
              ),
 
@@ -614,12 +615,13 @@ class Parameters(object):
               'is_child': True}
              ),
 
-            # ('jump_delay',
-            #  {'type'    : 'text',
-            #   'label'   : 'jump delay (frames)',
-            #   'default' : config_dict['jump_delay'],
-            #   'is_child': True}
-            #  )
+            ('blend_jumps',
+             {'type'    : 'choice',
+              'label'   : 'blend jumps',
+              'choices' : ['True', 'False'],
+              'default' : config_dict['blend_jumps'],
+              'is_child': True}
+             ),
         ])
 
         self.global_default_param = OrderedDict([
