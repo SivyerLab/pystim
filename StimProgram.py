@@ -1729,7 +1729,9 @@ class ImageJumpStim(StaticStim):
         self.gen_slice_list()
 
         # pushing textures is slow, so preload textures and instead switch stims
-        for slice in self.slice_list:
+
+        numpy.random.seed(self.move_seed)
+        for i, slice in enumerate(self.slice_list):
             if self.shuffle:
                 temp_stim = visual.GratingStim(win=MyWindow.win,
                                                size=self.gen_size(),
@@ -1748,12 +1750,16 @@ class ImageJumpStim(StaticStim):
                 MyWindow.win.clearBuffer()
                 cap = numpy.asarray(image) / 255.0 * 2 - 1
 
-                shuf = numpy.array(cap.reshape(-1, cap.shape[-1]))
-                numpy.random.shuffle(shuf)
-                shuf = shuf.reshape(cap.shape[0],
-                                    cap.shape[1],
-                                    cap.shape[2])
-                slice = shuf
+                if self.image_channel != 3:
+                    numpy.random.shuffle(cap.reshape(-1, cap.shape[-1]).T[self.image_channel])
+                else:
+                    # TODO: faster randomizing
+                    x, y, z = cap.shape[0], cap.shape[1], cap.shape[-1]
+                    numpy.random.shuffle(cap.reshape(-1, z))
+                    cap.reshape(x, y, z)
+
+                slice = cap
+                print 'Shuffling {}/{}'.format(i+1, len(self.slice_list))
 
             self.jumpstim_list.append(visual.GratingStim(win=MyWindow.win,
                                            size=self.gen_size(),
@@ -1765,6 +1771,8 @@ class ImageJumpStim(StaticStim):
                                            autoLog=False,
                                            texRes=2**10)
                                       )
+
+        print 'Done.'
 
         return tex
 
@@ -1861,7 +1869,14 @@ class ImageJumpStim(StaticStim):
             return tex
 
         else:
-            raise AssertionError('Image drawn size must be larger than window size (can\'t jump around otherwise...)')
+            raise AssertionError('Image drawn size must be larger than window size'
+                                 '(can\'t jump around otherwise...).\nImage '
+                                 'size:  {} x {} pixels\nwindow size: {} x {} '
+                                 'pixels'.format(
+                self.image_size[0], self.image_size[1],
+                GlobalDefaults['display_size'][0], GlobalDefaults[
+                    'display_size'][1]
+            ))
 
     def gen_slice_list(self):
         """
@@ -1870,7 +1885,6 @@ class ImageJumpStim(StaticStim):
         for i in range(self.num_jumps):
             self.slice_list.append(self.gen_slice())
             print 'Slicing {}/{}'.format(i+1, self.num_jumps)
-        print "Done."
 
 
 # function because inheritance is conditional
