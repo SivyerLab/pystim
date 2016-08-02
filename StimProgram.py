@@ -572,6 +572,7 @@ class StimDefaults(object):
                  move_delay=0,
                  num_jumps=5,
                  shuffle=False,
+                 blend_jumps=False,
                  force_stop=0,
                  end_delay=0):
         """
@@ -601,6 +602,7 @@ class StimDefaults(object):
         self.trigger = trigger
         self.num_jumps = num_jumps
         self.shuffle = shuffle
+        self.blend_jumps = blend_jumps
         self.contrast_channel = ['red', 'green', 'blue'].index(contrast_channel)
         self.image_channel = ['red', 'green', 'blue', 'all'].index(
                 image_channel)
@@ -1628,6 +1630,7 @@ class ImageJumpStim(StaticStim):
         # pushing textures is slow, so preload textures and instead switch stims
 
         numpy.random.seed(self.move_seed)
+
         for i, slice in enumerate(self.slice_list):
             if self.shuffle:
                 temp_stim = visual.GratingStim(win=MyWindow.win,
@@ -1651,23 +1654,24 @@ class ImageJumpStim(StaticStim):
                     numpy.random.shuffle(cap.reshape(-1, cap.shape[-1]).T[self.image_channel])
                 else:
                     # TODO: faster randomizing
-                    x, y, z = cap.shape[0], cap.shape[1], cap.shape[-1]
-                    numpy.random.shuffle(cap.reshape(-1, z))
-                    cap.reshape(x, y, z)
+                    numpy.random.shuffle(cap.reshape(-1, cap.shape[-1]))
 
-                slice = cap
+                # slice = cap
                 print 'Shuffling {}/{}'.format(i+1, len(self.slice_list))
+                temp_stim.setTex(cap)
+                self.jumpstim_list.append(temp_stim)
 
-            self.jumpstim_list.append(visual.GratingStim(win=MyWindow.win,
-                                           size=self.gen_size(),
-                                           mask=self.gen_mask(),
-                                           tex=slice,
-                                           pos=self.location,
-                                           phase=self.phase,
-                                           ori=self.orientation,
-                                           autoLog=False,
-                                           texRes=2**10)
-                                      )
+            else:
+                self.jumpstim_list.append(visual.GratingStim(win=MyWindow.win,
+                                               size=self.gen_size(),
+                                               mask=self.gen_mask(),
+                                               tex=slice,
+                                               pos=self.location,
+                                               phase=self.phase,
+                                               ori=self.orientation,
+                                               autoLog=False,
+                                               texRes=2**10)
+                                          )
 
         print 'Done.'
 
@@ -1718,11 +1722,6 @@ class ImageJumpStim(StaticStim):
         if self.start_stim <= frame < self.end_stim:
 
             if frame % self.move_delay == 0:
-                # pixels = MyWindow.win._getRegionOfFrame(buffer='back')
-                # print type(pixels), repr(pixels)
-                # texture = numpy.asarray(pixels)
-
-                # self.stim.tex = self.slice_list[self.slice_index]
                 self.stim = self.jumpstim_list[self.slice_index]
                 self.slice_index += 1
 
