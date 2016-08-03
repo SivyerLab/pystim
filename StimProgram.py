@@ -62,7 +62,6 @@ defaults = dict(logsDir='.\\psychopy\\logs\\',
                 monitor='blank')
 config = ConfigParser.ConfigParser()
 config.read(os.path.abspath('./psychopy/config.ini'))
-# config.read(os.path.abspath("C:\Users\Alex\PycharmProjects\StimulusProgram\psychopy\config.ini"))
 
 
 class StimInfo(object):
@@ -1630,6 +1629,7 @@ class ImageJumpStim(StaticStim):
         # pushing textures is slow, so preload textures and instead switch stims
 
         numpy.random.seed(self.move_seed)
+        # clock = core.Clock()
 
         for i, slice in enumerate(self.slice_list):
             if self.shuffle:
@@ -1651,7 +1651,8 @@ class ImageJumpStim(StaticStim):
                 cap = numpy.asarray(image) / 255.0 * 2 - 1
 
                 if self.image_channel != 3:
-                    numpy.random.shuffle(cap.reshape(-1, cap.shape[-1]).T[self.image_channel])
+                    numpy.random.shuffle(cap.reshape(-1, cap.shape[-1])
+                                         .T[self.image_channel])
                 else:
                     # TODO: faster randomizing
                     numpy.random.shuffle(cap.reshape(-1, cap.shape[-1]))
@@ -1662,16 +1663,18 @@ class ImageJumpStim(StaticStim):
                 self.jumpstim_list.append(temp_stim)
 
             else:
+                # clock.reset()
                 self.jumpstim_list.append(visual.GratingStim(win=MyWindow.win,
-                                               size=self.gen_size(),
-                                               mask=self.gen_mask(),
-                                               tex=slice,
-                                               pos=self.location,
-                                               phase=self.phase,
-                                               ori=self.orientation,
-                                               autoLog=False,
-                                               texRes=2**10)
+                                          size=self.gen_size(),
+                                          mask=self.gen_mask(),
+                                          tex=slice,
+                                          pos=self.location,
+                                          phase=self.phase,
+                                          ori=self.orientation,
+                                          autoLog=False,
+                                          texRes=2**10)
                                           )
+                # print clock.getTime() * 1000
 
         print 'Done.'
 
@@ -1728,9 +1731,10 @@ class ImageJumpStim(StaticStim):
             super(ImageJumpStim, self).animate(frame)
 
     def gen_slice(self, *args):
-        """Creates 2 arrays for x, y coordinates of stims for each frame.
+        """Slices the original texture and returns slice, i.e. a smaller
+        section of the original image that will be zoomed in.
 
-        :return: the x, y coordinates of the stim for every frame as 2 arrays
+        :return: texture slice
         """
         if self.image_size[0] >= GlobalDefaults['display_size'][0] and \
             self.image_size[1] >= GlobalDefaults['display_size'][1]:
@@ -1750,18 +1754,6 @@ class ImageJumpStim(StaticStim):
             tex = self.orig_tex[y_low:y_high,
                                 x_low:x_high]
 
-            # if self.shuffle:
-            #     if len(tex.shape) == 2:
-            #         numpy.random.shuffle(tex.flat)
-            #     else:
-            #         shuf = tex.reshape(-1, tex.shape[-1])
-            #         print shuf.flags
-            #         numpy.random.shuffle(shuf)
-            #         shuf = shuf.reshape(tex.shape[0], tex.shape[1],
-            #                             tex.shape[2])
-            #         tex = shuf
-
-            # print numpy.mean(tex)
             return tex
 
         else:
