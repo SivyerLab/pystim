@@ -1614,6 +1614,7 @@ class ImageJumpStim(StaticStim):
         self.orig_tex = None
         self.slice_index = 0
         self.slice_list = []
+        self.slice_log = []
         self.jumpstim_list = []
 
     def gen_texture(self):
@@ -1731,9 +1732,11 @@ class ImageJumpStim(StaticStim):
                 self.stim.setTex(self.slice_list[self.slice_index])
 
                 self.slice_index += 1
+                # image = MyWindow.win._getRegionOfFrame(buffer='front')
+                # cap = numpy.asarray(image)
 
             super(ImageJumpStim, self).animate(frame)
-            # if frame % self.move_delay == 0:
+
         print clock.getTime() * 1000
 
     def gen_slice(self, *args):
@@ -1756,6 +1759,8 @@ class ImageJumpStim(StaticStim):
 
             x_high = int(x_low + x_factor)
             y_high = int(y_low + y_factor)
+
+            self.slice_log.append([y_low, y_high, x_low, x_high])
 
             tex = self.orig_tex[y_low:y_high,
                                 x_low:x_high]
@@ -2051,6 +2056,9 @@ def log_stats(count_reps, reps, count_frames, num_frames, elapsed_time,
             if stim_list[i].stim_type == 'MovingStim':
                 file_name = 'Movinglog_' + current_time_string + '_' + '.txt'
 
+            if stim_list[i].stim_type == 'ImageJumpStim':
+                file_name = 'Jumpinglog_' + current_time_string + '_' + '.txt'
+
             if stim_list[i].stim_type in ['RandomlyMovingStim', 'MovingStim']:
 
                 with open((path+file_name), 'w') as f:
@@ -2104,6 +2112,26 @@ def log_stats(count_reps, reps, count_frames, num_frames, elapsed_time,
                     for j in range(len(to_animate[i].log[0])):
                         f.write(str(to_animate[i].log[2][j][1]))
                         f.write('\n')
+
+            if stim_list[i].stim_type in ['ImageJumpStim']:
+
+                with open((path+file_name), 'w') as f:
+
+                    if has_tabulate:
+                        # nicer formatting
+                        f.write('image: ' + to_animate[i].image_filename)
+                        f.write('\nshuffle: ' + str(to_animate[i].shuffle))
+                        f.write('\nimage_channel: ' + str(to_animate[i].image_channel))
+                        f.write('\nimage_size: ' + str(to_animate[i].image_size))
+                        f.write('\n\n')
+                        f.write(tabulate(to_animate[i].slice_log,
+                                         headers=['y_low', 'y_high', 'x_low',
+                                                  'x_high'],
+                                         tablefmt="orgtbl"))
+
+                    else:
+                        raise ImportError('Could not log Jumpstim without '
+                                          'tabulate (dev is lazy.')
 
     return current_time_string
 
