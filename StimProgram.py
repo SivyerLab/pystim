@@ -1623,60 +1623,60 @@ class ImageJumpStim(StaticStim):
         """
         tex = super(ImageJumpStim, self).gen_texture()
         self.orig_tex = tex
-
+        #
         self.gen_slice_list()
-
+        #
         # pushing textures is slow, so preload textures and instead switch stims
-
-        numpy.random.seed(self.move_seed)
+        #
+        # numpy.random.seed(self.move_seed)
         # clock = core.Clock()
+        #
+        # for i, slice in enumerate(self.slice_list):
+        #     if self.shuffle:
+        #         temp_stim = visual.GratingStim(win=MyWindow.win,
+        #                                        size=self.gen_size(),
+        #                                        mask=self.gen_mask(),
+        #                                        tex=slice,
+        #                                        pos=self.location,
+        #                                        phase=self.phase,
+        #                                        ori=self.orientation,
+        #                                        autoLog=False,
+        #                                        texRes=2**10)
+        #
+        #         # want to shuffle scaled tex, so draw to back and pull then
+        #         # shuffle that
+        #         temp_stim.draw()
+        #         image = MyWindow.win._getRegionOfFrame(buffer='back')
+        #         MyWindow.win.clearBuffer()
+        #         cap = numpy.asarray(image) / 255.0 * 2 - 1
+        #
+        #         if self.image_channel != 3:
+        #             numpy.random.shuffle(cap.reshape(-1, cap.shape[-1])
+        #                                  .T[self.image_channel])
+        #         else:
+        #             # TODO: faster randomizing
+        #             numpy.random.shuffle(cap.reshape(-1, cap.shape[-1]))
+        #
+        #         # slice = cap
+        #         print 'Shuffling {}/{}'.format(i+1, len(self.slice_list))
+        #         temp_stim.setTex(cap)
+        #         self.jumpstim_list.append(temp_stim)
 
-        for i, slice in enumerate(self.slice_list):
-            if self.shuffle:
-                temp_stim = visual.GratingStim(win=MyWindow.win,
-                                               size=self.gen_size(),
-                                               mask=self.gen_mask(),
-                                               tex=slice,
-                                               pos=self.location,
-                                               phase=self.phase,
-                                               ori=self.orientation,
-                                               autoLog=False,
-                                               texRes=2**10)
-
-                # want to shuffle scaled tex, so draw to back and pull then
-                # shuffle that
-                temp_stim.draw()
-                image = MyWindow.win._getRegionOfFrame(buffer='back')
-                MyWindow.win.clearBuffer()
-                cap = numpy.asarray(image) / 255.0 * 2 - 1
-
-                if self.image_channel != 3:
-                    numpy.random.shuffle(cap.reshape(-1, cap.shape[-1])
-                                         .T[self.image_channel])
-                else:
-                    # TODO: faster randomizing
-                    numpy.random.shuffle(cap.reshape(-1, cap.shape[-1]))
-
-                # slice = cap
-                print 'Shuffling {}/{}'.format(i+1, len(self.slice_list))
-                temp_stim.setTex(cap)
-                self.jumpstim_list.append(temp_stim)
-
-            else:
-                # clock.reset()
-                self.jumpstim_list.append(visual.GratingStim(win=MyWindow.win,
-                                          size=self.gen_size(),
-                                          mask=self.gen_mask(),
-                                          tex=slice,
-                                          pos=self.location,
-                                          phase=self.phase,
-                                          ori=self.orientation,
-                                          autoLog=False,
-                                          texRes=2**10)
-                                          )
+            # else:
+            #     # clock.reset()
+            #     self.jumpstim_list.append(visual.GratingStim(win=MyWindow.win,
+            #                               size=self.gen_size(),
+            #                               mask=self.gen_mask(),
+            #                               tex=self.gen_slice(),
+            #                               pos=self.location,
+            #                               phase=self.phase,
+            #                               ori=self.orientation,
+            #                               autoLog=False,
+            #                               texRes=2**10)
+            #                               )
                 # print clock.getTime() * 1000
 
-        print 'Done.'
+        # print 'Done.'
 
         return tex
 
@@ -1722,13 +1722,19 @@ class ImageJumpStim(StaticStim):
         :param frame: current frame number
         """
         # check if within animation range
+        clock = core.Clock()
+        clock.reset()
         if self.start_stim <= frame < self.end_stim:
 
             if frame % self.move_delay == 0:
-                self.stim = self.jumpstim_list[self.slice_index]
+                # self.stim = self.jumpstim_list[self.slice_index]
+                self.stim.setTex(self.slice_list[self.slice_index])
+
                 self.slice_index += 1
 
             super(ImageJumpStim, self).animate(frame)
+            # if frame % self.move_delay == 0:
+        print clock.getTime() * 1000
 
     def gen_slice(self, *args):
         """Slices the original texture and returns slice, i.e. a smaller
