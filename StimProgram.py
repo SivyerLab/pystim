@@ -13,6 +13,7 @@ from psychopy import visual, core, event, filters
 from time import strftime, localtime
 from random import Random
 from PIL import Image
+from tqdm import tqdm, trange
 
 import scipy, scipy.signal
 import sortedcontainers
@@ -304,8 +305,8 @@ class MyWindow(object):
                                      viewPos=GlobalDefaults['offset'],
                                      viewScale=GlobalDefaults['scale'],
                                      screen=GlobalDefaults['screen_num'],
-                                     monitor=config.get('StimProgram',
-                                                        'monitor')
+                                     # monitor=config.get('StimProgram',
+                                     #                    'monitor')
                                      )
 
         MyWindow.win.mouseVisible = True,
@@ -1636,7 +1637,7 @@ class ImageJumpStim(StaticStim):
         # clock = core.Clock()
 
         if self.shuffle:
-            for i, slice in enumerate(self.slice_list):
+            for i, slice in enumerate(tqdm(self.slice_list)):
                 temp_stim = visual.GratingStim(win=MyWindow.win,
                                                size=self.gen_size(),
                                                mask=self.gen_mask(),
@@ -1662,11 +1663,9 @@ class ImageJumpStim(StaticStim):
                     numpy.random.shuffle(cap.reshape(-1, cap.shape[-1]))
 
                 # slice = cap
-                print 'Shuffling {}/{}'.format(i+1, len(self.slice_list))
                 temp_stim.setTex(cap)
                 self.jumpstim_list.append(temp_stim)
 
-        print 'Done.'
 
         return tex
 
@@ -1770,9 +1769,8 @@ class ImageJumpStim(StaticStim):
         """
         Generates slices for jumping around.
         """
-        for i in range(self.num_jumps):
+        for i in trange(self.num_jumps):
             self.slice_list.append(self.gen_slice())
-            print 'Slicing {}/{}'.format(i+1, self.num_jumps)
 
 
 # function because inheritance is conditional
