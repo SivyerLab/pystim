@@ -1666,7 +1666,6 @@ class ImageJumpStim(StaticStim):
                 temp_stim.setTex(cap)
                 self.jumpstim_list.append(temp_stim)
 
-
         return tex
 
     def gen_size(self):
@@ -2112,6 +2111,8 @@ def log_stats(count_reps, reps, count_frames, num_frames, elapsed_time,
                         f.write('\nimage_size: ' + str(to_animate[i].image_size))
                         f.write('\nwindow_size: ' + str(GlobalDefaults[
                                                             'display_size']))
+                        f.write('\ntrigger_wait: ' + str(GlobalDefaults[
+                                                            'trigger_wait']))
                         f.write('\n\n')
                         f.write(tabulate(to_animate[i].slice_log,
                                          headers=['y_low', 'y_high', 'x_low',
