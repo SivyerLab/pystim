@@ -572,14 +572,19 @@ class StimDefaults(object):
                  trigger=False,
                  move_delay=0,
                  num_jumps=5,
+                 # jump_delay=None,
                  shuffle=False,
                  blend_jumps=False,
                  force_stop=0,
-                 end_delay=0):
+                 end_delay=0,
+                 **kwargs):
         """
         Default variable constructors; distance and time units converted
         appropriately.
         """
+        for key, value in kwargs.iteritems():
+            print 'NOT USED: {}={}'.format(key, value)
+
         self.shape = shape
         self.fill_mode = fill_mode
         self.sf = sf
@@ -668,8 +673,9 @@ class StimDefaults(object):
             self.movie_size = [100, 100]
 
         if image_size is not None:
-            self.image_size = [image_size[0] * GlobalDefaults['pix_per_micron'],
-                               image_size[1] * GlobalDefaults['pix_per_micron']]
+            self.image_size = map(int,
+                [image_size[0] * GlobalDefaults['pix_per_micron'],
+                 image_size[1] * GlobalDefaults['pix_per_micron']])
         else:
             self.movie_size = [100, 100]
 
@@ -2109,11 +2115,19 @@ def log_stats(count_reps, reps, count_frames, num_frames, elapsed_time,
                         f.write('\nshuffle: ' + str(to_animate[i].shuffle))
                         f.write('\nimage_channel: ' + str(to_animate[i].image_channel))
                         f.write('\nimage_size: ' + str(to_animate[i].image_size))
+                        f.write('\nnum_jumps: ' + str(to_animate[i].num_jumps))
+                        f.write('\nmove_seed: ' + str(to_animate[i].move_seed))
+
                         f.write('\nwindow_size: ' + str(GlobalDefaults[
                                                             'display_size']))
+                        f.write('\noffset: ' + str(GlobalDefaults[
+                                                            'offset']))
                         f.write('\ntrigger_wait: ' + str(GlobalDefaults[
                                                             'trigger_wait']))
+                        f.write('\ngamma_correction: ' + str(GlobalDefaults[
+                                                            'gamma_correction']))
                         f.write('\n\n')
+
                         f.write(tabulate(to_animate[i].slice_log,
                                          headers=['y_low', 'y_high', 'x_low',
                                                   'x_high'],
@@ -2214,7 +2228,8 @@ def main(stim_list, verbose=True):
 
             MyWindow.win.recordFrameIntervals = True
 
-            for frame in xrange(num_frames):
+            # for frame in xrange(num_frames):
+            for frame in trange(num_frames):
                 for stim in to_animate:
                     stim.animate(frame)
 
