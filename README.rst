@@ -17,7 +17,8 @@ functional.
 Documentation
 -------------
 
-Documentation is included in HTML format in the docs/html/ directory. Further
+Documentation is included in HTML format in the docs/html/ directory. A
+version is available on github pages `here <http://awctomlinson.github.io/StimulusProgram/>`_. Further
 documentation on Psychopy can be found on the psychopy `website <www.psychopy.org>`_.
 
 Quick Install
