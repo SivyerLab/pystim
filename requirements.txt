@@ -3,12 +3,14 @@ numpy
 Pillow
 PsychoPy
 pyglet
+sortedcontainers
+tabulate
+igor
 
 ## need to be installed manually
 # wxpython
 
 ## optional
-# sortedcontainers
 # LabJackPython
 # tabulate
 # igor
