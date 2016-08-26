@@ -1699,7 +1699,7 @@ class ImageJumpStim(StaticStim):
         self.draw_duration = self.end_stim - self.start_stim
 
         if self.trigger:
-            for i in range(self.num_jumps):
+            for i in range(self.num_jumps + 1):
                 trigger_frame = i * self.move_delay + self.delay
                 if trigger_frame not in MyWindow.frame_trigger_list:
                     MyWindow.frame_trigger_list.add(trigger_frame)
