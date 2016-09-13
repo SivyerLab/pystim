@@ -69,7 +69,8 @@
 
 <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">Script for setting the gamma correction table for psychopy. Steps through</span>
-<span class="sd">luminosity intervals while user records values, then prompts for table. Table is</span>
+<span class="sd">luminosity intervals while user records values, then prompts for table.</span>
+<span class="sd">Can skip the luminosity stepping and go straight to table. Table is</span>
 <span class="sd">text file, with newline separated values, and each color (in RGB order)</span>
 <span class="sd">separated by 2 new lines.</span>
 
@@ -93,27 +94,43 @@
 <span class="sd">    0.24</span>
 <span class="sd">    0.25</span>
 
-<span class="sd">Currently, in OSX, the calibrate button in the GUI is unable to invoke the</span>
-<span class="sd">script, but instead brings up a terminal window in the correct location,</span>
-<span class="sd">and the script can be started by entering (note .pyc, not .py)::</span>
+<span class="sd">The script can be invoked from the command line/terminal::</span>
 
-<span class="sd">    python GammaCorrection.pyc</span>
+<span class="sd">    python GammaCorrection.py</span>
+
+<span class="sd">Psychopy has built in gamma correction. This script provides an alternative</span>
+<span class="sd">to that due to difficulties using it with a second monitor on some platforms.</span>
+<span class="sd">See the psychopy documentation for information on using the built in gamma</span>
+<span class="sd">correction.</span>
 <span class="sd">&quot;&quot;&quot;</span>
 
-<span class="kn">from</span> <span class="nn">psychopy</span> <span class="kn">import</span> <span class="n">visual</span><span class="p">,</span> <span class="n">core</span><span class="p">,</span> <span class="n">event</span><span class="p">,</span> <span class="n">logging</span>
+<span class="kn">from</span> <span class="nn">psychopy</span> <span class="kn">import</span> <span class="n">visual</span><span class="p">,</span> <span class="n">core</span><span class="p">,</span> <span class="n">logging</span>
 <span class="kn">from</span> <span class="nn">psychopy.monitors</span> <span class="kn">import</span> <span class="n">Monitor</span>
 <span class="kn">from</span> <span class="nn">scipy</span> <span class="kn">import</span> <span class="n">stats</span><span class="p">,</span> <span class="n">interpolate</span><span class="p">,</span> <span class="n">array</span><span class="p">,</span> <span class="n">ndarray</span>
-<span class="c1"># import matplotlib.pyplot as plt</span>
 <span class="kn">import</span> <span class="nn">cPickle</span>
 <span class="kn">import</span> <span class="nn">os.path</span>
+<span class="kn">import</span> <span class="nn">numpy</span>
 <span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">import</span> <span class="nn">copy_reg</span><span class="o">,</span> <span class="nn">types</span>
+<span class="c1"># import matplotlib.pyplot as plt</span>
 
 <span class="c1"># suppress extra warnings</span>
 <span class="n">logging</span><span class="o">.</span><span class="n">console</span><span class="o">.</span><span class="n">setLevel</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">CRITICAL</span><span class="p">)</span>
 
+
+<span class="c1"># def reduce_method(m):</span>
+<span class="c1">#     &quot;&quot;&quot;</span>
+<span class="c1">#     Method to allow pickling</span>
+<span class="c1">#     &quot;&quot;&quot;</span>
+<span class="c1">#     return (getattr, (m.__self__, m.__func__.__name__))</span>
+<span class="c1">#</span>
+<span class="c1"># copy_reg.pickle(types.MethodType, reduce_method)</span>
+
+
 <div class="viewcode-block" id="gammaCorrect"><a class="viewcode-back" href="../GammaCorrection.html#GammaCorrection.gammaCorrect">[docs]</a><span class="k">def</span> <span class="nf">gammaCorrect</span><span class="p">():</span>
     <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Main function.</span>
+<span class="sd">    Prompts user for inputs. Generates evenly spaced RGB values in each gun</span>
+<span class="sd">    if user desires. Gets splines and prompts for saving.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">prompt</span> <span class="o">=</span> <span class="bp">True</span>
 
@@ -228,16 +245,17 @@
     <span class="c1">#     corrected[1].append(rgb[1])</span>
     <span class="c1">#     corrected[2].append(rgb[2])</span>
     <span class="c1">#</span>
-    <span class="c1"># plt.plot(vals, vals, &#39;k--&#39;, label=&#39;linear&#39;)</span>
-    <span class="c1"># plt.plot(vals, corrected[0], &#39;r&#39;, label=&#39;red&#39;)</span>
-    <span class="c1"># plt.plot(vals, corrected[1], &#39;g&#39;, label=&#39;green&#39;)</span>
-    <span class="c1"># plt.plot(vals, corrected[2], &#39;b&#39;, label=&#39;blue&#39;)</span>
-    <span class="c1"># plt.legend(loc=0)</span>
-    <span class="c1"># plt.show()</span>
+    <span class="c1"># if show_plot == &#39;Y&#39;:</span>
+    <span class="c1">#     plt.plot(vals, vals, &#39;k--&#39;, label=&#39;linear&#39;)</span>
+    <span class="c1">#     plt.plot(vals, corrected[0], &#39;r&#39;, label=&#39;red&#39;)</span>
+    <span class="c1">#     plt.plot(vals, corrected[1], &#39;g&#39;, label=&#39;green&#39;)</span>
+    <span class="c1">#     plt.plot(vals, corrected[2], &#39;b&#39;, label=&#39;blue&#39;)</span>
+    <span class="c1">#     plt.legend(loc=0)</span>
+    <span class="c1">#     plt.show()</span>
 
     <span class="n">should_save</span> <span class="o">=</span> <span class="nb">raw_input</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">Save? Y, N: &#39;</span><span class="p">)</span>
 
-    <span class="n">gamma_file</span> <span class="o">=</span> <span class="s1">&#39;./psychopy/gammaTables.txt&#39;</span>
+    <span class="n">gamma_file</span> <span class="o">=</span> <span class="s1">&#39;./psychopy/data/gammaTables.txt&#39;</span>
 
     <span class="k">if</span> <span class="n">should_save</span> <span class="o">==</span> <span class="s1">&#39;Y&#39;</span><span class="p">:</span>
         <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">gamma_file</span><span class="p">):</span>
@@ -332,23 +350,48 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">r_spline</span> <span class="o">=</span> <span class="n">r</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">r_slope</span> <span class="o">=</span> <span class="n">r</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">r_int</span> <span class="o">=</span> <span class="n">r</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
+
         <span class="bp">self</span><span class="o">.</span><span class="n">g_spline</span> <span class="o">=</span> <span class="n">g</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">g_slope</span> <span class="o">=</span> <span class="n">g</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">g_int</span> <span class="o">=</span> <span class="n">g</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
+
         <span class="bp">self</span><span class="o">.</span><span class="n">b_spline</span> <span class="o">=</span> <span class="n">b</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">b_slope</span> <span class="o">=</span> <span class="n">b</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">b_int</span> <span class="o">=</span> <span class="n">b</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
 
-    <span class="k">def</span> <span class="nf">gamma_correct</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="GammaValues.r_correct"><a class="viewcode-back" href="../GammaCorrection.html#GammaCorrection.GammaValues.r_correct">[docs]</a>    <span class="k">def</span> <span class="nf">r_correct</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">r</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Function to gamma correct an array</span>
+<span class="sd">        Method to gamma correct red channel.</span>
 
-<span class="sd">        :return:</span>
+<span class="sd">        :return: corrected red color</span>
 <span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">r_adj</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">r_spline</span><span class="p">(</span><span class="n">r</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">r_slope</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">r_int</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">r_adj</span></div>
 
-    <span class="k">def</span> <span class="nf">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">color</span><span class="p">,</span> <span class="n">channel</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+<div class="viewcode-block" id="GammaValues.g_correct"><a class="viewcode-back" href="../GammaCorrection.html#GammaCorrection.GammaValues.g_correct">[docs]</a>    <span class="k">def</span> <span class="nf">g_correct</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">g</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Calculates adjusted color value.</span>
+<span class="sd">        Method to gamma correct green channel.</span>
+
+<span class="sd">        :return: corrected green color</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># print g</span>
+        <span class="c1"># print type(g)</span>
+        <span class="n">g_adj</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">g_spline</span><span class="p">(</span><span class="n">g</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">g_slope</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">g_int</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">g_adj</span></div>
+
+<div class="viewcode-block" id="GammaValues.b_correct"><a class="viewcode-back" href="../GammaCorrection.html#GammaCorrection.GammaValues.b_correct">[docs]</a>    <span class="k">def</span> <span class="nf">b_correct</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">b</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Method to gamma correct blue channel.</span>
+
+<span class="sd">        :return: corrected blue color</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">b_adj</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">b_spline</span><span class="p">(</span><span class="n">b</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">b_slope</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">b_int</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">b_adj</span></div>
+
+<div class="viewcode-block" id="GammaValues.__call__"><a class="viewcode-back" href="../GammaCorrection.html#GammaCorrection.GammaValues.__call__">[docs]</a>    <span class="k">def</span> <span class="nf">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">color</span><span class="p">,</span> <span class="n">channel</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Calculates adjusted color value. Allows getting corrected values by</span>
+<span class="sd">        making calls to instance.</span>
 
 <span class="sd">        :param list color: List of RGB values, scaled from -1 to 1, or color</span>
 <span class="sd">         from a single channel.</span>
@@ -357,43 +400,124 @@
 <span class="sd">        :return: Adjusted list of RGB values, or single adjusted color.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">channel</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
-            <span class="c1"># ignore alpha</span>
-            <span class="n">r</span> <span class="o">=</span> <span class="n">color</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-            <span class="n">g</span> <span class="o">=</span> <span class="n">color</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
-            <span class="n">b</span> <span class="o">=</span> <span class="n">color</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
+            <span class="c1"># if entire texture</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">numpy</span><span class="o">.</span><span class="n">shape</span><span class="p">(</span><span class="n">color</span><span class="p">))</span> <span class="o">==</span> <span class="mi">3</span><span class="p">:</span>
+                <span class="n">has_alpha</span> <span class="o">=</span> <span class="nb">bool</span><span class="p">(</span><span class="n">numpy</span><span class="o">.</span><span class="n">shape</span><span class="p">(</span><span class="n">color</span><span class="p">)[</span><span class="mi">2</span><span class="p">]</span> <span class="o">==</span> <span class="mi">4</span><span class="p">)</span>
 
-            <span class="n">r_adj</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">r_spline</span><span class="p">(</span><span class="n">r</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">r_slope</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">r_int</span><span class="p">))</span>
-            <span class="n">g_adj</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">g_spline</span><span class="p">(</span><span class="n">g</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">g_slope</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">g_int</span><span class="p">))</span>
-            <span class="n">b_adj</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">b_spline</span><span class="p">(</span><span class="n">b</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">b_slope</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">b_int</span><span class="p">))</span>
+                <span class="n">adj_color</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">color</span><span class="p">)</span>
 
-            <span class="n">color</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">r_adj</span>
-            <span class="n">color</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">g_adj</span>
-            <span class="n">color</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="n">b_adj</span>
+                <span class="n">size_x</span> <span class="o">=</span> <span class="n">adj_color</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+                <span class="n">size_y</span> <span class="o">=</span> <span class="n">adj_color</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
 
-            <span class="c1"># add ceiling/floor</span>
-            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">color</span><span class="p">)):</span>
-                <span class="k">if</span> <span class="n">color</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">&gt;=</span> <span class="mi">1</span><span class="p">:</span>
-                     <span class="n">color</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.0</span>
-                <span class="k">elif</span> <span class="n">color</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span>
-                     <span class="n">color</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span><span class="mf">1.0</span>
+                <span class="k">if</span> <span class="n">has_alpha</span><span class="p">:</span>
+                    <span class="n">r</span><span class="p">,</span> <span class="n">g</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">a</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">dsplit</span><span class="p">(</span><span class="n">adj_color</span><span class="p">,</span> <span class="mi">4</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">r</span><span class="p">,</span> <span class="n">g</span><span class="p">,</span> <span class="n">b</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">dsplit</span><span class="p">(</span><span class="n">adj_color</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
 
+                <span class="n">r</span> <span class="o">=</span> <span class="n">r</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span>
+                <span class="n">g</span> <span class="o">=</span> <span class="n">g</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span>
+                <span class="n">b</span> <span class="o">=</span> <span class="n">b</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span>
+
+                <span class="c1"># print &#39;red correcting.....&#39;,</span>
+                <span class="n">r</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">r_correct</span><span class="p">(</span><span class="n">r</span><span class="p">)</span>
+                <span class="c1"># print &#39;done&#39;</span>
+                <span class="c1"># print &#39;green correcting...&#39;,</span>
+                <span class="n">g</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">g_correct</span><span class="p">(</span><span class="n">g</span><span class="p">)</span>
+                <span class="c1"># print &#39;done&#39;</span>
+                <span class="c1"># print &#39;blue correcting....&#39;,</span>
+                <span class="n">b</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">b_correct</span><span class="p">(</span><span class="n">b</span><span class="p">)</span>
+                <span class="c1"># print &#39;done\n&#39;</span>
+
+                <span class="n">r</span> <span class="o">=</span> <span class="n">r</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">size_x</span><span class="p">,</span> <span class="n">size_y</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+                <span class="n">g</span> <span class="o">=</span> <span class="n">g</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">size_x</span><span class="p">,</span> <span class="n">size_y</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+                <span class="n">b</span> <span class="o">=</span> <span class="n">b</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">size_x</span><span class="p">,</span> <span class="n">size_y</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+
+                <span class="k">if</span> <span class="n">has_alpha</span><span class="p">:</span>
+                    <span class="n">adj_color</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">dstack</span><span class="p">([</span><span class="n">r</span><span class="p">,</span><span class="n">g</span><span class="p">,</span><span class="n">b</span><span class="p">,</span><span class="n">a</span><span class="p">])</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">adj_color</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">dstack</span><span class="p">([</span><span class="n">r</span><span class="p">,</span><span class="n">g</span><span class="p">,</span><span class="n">b</span><span class="p">])</span>
+
+            <span class="c1"># if single color</span>
+            <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="n">numpy</span><span class="o">.</span><span class="n">shape</span><span class="p">(</span><span class="n">color</span><span class="p">))</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="c1"># ignore alpha</span>
+                <span class="n">r</span> <span class="o">=</span> <span class="n">color</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+                <span class="n">g</span> <span class="o">=</span> <span class="n">color</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+                <span class="n">b</span> <span class="o">=</span> <span class="n">color</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
+
+                <span class="c1"># print &#39;red correcting.....&#39;,</span>
+                <span class="n">r_adj</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">r_correct</span><span class="p">(</span><span class="n">r</span><span class="p">)</span>
+                <span class="c1"># print &#39;done&#39;</span>
+                <span class="c1"># print &#39;green correcting...&#39;,</span>
+                <span class="n">g_adj</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">g_correct</span><span class="p">(</span><span class="n">g</span><span class="p">)</span>
+                <span class="c1"># print &#39;done&#39;</span>
+                <span class="c1"># print &#39;blue correcting....&#39;,</span>
+                <span class="n">b_adj</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">b_correct</span><span class="p">(</span><span class="n">b</span><span class="p">)</span>
+                <span class="c1"># print &#39;done\n&#39;</span>
+
+                <span class="n">adj_color</span> <span class="o">=</span> <span class="n">color</span><span class="p">[:]</span>
+
+                <span class="n">adj_color</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">r_adj</span>
+                <span class="n">adj_color</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">g_adj</span>
+                <span class="n">adj_color</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="n">b_adj</span>
+
+                <span class="c1"># add ceiling/floor</span>
+                <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">color</span><span class="p">)):</span>
+                    <span class="k">if</span> <span class="n">adj_color</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">&gt;=</span> <span class="mi">1</span><span class="p">:</span>
+                         <span class="n">adj_color</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.0</span>
+                    <span class="k">elif</span> <span class="n">adj_color</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span>
+                         <span class="n">adj_color</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span><span class="mf">1.0</span>
+
+            <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="n">numpy</span><span class="o">.</span><span class="n">shape</span><span class="p">(</span><span class="n">color</span><span class="p">))</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
+
+                <span class="c1"># if grayscale image</span>
+                <span class="k">if</span> <span class="n">numpy</span><span class="o">.</span><span class="n">shape</span><span class="p">(</span><span class="n">color</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span> <span class="o">!=</span> <span class="mi">3</span><span class="p">:</span>
+                    <span class="k">print</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">WARNING: Cannot gamma correct grayscale .iml images.&#39;</span>
+                    <span class="n">adj_color</span> <span class="o">=</span> <span class="n">color</span>
+
+                <span class="c1"># if noise checkerboard</span>
+                <span class="k">elif</span> <span class="n">numpy</span><span class="o">.</span><span class="n">shape</span><span class="p">(</span><span class="n">color</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="mi">3</span><span class="p">:</span>
+                    <span class="n">r</span><span class="p">,</span> <span class="n">g</span><span class="p">,</span> <span class="n">b</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">hsplit</span><span class="p">(</span><span class="n">color</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
+
+                    <span class="n">r</span> <span class="o">=</span> <span class="n">r</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span>
+                    <span class="n">g</span> <span class="o">=</span> <span class="n">g</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span>
+                    <span class="n">b</span> <span class="o">=</span> <span class="n">b</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span>
+
+                    <span class="c1"># print &#39;red correcting.....&#39;,</span>
+                    <span class="n">r</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">r_correct</span><span class="p">(</span><span class="n">r</span><span class="p">)</span>
+                    <span class="c1"># print &#39;done&#39;</span>
+                    <span class="c1"># print &#39;green correcting...&#39;,</span>
+                    <span class="n">g</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">g_correct</span><span class="p">(</span><span class="n">g</span><span class="p">)</span>
+                    <span class="c1"># print &#39;done&#39;</span>
+                    <span class="c1"># print &#39;blue correcting....&#39;,</span>
+                    <span class="n">b</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">b_correct</span><span class="p">(</span><span class="n">b</span><span class="p">)</span>
+                    <span class="c1"># print &#39;done\n&#39;</span>
+
+                    <span class="n">adj_color</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">dstack</span><span class="p">([</span><span class="n">r</span><span class="p">,</span> <span class="n">g</span><span class="p">,</span> <span class="n">b</span><span class="p">])[</span><span class="mi">0</span><span class="p">]</span>
+
+        <span class="c1"># if single channel</span>
         <span class="k">elif</span> <span class="n">channel</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">channel</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
-                <span class="n">adj</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">r_spline</span><span class="p">(</span><span class="n">color</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">r_slope</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">r_int</span><span class="p">))</span>
+                <span class="c1"># print &#39;red correcting.....&#39;,</span>
+                <span class="n">adj</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">r_correct</span><span class="p">(</span><span class="n">color</span><span class="p">)</span>
+                <span class="c1"># print &#39;done&#39;</span>
             <span class="k">if</span> <span class="n">channel</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
-                <span class="n">adj</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">g_spline</span><span class="p">(</span><span class="n">color</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">g_slope</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">g_int</span><span class="p">))</span>
+                <span class="c1"># print &#39;green correcting...&#39;,</span>
+                <span class="n">adj</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">g_correct</span><span class="p">(</span><span class="n">color</span><span class="p">)</span>
+                <span class="c1"># print &#39;done&#39;</span>
             <span class="k">if</span> <span class="n">channel</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
-                <span class="n">adj</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">b_spline</span><span class="p">(</span><span class="n">color</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">b_slope</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">b_int</span><span class="p">))</span>
+                <span class="c1"># print &#39;blue correcting....&#39;,</span>
+                <span class="n">adj</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">b_correct</span><span class="p">(</span><span class="n">color</span><span class="p">)</span>
+                <span class="c1"># print &#39;done&#39;</span>
 
-            <span class="n">color</span> <span class="o">=</span> <span class="n">adj</span>
+            <span class="n">adj_color</span> <span class="o">=</span> <span class="n">adj</span>
 
             <span class="c1"># add ceiling/floor</span>
-            <span class="k">if</span> <span class="n">color</span> <span class="o">&gt;=</span> <span class="mi">1</span><span class="p">:</span>
-                <span class="n">color</span> <span class="o">=</span> <span class="mf">1.0</span>
-            <span class="k">elif</span> <span class="n">color</span> <span class="o">&lt;=</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span>
-                <span class="n">color</span> <span class="o">=</span> <span class="o">-</span><span class="mf">1.0</span>
+            <span class="k">if</span> <span class="n">adj_color</span> <span class="o">&gt;=</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="n">adj_color</span> <span class="o">=</span> <span class="mf">1.0</span>
+            <span class="k">elif</span> <span class="n">adj_color</span> <span class="o">&lt;=</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span>
+                <span class="n">adj_color</span> <span class="o">=</span> <span class="o">-</span><span class="mf">1.0</span>
 
-        <span class="k">return</span> <span class="n">color</span></div>
+        <span class="k">return</span> <span class="n">adj_color</span></div></div>
 
 <span class="k">if</span> <span class="n">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
     <span class="n">gammaCorrect</span><span class="p">()</span>
@@ -419,7 +543,6 @@
     </div>
     <div class="footer" role="contentinfo">
         &copy; Copyright 2016, Alexander Tomlinson.
-      Last updated on Feb 02, 2016.
       Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.3.5.
     </div>
   </body>

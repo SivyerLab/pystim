@@ -1,0 +1,198 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Table Stim &mdash; Stimulus Program 1.1 documentation</title>
+    
+    <link rel="stylesheet" href="_static/sphinxdoc.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '1.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="Stimulus Program 1.1 documentation" href="index.html" />
+    <link rel="up" title="StimProgram module" href="StimProgram.html" />
+    <link rel="next" title="Checkerboard Stim" href="BoardTexture.html" />
+    <link rel="prev" title="Randomly Moving Stim" href="RandomlyMovingStim.html" /> 
+  </head>
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="BoardTexture.html" title="Checkerboard Stim"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="RandomlyMovingStim.html" title="Randomly Moving Stim"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">Stimulus Program 1.1 documentation</a> &raquo;</li>
+          <li class="nav-item nav-item-1"><a href="StimProgram.html" accesskey="U">StimProgram module</a> &raquo;</li> 
+      </ul>
+    </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="RandomlyMovingStim.html"
+                        title="previous chapter">Randomly Moving Stim</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="BoardTexture.html"
+                        title="next chapter">Checkerboard Stim</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/TableStim.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="table-stim">
+<h1>Table Stim<a class="headerlink" href="#table-stim" title="Permalink to this headline">¶</a></h1>
+<dl class="class">
+<dt id="StimProgram.TableStim">
+<em class="property">class </em><code class="descclassname">StimProgram.</code><code class="descname">TableStim</code><span class="sig-paren">(</span><em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/StimProgram.html#TableStim"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#StimProgram.TableStim" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="MovingStim.html#StimProgram.MovingStim" title="StimProgram.MovingStim"><code class="xref py py-class docutils literal"><span class="pre">StimProgram.MovingStim</span></code></a></p>
+<p>Class where stim motion is determined by a table of radial coordinates.</p>
+<p>Table can be a text file with new line separated values, or an Igor file
+in binary wave/packed experiment format. First column is distance from
+center of window in micrometers, and second column either 0 or 1,
+for whether or not to trigger. Trigger will occur right before frame where
+indicated position is flipped. First and last coordinate will always
+trigger (if stim is set to trigger).</p>
+<p>For a binary wave file, values must be for coordinates, and triggering
+will only happen on first coordinate. For packed experiment files,
+leave wave names as &#8216;wave0&#8217; and &#8216;wave1&#8217;, where &#8216;wave0&#8217; is coordinates and
+&#8216;wave1&#8217; is whether or not to trigger.</p>
+<dl class="method">
+<dt id="StimProgram.TableStim.draw_times">
+<code class="descname">draw_times</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/StimProgram.html#TableStim.draw_times"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#StimProgram.TableStim.draw_times" title="Permalink to this definition">¶</a></dt>
+<dd><p>Determines during which frames stim should be drawn, based on desired
+delay and duration times. Overrides super method.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">last frame number as int</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="StimProgram.TableStim.gen_pos">
+<code class="descname">gen_pos</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/StimProgram.html#TableStim.gen_pos"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#StimProgram.TableStim.gen_pos" title="Permalink to this definition">¶</a></dt>
+<dd><p>Overrides super method. Calls gen_pos_array() and resets frame
+counter.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="StimProgram.TableStim.gen_pos_array">
+<code class="descname">gen_pos_array</code><span class="sig-paren">(</span><em>*args</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/StimProgram.html#TableStim.gen_pos_array"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#StimProgram.TableStim.gen_pos_array" title="Permalink to this definition">¶</a></dt>
+<dd><p>Creates 2 arrays for x, y coordinates of stims for each frame.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">the x, y coordinates of the stim for every frame as 2 arrays</p>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><ul class="first last simple">
+<li><strong>ImportError</strong> &#8211; if attempts to load from an Igor file without
+having the igor module.</li>
+<li><strong>IOError</strong> &#8211; raised if file contents not properly formatted.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="StimProgram.TableStim.get_next_pos">
+<code class="descname">get_next_pos</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/StimProgram.html#TableStim.get_next_pos"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#StimProgram.TableStim.get_next_pos" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the next coordinate from x, y_array for animate to set the
+position of the stim for the next frame.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">x, y coordinate as tuple</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="BoardTexture.html" title="Checkerboard Stim"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="RandomlyMovingStim.html" title="Randomly Moving Stim"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">Stimulus Program 1.1 documentation</a> &raquo;</li>
+          <li class="nav-item nav-item-1"><a href="StimProgram.html" >StimProgram module</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &copy; Copyright 2016, Alexander Tomlinson.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.3.5.
+    </div>
+  </body>
+</html>

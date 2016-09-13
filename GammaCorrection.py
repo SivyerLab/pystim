@@ -32,33 +32,40 @@ The script can be invoked from the command line/terminal::
     python GammaCorrection.py
 
 Psychopy has built in gamma correction. This script provides an alternative
-to that due to difficulties using it on some platforms. See the psychopy
-documentation for information on using that gamma correction.
+to that due to difficulties using it with a second monitor on some platforms.
+See the psychopy documentation for information on using the built in gamma
+correction.
 """
 
-from psychopy import visual, core, event, logging
-from psychopy.monitors import Monitor
+from psychopy import visual, core, logging
+# from psychopy.monitors import Monitor
 from scipy import stats, interpolate, array, ndarray
+# from multiprocessing import Process, Queue
+import ConfigParser
 import cPickle
 import os.path
 import numpy
-import sys
-import copy_reg, types
+# import sys
+# import copy_reg, types
 # import matplotlib.pyplot as plt
 
 # suppress extra warnings
 logging.console.setLevel(logging.CRITICAL)
 
 
-def reduce_method(m):
-    return (getattr, (m.__self__, m.__func__.__name__))
-
-copy_reg.pickle(types.MethodType, reduce_method)
+# def reduce_method(m):
+#     """
+#     Method to allow pickling
+#     """
+#     return (getattr, (m.__self__, m.__func__.__name__))
+#
+# copy_reg.pickle(types.MethodType, reduce_method)
 
 
 def gammaCorrect():
     """
-    Main function.
+    Prompts user for inputs. Generates evenly spaced RGB values in each gun
+    if user desires. Gets splines and prompts for saving.
     """
     prompt = True
 
@@ -183,7 +190,12 @@ def gammaCorrect():
 
     should_save = raw_input('\nSave? Y, N: ')
 
-    gamma_file = './psychopy/data/gammaTables.txt'
+    # save dir
+    config = ConfigParser.ConfigParser()
+    config.read(os.path.abspath('./psychopy/config.ini'))
+    data_dir = config.get('GUI', 'data_dir')
+    # gamma file
+    gamma_file = os.path.join(data_dir, 'gammaTables.txt')
 
     if should_save == 'Y':
         if os.path.exists(gamma_file):
@@ -287,16 +299,20 @@ class GammaValues(object):
         self.b_slope = b[1]
         self.b_int = b[2]
 
-    def r_correct(self, r):
+    def r_correct(self, r, q=None):
         """
         Method to gamma correct red channel.
 
         :return: corrected red color
         """
         r_adj = self.r_spline(r * self.r_slope + self.r_int)
-        return r_adj
 
-    def g_correct(self, g):
+        if q is None:
+            return r_adj
+        else:
+            q.put(r_adj)
+
+    def g_correct(self, g, q=None):
         """
         Method to gamma correct green channel.
 
@@ -305,20 +321,29 @@ class GammaValues(object):
         # print g
         # print type(g)
         g_adj = self.g_spline(g * self.g_slope + self.g_int)
-        return g_adj
 
-    def b_correct(self, b):
+        if q is None:
+            return g_adj
+        else:
+            q.put(g_adj)
+
+    def b_correct(self, b, q=None):
         """
         Method to gamma correct blue channel.
 
         :return: corrected blue color
         """
         b_adj = self.b_spline(b * self.b_slope + self.b_int)
-        return b_adj
+
+        if q is None:
+            return b_adj
+        else:
+            q.put(b_adj)
 
     def __call__(self, color, channel=None):
         """
-        Calculates adjusted color value.
+        Calculates adjusted color value. Allows getting corrected values by
+        making calls to instance.
 
         :param list color: List of RGB values, scaled from -1 to 1, or color
          from a single channel.
@@ -333,38 +358,53 @@ class GammaValues(object):
 
                 adj_color = numpy.copy(color)
 
-                size = adj_color.shape[0]
+                size_x = adj_color.shape[0]
+                size_y = adj_color.shape[1]
 
                 if has_alpha:
-                    r, g, b, a = numpy.split(adj_color, 4, axis=2)
+                    r, g, b, a = numpy.dsplit(adj_color, 4)
                 else:
-                    r, g, b = numpy.split(adj_color, 3, axis=2)
+                    r, g, b = numpy.dsplit(adj_color, 3)
 
                 r = r.flatten()
                 g = g.flatten()
                 b = b.flatten()
-                if has_alpha:
-                    a = a.flatten()
-
-                print 'red correcting.....',
+                # print 'red correcting.....',
                 r = self.r_correct(r)
-                print 'done'
-                print 'green correcting...',
+                # print 'done'
+                # print 'green correcting...',
                 g = self.g_correct(g)
-                print 'done'
-                print 'blue correcting....',
+                # print 'done'
+                # print 'blue correcting....',
                 b = self.b_correct(b)
-                print 'done\n'
+                # print 'done\n'
+
+                '''
+                q = Queue()
+                r_proc = Process(target=self.r_correct, args=(r, q))
+                r_proc.start()
+                g_proc = Process(target=self.g_correct, args=(g, q))
+                g_proc.start()
+                b_proc = Process(target=self.b_correct, args=(b, q))
+                b_proc.start()
+
+                r = q.get()
+                g = q.get()
+                b = q.get()
+
+                r_proc.join()
+                g_proc.join()
+                b_proc.join()
+                '''
+
+                r = r.reshape(size_x, size_y, 1)
+                g = g.reshape(size_x, size_y, 1)
+                b = b.reshape(size_x, size_y, 1)
 
                 if has_alpha:
-                    adj_color = numpy.dstack([numpy.split(r, size),
-                                              numpy.split(g, size),
-                                              numpy.split(b, size),
-                                              numpy.split(a, size)])
+                    adj_color = numpy.dstack([r,g,b,a])
                 else:
-                    adj_color = numpy.dstack([numpy.split(r, size),
-                                              numpy.split(g, size),
-                                              numpy.split(b, size)])
+                    adj_color = numpy.dstack([r,g,b])
 
             # if single color
             elif len(numpy.shape(color)) == 1:
@@ -373,15 +413,15 @@ class GammaValues(object):
                 g = color[1]
                 b = color[2]
 
-                print 'red correcting.....',
+                # print 'red correcting.....',
                 r_adj = self.r_correct(r)
-                print 'done'
-                print 'green correcting...',
+                # print 'done'
+                # print 'green correcting...',
                 g_adj = self.g_correct(g)
-                print 'done'
-                print 'blue correcting....',
+                # print 'done'
+                # print 'blue correcting....',
                 b_adj = self.b_correct(b)
-                print 'done\n'
+                # print 'done\n'
 
                 adj_color = color[:]
 
@@ -395,6 +435,33 @@ class GammaValues(object):
                          adj_color[i] = 1.0
                     elif adj_color[i] <= -1:
                          adj_color[i] = -1.0
+
+            elif len(numpy.shape(color)) == 2:
+
+                # if grayscale image
+                if numpy.shape(color)[1] != 3:
+                    print '\nWARNING: Cannot gamma correct grayscale .iml images.'
+                    adj_color = color
+
+                # if noise checkerboard
+                elif numpy.shape(color)[1] == 3:
+                    r, g, b = numpy.hsplit(color, 3)
+
+                    r = r.flatten()
+                    g = g.flatten()
+                    b = b.flatten()
+
+                    # print 'red correcting.....',
+                    r = self.r_correct(r)
+                    # print 'done'
+                    # print 'green correcting...',
+                    g = self.g_correct(g)
+                    # print 'done'
+                    # print 'blue correcting....',
+                    b = self.b_correct(b)
+                    # print 'done\n'
+
+                    adj_color = numpy.dstack([r, g, b])[0]
 
         # if single channel
         elif channel is not None:

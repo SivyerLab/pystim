@@ -25,8 +25,8 @@
     <script type="text/javascript" src="_static/doctools.js"></script>
     <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <link rel="top" title="Stimulus Program 1.1 documentation" href="index.html" />
-    <link rel="next" title="gui module" href="gui.html" />
-    <link rel="prev" title="Welcome to Stimulus Program’s documentation!" href="index.html" /> 
+    <link rel="next" title="Parameter Defaults" href="StimDefaults.html" />
+    <link rel="prev" title="License" href="LICENSE.html" /> 
   </head>
   <body role="document">
     <div class="related" role="navigation" aria-label="related navigation">
@@ -39,22 +39,31 @@
           <a href="py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
         <li class="right" >
-          <a href="gui.html" title="gui module"
+          <a href="StimDefaults.html" title="Parameter Defaults"
              accesskey="N">next</a> |</li>
         <li class="right" >
-          <a href="index.html" title="Welcome to Stimulus Program’s documentation!"
+          <a href="LICENSE.html" title="License"
              accesskey="P">previous</a> |</li>
         <li class="nav-item nav-item-0"><a href="index.html">Stimulus Program 1.1 documentation</a> &raquo;</li> 
       </ul>
     </div>
       <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
         <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">StimProgram module</a><ul>
+<li><a class="reference internal" href="#stim-types">Stim types</a></li>
+<li><a class="reference internal" href="#other">Other</a></li>
+</ul>
+</li>
+</ul>
+
   <h4>Previous topic</h4>
-  <p class="topless"><a href="index.html"
-                        title="previous chapter">Welcome to Stimulus Program&#8217;s documentation!</a></p>
+  <p class="topless"><a href="LICENSE.html"
+                        title="previous chapter">License</a></p>
   <h4>Next topic</h4>
-  <p class="topless"><a href="gui.html"
-                        title="next chapter">gui module</a></p>
+  <p class="topless"><a href="StimDefaults.html"
+                        title="next chapter">Parameter Defaults</a></p>
   <div role="note" aria-label="source link">
     <h3>This Page</h3>
     <ul class="this-page-menu">
@@ -83,653 +92,30 @@
         <div class="bodywrapper">
           <div class="body" role="main">
             
-  <div class="section" id="module-StimProgram">
-<span id="stimprogram-module"></span><h1>StimProgram module<a class="headerlink" href="#module-StimProgram" title="Permalink to this headline">¶</a></h1>
-<p>Program for presenting visual stimuli to patch clamped retinal neurons.</p>
-<dl class="class">
-<dt id="StimProgram.StimInfo">
-<em class="property">class </em><code class="descclassname">StimProgram.</code><code class="descname">StimInfo</code><span class="sig-paren">(</span><em>stim_type</em>, <em>parameters</em>, <em>number</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/StimProgram.html#StimInfo"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#StimProgram.StimInfo" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference external" href="https://docs.python.org/library/functions.html#object" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">object</span></code></a></p>
-<p>Class for storing type and parameters of a stim.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>stim_type</strong> (<a class="reference external" href="https://docs.python.org/library/string.html#module-string" title="(in Python v2.7)"><em>string</em></a>) &#8211; The move type of the stim, such as static,
-random, table, etc.</li>
-<li><strong>parameters</strong> (<a class="reference external" href="https://docs.python.org/library/stdtypes.html#dict" title="(in Python v2.7)"><em>dict</em></a>) &#8211; Dictionary of parameters passed from GUI.</li>
-<li><strong>number</strong> (<a class="reference external" href="https://docs.python.org/library/functions.html#int" title="(in Python v2.7)"><em>int</em></a>) &#8211; For order of stims.</li>
+  <div class="section" id="stimprogram-module">
+<h1>StimProgram module<a class="headerlink" href="#stimprogram-module" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="stim-types">
+<h2>Stim types<a class="headerlink" href="#stim-types" title="Permalink to this headline">¶</a></h2>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="StimDefaults.html">Parameter Defaults</a></li>
+<li class="toctree-l1"><a class="reference internal" href="StaticStim.html">Static Stim</a></li>
+<li class="toctree-l1"><a class="reference internal" href="MovingStim.html">Moving Stim</a></li>
+<li class="toctree-l1"><a class="reference internal" href="RandomlyMovingStim.html">Randomly Moving Stim</a></li>
+<li class="toctree-l1"><a class="reference internal" href="TableStim.html">Table Stim</a></li>
+<li class="toctree-l1"><a class="reference internal" href="BoardTexture.html">Checkerboard Stim</a></li>
 </ul>
-</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="class">
-<dt id="StimProgram.GlobalDefaultsMeta">
-<em class="property">class </em><code class="descclassname">StimProgram.</code><code class="descname">GlobalDefaultsMeta</code><a class="reference internal" href="_modules/StimProgram.html#GlobalDefaultsMeta"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#StimProgram.GlobalDefaultsMeta" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference external" href="https://docs.python.org/library/functions.html#type" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">type</span></code></a></p>
-<p>Metaclass to redefine get item for GlobalDefaults.</p>
-</dd></dl>
-
-<dl class="class">
-<dt id="StimProgram.GlobalDefaults">
-<em class="property">class </em><code class="descclassname">StimProgram.</code><code class="descname">GlobalDefaults</code><span class="sig-paren">(</span><em>frame_rate=None</em>, <em>pix_per_micron=None</em>, <em>scale=None</em>, <em>display_size=None</em>, <em>position=None</em>, <em>protocol_reps=None</em>, <em>background=None</em>, <em>fullscreen=None</em>, <em>screen_num=None</em>, <em>trigger_wait=None</em>, <em>log=None</em>, <em>gamma_correction=None</em>, <em>offset=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/StimProgram.html#GlobalDefaults"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#StimProgram.GlobalDefaults" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference external" href="https://docs.python.org/library/functions.html#object" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">object</span></code></a></p>
-<p>Class with global constants, such as window information. Uses dictionary
-to simulate &#8216;mutable static class variables&#8217; (need better, more pythonic,
-way to do this).</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>frame_rate</strong> (<a class="reference external" href="https://docs.python.org/library/functions.html#int" title="(in Python v2.7)"><em>int</em></a>) &#8211; Frame rate of monitor.</li>
-<li><strong>pix_per_micron</strong> (<a class="reference external" href="https://docs.python.org/library/functions.html#float" title="(in Python v2.7)"><em>float</em></a>) &#8211; Number of pixels per micron. Used for unit
-conversion.</li>
-<li><strong>scale</strong> (<a class="reference external" href="https://docs.python.org/library/functions.html#float" title="(in Python v2.7)"><em>float</em></a>) &#8211; The factor by which to scale the size of the stimuli.</li>
-<li><strong>display_size</strong> (<a class="reference external" href="https://docs.python.org/library/functions.html#float" title="(in Python v2.7)"><em>float</em></a>) &#8211; List of height and width of the monitor.</li>
-<li><strong>position</strong> (<a class="reference external" href="https://docs.python.org/library/functions.html#list" title="(in Python v2.7)"><em>list</em></a>) &#8211; List of xy coordinates of stim window location.</li>
-<li><strong>protocol_reps</strong> (<a class="reference external" href="https://docs.python.org/library/functions.html#int" title="(in Python v2.7)"><em>int</em></a>) &#8211; Number of repetitions to cycle through of all
-stims.</li>
-<li><strong>background</strong> (<a class="reference external" href="https://docs.python.org/library/functions.html#list" title="(in Python v2.7)"><em>list</em></a>) &#8211; RGB list of window background.</li>
-<li><strong>fullscreen</strong> (<a class="reference external" href="https://docs.python.org/library/functions.html#bool" title="(in Python v2.7)"><em>bool</em></a>) &#8211; Boolean, whether or not window should be fullscreen.</li>
-<li><strong>screen_num</strong> (<a class="reference external" href="https://docs.python.org/library/functions.html#int" title="(in Python v2.7)"><em>int</em></a>) &#8211; On which monitor to display the window.</li>
-<li><strong>gamma_correction</strong> (<a class="reference external" href="https://docs.python.org/library/string.html#module-string" title="(in Python v2.7)"><em>string</em></a>) &#8211; Spline to use for gamma correction. See
-:doc:&#8217;GammaCorrection&#8217; documentation.</li>
-<li><strong>trigger_wait</strong> (<a class="reference external" href="https://docs.python.org/library/functions.html#float" title="(in Python v2.7)"><em>float</em></a>) &#8211; The wait time between the labjack sending a
-pulse and the start of the stims.</li>
-<li><strong>log</strong> (<a class="reference external" href="https://docs.python.org/library/functions.html#bool" title="(in Python v2.7)"><em>bool</em></a>) &#8211; Whether or not to write to a log file.</li>
-<li><strong>offset</strong> (<a class="reference external" href="https://docs.python.org/library/functions.html#list" title="(in Python v2.7)"><em>list</em></a>) &#8211; List of microns in xy coordinates of how much to
-offset the center of the window.</li>
+</div>
+</div>
+<div class="section" id="other">
+<h2>Other<a class="headerlink" href="#other" title="Permalink to this headline">¶</a></h2>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="StimProgramOther.html">Other classes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="StimProgramOtherMethods.html">Other functions</a></li>
 </ul>
-</td>
-</tr>
-</tbody>
-</table>
-<dl class="attribute">
-<dt id="StimProgram.GlobalDefaults.defaults">
-<code class="descname">defaults</code><em class="property"> = {'fullscreen': False, 'protocol_reps': 1, 'scale': 1, 'log': False, 'display_size': [400, 400], 'background': [-1, 0, -1], 'trigger_wait': 0.1, 'frame_rate': 75, 'offset': [0, 0], 'position': [0, 0], 'gamma_correction': 'default', 'pix_per_micron': 1, 'screen_num': 1}</em><a class="headerlink" href="#StimProgram.GlobalDefaults.defaults" title="Permalink to this definition">¶</a></dt>
-<dd><p>Dictionary of default defaults.</p>
-</dd></dl>
-
-</dd></dl>
-
-<dl class="class">
-<dt id="StimProgram.MyWindow">
-<em class="property">class </em><code class="descclassname">StimProgram.</code><code class="descname">MyWindow</code><a class="reference internal" href="_modules/StimProgram.html#MyWindow"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#StimProgram.MyWindow" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference external" href="https://docs.python.org/library/functions.html#object" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">object</span></code></a></p>
-<p>Class with static methods for window management and triggering.</p>
-<dl class="attribute">
-<dt id="StimProgram.MyWindow.win">
-<code class="descname">win</code><em class="property"> = None</em><a class="headerlink" href="#StimProgram.MyWindow.win" title="Permalink to this definition">¶</a></dt>
-<dd><p>Psychopy window instance.</p>
-</dd></dl>
-
-<dl class="attribute">
-<dt id="StimProgram.MyWindow.gamma_mon">
-<code class="descname">gamma_mon</code><em class="property"> = None</em><a class="headerlink" href="#StimProgram.MyWindow.gamma_mon" title="Permalink to this definition">¶</a></dt>
-<dd><p>Gamma correction instance. See GammaCorrection.py.</p>
-</dd></dl>
-
-<dl class="attribute">
-<dt id="StimProgram.MyWindow.should_break">
-<code class="descname">should_break</code><em class="property"> = False</em><a class="headerlink" href="#StimProgram.MyWindow.should_break" title="Permalink to this definition">¶</a></dt>
-<dd><p>Used to break out of animation loop in main().</p>
-</dd></dl>
-
-<dl class="attribute">
-<dt id="StimProgram.MyWindow.d">
-<code class="descname">d</code><em class="property"> = None</em><a class="headerlink" href="#StimProgram.MyWindow.d" title="Permalink to this definition">¶</a></dt>
-<dd><p>Labjack U3 instance for triggering.</p>
-</dd></dl>
-
-<dl class="staticmethod">
-<dt id="StimProgram.MyWindow.make_win">
-<em class="property">static </em><code class="descname">make_win</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/StimProgram.html#MyWindow.make_win"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#StimProgram.MyWindow.make_win" title="Permalink to this definition">¶</a></dt>
-<dd><p>Static method to create window from global parameters. Checks if
-gamma correction splines are present. Also instantiates labjack if
-present.</p>
-</dd></dl>
-
-<dl class="staticmethod">
-<dt id="StimProgram.MyWindow.close_win">
-<em class="property">static </em><code class="descname">close_win</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/StimProgram.html#MyWindow.close_win"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#StimProgram.MyWindow.close_win" title="Permalink to this definition">¶</a></dt>
-<dd><p>Static method to close window.</p>
-</dd></dl>
-
-<dl class="staticmethod">
-<dt id="StimProgram.MyWindow.send_trigger">
-<em class="property">static </em><code class="descname">send_trigger</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/StimProgram.html#MyWindow.send_trigger"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#StimProgram.MyWindow.send_trigger" title="Permalink to this definition">¶</a></dt>
-<dd><p>Triggers recording device by sending short voltage spike from LabJack
-U3-HV. Spike last approximately 0.4 ms. Ensure high enough sampling
-rate to reliably detect triggers.</p>
-</dd></dl>
-
-</dd></dl>
-
-<dl class="class">
-<dt id="StimProgram.StimDefaults">
-<em class="property">class </em><code class="descclassname">StimProgram.</code><code class="descname">StimDefaults</code><span class="sig-paren">(</span><em>shape='circle'</em>, <em>fill_mode='uniform'</em>, <em>orientation=0</em>, <em>size=None</em>, <em>outer_diameter=75</em>, <em>inner_diameter=40</em>, <em>check_size=None</em>, <em>num_check=64</em>, <em>delay=0</em>, <em>duration=0.5</em>, <em>location=None</em>, <em>timing='step'</em>, <em>intensity=1</em>, <em>alpha=1</em>, <em>color=None</em>, <em>color_mode='intensity'</em>, <em>fill_seed=1</em>, <em>move_seed=1</em>, <em>speed=10</em>, <em>num_dirs=4</em>, <em>start_dir=0</em>, <em>start_radius=300</em>, <em>travel_distance=50</em>, <em>phase_mod=False</em>, <em>sf=1</em>, <em>phase=None</em>, <em>contrast_channel='Green'</em>, <em>movie_filename=None</em>, <em>movie_size=None</em>, <em>period_mod=1</em>, <em>image_size=None</em>, <em>image_filename=None</em>, <em>table_filename=None</em>, <em>trigger=False</em>, <em>move_delay=0</em>, <em>num_jumps=5</em>, <em>jump_delay=100</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/StimProgram.html#StimDefaults"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#StimProgram.StimDefaults" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference external" href="https://docs.python.org/library/functions.html#object" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">object</span></code></a></p>
-<p>Super class to hold parameter defaults. GUI passes dictionary of all
-parameters, whether used to make stim or not.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>shape</strong> (<a class="reference external" href="https://docs.python.org/library/string.html#module-string" title="(in Python v2.7)"><em>string</em></a>) &#8211; Shape of the stim, &#8216;circle&#8217;, &#8216;rectangle, or &#8216;annulus&#8217;.</li>
-<li><strong>fill_mode</strong> (<a class="reference external" href="https://docs.python.org/library/string.html#module-string" title="(in Python v2.7)"><em>string</em></a>) &#8211; How the stim is filled. Can be &#8216;uniform&#8217;,
-&#8216;sine&#8217;, &#8216;square&#8217;, &#8216;concentric&#8217;, &#8216;checkerboard&#8217;, &#8216;random&#8217;, &#8216;image&#8217;,
-or &#8216;movie&#8217;.</li>
-<li><strong>orientation</strong> (<a class="reference external" href="https://docs.python.org/library/functions.html#float" title="(in Python v2.7)"><em>float</em></a>) &#8211; Orientation of the stim, in degrees.</li>
-<li><strong>size</strong> (<a class="reference external" href="https://docs.python.org/library/functions.html#list" title="(in Python v2.7)"><em>list</em></a>) &#8211; Size of the stim, as an x, y list.</li>
-<li><strong>outer_diameter</strong> (<a class="reference external" href="https://docs.python.org/library/functions.html#float" title="(in Python v2.7)"><em>float</em></a>) &#8211; Size of circle, or outer diameter of
-annulus, in micrometers.</li>
-<li><strong>inner_diameter</strong> (<a class="reference external" href="https://docs.python.org/library/functions.html#float" title="(in Python v2.7)"><em>float</em></a>) &#8211; Inner diameter of annulus, in micrometers.</li>
-<li><strong>check_size</strong> (<a class="reference external" href="https://docs.python.org/library/functions.html#list" title="(in Python v2.7)"><em>list</em></a>) &#8211; Size of each check in a checkerboard or randomly
-filled board, as an x, y list in micrometers.</li>
-<li><strong>num_check</strong> (<a class="reference external" href="https://docs.python.org/library/functions.html#int" title="(in Python v2.7)"><em>int</em></a>) &#8211; The number of checks in each direction.</li>
-<li><strong>delay</strong> (<a class="reference external" href="https://docs.python.org/library/functions.html#float" title="(in Python v2.7)"><em>float</em></a>) &#8211; The time to between the first frame and the stim
-appearing on screen. Rounds up to the nearest frame.</li>
-<li><strong>duration</strong> (<a class="reference external" href="https://docs.python.org/library/functions.html#float" title="(in Python v2.7)"><em>float</em></a>) &#8211; The duration for which the stim will animated.
-Rounds up to the nearest frame.</li>
-<li><strong>location</strong> (<a class="reference external" href="https://docs.python.org/library/functions.html#list" title="(in Python v2.7)"><em>list</em></a>) &#8211; Coordinates of the stim, as an x, y list.</li>
-<li><strong>timing</strong> (<a class="reference external" href="https://docs.python.org/library/string.html#module-string" title="(in Python v2.7)"><em>string</em></a>) &#8211; How the stim appears on screen over time. For
-&#8216;step&#8217;, the stim appears immediately. Other options include &#8216;sine&#8217;,
-&#8216;sawtooth&#8217;, &#8216;square&#8217;, and &#8216;linear&#8217;.</li>
-<li><strong>period_mod</strong> (<a class="reference external" href="https://docs.python.org/library/functions.html#float" title="(in Python v2.7)"><em>float</em></a>) &#8211; For cyclic timing modes, the number of cycles.</li>
-<li><strong>alpha</strong> (<a class="reference external" href="https://docs.python.org/library/functions.html#float" title="(in Python v2.7)"><em>float</em></a>) &#8211; The transparency of the of the stim, between 0 and 1.
-Does not apply to checkerboard or random fill stims, or images and movies.</li>
-<li><strong>color_mode</strong> (<a class="reference external" href="https://docs.python.org/library/string.html#module-string" title="(in Python v2.7)"><em>string</em></a>) &#8211; The way in which the color of the stim is
-determined. Can be either &#8216;intensity&#8217;, or &#8216;rgb&#8217;.</li>
-<li><strong>contrast_channel</strong> (<a class="reference external" href="https://docs.python.org/library/string.html#module-string" title="(in Python v2.7)"><em>string</em></a>) &#8211; The color channel in which color is
-displayed in intensity mode. For the RGB color mode, contrast channel is
-only used if a fill other than uniform is specified.</li>
-<li><strong>intensity</strong> (<a class="reference external" href="https://docs.python.org/library/functions.html#float" title="(in Python v2.7)"><em>float</em></a>) &#8211; The color of the stim relative to background,
-between -1 and 1. For  fills, the color will fluctuate between high and
-low values of the  specified intensity relative to background, and thus
-background values on either extreme must use low intensities or risk
-hitting the color ceiling/floor of the monitor.</li>
-<li><strong>color</strong> (<a class="reference external" href="https://docs.python.org/library/functions.html#list" title="(in Python v2.7)"><em>list</em></a>) &#8211; RGB color values of the stim, as a list of 3 values
-between -1 and 1.</li>
-<li><strong>fill_seed</strong> (<a class="reference external" href="https://docs.python.org/library/functions.html#float" title="(in Python v2.7)"><em>float</em></a>) &#8211; The seed for the random number generator for
-random fills.</li>
-<li><strong>move_seed</strong> (<a class="reference external" href="https://docs.python.org/library/functions.html#float" title="(in Python v2.7)"><em>float</em></a>) &#8211; The seed for the random number generator for
-random movement.</li>
-<li><strong>speed</strong> (<a class="reference external" href="https://docs.python.org/library/functions.html#float" title="(in Python v2.7)"><em>float</em></a>) &#8211; The speed of moving stims, in micrometers per second.</li>
-<li><strong>num_dirs</strong> (<a class="reference external" href="https://docs.python.org/library/functions.html#int" title="(in Python v2.7)"><em>int</em></a>) &#8211; The number of directions radially moving stims will
-travel in.</li>
-<li><strong>start_dir</strong> (<a class="reference external" href="https://docs.python.org/library/functions.html#float" title="(in Python v2.7)"><em>float</em></a>) &#8211; The start direction for radially moving stims.</li>
-<li><strong>start_radius</strong> (<a class="reference external" href="https://docs.python.org/library/functions.html#float" title="(in Python v2.7)"><em>float</em></a>) &#8211; The start radius for radially moving stims.</li>
-<li><strong>move_delay</strong> (<a class="reference external" href="https://docs.python.org/library/functions.html#float" title="(in Python v2.7)"><em>float</em></a>) &#8211; The amount of wait time between each move
-direction.</li>
-<li><strong>travel_distance</strong> (<a class="reference external" href="https://docs.python.org/library/functions.html#float" title="(in Python v2.7)"><em>float</em></a>) &#8211; The distance that randomly moving stims
-will travel before choosing a new direction.</li>
-<li><strong>sf</strong> (<a class="reference external" href="https://docs.python.org/library/functions.html#float" title="(in Python v2.7)"><em>float</em></a>) &#8211; The spatial frequency of a stim texture.</li>
-<li><strong>phase</strong> (<a class="reference external" href="https://docs.python.org/library/functions.html#list" title="(in Python v2.7)"><em>list</em></a>) &#8211; The offset of texture in the stim. Units are in
-cycles, so integer phases will result in no discernible change.</li>
-<li><strong>movie_filename</strong> (<a class="reference external" href="https://docs.python.org/library/string.html#module-string" title="(in Python v2.7)"><em>string</em></a>) &#8211; File path of the movie to be displayed.</li>
-<li><strong>movie_size</strong> (<a class="reference external" href="https://docs.python.org/library/functions.html#list" title="(in Python v2.7)"><em>list</em></a>) &#8211; Size of the movie, as an x, y list, in micrometers.
-Keep aspect ratio or movie will be distorted.</li>
-<li><strong>image_filename</strong> (<a class="reference external" href="https://docs.python.org/library/string.html#module-string" title="(in Python v2.7)"><em>string</em></a>) &#8211; File path of the image to be displayed.</li>
-<li><strong>image_size</strong> (<a class="reference external" href="https://docs.python.org/library/functions.html#list" title="(in Python v2.7)"><em>list</em></a>) &#8211; Size of the image, as an x, y list, in micrometers.
-Keep aspect ratio or movie will be distorted.</li>
-<li><strong>table_filename</strong> (<a class="reference external" href="https://docs.python.org/library/string.html#module-string" title="(in Python v2.7)"><em>string</em></a>) &#8211; File path of the table to be used for
-coordinates.</li>
-<li><strong>trigger</strong> (<a class="reference external" href="https://docs.python.org/library/functions.html#bool" title="(in Python v2.7)"><em>bool</em></a>) &#8211; Whether or not to send a trigger for the stim.</li>
-<li><strong>num_jumps</strong> (<a class="reference external" href="https://docs.python.org/library/functions.html#int" title="(in Python v2.7)"><em>int</em></a>) &#8211; </li>
-<li><strong>jump_delay</strong> (<a class="reference external" href="https://docs.python.org/library/functions.html#float" title="(in Python v2.7)"><em>float</em></a>) &#8211; </li>
-</ul>
-</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="class">
-<dt id="StimProgram.StaticStim">
-<em class="property">class </em><code class="descclassname">StimProgram.</code><code class="descname">StaticStim</code><span class="sig-paren">(</span><em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/StimProgram.html#StaticStim"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#StimProgram.StaticStim" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#StimProgram.StimDefaults" title="StimProgram.StimDefaults"><code class="xref py py-class docutils literal"><span class="pre">StimProgram.StimDefaults</span></code></a></p>
-<p>Class for generic non moving stims. Super class for other stim
-types. Stim object instantiated in make_stim(), and drawn with calls to
-animate().</p>
-<dl class="method">
-<dt id="StimProgram.StaticStim.make_stim">
-<code class="descname">make_stim</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/StimProgram.html#StaticStim.make_stim"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#StimProgram.StaticStim.make_stim" title="Permalink to this definition">¶</a></dt>
-<dd><p>Creates instance of psychopy stim object.</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="StimProgram.StaticStim.draw_times">
-<code class="descname">draw_times</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/StimProgram.html#StaticStim.draw_times"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#StimProgram.StaticStim.draw_times" title="Permalink to this definition">¶</a></dt>
-<dd><p>Determines during which frames stim should be drawn, based on desired
-delay and duration times.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">last frame number as int</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
-<dt id="StimProgram.StaticStim.animate">
-<code class="descname">animate</code><span class="sig-paren">(</span><em>frame</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/StimProgram.html#StaticStim.animate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#StimProgram.StaticStim.animate" title="Permalink to this definition">¶</a></dt>
-<dd><p>Method for drawing stim objects to back buffer. Checks if object
-should be drawn. Back buffer is brought to front with calls to flip()
-on the window. Sends trigger at beginning of animation.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>frame</strong> &#8211; current frame number</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
-<dt id="StimProgram.StaticStim.gen_rgb">
-<code class="descname">gen_rgb</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/StimProgram.html#StaticStim.gen_rgb"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#StimProgram.StaticStim.gen_rgb" title="Permalink to this definition">¶</a></dt>
-<dd><p>Depending on color mode, calculates necessary values. Texture color is
-either relative to background by specifying intensity in a certain
-channel, or passed as RGB values by the user.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">tuple of high, low, delta, and background</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
-<dt id="StimProgram.StaticStim.gen_size">
-<code class="descname">gen_size</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/StimProgram.html#StaticStim.gen_size"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#StimProgram.StaticStim.gen_size" title="Permalink to this definition">¶</a></dt>
-<dd><p>Calculates sizes of various sims.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">size of stim, as float for circles/annuli and height width
-tuple for other shapes</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
-<dt id="StimProgram.StaticStim.gen_mask">
-<code class="descname">gen_mask</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/StimProgram.html#StaticStim.gen_mask"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#StimProgram.StaticStim.gen_mask" title="Permalink to this definition">¶</a></dt>
-<dd><p>Determines the mask of the stim object. The mask determines the shape of
-the stim. See psychopy documentation for more details.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">mask of the stim object, as a string</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
-<dt id="StimProgram.StaticStim.gen_texture">
-<code class="descname">gen_texture</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/StimProgram.html#StaticStim.gen_texture"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#StimProgram.StaticStim.gen_texture" title="Permalink to this definition">¶</a></dt>
-<dd><p>Generates texture for stim object. Textures are 3D numpy arrays (
-size*size*4). The 3rd dimension is RGB and Alpha (transparency)
-values.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">texture as numpy array</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
-<dt id="StimProgram.StaticStim.gen_timing">
-<code class="descname">gen_timing</code><span class="sig-paren">(</span><em>frame</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/StimProgram.html#StaticStim.gen_timing"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#StimProgram.StaticStim.gen_timing" title="Permalink to this definition">¶</a></dt>
-<dd><p>Adjusts alpha values of stims based on desired timing (i.e. as a
-function of current frame over draw time). Recalculated on every call to
-animate()</p>
-<p>TODO: precompute values</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>frame</strong> &#8211; current frame number</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">list of rgb values as floats</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
-<dt id="StimProgram.StaticStim.set_rgb">
-<code class="descname">set_rgb</code><span class="sig-paren">(</span><em>rgb</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/StimProgram.html#StaticStim.set_rgb"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#StimProgram.StaticStim.set_rgb" title="Permalink to this definition">¶</a></dt>
-<dd><p>Color setter.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>rgb</strong> &#8211; tuple or list of rgb values</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-</dd></dl>
-
-<dl class="class">
-<dt id="StimProgram.MovingStim">
-<em class="property">class </em><code class="descclassname">StimProgram.</code><code class="descname">MovingStim</code><span class="sig-paren">(</span><em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/StimProgram.html#MovingStim"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#StimProgram.MovingStim" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#StimProgram.StaticStim" title="StimProgram.StaticStim"><code class="xref py py-class docutils literal"><span class="pre">StimProgram.StaticStim</span></code></a></p>
-<p>Class for stims moving radially inwards. Overrides several classes.</p>
-<dl class="method">
-<dt id="StimProgram.MovingStim.draw_times">
-<code class="descname">draw_times</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/StimProgram.html#MovingStim.draw_times"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#StimProgram.MovingStim.draw_times" title="Permalink to this definition">¶</a></dt>
-<dd><p>Determines during which frames stim should be drawn, based on desired
-delay and duration times. Overrides super method.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">last frame number as int</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
-<dt id="StimProgram.MovingStim.animate">
-<code class="descname">animate</code><span class="sig-paren">(</span><em>frame</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/StimProgram.html#MovingStim.animate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#StimProgram.MovingStim.animate" title="Permalink to this definition">¶</a></dt>
-<dd><p>Method for animating moving stims. Moves stims appropriately,
-then makes call to animate of super. Sends trigger on each
-recalculation of movements.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>frame</strong> &#8211; current frame number</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
-<dt id="StimProgram.MovingStim.gen_phase">
-<code class="descname">gen_phase</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/StimProgram.html#MovingStim.gen_phase"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#StimProgram.MovingStim.gen_phase" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="StimProgram.MovingStim.gen_pos">
-<code class="descname">gen_pos</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/StimProgram.html#MovingStim.gen_pos"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#StimProgram.MovingStim.gen_pos" title="Permalink to this definition">¶</a></dt>
-<dd><p>Makes calls to gen_start_pos() and gen_pos_array() with proper
-variables to get new array of position coordinates.</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="StimProgram.MovingStim.gen_start_pos">
-<code class="descname">gen_start_pos</code><span class="sig-paren">(</span><em>direction</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/StimProgram.html#MovingStim.gen_start_pos"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#StimProgram.MovingStim.gen_start_pos" title="Permalink to this definition">¶</a></dt>
-<dd><p>Calculates starting position in x, y coordinates on the starting
-radius based on travel direction.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>direction</strong> &#8211; starting position on border of frame based on travel</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">starting position on border of frame based on travel angle
-origin</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
-<dt id="StimProgram.MovingStim.gen_pos_array">
-<code class="descname">gen_pos_array</code><span class="sig-paren">(</span><em>start_x</em>, <em>start_y</em>, <em>num_frames</em>, <em>angle</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/StimProgram.html#MovingStim.gen_pos_array"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#StimProgram.MovingStim.gen_pos_array" title="Permalink to this definition">¶</a></dt>
-<dd><p>Creates 2 arrays for x, y coordinates of stims for each frame.</p>
-<p>Adapted from code By David L. Morton, used under MIT License. Source:
-<a class="reference external" href="https://code.google.com/p/computational-neuroscience/source/browse/trunk/projects/electrophysiology/stimuli/randomly_moving_checkerboard_search.py/#40">https://code.google.com/p/computational-neuroscience/source/browse/trunk/projects/electrophysiology/stimuli/randomly_moving_checkerboard_search.py/#40</a></p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>start_x</strong> &#8211; starting x coordinate</li>
-<li><strong>start_y</strong> &#8211; starting y coordinate</li>
-<li><strong>num_frames</strong> &#8211; number of frames stim will travel for</li>
-<li><strong>angle</strong> &#8211; travel direction</li>
-</ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">the x, y coordinates of the stim for every frame as 2 arrays</p>
-</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
-<dt id="StimProgram.MovingStim.get_next_pos">
-<code class="descname">get_next_pos</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/StimProgram.html#MovingStim.get_next_pos"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#StimProgram.MovingStim.get_next_pos" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns the next coordinate from x, y_array for animate to set the
-position of the stim for the next frame.
-:return: x, y coordinate as tuple</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="StimProgram.MovingStim.set_pos">
-<code class="descname">set_pos</code><span class="sig-paren">(</span><em>x</em>, <em>y</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/StimProgram.html#MovingStim.set_pos"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#StimProgram.MovingStim.set_pos" title="Permalink to this definition">¶</a></dt>
-<dd><p>Position setter. Necessary for alternate position setting in subclasses.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>x</strong> &#8211; x coordinate</li>
-<li><strong>y</strong> &#8211; y coordinate</li>
-</ul>
-</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
-<dt id="StimProgram.MovingStim.get_pos">
-<code class="descname">get_pos</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/StimProgram.html#MovingStim.get_pos"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#StimProgram.MovingStim.get_pos" title="Permalink to this definition">¶</a></dt>
-<dd><p>Position getter.</p>
-</dd></dl>
-
-</dd></dl>
-
-<dl class="class">
-<dt id="StimProgram.RandomlyMovingStim">
-<em class="property">class </em><code class="descclassname">StimProgram.</code><code class="descname">RandomlyMovingStim</code><span class="sig-paren">(</span><em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/StimProgram.html#RandomlyMovingStim"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#StimProgram.RandomlyMovingStim" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#StimProgram.MovingStim" title="StimProgram.MovingStim"><code class="xref py py-class docutils literal"><span class="pre">StimProgram.MovingStim</span></code></a></p>
-<p>Class for stims moving randomly. Overrides several classes.</p>
-<dl class="method">
-<dt id="StimProgram.RandomlyMovingStim.draw_times">
-<code class="descname">draw_times</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/StimProgram.html#RandomlyMovingStim.draw_times"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#StimProgram.RandomlyMovingStim.draw_times" title="Permalink to this definition">¶</a></dt>
-<dd><p>Determines during which frames stim should be drawn, based on desired
-delay and duration times. Uses StaticStim&#8217;s method.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">last frame number as int</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
-<dt id="StimProgram.RandomlyMovingStim.gen_pos">
-<code class="descname">gen_pos</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/StimProgram.html#RandomlyMovingStim.gen_pos"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#StimProgram.RandomlyMovingStim.gen_pos" title="Permalink to this definition">¶</a></dt>
-<dd><p>Makes calls to gen_start_pos() and gen_pos_array() with proper
-variables to get new array of position coordinates. Overrides super.</p>
-</dd></dl>
-
-</dd></dl>
-
-<dl class="class">
-<dt id="StimProgram.TableStim">
-<em class="property">class </em><code class="descclassname">StimProgram.</code><code class="descname">TableStim</code><span class="sig-paren">(</span><em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/StimProgram.html#TableStim"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#StimProgram.TableStim" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#StimProgram.MovingStim" title="StimProgram.MovingStim"><code class="xref py py-class docutils literal"><span class="pre">StimProgram.MovingStim</span></code></a></p>
-<p>Class where stim motion is determined by a table of radial coordinates.</p>
-<p>Table can be a text file with new line separated values, or an Igor file
-in binary wave or packed experiment format. First column is distance from
-center of window in micrometers, and second column either 0 or 1,
-for whether or not to trigger. Trigger will occur right before frame with
-indicated position is flipped. First coordinate will always trigger (if
-stim is set to trigger).</p>
-<p>For a binary wave file, values must be for coordinates, and triggering
-will only happen on first coordinate. For packed experiment files,
-leave wave names as &#8216;wave0&#8217; and &#8216;wave1&#8217;, where &#8216;wave0&#8217; is coordinates and
-&#8216;wave1&#8217; is whether or not to trigger.</p>
-<dl class="method">
-<dt id="StimProgram.TableStim.draw_times">
-<code class="descname">draw_times</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/StimProgram.html#TableStim.draw_times"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#StimProgram.TableStim.draw_times" title="Permalink to this definition">¶</a></dt>
-<dd><p>Determines during which frames stim should be drawn, based on desired
-delay and duration times. Overrides super method.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">last frame number as int</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
-<dt id="StimProgram.TableStim.gen_pos">
-<code class="descname">gen_pos</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/StimProgram.html#TableStim.gen_pos"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#StimProgram.TableStim.gen_pos" title="Permalink to this definition">¶</a></dt>
-<dd><p>Overrides super method. Calls gen_pos_array() and resets frame counter.</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="StimProgram.TableStim.gen_pos_array">
-<code class="descname">gen_pos_array</code><span class="sig-paren">(</span><em>*args</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/StimProgram.html#TableStim.gen_pos_array"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#StimProgram.TableStim.gen_pos_array" title="Permalink to this definition">¶</a></dt>
-<dd><p>Creates 2 arrays for x, y coordinates of stims for each frame.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">the x, y coordinates of the stim for every frame as 2 arrays</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><strong>ImportError</strong> &#8211; if attempts to load from an Igor file without
-having the igor module</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-</dd></dl>
-
-<dl class="class">
-<dt id="StimProgram.ImageJumpStim">
-<em class="property">class </em><code class="descclassname">StimProgram.</code><code class="descname">ImageJumpStim</code><span class="sig-paren">(</span><em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/StimProgram.html#ImageJumpStim"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#StimProgram.ImageJumpStim" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#StimProgram.StaticStim" title="StimProgram.StaticStim"><code class="xref py py-class docutils literal"><span class="pre">StimProgram.StaticStim</span></code></a></p>
-<p>Class to jump through random areas on a larger image.</p>
-<p>Currently broken.</p>
-<dl class="method">
-<dt id="StimProgram.ImageJumpStim.make_stim">
-<code class="descname">make_stim</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/StimProgram.html#ImageJumpStim.make_stim"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#StimProgram.ImageJumpStim.make_stim" title="Permalink to this definition">¶</a></dt>
-<dd><p>Creates buffer with rendered images. Images are sampled to size of
-window.</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="StimProgram.ImageJumpStim.get_draw_times">
-<code class="descname">get_draw_times</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/StimProgram.html#ImageJumpStim.get_draw_times"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#StimProgram.ImageJumpStim.get_draw_times" title="Permalink to this definition">¶</a></dt>
-<dd><p>Determines frames during which to draw stimulus.
-:return: last frame number as int</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="StimProgram.ImageJumpStim.animate">
-<code class="descname">animate</code><span class="sig-paren">(</span><em>frame</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/StimProgram.html#ImageJumpStim.animate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#StimProgram.ImageJumpStim.animate" title="Permalink to this definition">¶</a></dt>
-<dd><p>Method for drawing stim objects to back buffer. Checks if object
-should be drawn. Back buffer is brought to front with calls to flip()
-on the window.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>frame</strong> &#8211; current frame number</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-</dd></dl>
-
-<dl class="function">
-<dt id="StimProgram.board_texture_class">
-<code class="descclassname">StimProgram.</code><code class="descname">board_texture_class</code><span class="sig-paren">(</span><em>bases</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/StimProgram.html#board_texture_class"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#StimProgram.board_texture_class" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="function">
-<dt id="StimProgram.movie_stim_class">
-<code class="descclassname">StimProgram.</code><code class="descname">movie_stim_class</code><span class="sig-paren">(</span><em>bases</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/StimProgram.html#movie_stim_class"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#StimProgram.movie_stim_class" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="function">
-<dt id="StimProgram.log_stats">
-<code class="descclassname">StimProgram.</code><code class="descname">log_stats</code><span class="sig-paren">(</span><em>count_reps</em>, <em>reps</em>, <em>count_frames</em>, <em>num_frames</em>, <em>elapsed_time</em>, <em>stim_list</em>, <em>to_animate</em>, <em>time_at_run</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/StimProgram.html#log_stats"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#StimProgram.log_stats" title="Permalink to this definition">¶</a></dt>
-<dd><p>Function to write information about stims to file.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>count_reps</strong> &#8211; Elapsed reps.</li>
-<li><strong>reps</strong> &#8211; Total possible reps.</li>
-<li><strong>count_frames</strong> &#8211; Elapsed frames.</li>
-<li><strong>num_frames</strong> &#8211; Total possible frames.</li>
-<li><strong>elapsed_time</strong> &#8211; Elapsed time</li>
-<li><strong>stim_list</strong> &#8211; List of stims that ran.</li>
-<li><strong>time_at_run</strong> &#8211; Time at which stims were run</li>
-</ul>
-</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="function">
-<dt id="StimProgram.main">
-<code class="descclassname">StimProgram.</code><code class="descname">main</code><span class="sig-paren">(</span><em>stim_list</em>, <em>verbose=True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/StimProgram.html#main"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#StimProgram.main" title="Permalink to this definition">¶</a></dt>
-<dd><p>Function to animate stims. Creates instances of stim types, and makes
-necessary calls to animate stims and flip window.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>stim_list</strong> &#8211; List of StimInfo classes.</li>
-<li><strong>verbose</strong> &#8211; Whether or not to print stim info to console.</li>
-</ul>
-</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
+</div>
+</div>
 </div>
 
 
@@ -748,17 +134,16 @@ necessary calls to animate stims and flip window.</p>
           <a href="py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
         <li class="right" >
-          <a href="gui.html" title="gui module"
+          <a href="StimDefaults.html" title="Parameter Defaults"
              >next</a> |</li>
         <li class="right" >
-          <a href="index.html" title="Welcome to Stimulus Program’s documentation!"
+          <a href="LICENSE.html" title="License"
              >previous</a> |</li>
         <li class="nav-item nav-item-0"><a href="index.html">Stimulus Program 1.1 documentation</a> &raquo;</li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">
         &copy; Copyright 2016, Alexander Tomlinson.
-      Last updated on Feb 02, 2016.
       Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.3.5.
     </div>
   </body>

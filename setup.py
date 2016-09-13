@@ -41,11 +41,11 @@ def setup():
                      ("psychopy\\stims", stim_files),
                      ('psychopy', ini_file)]
 
-        setup(console=['gui.py'],
+        setup(console=['StimProgramGUI.py'],
               data_files=all_files,
               windows= [
                   {
-                      'script' : 'gui.py',
+                      'script' : 'StimProgramGUI.py',
                       # 'icon_resources' : [(1, 'icon1.ico')]
                   }
               ],
@@ -87,7 +87,7 @@ def setup():
         all_files = [("psychopy/preferences", pref_files),
                      ("psychopy/stims", stim_files), ('psychopy', helper_files)]
 
-        setup(app=['gui.py'],
+        setup(app=['StimProgramGUI.py'],
               setup_requires=['py2app'],
               data_files=all_files,
               options={
