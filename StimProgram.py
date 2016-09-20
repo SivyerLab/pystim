@@ -1744,9 +1744,11 @@ class ImageJumpStim(StaticStim):
         if self.image_size[0] >= GlobalDefaults['display_size'][0] and \
             self.image_size[1] >= GlobalDefaults['display_size'][1]:
 
+            # max side length of slice
             x_factor = GlobalDefaults['display_size'][0] / float(self.image_size[0]) * self.orig_tex.shape[1]
             y_factor = GlobalDefaults['display_size'][1] / float(self.image_size[1]) * self.orig_tex.shape[0]
 
+            # maximum coordinate of slice
             max_x = self.orig_tex.shape[1] - int(x_factor)
             max_y = self.orig_tex.shape[0] - int(y_factor)
 
@@ -1758,8 +1760,14 @@ class ImageJumpStim(StaticStim):
 
             self.slice_log.append([y_low, y_high, x_low, x_high])
 
+            # subsection of original 1536x1024 image, gets scaled by gpu to
+            # fit window
             tex = self.orig_tex[y_low:y_high,
                                 x_low:x_high]
+
+            print x_factor, max_x, x_low, x_high
+            print y_factor, max_y, y_low, y_high
+            print
 
             return tex
 
