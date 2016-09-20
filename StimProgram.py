@@ -1726,6 +1726,9 @@ class ImageJumpStim(StaticStim):
                 else:
                     self.stim.setTex(self.slice_list[self.slice_index])
 
+                    if self.small_stim is not None:
+                        self.small_stim.setTex(self.slice_list[self.slice_index])
+
                 self.slice_index += 1
 
             super(ImageJumpStim, self).animate(frame)
@@ -2107,6 +2110,40 @@ def log_stats(count_reps, reps, count_frames, num_frames, elapsed_time,
 
             if stim_list[i].stim_type in ['ImageJumpStim']:
 
+                mock_jump = ImageJumpStim(image_filename=to_animate[i].image_filename,
+                                          shuffle=to_animate[i].shuffle,
+                                          image_channel=['red', 'green',
+                                                         'blue', 'all'][
+                                              to_animate[i].image_channel],
+                                          image_size=to_animate[i].image_size,
+                                          num_jumps=0,
+                                          fill_mode='image',
+                                          shape='rectangle')
+
+                tex = mock_jump.gen_texture()
+
+                MyWindow.close_win()
+                cap_win = visual.Window(units='pix', size=to_animate[i].image_size)
+
+                mock_stim = visual.GratingStim(win=cap_win,
+                                               size=to_animate[i].image_size,
+                                               mask=mock_jump.gen_mask(),
+                                               tex=tex,
+                                               pos=mock_jump.location,
+                                               phase=mock_jump.phase,
+                                               ori=mock_jump.orientation,
+                                               autoLog=False,
+                                               texRes=2**10)
+                mock_stim.draw()
+                tex = cap_win._getRegionOfFrame(buffer='back')
+                cap_win.close()
+                MyWindow.make_win()
+                cap = numpy.asarray(tex)
+                save_name = path + file_name[:-3] + 'npy'
+                numpy.save(save_name, cap)
+                # print cap.shape, cap.dtype
+                # tex.show()
+
                 with open((path+file_name), 'w') as f:
 
                     if has_tabulate:
@@ -2135,7 +2172,7 @@ def log_stats(count_reps, reps, count_frames, num_frames, elapsed_time,
 
                     else:
                         raise ImportError('Could not log Jumpstim without '
-                                          'tabulate (dev is lazy.')
+                                          'tabulate (needs to be implemented).')
 
     return current_time_string
 
@@ -2197,7 +2234,7 @@ def main(stim_list, verbose=True):
             # reset frame trigger times
             del MyWindow.frame_trigger_list[:-1]
 
-            # determine end time of last stim
+            # gen draw times and get end time of last stim
             num_frames = max(stim.draw_times() for stim in to_animate)
 
             # draw stims and flip window
@@ -2226,9 +2263,11 @@ def main(stim_list, verbose=True):
                 save_loc = os.path.join(capture_dir, save_dir)
                 os.makedirs(save_loc)
 
-            MyWindow.win.recordFrameIntervals = True
+            # MyWindow.win.recordFrameIntervals = True
 
             # for frame in xrange(num_frames):
+            # trange for pretty, low overhead (on the order of ns), progress
+            # bar in stdout
             for frame in trange(num_frames):
                 for stim in to_animate:
                     stim.animate(frame)
@@ -2268,8 +2307,8 @@ def main(stim_list, verbose=True):
             # get elapsed time for fps
             count_elapsed_time += elapsed_time.getTime()
 
-            MyWindow.win.recordFrameIntervals = False
-            MyWindow.win.saveFrameIntervals()
+            # MyWindow.win.recordFrameIntervals = False
+            # MyWindow.win.saveFrameIntervals()
 
             # stop movies from continuing in background
             for stim in to_animate:
@@ -2315,6 +2354,7 @@ def main(stim_list, verbose=True):
         time_stamp = log_stats(count_reps, reps, count_frames, num_frames,
                                count_elapsed_time, stim_list, to_animate,
                                current_time)
+
 
     fps = (count_reps * num_frames + count_frames) / count_elapsed_time
 
