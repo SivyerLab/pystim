@@ -9,6 +9,7 @@ Program for presenting visual stimuli to patch clamped retinal neurons.
 
 from GammaCorrection import GammaValues  # necessary for pickling
 from psychopy.tools.coordinatetools import pol2cart
+from psychopy.tools.typetools import uint8_float, float_uint8
 from psychopy import visual, core, event, filters
 from time import strftime, localtime
 from random import Random
@@ -811,9 +812,9 @@ class StaticStim(StimDefaults):
                 self.gen_phase()
 
             # draw to back buffer
-            self.stim.draw()
+            self.stim.draw(MyWindow.win)
             if self.small_stim is not None:
-                self.small_stim.draw()
+                self.small_stim.draw(MyWindow.small_win)
 
     def gen_rgb(self):
         """Depending on color mode, calculates necessary values. Texture
@@ -1630,13 +1631,36 @@ class ImageJumpStim(StaticStim):
         Keeps copy of og texture
         :return:
         """
-        tex = super(ImageJumpStim, self).gen_texture()
-        self.orig_tex = tex
+        mock_jump = StaticStim(image_filename=self.image_filename,
+                               image_channel=['red', 'green','blue', 'all'][
+                                   self.image_channel],
+                               image_size=self.image_size,
+                               fill_mode='image',
+                               shape=self.shape)
+
+        tex = mock_jump.gen_texture()
+
+        MyWindow.close_win()
+        cap_win = visual.Window(units='pix', size=self.image_size)
+
+        mock_stim = visual.GratingStim(win=cap_win,
+                                       size=self.image_size,
+                                       mask=None,
+                                       tex=tex,
+                                       autoLog=False)
+        mock_stim.draw()
+        tex = cap_win._getRegionOfFrame(buffer='back')
+        cap_win.close()
+        MyWindow.make_win()
+        cap = numpy.asarray(tex.transpose(Image.FLIP_TOP_BOTTOM))
+        cap = uint8_float(cap)
+
+        self.orig_tex = cap
 
         self.gen_slice_list()
 
         # Pushing textures is slow, but preloading textures is memory
-        # intensive. Generating shuffled textures is too slow, so preload
+        # expensive. Generating shuffled textures is too slow, so preload
         # those, but do other slices on the fly.
 
         numpy.random.seed(self.move_seed)
@@ -1744,30 +1768,24 @@ class ImageJumpStim(StaticStim):
         if self.image_size[0] >= GlobalDefaults['display_size'][0] and \
             self.image_size[1] >= GlobalDefaults['display_size'][1]:
 
-            # max side length of slice
-            x_factor = GlobalDefaults['display_size'][0] / float(self.image_size[0]) * self.orig_tex.shape[1]
-            y_factor = GlobalDefaults['display_size'][1] / float(self.image_size[1]) * self.orig_tex.shape[0]
+            x = int(GlobalDefaults['display_size'][0])
+            y = int(GlobalDefaults['display_size'][1])
 
             # maximum coordinate of slice
-            max_x = self.orig_tex.shape[1] - int(x_factor)
-            max_y = self.orig_tex.shape[0] - int(y_factor)
+            max_x = self.orig_tex.shape[1] - x
+            max_y = self.orig_tex.shape[0] - y
 
             x_low = self.move_random.randint(0, max_x)
             y_low = self.move_random.randint(0, max_y)
 
-            x_high = int(x_low + x_factor)
-            y_high = int(y_low + y_factor)
+            x_high = int(x_low + x)
+            y_high = int(y_low + y)
 
             self.slice_log.append([y_low, y_high, x_low, x_high])
 
-            # subsection of original 1536x1024 image, gets scaled by gpu to
-            # fit window
+            # subsection of original 1536x1024 image of window size
             tex = self.orig_tex[y_low:y_high,
                                 x_low:x_high]
-
-            print x_factor, max_x, x_low, x_high
-            print y_factor, max_y, y_low, y_high
-            print
 
             return tex
 
@@ -2003,6 +2021,10 @@ def log_stats(count_reps, reps, count_frames, num_frames, elapsed_time,
         path += strftime('%Y_%m_%d', current_time) + '\\'
         if not os.path.exists(path):
             os.makedirs(path)
+        # time folder
+        path += strftime('%Hh%Mm%Ss', current_time) + '\\'
+        if not os.path.exists(path):
+            os.makedirs(path)
 
     elif sys.platform == 'darwin':
         # log folder
@@ -2011,6 +2033,10 @@ def log_stats(count_reps, reps, count_frames, num_frames, elapsed_time,
             os.makedirs(path)
         # day folder
         path += strftime('%Y_%m_%d', current_time) + '/'
+        if not os.path.exists(path):
+            os.makedirs(path)
+        # time folder
+        path += strftime('%Hh%Mm%Ss', current_time) + '/'
         if not os.path.exists(path):
             os.makedirs(path)
 
@@ -2118,39 +2144,10 @@ def log_stats(count_reps, reps, count_frames, num_frames, elapsed_time,
 
             if stim_list[i].stim_type in ['ImageJumpStim']:
 
-                mock_jump = ImageJumpStim(image_filename=to_animate[i].image_filename,
-                                          shuffle=to_animate[i].shuffle,
-                                          image_channel=['red', 'green',
-                                                         'blue', 'all'][
-                                              to_animate[i].image_channel],
-                                          image_size=to_animate[i].image_size,
-                                          num_jumps=0,
-                                          fill_mode='image',
-                                          shape='rectangle')
-
-                tex = mock_jump.gen_texture()
-
-                MyWindow.close_win()
-                cap_win = visual.Window(units='pix', size=to_animate[i].image_size)
-
-                mock_stim = visual.GratingStim(win=cap_win,
-                                               size=to_animate[i].image_size,
-                                               mask=mock_jump.gen_mask(),
-                                               tex=tex,
-                                               pos=mock_jump.location,
-                                               phase=mock_jump.phase,
-                                               ori=mock_jump.orientation,
-                                               autoLog=False,
-                                               texRes=2**10)
-                mock_stim.draw()
-                tex = cap_win._getRegionOfFrame(buffer='back')
-                cap_win.close()
-                MyWindow.make_win()
-                cap = numpy.asarray(tex)
+                cap = float_uint8(to_animate[i].orig_tex)
                 save_name = path + file_name[:-3] + 'npy'
-                numpy.save(save_name, cap)
-                # print cap.shape, cap.dtype
-                # tex.show()
+                numpy.save(save_name, numpy.flipud(cap))
+                print cap.shape, cap.dtype
 
                 with open((path+file_name), 'w') as f:
 

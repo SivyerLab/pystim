@@ -1863,8 +1863,11 @@ class DirPanel(wx.Panel):
         # get path from browser
         path = self.browser.GetPath()
 
-        is_log = os.path.split(os.path.split(os.path.dirname(path))[0])[1] ==\
-                 'logs'
+        # print path
+        # print 'logs'
+        # is_log = os.path.split(os.path.split(os.path.dirname(path))[0])[1] ==\
+        #          'logs'
+        is_log = 'logs' in path
 
         # if not log file, open and load pickle data
         if not is_log:
