@@ -39,7 +39,7 @@ correction.
 
 from psychopy import visual, core, logging
 # from psychopy.monitors import Monitor
-from scipy import stats, interpolate, array, ndarray
+from scipy import stats, interpolate
 # from multiprocessing import Process, Queue
 import ConfigParser
 import cPickle
@@ -75,14 +75,15 @@ def gammaCorrect():
 
         if should_step == 'Y':
             should_step = True
-            mon_name = raw_input('Gamma profile to use? None or name: ')
+            # mon_name = raw_input('Gamma profile to use? None or name: ')
 
             num_steps = raw_input('\nNumber of steps per gun? ').rstrip()
 
             if num_steps.isdigit():
                 num_steps = int(num_steps)
-                colors = [i * 1.0 / num_steps * 2 - 1 for i in range(num_steps+1)]
-                inputs = [(i+1)/2 for i in colors]
+                colors = [i * 1.0 / num_steps * 2 - 1 for
+                          i in range(num_steps + 1)]
+                # inputs = [(i + 1) / 2 for i in colors]
 
                 step_time = raw_input('Time between steps (ms)? ').rstrip()
 
@@ -120,7 +121,8 @@ def gammaCorrect():
         rgb = ['RED', 'GREEN', 'BLUE']
 
         for i in range(3):
-            raw_input("\n{}\npress enter to proceed when ready...".format(rgb[i])).rstrip()
+            raw_input("\n{}\npress enter to proceed when ready...".
+                      format(rgb[i])).rstrip()
 
             for color in colors:
                 fill = [-1, -1, -1]
@@ -133,7 +135,7 @@ def gammaCorrect():
                 rect.setFillColor(fill)
                 rect.draw()
                 win.flip()
-                core.wait(step_time * 1.0 /1000)
+                core.wait(step_time * 1.0 / 1000)
 
         win.close()
 
@@ -170,7 +172,7 @@ def gammaCorrect():
 
     gamma_correction = GammaValues(r_tuple, g_tuple, b_tuple)
 
-    ## GRAPHING STUFF TO TEST ##
+    # GRAPHING STUFF TO TEST
     # vals = [i * 1.0 / (51 - 1) * 2 - 1 for i in range(51)]
     # corrected = [[], [], []]
     # for i in range(len(vals)):
@@ -233,13 +235,13 @@ def make_correction(measured):
                    for i in range(len(measured))]
 
     # for spline, x must be increasing, so do check on values
-    is_increasing = [x<y for x, y in zip(measured, measured[1:])]
+    is_increasing = [x < y for x, y in zip(measured, measured[1:])]
 
     # remove non increasing values, going backwards to not change indices
     for i in range(len(is_increasing) - 1, -1, -1):
         if not is_increasing[i]:
-            del measured[i+1]
-            del measured_at[i+1]
+            del measured[i + 1]
+            del measured_at[i + 1]
 
     min = measured[0]
     max = measured[-1]
@@ -248,15 +250,16 @@ def make_correction(measured):
     slope, intercept, _, _, _ = stats.linregress([-1.0, 1.0], [min, max])
 
     # splines to fit to data
-    spline = interpolate.InterpolatedUnivariateSpline(measured_at, measured)
+    # spline = interpolate.InterpolatedUnivariateSpline(measured_at, measured)
     inverse_spline = interpolate.InterpolatedUnivariateSpline(measured,
                                                               measured_at)
 
     # ##GRAPHING STUFF TO TEST##
-    linear = [i * slope + intercept for i in measured_at]
-    spline_values = spline([i for i in measured_at])
-    corrected_values = inverse_spline([i * slope + intercept for i in measured_at])
-    graph_corrected = spline([i for i in corrected_values])
+    # linear = [i * slope + intercept for i in measured_at]
+    # spline_values = spline([i for i in measured_at])
+    # corrected_values = inverse_spline([i * slope + intercept for i in
+    #                                    measured_at])
+    # graph_corrected = spline([i for i in corrected_values])
 
     # for i in range(len(corrected_values)):
     #     print "%.3f" % measured_at[i], "%.3f" % corrected_values[i]
@@ -265,7 +268,8 @@ def make_correction(measured):
     # points
     # to_plot.append(plt.plot(measured_at, measured, 'ro', label='measured'))
     # fit
-    # to_plot.append(plt.plot(measured_at, spline_values, label='interpolated'))
+    # to_plot.append(plt.plot(measured_at, spline_values,
+    #                         label='interpolated'))
     # corrected
     # to_plot.append(plt.plot(measured_at, graph_corrected, label='corrected'))
     # check against linear
@@ -274,6 +278,7 @@ def make_correction(measured):
     # plt.show()
 
     return inverse_spline, slope, intercept, to_plot
+
 
 class GammaValues(object):
     """
@@ -402,9 +407,9 @@ class GammaValues(object):
                 b = b.reshape(size_x, size_y, 1)
 
                 if has_alpha:
-                    adj_color = numpy.dstack([r,g,b,a])
+                    adj_color = numpy.dstack([r, g, b, a])
                 else:
-                    adj_color = numpy.dstack([r,g,b])
+                    adj_color = numpy.dstack([r, g, b])
 
             # if single color
             elif len(numpy.shape(color)) == 1:
@@ -432,15 +437,16 @@ class GammaValues(object):
                 # add ceiling/floor
                 for i in range(len(color)):
                     if adj_color[i] >= 1:
-                         adj_color[i] = 1.0
+                        adj_color[i] = 1.0
                     elif adj_color[i] <= -1:
-                         adj_color[i] = -1.0
+                        adj_color[i] = -1.0
 
             elif len(numpy.shape(color)) == 2:
 
                 # if grayscale image
                 if numpy.shape(color)[1] != 3:
-                    print '\nWARNING: Cannot gamma correct grayscale .iml images.'
+                    print '\nWARNING: Cannot gamma correct grayscale .iml'
+                    'images.'
                     adj_color = color
 
                 # if noise checkerboard
