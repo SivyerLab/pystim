@@ -1,5 +1,3 @@
-#!/Library/Frameworks/Python.framework/Versions/2.7/bin/python
-
 """
 GUI for StimProgram
 """
@@ -12,7 +10,7 @@ GUI for StimProgram
 import pyglet
 pyglet.options['shadow_window'] = False
 
-from GammaCorrection import GammaValues  # necessary for pickling
+from GammaCorrection import GammaValues  # unused, but necessary for pickling
 from collections import OrderedDict
 from copy import deepcopy
 from sys import platform
@@ -253,7 +251,8 @@ class Parameters(object):
                   'circle'   : ['outer_diameter'],
                   'rectangle': ['size'],
                   'annulus'  : ['inner_diameter', 'outer_diameter']
-              }}
+                  }
+              }
              ),
 
             ('orientation',
@@ -290,7 +289,7 @@ class Parameters(object):
               'default' : config_dict['outer_diameter'],
               'is_child': True}
              ),
-        ])
+            ])
 
         self.timing_param = OrderedDict([
             ('delay',
@@ -328,7 +327,7 @@ class Parameters(object):
               'default' : config_dict['trigger'],
               'is_child': False}
              ),
-        ])
+            ])
 
         self.fill_param = OrderedDict([
             ('color_mode',
@@ -340,7 +339,8 @@ class Parameters(object):
               'children': {
                   'rgb'        : ['color', 'contrast_channel'],
                   'intensity'  : ['intensity', 'contrast_channel'],
-              }}
+                  }
+              }
              ),
 
             ('color',
@@ -376,7 +376,8 @@ class Parameters(object):
                   'square'  : ['period_mod', 'intensity_dir'],
                   'sawtooth': ['period_mod', 'intensity_dir'],
                   'linear'  : ['intensity_dir']
-              }}
+                  }
+              }
              ),
 
             ('fill_mode',
@@ -398,7 +399,8 @@ class Parameters(object):
                   'movie'       : ['movie_filename', 'movie_size'],
                   'image'       : ['image_filename', 'image_size', 'phase',
                                    'phase_speed', 'image_channel'],
-              }}
+                  }
+              }
              ),
 
             ('alpha',
@@ -508,7 +510,7 @@ class Parameters(object):
               'default' : config_dict['period_mod'],
               'is_child': True}
              ),
-        ])
+            ])
 
         self.motion_param = OrderedDict([
             ('move_type',
@@ -525,7 +527,8 @@ class Parameters(object):
                              'num_dirs', 'move_delay', 'ori_with_dir'],
                   'jump'  : ['num_jumps', 'move_delay', 'move_seed',
                              'shuffle', 'blend_jumps'],
-              }}
+                  }
+              }
              ),
 
             ('speed',
@@ -622,7 +625,7 @@ class Parameters(object):
               'default' : config_dict['blend_jumps'],
               'is_child': True}
              ),
-        ])
+            ])
 
         self.global_default_param = OrderedDict([
             ('display_size',
@@ -742,7 +745,7 @@ class Parameters(object):
               'default' : config_dict['capture'],
               'is_child': False}
              )
-        ])
+            ])
 
 
 class TextCtrlTag(wx.TextCtrl):
@@ -1049,8 +1052,12 @@ class InputPanel(wx.Panel):
 
                         # add to sizer
                         list_sizer.Add(ctrl)
-                        self.Bind(wx.EVT_TEXT, self.input_update, ctrl)
-                        self.Bind(wx.EVT_CONTEXT_MENU, self.on_right_click, ctrl)
+                        self.Bind(wx.EVT_TEXT,
+                                  self.input_update,
+                                  ctrl)
+                        self.Bind(wx.EVT_CONTEXT_MENU,
+                                  self.on_right_click,
+                                  ctrl)
 
                     # set ctrl to sizer in order to be added to grid_sizer
                     ctrl = list_sizer
@@ -1131,7 +1138,6 @@ class InputPanel(wx.Panel):
                 event.Skip()
                 event.GetEventObject().SetStringSelection('table')
                 return
-
 
         # if a list type param, change the appropriate list item by getting
         # tag2 (list index)
@@ -1569,7 +1575,8 @@ class ListPanel(wx.Panel):
 
         # deselect all in list and select most recently added
         while self.list_control.GetSelectedItemCount() != 0:
-            self.list_control.Select(self.list_control.GetFirstSelected(), on=0)
+            self.list_control.Select(self.list_control.GetFirstSelected(),
+                                     on=0)
         self.list_control.Select(insert_pos)
 
         # print self.stims_to_run_w_grid
@@ -1863,10 +1870,6 @@ class DirPanel(wx.Panel):
         # get path from browser
         path = self.browser.GetPath()
 
-        # print path
-        # print 'logs'
-        # is_log = os.path.split(os.path.split(os.path.dirname(path))[0])[1] ==\
-        #          'logs'
         is_log = 'logs' in path
 
         # if not log file, open and load pickle data
@@ -1939,7 +1942,7 @@ class DirPanel(wx.Panel):
         path = self.browser.GetPath()
 
         is_log = os.path.split(os.path.split(os.path.dirname(path))[0])[1] ==\
-                 'logs'
+            'logs'
 
         if is_log:
             if platform == 'win32':
@@ -2029,13 +2032,13 @@ class MyGrid(wx.Frame):
         """
         ctrls = self.frame.all_controls[param]
 
-        if param not in self.control_dict and ctrls[0].GetParent().category != \
-                'global':
+        if param not in self.control_dict and ctrls[0].GetParent().category \
+                != 'global':
             # add column to grid
             self.grid.ClearSelection()
             self.grid.AppendCols(1)
-            self.grid.SetGridCursor(0, self.grid.GetNumberCols()-1)
-            self.grid.SetColLabelValue(self.grid.GetNumberCols()-1, param)
+            self.grid.SetGridCursor(0, self.grid.GetNumberCols() - 1)
+            self.grid.SetColLabelValue(self.grid.GetNumberCols() - 1, param)
 
             # get value of control
             try:
@@ -2060,7 +2063,7 @@ class MyGrid(wx.Frame):
             for ctrl in ctrls:
                 ctrl.set_editable(False)
 
-            self.grid.SetCellValue(0, self.grid.GetNumberCols()-1, value)
+            self.grid.SetCellValue(0, self.grid.GetNumberCols() - 1, value)
 
         # if already in grid
         else:
@@ -2182,7 +2185,7 @@ class MyGrid(wx.Frame):
             # iterate until terminal nones
             for i in range(0, where_stop):
                 if values[i] is None:
-                    values[i] = values[i-1]
+                    values[i] = values[i - 1]
 
             values = map(self.parameters.try_cast, values)
             to_return[param] = values
@@ -2432,7 +2435,8 @@ class MyFrame(wx.Frame):
                                         # convert to instances
                                         elif param == 'move_type':
                                             value = \
-                                                self.list_panel.convert_stim_type(value)
+                                                self.list_panel.\
+                                                convert_stim_type(value)
 
                                             self.list_panel.stims_to_run[
                                                 j].stim_type = value
