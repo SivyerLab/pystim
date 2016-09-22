@@ -17,6 +17,7 @@ from sys import platform
 import ConfigParser
 import StimProgram
 import wx, wx.grid
+import subprocess
 import cPickle
 import os
 
@@ -35,10 +36,12 @@ class Parameters(object):
         self.global_default_param = None
 
         self.gui_params = None
+        self.stim_params = None
 
         # init params
         config_file = os.path.abspath('./psychopy/config.ini')
-        self.gui_params, config_dict = self.read_config_file(config_file)
+        self.gui_params, self.stim_params, config_dict = self.read_config_file(
+            config_file)
         self.init_params(config_dict)
 
     def read_config_file(self, config_file):
@@ -54,6 +57,7 @@ class Parameters(object):
 
         default_config_dict = {}
         gui_config_dict = {}
+        stim_config_dict = {}
 
         # make dict of options
         for option in config.options('Defaults'):
@@ -63,6 +67,9 @@ class Parameters(object):
         for option in config.options('GUI'):
             gui_config_dict[option] = config.get('GUI', option)
 
+        for option in config.options('StimProgram'):
+            stim_config_dict[option] = config.get('StimProgram', option)
+
         # cast, so that lists are not strings for proper set up of controls
         for key, value in default_config_dict.iteritems():
             default_config_dict[key] = self.try_cast(value)
@@ -70,7 +77,10 @@ class Parameters(object):
         for key, value in gui_config_dict.iteritems():
             gui_config_dict[key] = self.try_cast(value)
 
-        return gui_config_dict, default_config_dict
+        for key, value in stim_config_dict.iteritems():
+            stim_config_dict[key] = self.try_cast(value)
+
+        return gui_config_dict, stim_config_dict, default_config_dict
 
     def try_cast(self, value):
         """
@@ -178,6 +188,14 @@ class Parameters(object):
         :return: dictionary of gui settings
         """
         return self.gui_params
+
+    def get_stim_params(self):
+        """
+        Getter
+
+        :return: dictionary of stim settings
+        """
+        return self.stim_params
 
     def get_merged_params(self):
         """
@@ -735,7 +753,8 @@ class Parameters(object):
               'label'   : 'log',
               'choices' : ['True', 'False'],
               'default' : config_dict['log'],
-              'is_child': False}
+              'is_child': False,
+              'hide'    : True}
              ),
 
             ('capture',
@@ -743,7 +762,8 @@ class Parameters(object):
               'label'   : 'capture',
               'choices' : ['True', 'False'],
               'default' : config_dict['capture'],
-              'is_child': False}
+              'is_child': False,
+              'hide'    : True}
              )
             ])
 
@@ -964,7 +984,7 @@ class InputPanel(wx.Panel):
         # iterate through params in param dict
         for param, param_info in self.params.iteritems():
             # only generate fields for params that aren't children
-            if not param_info['is_child']:
+            if not param_info['is_child'] and not 'hide' in param_info:
                 # label widget
                 label = wx.StaticText(self, label=param_info['label'] + ':')
 
@@ -2193,6 +2213,105 @@ class MyGrid(wx.Frame):
         return to_return
 
 
+class MyMenuBar(wx.MenuBar):
+    """
+    Class for custom menu bar.
+    """
+    def __init__(self, parent):
+        """
+        Constructor.
+        """
+        super(MyMenuBar, self).__init__()
+
+        self.frame = parent
+
+        # menus
+        file_menu = wx.Menu()
+        view_menu = wx.Menu()
+        options_menu = wx.Menu()
+
+        # file menus
+        file_quit = file_menu.Append(wx.ID_EXIT, 'Quit', 'Quit application')
+
+        # view menus
+        view_logs = view_menu.Append(wx.ID_ANY, 'logs', 'Open log folder')
+        view_stims = view_menu.Append(wx.ID_ANY, 'stims', 'Open stim folder')
+
+        # options menus
+        self.options_log = options_menu.Append(wx.ID_ANY, 'log',
+                                               'Save runs to log file',
+                                               kind=wx.ITEM_CHECK)
+        self.options_log.Toggle()  # default to True
+        self.options_capture = options_menu.Append(wx.ID_ANY, 'capture',
+                                                   'Capture run and create '
+                                                   'video',
+                                                   kind=wx.ITEM_CHECK)
+
+        self.Append(file_menu, '&File')
+        self.Append(view_menu, '&View')
+        self.Append(options_menu, '&Options')
+
+        self.Bind(wx.EVT_MENU, self.on_file_quit, file_quit)
+        self.Bind(wx.EVT_MENU, self.on_view_logs, view_logs)
+        self.Bind(wx.EVT_MENU, self.on_view_stims, view_stims)
+        self.Bind(wx.EVT_MENU, self.on_options_log, self.options_log)
+        self.Bind(wx.EVT_MENU, self.on_options_capture, self.options_capture)
+
+    def on_file_quit(self, event):
+        """
+        Handles quitting.
+        """
+        self.frame.Close()
+
+    def on_view_logs(self, event):
+        """
+        Handles request to view logs
+        """
+        logs_dir = self.frame.stim_params['logs_dir']
+        print 'logs'
+
+        if platform == "win32":
+            os.startfile(logs_dir)
+        elif platform == "darwin":
+            subprocess.Popen(["open", logs_dir])
+
+    def on_view_stims(self, event):
+        """
+        Handles request to view stims
+        """
+        stim_dir = self.frame.gui_params['saved_stim_dir']
+        print 'stims'
+
+        if platform == "win32":
+            os.startfile(stim_dir)
+        elif platform == "darwin":
+            subprocess.Popen(["open", stim_dir])
+
+    def on_options_log(self, event):
+        """
+        Handles toggling logging
+
+        :param event:
+        :return:
+        """
+        if self.options_log.IsChecked():
+            self.frame.parameters.set_param_value('global', 'log', True)
+        else:
+            self.frame.parameters.set_param_value('global', 'log', False)
+
+    def on_options_capture(self, event):
+        """
+        Handles toggling capturing
+
+        :param event:
+        :return:
+        """
+        if self.options_log.IsChecked():
+            self.frame.parameters.set_param_value('global', 'capture', True)
+        else:
+            self.frame.parameters.set_param_value('global', 'capture', False)
+
+
 class MyStatusBar(wx.StatusBar):
     """
     Class for custom status bar to color background on errors.
@@ -2201,7 +2320,7 @@ class MyStatusBar(wx.StatusBar):
         super(MyStatusBar, self).__init__(parent, 1)
 
         self.SetFieldsCount(1)
-        self.text_box = wx.StaticText(self, -1, 'hello')
+        self.text_box = wx.StaticText(self, -1, 'hello there')
 
         if platform == 'win32':
             field_rect = self.GetFieldRect(0)
@@ -2234,6 +2353,7 @@ class MyFrame(wx.Frame):
         # instantiate parameters
         self.parameters = Parameters()
         self.gui_params = self.parameters.get_gui_params()
+        self.stim_params = self.parameters.get_stim_params()
 
         # instance attributes
         self.win_open = False
@@ -2352,6 +2472,10 @@ class MyFrame(wx.Frame):
         # self.SetStatusText('hi there')
         self.status_bar = MyStatusBar(self)
         self.SetStatusBar(self.status_bar)
+
+        # menu bar
+        self.menu_bar = MyMenuBar(self)
+        self.SetMenuBar(self.menu_bar)
 
         # hide all subpanels
         for panel in self.input_nb.GetChildren():

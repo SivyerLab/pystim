@@ -58,7 +58,7 @@ __status__ = "Beta"
 # logging.console.setLevel(logging.CRITICAL)
 
 # read ini file
-defaults = dict(logsDir='.\\psychopy\\logs\\',
+defaults = dict(logs_dir='.\\psychopy\\logs\\',
                 monitor='blank')
 config = ConfigParser.ConfigParser()
 config.read(os.path.abspath('./psychopy/config.ini'))
@@ -2021,7 +2021,7 @@ def log_stats(count_reps, reps, count_frames, num_frames, elapsed_time,
 
     if sys.platform == 'win32':
         # log folder
-        path = config.get('StimProgram', 'logsDir')
+        path = config.get('StimProgram', 'logs_dir')
         if not os.path.exists(path):
             os.makedirs(path)
         # day folder
@@ -2035,7 +2035,7 @@ def log_stats(count_reps, reps, count_frames, num_frames, elapsed_time,
 
     elif sys.platform == 'darwin':
         # log folder
-        path = config.get('StimProgram', 'logsDir')
+        path = config.get('StimProgram', 'logs_dir')
         if not os.path.exists(path):
             os.makedirs(path)
         # day folder
