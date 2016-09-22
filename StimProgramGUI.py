@@ -16,10 +16,12 @@ from copy import deepcopy
 from sys import platform
 import ConfigParser
 import StimProgram
-import wx, wx.grid
 import subprocess
 import cPickle
 import os
+
+import wx.lib.agw.multidirdialog as mdd
+import wx, wx.grid
 
 
 class Parameters(object):
@@ -984,7 +986,7 @@ class InputPanel(wx.Panel):
         # iterate through params in param dict
         for param, param_info in self.params.iteritems():
             # only generate fields for params that aren't children
-            if not param_info['is_child'] and not 'hide' in param_info:
+            if not param_info['is_child'] and 'hide' not in param_info:
                 # label widget
                 label = wx.StaticText(self, label=param_info['label'] + ':')
 
@@ -2246,7 +2248,14 @@ class MyMenuBar(wx.MenuBar):
                                                    'Capture run and create '
                                                    'video',
                                                    kind=wx.ITEM_CHECK)
+        # options submenu
+        options_tools = wx.Menu()
+        tools_rec_map = options_tools.Append(wx.ID_ANY,
+                                             'Map receptive field',
+                                             'Generate receptive field map')
+        options_menu.AppendMenu(wx.ID_ANY, 'Tools', options_tools)
 
+        # add top level menus to menu bar
         self.Append(file_menu, '&File')
         self.Append(view_menu, '&View')
         self.Append(options_menu, '&Options')
@@ -2256,6 +2265,7 @@ class MyMenuBar(wx.MenuBar):
         self.Bind(wx.EVT_MENU, self.on_view_stims, view_stims)
         self.Bind(wx.EVT_MENU, self.on_options_log, self.options_log)
         self.Bind(wx.EVT_MENU, self.on_options_capture, self.options_capture)
+        self.Bind(wx.EVT_MENU, self.on_options_tools_rec_map, tools_rec_map)
 
     def on_file_quit(self, event):
         """
@@ -2268,7 +2278,6 @@ class MyMenuBar(wx.MenuBar):
         Handles request to view logs
         """
         logs_dir = self.frame.stim_params['logs_dir']
-        print 'logs'
 
         if platform == "win32":
             os.startfile(logs_dir)
@@ -2280,7 +2289,6 @@ class MyMenuBar(wx.MenuBar):
         Handles request to view stims
         """
         stim_dir = self.frame.gui_params['saved_stim_dir']
-        print 'stims'
 
         if platform == "win32":
             os.startfile(stim_dir)
@@ -2294,10 +2302,10 @@ class MyMenuBar(wx.MenuBar):
         :param event:
         :return:
         """
-        if self.options_log.IsChecked():
-            self.frame.parameters.set_param_value('global', 'log', True)
-        else:
-            self.frame.parameters.set_param_value('global', 'log', False)
+        val = self.options_log.IsChecked()
+
+        self.frame.parameters.set_param_value('global', 'log', val)
+        StimProgram.GlobalDefaults['log'] = val
 
     def on_options_capture(self, event):
         """
@@ -2306,10 +2314,81 @@ class MyMenuBar(wx.MenuBar):
         :param event:
         :return:
         """
-        if self.options_log.IsChecked():
-            self.frame.parameters.set_param_value('global', 'capture', True)
-        else:
-            self.frame.parameters.set_param_value('global', 'capture', False)
+        val = self.options_capture.IsChecked()
+
+        self.frame.parameters.set_param_value('global', 'capture', val)
+        StimProgram.GlobalDefaults['capture'] = val
+
+    def on_options_tools_rec_map(self, event):
+        """
+        Handles request to map receptive field_rect
+
+        :param event:
+        :return:
+        """
+        # start dialog to select folders
+        log_dir = os.path.abspath(self.frame.stim_params['logs_dir'])
+        prompt = 'Select folder(s) with desired JumpStim logs'
+        folder_select_dialog = mdd.MultiDirDialog(self.frame,
+                                                 message=prompt,
+                                                 defaultPath=log_dir,
+                                                 agwStyle=mdd.DD_MULTIPLE)
+
+        # to exit out of dialog on cancel
+        if folder_select_dialog.ShowModal() == wx.ID_CANCEL:
+            return
+
+        jump_paths = folder_select_dialog.GetPaths()
+
+        if platform == 'win32':
+            jump_paths = map(lambda x: x.split()[2].replace(')',
+                             '').replace('(', ''), jump_paths)
+            jump_paths = map(os.path.abspath, jump_paths)
+
+        try:
+            for jump in jump_paths:
+                assert os.path.exists(jump)
+        except AssertionError:
+            print '\nOne or more of the selected paths do not exist:'
+            for jump in jump_paths:
+                print '    {}'.format(jump)
+            return
+
+        prompt = 'Select heka wave file'
+
+        wave_dialog = wx.FileDialog(self.frame,
+                                    message=prompt,
+                                    # defaultDir=default_dir,
+                                    wildcard='*.dat',
+                                    style=wx.FD_OPEN | wx.FD_FILE_MUST_EXIST)
+
+        # to exit out of dialog on cancel button
+        if wave_dialog.ShowModal() == wx.ID_CANCEL:
+            return
+
+        wave_path = os.path.abspath(wave_dialog.GetPath())
+
+        kwargs = dict(dat_file=wave_path,
+                      jump_logs=jump_paths,
+                      group=1,
+                      series=3,
+                      sweep=[1, 2, 3, 4, 5],
+                      data_trace=1,
+                      trigger_trace=3,
+                      thresh='2',
+                      center_on='max',  # 'min'
+                      window=0.75,  # ms
+                      latency=10  # ms
+                      )
+
+        print wave_path, jump_paths
+
+        try:
+            import process_data
+            process_data.main(**kwargs)
+        except Exception as e:
+            print 'Something went wrong: {}'.format(e)
+            return
 
 
 class MyStatusBar(wx.StatusBar):
@@ -2320,8 +2399,9 @@ class MyStatusBar(wx.StatusBar):
         super(MyStatusBar, self).__init__(parent, 1)
 
         self.SetFieldsCount(1)
-        self.text_box = wx.StaticText(self, -1, 'hello there')
+        self.text_box = wx.StaticText(self, -1, ' hello')
 
+        # size is weird on win32, so adjust for aesthetics
         if platform == 'win32':
             field_rect = self.GetFieldRect(0)
             field_rect.y += 3
