@@ -2250,10 +2250,10 @@ class MyMenuBar(wx.MenuBar):
                                                    kind=wx.ITEM_CHECK)
         # options submenu
         options_tools = wx.Menu()
-        tools_rec_map = options_tools.Append(wx.ID_ANY,
-                                             'Map receptive field',
-                                             'Generate receptive field map')
-        options_menu.AppendMenu(wx.ID_ANY, 'Tools', options_tools)
+        # tools_rec_map = options_tools.Append(wx.ID_ANY,
+        #                                      'Map receptive field',
+        #                                      'Generate receptive field map')
+        # options_menu.AppendMenu(wx.ID_ANY, 'Tools', options_tools)
 
         # add top level menus to menu bar
         self.Append(file_menu, '&File')
@@ -2265,7 +2265,7 @@ class MyMenuBar(wx.MenuBar):
         self.Bind(wx.EVT_MENU, self.on_view_stims, view_stims)
         self.Bind(wx.EVT_MENU, self.on_options_log, self.options_log)
         self.Bind(wx.EVT_MENU, self.on_options_capture, self.options_capture)
-        self.Bind(wx.EVT_MENU, self.on_options_tools_rec_map, tools_rec_map)
+        # self.Bind(wx.EVT_MENU, self.on_options_tools_rec_map, tools_rec_map)
 
     def on_file_quit(self, event):
         """
