@@ -1,5 +1,3 @@
-#!/Library/Frameworks/Python.framework/Versions/2.7/bin/python
-
 """
 GUI for StimProgram
 """
@@ -12,15 +10,18 @@ GUI for StimProgram
 import pyglet
 pyglet.options['shadow_window'] = False
 
-from GammaCorrection import GammaValues  # necessary for pickling
+from GammaCorrection import GammaValues  # unused, but necessary for pickling
 from collections import OrderedDict
 from copy import deepcopy
 from sys import platform
 import ConfigParser
 import StimProgram
-import wx, wx.grid
+import subprocess
 import cPickle
 import os
+
+import wx.lib.agw.multidirdialog as mdd
+import wx, wx.grid
 
 
 class Parameters(object):
@@ -37,10 +38,12 @@ class Parameters(object):
         self.global_default_param = None
 
         self.gui_params = None
+        self.stim_params = None
 
         # init params
         config_file = os.path.abspath('./psychopy/config.ini')
-        self.gui_params, config_dict = self.read_config_file(config_file)
+        self.gui_params, self.stim_params, config_dict = self.read_config_file(
+            config_file)
         self.init_params(config_dict)
 
     def read_config_file(self, config_file):
@@ -56,6 +59,7 @@ class Parameters(object):
 
         default_config_dict = {}
         gui_config_dict = {}
+        stim_config_dict = {}
 
         # make dict of options
         for option in config.options('Defaults'):
@@ -65,6 +69,9 @@ class Parameters(object):
         for option in config.options('GUI'):
             gui_config_dict[option] = config.get('GUI', option)
 
+        for option in config.options('StimProgram'):
+            stim_config_dict[option] = config.get('StimProgram', option)
+
         # cast, so that lists are not strings for proper set up of controls
         for key, value in default_config_dict.iteritems():
             default_config_dict[key] = self.try_cast(value)
@@ -72,7 +79,10 @@ class Parameters(object):
         for key, value in gui_config_dict.iteritems():
             gui_config_dict[key] = self.try_cast(value)
 
-        return gui_config_dict, default_config_dict
+        for key, value in stim_config_dict.iteritems():
+            stim_config_dict[key] = self.try_cast(value)
+
+        return gui_config_dict, stim_config_dict, default_config_dict
 
     def try_cast(self, value):
         """
@@ -181,6 +191,14 @@ class Parameters(object):
         """
         return self.gui_params
 
+    def get_stim_params(self):
+        """
+        Getter
+
+        :return: dictionary of stim settings
+        """
+        return self.stim_params
+
     def get_merged_params(self):
         """
         Getter.
@@ -253,7 +271,8 @@ class Parameters(object):
                   'circle'   : ['outer_diameter'],
                   'rectangle': ['size'],
                   'annulus'  : ['inner_diameter', 'outer_diameter']
-              }}
+                  }
+              }
              ),
 
             ('orientation',
@@ -290,7 +309,7 @@ class Parameters(object):
               'default' : config_dict['outer_diameter'],
               'is_child': True}
              ),
-        ])
+            ])
 
         self.timing_param = OrderedDict([
             ('delay',
@@ -328,7 +347,7 @@ class Parameters(object):
               'default' : config_dict['trigger'],
               'is_child': False}
              ),
-        ])
+            ])
 
         self.fill_param = OrderedDict([
             ('color_mode',
@@ -340,7 +359,8 @@ class Parameters(object):
               'children': {
                   'rgb'        : ['color', 'contrast_channel'],
                   'intensity'  : ['intensity', 'contrast_channel'],
-              }}
+                  }
+              }
              ),
 
             ('color',
@@ -376,7 +396,8 @@ class Parameters(object):
                   'square'  : ['period_mod', 'intensity_dir'],
                   'sawtooth': ['period_mod', 'intensity_dir'],
                   'linear'  : ['intensity_dir']
-              }}
+                  }
+              }
              ),
 
             ('fill_mode',
@@ -398,7 +419,8 @@ class Parameters(object):
                   'movie'       : ['movie_filename', 'movie_size'],
                   'image'       : ['image_filename', 'image_size', 'phase',
                                    'phase_speed', 'image_channel'],
-              }}
+                  }
+              }
              ),
 
             ('alpha',
@@ -508,7 +530,7 @@ class Parameters(object):
               'default' : config_dict['period_mod'],
               'is_child': True}
              ),
-        ])
+            ])
 
         self.motion_param = OrderedDict([
             ('move_type',
@@ -525,7 +547,8 @@ class Parameters(object):
                              'num_dirs', 'move_delay', 'ori_with_dir'],
                   'jump'  : ['num_jumps', 'move_delay', 'move_seed',
                              'shuffle', 'blend_jumps'],
-              }}
+                  }
+              }
              ),
 
             ('speed',
@@ -622,7 +645,7 @@ class Parameters(object):
               'default' : config_dict['blend_jumps'],
               'is_child': True}
              ),
-        ])
+            ])
 
         self.global_default_param = OrderedDict([
             ('display_size',
@@ -732,7 +755,8 @@ class Parameters(object):
               'label'   : 'log',
               'choices' : ['True', 'False'],
               'default' : config_dict['log'],
-              'is_child': False}
+              'is_child': False,
+              'hide'    : True}
              ),
 
             ('capture',
@@ -740,9 +764,10 @@ class Parameters(object):
               'label'   : 'capture',
               'choices' : ['True', 'False'],
               'default' : config_dict['capture'],
-              'is_child': False}
+              'is_child': False,
+              'hide'    : True}
              )
-        ])
+            ])
 
 
 class TextCtrlTag(wx.TextCtrl):
@@ -961,7 +986,7 @@ class InputPanel(wx.Panel):
         # iterate through params in param dict
         for param, param_info in self.params.iteritems():
             # only generate fields for params that aren't children
-            if not param_info['is_child']:
+            if not param_info['is_child'] and 'hide' not in param_info:
                 # label widget
                 label = wx.StaticText(self, label=param_info['label'] + ':')
 
@@ -1049,8 +1074,12 @@ class InputPanel(wx.Panel):
 
                         # add to sizer
                         list_sizer.Add(ctrl)
-                        self.Bind(wx.EVT_TEXT, self.input_update, ctrl)
-                        self.Bind(wx.EVT_CONTEXT_MENU, self.on_right_click, ctrl)
+                        self.Bind(wx.EVT_TEXT,
+                                  self.input_update,
+                                  ctrl)
+                        self.Bind(wx.EVT_CONTEXT_MENU,
+                                  self.on_right_click,
+                                  ctrl)
 
                     # set ctrl to sizer in order to be added to grid_sizer
                     ctrl = list_sizer
@@ -1131,7 +1160,6 @@ class InputPanel(wx.Panel):
                 event.Skip()
                 event.GetEventObject().SetStringSelection('table')
                 return
-
 
         # if a list type param, change the appropriate list item by getting
         # tag2 (list index)
@@ -1569,7 +1597,8 @@ class ListPanel(wx.Panel):
 
         # deselect all in list and select most recently added
         while self.list_control.GetSelectedItemCount() != 0:
-            self.list_control.Select(self.list_control.GetFirstSelected(), on=0)
+            self.list_control.Select(self.list_control.GetFirstSelected(),
+                                     on=0)
         self.list_control.Select(insert_pos)
 
         # print self.stims_to_run_w_grid
@@ -1863,8 +1892,7 @@ class DirPanel(wx.Panel):
         # get path from browser
         path = self.browser.GetPath()
 
-        is_log = os.path.split(os.path.split(os.path.dirname(path))[0])[1] ==\
-                 'logs'
+        is_log = 'logs' in path
 
         # if not log file, open and load pickle data
         if not is_log:
@@ -1936,7 +1964,7 @@ class DirPanel(wx.Panel):
         path = self.browser.GetPath()
 
         is_log = os.path.split(os.path.split(os.path.dirname(path))[0])[1] ==\
-                 'logs'
+            'logs'
 
         if is_log:
             if platform == 'win32':
@@ -2026,13 +2054,13 @@ class MyGrid(wx.Frame):
         """
         ctrls = self.frame.all_controls[param]
 
-        if param not in self.control_dict and ctrls[0].GetParent().category != \
-                'global':
+        if param not in self.control_dict and ctrls[0].GetParent().category \
+                != 'global':
             # add column to grid
             self.grid.ClearSelection()
             self.grid.AppendCols(1)
-            self.grid.SetGridCursor(0, self.grid.GetNumberCols()-1)
-            self.grid.SetColLabelValue(self.grid.GetNumberCols()-1, param)
+            self.grid.SetGridCursor(0, self.grid.GetNumberCols() - 1)
+            self.grid.SetColLabelValue(self.grid.GetNumberCols() - 1, param)
 
             # get value of control
             try:
@@ -2057,7 +2085,7 @@ class MyGrid(wx.Frame):
             for ctrl in ctrls:
                 ctrl.set_editable(False)
 
-            self.grid.SetCellValue(0, self.grid.GetNumberCols()-1, value)
+            self.grid.SetCellValue(0, self.grid.GetNumberCols() - 1, value)
 
         # if already in grid
         else:
@@ -2179,12 +2207,267 @@ class MyGrid(wx.Frame):
             # iterate until terminal nones
             for i in range(0, where_stop):
                 if values[i] is None:
-                    values[i] = values[i-1]
+                    values[i] = values[i - 1]
 
             values = map(self.parameters.try_cast, values)
             to_return[param] = values
 
         return to_return
+
+
+class MyMenuBar(wx.MenuBar):
+    """
+    Class for custom menu bar.
+    """
+    def __init__(self, parent):
+        """
+        Constructor.
+        """
+        super(MyMenuBar, self).__init__()
+
+        self.frame = parent
+
+        # menus
+        file_menu = wx.Menu()
+        view_menu = wx.Menu()
+        options_menu = wx.Menu()
+
+        # file menus
+        file_quit = file_menu.Append(wx.ID_EXIT, 'Quit', 'Quit application')
+
+        # view menus
+        view_logs = view_menu.Append(wx.ID_ANY, 'logs', 'Open log folder')
+        view_stims = view_menu.Append(wx.ID_ANY, 'stims', 'Open stim folder')
+
+        # options menus
+        self.options_log = options_menu.Append(wx.ID_ANY, 'log',
+                                               'Save runs to log file',
+                                               kind=wx.ITEM_CHECK)
+        self.options_log.Toggle()  # default to True
+        self.options_capture = options_menu.Append(wx.ID_ANY, 'capture',
+                                                   'Capture run and create '
+                                                   'video',
+                                                   kind=wx.ITEM_CHECK)
+        # options submenu
+        options_tools = wx.Menu()
+        # tools_rec_map = options_tools.Append(wx.ID_ANY,
+        #                                      'Map receptive field',
+        #                                      'Generate receptive field map')
+        # options_menu.AppendMenu(wx.ID_ANY, 'Tools', options_tools)
+
+        # add top level menus to menu bar
+        self.Append(file_menu, '&File')
+        self.Append(view_menu, '&View')
+        self.Append(options_menu, '&Options')
+
+        self.Bind(wx.EVT_MENU, self.on_file_quit, file_quit)
+        self.Bind(wx.EVT_MENU, self.on_view_logs, view_logs)
+        self.Bind(wx.EVT_MENU, self.on_view_stims, view_stims)
+        self.Bind(wx.EVT_MENU, self.on_options_log, self.options_log)
+        self.Bind(wx.EVT_MENU, self.on_options_capture, self.options_capture)
+        # self.Bind(wx.EVT_MENU, self.on_options_tools_rec_map, tools_rec_map)
+
+    def on_file_quit(self, event):
+        """
+        Handles quitting.
+        """
+        self.frame.Close()
+
+    def on_view_logs(self, event):
+        """
+        Handles request to view logs
+        """
+        logs_dir = self.frame.stim_params['logs_dir']
+
+        if platform == "win32":
+            os.startfile(logs_dir)
+        elif platform == "darwin":
+            subprocess.Popen(["open", logs_dir])
+
+    def on_view_stims(self, event):
+        """
+        Handles request to view stims
+        """
+        stim_dir = self.frame.gui_params['saved_stim_dir']
+
+        if platform == "win32":
+            os.startfile(stim_dir)
+        elif platform == "darwin":
+            subprocess.Popen(["open", stim_dir])
+
+    def on_options_log(self, event):
+        """
+        Handles toggling logging
+
+        :param event:
+        :return:
+        """
+        val = self.options_log.IsChecked()
+
+        self.frame.parameters.set_param_value('global', 'log', val)
+        StimProgram.GlobalDefaults['log'] = val
+
+    def on_options_capture(self, event):
+        """
+        Handles toggling capturing
+
+        :param event:
+        :return:
+        """
+        val = self.options_capture.IsChecked()
+
+        self.frame.parameters.set_param_value('global', 'capture', val)
+        StimProgram.GlobalDefaults['capture'] = val
+
+    def on_options_tools_rec_map(self, event):
+        """
+        Handles request to map receptive field_rect
+
+        :param event:
+        :return:
+        """
+        # start dialog to select folders
+        log_dir = os.path.abspath(self.frame.stim_params['logs_dir'])
+        prompt = 'Select folder(s) with desired JumpStim logs'
+        folder_select_dialog = mdd.MultiDirDialog(self.frame,
+                                                 message=prompt,
+                                                 defaultPath=log_dir,
+                                                 agwStyle=mdd.DD_MULTIPLE)
+
+        # to exit out of dialog on cancel
+        if folder_select_dialog.ShowModal() == wx.ID_CANCEL:
+            return
+
+        jump_paths = folder_select_dialog.GetPaths()
+
+        if platform == 'win32':
+            jump_paths = map(lambda x: x.split()[2].replace(')',
+                             '').replace('(', ''), jump_paths)
+            jump_paths = map(os.path.abspath, jump_paths)
+        # TODO: add handling for darwin
+
+        try:
+            for jump in jump_paths:
+                assert os.path.exists(jump)
+        except AssertionError:
+            print '\nOne or more of the selected paths do not exist:'
+            for jump in jump_paths:
+                print '    {}'.format(jump)
+            return
+
+        prompt = 'Select heka wave file'
+
+        wave_dialog = wx.FileDialog(self.frame,
+                                    message=prompt,
+                                    # defaultDir=default_dir,
+                                    wildcard='*.dat',
+                                    style=wx.FD_OPEN | wx.FD_FILE_MUST_EXIST)
+
+        # to exit out of dialog on cancel button
+        if wave_dialog.ShowModal() == wx.ID_CANCEL:
+            return
+
+        wave_path = os.path.abspath(wave_dialog.GetPath())
+
+        wave_details = self.prompt_wave_details()
+
+        kwargs = dict(dat_file=wave_path,
+                      jump_logs=jump_paths,
+                      group=1,
+                      series=3,
+                      sweep=[1, 2, 3, 4, 5],
+                      data_trace=1,
+                      trigger_trace=3,
+                      thresh='2',
+                      center_on='max',  # 'min'
+                      window=0.75,  # ms
+                      latency=10  # ms
+                      )
+
+        # try:
+        #     import process_data
+        #     process_data.main(**kwargs)
+        # except Exception as e:
+        #     print 'Something went wrong: {}'.format(e)
+        #     return
+
+    def prompt_wave_details(self):
+        """
+        Dialog to prompt for details about the heka file.
+        """
+
+        dlg = wx.Dialog(parent=self, title='Wave details')
+
+        # dlg panel
+        panel = wx.Panel(dlg)
+
+        sizer = wx.FlexGridSizer(rows=9, cols=2, vgap=5, hgap=5)
+
+        params = OrderedDict([
+            ('group',
+             {'label'   : 'group',
+              'default' : ''}
+             ),
+
+            ('series',
+             {'label'   : 'series',
+              'default' : ''}
+             ),
+
+            ('sweep',
+             {'label'   : 'sweep',
+              'default' : ''}
+             ),
+
+            ('data_trace',
+             {'label'   : 'data trace',
+              'default' : ''}
+             ),
+
+            ('trigger_trace',
+             {'label'   : 'trigger trace',
+              'default' : ''}
+             ),
+
+            ('series',
+             {'label'   : 'series',
+              'default' : ''}
+             ),
+
+            ('sweep',
+             {'label'   : 'sweep',
+              'default' : ''}
+             ),
+
+            ('data_trace',
+             {'label'   : 'data trace',
+              'default' : ''}
+             ),
+
+            ('trigger_trace',
+             {'label'   : 'trigger trace',
+              'default' : ''}
+             ),
+            ])
+
+        # sizer_counter = 0
+
+        for tag, values in params.iteritems():
+            label = wx.StaticText(self, label=tag + ':')
+            ctrl = TextCtrlTag(self,
+                               size=(120, -1),
+                               tag=tag,
+                               value=values['default'])
+
+            sizer.Add(label)
+            sizer.Add(ctrl)
+
+        panel.SetSizer(sizer)
+        # sizer.Fit(dlg)
+
+        # to exit out of dialog on cancel button
+        if dlg.ShowModal() == wx.ID_CANCEL:
+            return
 
 
 class MyStatusBar(wx.StatusBar):
@@ -2195,8 +2478,9 @@ class MyStatusBar(wx.StatusBar):
         super(MyStatusBar, self).__init__(parent, 1)
 
         self.SetFieldsCount(1)
-        self.text_box = wx.StaticText(self, -1, 'hello')
+        self.text_box = wx.StaticText(self, -1, ' hello')
 
+        # size is weird on win32, so adjust for aesthetics
         if platform == 'win32':
             field_rect = self.GetFieldRect(0)
             field_rect.y += 3
@@ -2228,6 +2512,7 @@ class MyFrame(wx.Frame):
         # instantiate parameters
         self.parameters = Parameters()
         self.gui_params = self.parameters.get_gui_params()
+        self.stim_params = self.parameters.get_stim_params()
 
         # instance attributes
         self.win_open = False
@@ -2347,6 +2632,10 @@ class MyFrame(wx.Frame):
         self.status_bar = MyStatusBar(self)
         self.SetStatusBar(self.status_bar)
 
+        # menu bar
+        self.menu_bar = MyMenuBar(self)
+        self.SetMenuBar(self.menu_bar)
+
         # hide all subpanels
         for panel in self.input_nb.GetChildren():
             for param in panel.sub_panel_dict.iterkeys():
@@ -2429,7 +2718,8 @@ class MyFrame(wx.Frame):
                                         # convert to instances
                                         elif param == 'move_type':
                                             value = \
-                                                self.list_panel.convert_stim_type(value)
+                                                self.list_panel.\
+                                                convert_stim_type(value)
 
                                             self.list_panel.stims_to_run[
                                                 j].stim_type = value
