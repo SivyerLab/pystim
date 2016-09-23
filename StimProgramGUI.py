@@ -2344,6 +2344,7 @@ class MyMenuBar(wx.MenuBar):
             jump_paths = map(lambda x: x.split()[2].replace(')',
                              '').replace('(', ''), jump_paths)
             jump_paths = map(os.path.abspath, jump_paths)
+        # TODO: add handling for darwin
 
         try:
             for jump in jump_paths:
@@ -2368,6 +2369,8 @@ class MyMenuBar(wx.MenuBar):
 
         wave_path = os.path.abspath(wave_dialog.GetPath())
 
+        wave_details = self.prompt_wave_details()
+
         kwargs = dict(dat_file=wave_path,
                       jump_logs=jump_paths,
                       group=1,
@@ -2381,13 +2384,89 @@ class MyMenuBar(wx.MenuBar):
                       latency=10  # ms
                       )
 
-        print wave_path, jump_paths
+        # try:
+        #     import process_data
+        #     process_data.main(**kwargs)
+        # except Exception as e:
+        #     print 'Something went wrong: {}'.format(e)
+        #     return
 
-        try:
-            import process_data
-            process_data.main(**kwargs)
-        except Exception as e:
-            print 'Something went wrong: {}'.format(e)
+    def prompt_wave_details(self):
+        """
+        Dialog to prompt for details about the heka file.
+        """
+
+        dlg = wx.Dialog(parent=self, title='Wave details')
+
+        # dlg panel
+        panel = wx.Panel(dlg)
+
+        sizer = wx.FlexGridSizer(rows=9, cols=2, vgap=5, hgap=5)
+
+        params = OrderedDict([
+            ('group',
+             {'label'   : 'group',
+              'default' : ''}
+             ),
+
+            ('series',
+             {'label'   : 'series',
+              'default' : ''}
+             ),
+
+            ('sweep',
+             {'label'   : 'sweep',
+              'default' : ''}
+             ),
+
+            ('data_trace',
+             {'label'   : 'data trace',
+              'default' : ''}
+             ),
+
+            ('trigger_trace',
+             {'label'   : 'trigger trace',
+              'default' : ''}
+             ),
+
+            ('series',
+             {'label'   : 'series',
+              'default' : ''}
+             ),
+
+            ('sweep',
+             {'label'   : 'sweep',
+              'default' : ''}
+             ),
+
+            ('data_trace',
+             {'label'   : 'data trace',
+              'default' : ''}
+             ),
+
+            ('trigger_trace',
+             {'label'   : 'trigger trace',
+              'default' : ''}
+             ),
+            ])
+
+        # sizer_counter = 0
+
+        for tag, values in params.iteritems():
+            label = wx.StaticText(self, label=tag + ':')
+            ctrl = TextCtrlTag(self,
+                               size=(120, -1),
+                               tag=tag,
+                               value=values['default'])
+
+            sizer.Add(label)
+            sizer.Add(ctrl)
+
+        panel.SetSizer(sizer)
+        # sizer.Fit(dlg)
+
+        # to exit out of dialog on cancel button
+        if dlg.ShowModal() == wx.ID_CANCEL:
             return
 
 
