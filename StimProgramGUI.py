@@ -5,7 +5,7 @@ GUI for StimProgram
 # Copyright (C) 2016 Alexander Tomlinson
 # Distributed under the terms of the GNU General Public License (GPL).
 
-# must first turn pyglet shadow windows off to avoid conflict beteween wxPython
+# must first turn pyglet shadow windows off to avoid conflict between wxPython
 # and psychopy.visual on OSX
 import pyglet
 pyglet.options['shadow_window'] = False
@@ -2250,10 +2250,10 @@ class MyMenuBar(wx.MenuBar):
                                                    kind=wx.ITEM_CHECK)
         # options submenu
         options_tools = wx.Menu()
-        # tools_rec_map = options_tools.Append(wx.ID_ANY,
-        #                                      'Map receptive field',
-        #                                      'Generate receptive field map')
-        # options_menu.AppendMenu(wx.ID_ANY, 'Tools', options_tools)
+        tools_rec_map = options_tools.Append(wx.ID_ANY,
+                                             'Map receptive field',
+                                             'Generate receptive field map')
+        options_menu.AppendMenu(wx.ID_ANY, 'Tools', options_tools)
 
         # add top level menus to menu bar
         self.Append(file_menu, '&File')
@@ -2265,7 +2265,7 @@ class MyMenuBar(wx.MenuBar):
         self.Bind(wx.EVT_MENU, self.on_view_stims, view_stims)
         self.Bind(wx.EVT_MENU, self.on_options_log, self.options_log)
         self.Bind(wx.EVT_MENU, self.on_options_capture, self.options_capture)
-        # self.Bind(wx.EVT_MENU, self.on_options_tools_rec_map, tools_rec_map)
+        self.Bind(wx.EVT_MENU, self.on_options_tools_rec_map, tools_rec_map)
 
     def on_file_quit(self, event):
         """
@@ -2373,16 +2373,20 @@ class MyMenuBar(wx.MenuBar):
 
         kwargs = dict(dat_file=wave_path,
                       jump_logs=jump_paths,
-                      group=1,
-                      series=3,
-                      sweep=[1, 2, 3, 4, 5],
-                      data_trace=1,
-                      trigger_trace=3,
-                      thresh='2',
-                      center_on='max',  # 'min'
-                      window=0.75,  # ms
-                      latency=10  # ms
+                      group=int(wave_details['group']),
+                      series=int(wave_details['series']),
+                      sweep=map(int, wave_details['sweep'].replace(',',
+                          '').split()),
+                      data_trace=int(wave_details['data_trace']),
+                      trigger_trace=int(wave_details['trigger_trace']),
+                      thresh=wave_details['thresh'],
+                      center_on=wave_details['center_on'],
+                      window=float(wave_details['window']),
+                      latency=int(wave_details['latency'])
                       )
+
+        for k, v in kwargs.iteritems():
+            print k, v
 
         # try:
         #     import process_data
@@ -2395,79 +2399,97 @@ class MyMenuBar(wx.MenuBar):
         """
         Dialog to prompt for details about the heka file.
         """
-
-        dlg = wx.Dialog(parent=self, title='Wave details')
-
-        # dlg panel
-        panel = wx.Panel(dlg)
-
-        sizer = wx.FlexGridSizer(rows=9, cols=2, vgap=5, hgap=5)
-
         params = OrderedDict([
             ('group',
-             {'label'   : 'group',
-              'default' : ''}
+             {'label': 'group',
+              'default': ''}
              ),
 
             ('series',
-             {'label'   : 'series',
-              'default' : ''}
+             {'label': 'series',
+              'default': ''}
              ),
 
             ('sweep',
-             {'label'   : 'sweep',
-              'default' : ''}
+             {'label': 'sweeps (csv)',
+              'default': ''}
              ),
 
             ('data_trace',
-             {'label'   : 'data trace',
-              'default' : ''}
+             {'label': 'data trace',
+              'default': ''}
              ),
 
             ('trigger_trace',
-             {'label'   : 'trigger trace',
-              'default' : ''}
+             {'label': 'trigger trace',
+              'default': ''}
              ),
 
-            ('series',
-             {'label'   : 'series',
-              'default' : ''}
+            ('thresh',
+             {'label': 'threshold',
+              'default': '2'}
              ),
 
-            ('sweep',
-             {'label'   : 'sweep',
-              'default' : ''}
+            ('center_on',
+             {'label' : 'center on (min, max)',
+              'default': 'min'}
              ),
 
-            ('data_trace',
-             {'label'   : 'data trace',
-              'default' : ''}
+            ('window',
+             {'label': 'spike width (ms)',
+              'default': '0.75'}
              ),
 
-            ('trigger_trace',
-             {'label'   : 'trigger trace',
-              'default' : ''}
+            ('latency',
+             {'label': 'latency (ms)',
+              'default': '10'}
              ),
             ])
 
-        # sizer_counter = 0
+        dlg = wx.Dialog(parent=None, title='Wave details')
+
+        # inputs sizer
+        inputs_sizer = wx.FlexGridSizer(rows=9, cols=2, vgap=5, hgap=5)
+
+        inputs = []
 
         for tag, values in params.iteritems():
-            label = wx.StaticText(self, label=tag + ':')
-            ctrl = TextCtrlTag(self,
-                               size=(120, -1),
+            label = wx.StaticText(dlg, label=tag + ':')
+            ctrl = TextCtrlTag(dlg,
+                               size=(-1, -1),
                                tag=tag,
                                value=values['default'])
 
-            sizer.Add(label)
-            sizer.Add(ctrl)
+            inputs.append(ctrl)
 
-        panel.SetSizer(sizer)
-        # sizer.Fit(dlg)
+            inputs_sizer.Add(label)
+            inputs_sizer.Add(ctrl)
+
+        dlg_sizer = wx.BoxSizer(wx.VERTICAL)
+        dlg_sizer.Add(inputs_sizer,
+                      proportion=0,
+                      flag=wx.EXPAND | wx.TOP | wx.LEFT,
+                      border=5)
+
+        button_sizer = dlg.CreateSeparatedButtonSizer(wx.OK | wx.CANCEL)
+        dlg_sizer.Add(button_sizer,
+                      proportion=0,
+                      flag=wx.EXPAND | wx.TOP | wx.BOTTOM,
+                      border=10)
+
+        dlg.SetSizer(dlg_sizer)
+        dlg_sizer.Fit(dlg)
 
         # to exit out of dialog on cancel button
         if dlg.ShowModal() == wx.ID_CANCEL:
             return
+
+        ret = {}
+
+        for input in inputs:
+            ret[input.tag] = input.GetValue()
+
+        return ret
 
 
 class MyStatusBar(wx.StatusBar):
