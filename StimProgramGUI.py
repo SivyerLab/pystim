@@ -14,6 +14,7 @@ from GammaCorrection import GammaValues  # unused, but necessary for pickling
 from collections import OrderedDict
 from copy import deepcopy
 from sys import platform
+from PIL import Image
 import ConfigParser
 import StimProgram
 import subprocess
@@ -2340,6 +2341,8 @@ class MyMenuBar(wx.MenuBar):
 
         jump_paths = folder_select_dialog.GetPaths()
 
+        # GetPaths of MultiDirDialog prepends volume information to paths,
+        # so need to strip out, platform dependant
         if platform == 'win32':
             jump_paths = map(lambda x: x.split()[2].replace(')',
                              '').replace('(', ''), jump_paths)
@@ -2392,10 +2395,32 @@ class MyMenuBar(wx.MenuBar):
 
         try:
             import process_data
-            process_data.main(**kwargs)
+            rec_field = process_data.main(**kwargs)
         except Exception as e:
             print 'Something went wrong: {}'.format(e)
             return
+
+        rec_field = Image.fromarray(rec_field)
+        rec_field.show()
+
+        # default_dir = os.path.abspath('./psychopy/stims/')
+
+        # popup save dialog
+        save_dialog = wx.FileDialog(self.frame,
+                                    message='Save receptive field map?',
+                                    wildcard='.png',
+                                    # defaultDir=default_dir,
+                                    style=wx.FD_SAVE | wx.FD_OVERWRITE_PROMPT)
+
+        # to exit out of popup on cancel button
+        if save_dialog.ShowModal() == wx.ID_CANCEL:
+            return
+
+        path = save_dialog.GetPath()
+        print path
+
+        rec_field.save(path)
+        return
 
     def prompt_wave_details(self):
         """
@@ -2485,6 +2510,8 @@ class MyMenuBar(wx.MenuBar):
         # to exit out of dialog on cancel button
         if dlg.ShowModal() == wx.ID_CANCEL:
             return
+
+        dlg.Destroy()
 
         ret = {}
 

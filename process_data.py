@@ -8,6 +8,7 @@ from heka_reader import Bundle
 from tqdm import tqdm
 from pandas import cut
 import numpy as np
+from PIL import Image
 
 from spike_sort.core.extract import detect_spikes
 import ast
@@ -299,6 +300,7 @@ def get_rec_field(slices, texs, weights):
                         4), dtype=np.float64)
 
     print '\nBuilding receptive field...'
+
     for i, slice in enumerate(slices):
         tex = np.load(texs[i]).astype(np.float64)
 
@@ -316,25 +318,6 @@ def get_rec_field(slices, texs, weights):
 
 
 def main(**kwargs):
-    # dat_file = os.path.abspath("C:\Users\Alex\PycharmProjects\heka_browser"
-    #                            "\data\R2P_160817_04-jump_onds.dat")
-    #
-    # folder = [r'./jump_logs/on-ds']
-    #
-    # kwargs = dict(dat_file=dat_file,
-    #               jump_logs=folder,
-    #               group=1,
-    #               series=3,  # change according to file
-    #               # sweep=[1, 2, 3, 4, 5],
-    #               sweep=[1, 2],
-    #               # sweep=1,
-    #               data_trace=1,
-    #               trigger_trace=3,
-    #               thresh='2',
-    #               center_on='max',
-    #               # center_on='min',
-    #               window=0.75,
-    #               latency=10)
 
     slices, texs = get_slices_texs(folder=kwargs['jump_logs'],
                                    # which=[1, 3, 5]
@@ -346,13 +329,44 @@ def main(**kwargs):
     weights = get_weights(**kwargs)
 
     rec_field = get_rec_field(slices, texs, weights)
-
+    return rec_field
     # cv2.imwrite('rec_field.png', rec_field.copy())
 
-    scale = 1
-    disp = cv2.resize(rec_field, (0, 0), fx=scale, fy=scale)
-    cv2.imshow('Scaled receptive field map', disp)
-    cv2.waitKey(0)
+    # scale = 1
+    # disp = cv2.resize(rec_field, (0, 0), fx=scale, fy=scale)
+    # cv2.imshow('Scaled receptive field map', disp)
+    # cv2.waitKey(0)
 
 if __name__ == '__main__':
-    main()
+    dat_file = os.path.abspath("C:\Users\Alex\PycharmProjects\heka_browser"
+                               "\data\R2P_160817_04-jump_onds.dat")
+
+    folder = [r'./jump_logs/on-ds']
+    jump_logs = [r"C:\Users\Alex\PycharmProjects\StimulusProgram\psychopy"
+                 r"\logs\2016_09_22\14h54m20s",
+                 r"C:\Users\Alex\PycharmProjects\StimulusProgram\psychopy"
+                 r"\logs\2016_09_22\14h54m27s"]
+
+    kwargs = dict(dat_file=dat_file,
+                  jump_logs=jump_logs,
+                  group=1,
+                  series=3,  # change according to file
+                  # sweep=[1, 2, 3, 4, 5],
+                  sweep=[1, 2],
+                  # sweep=1,
+                  data_trace=1,
+                  trigger_trace=3,
+                  thresh='2',
+                  center_on='max',
+                  # center_on='min',
+                  window=0.75,
+                  latency=10)
+
+    img = main(**kwargs)
+    # cv2.imshow('img', img)
+    # cv2.waitKey(0)
+
+    im = Image.fromarray(img)
+    im.show()
+
+
