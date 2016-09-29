@@ -18,6 +18,7 @@ from PIL import Image
 import ConfigParser
 import StimProgram
 import subprocess
+import traceback
 import cPickle
 import os
 
@@ -2397,6 +2398,7 @@ class MyMenuBar(wx.MenuBar):
             import process_data
             rec_field = process_data.main(**kwargs)
         except Exception as e:
+            print traceback.print_exc()
             print 'Something went wrong: {}'.format(e)
             return
 

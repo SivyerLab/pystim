@@ -81,18 +81,18 @@ def get_weights(dat_file,
         trace_spts = [detect_spikes(trace_raw,
                                     thresh=thresh,
                                     edge='rising',
-                                    contact=i)['data'] for i in sweeps]
+                                    contact=i)['data'] for i in range(len(sweeps))]
     if center_on == 'min':
         trace_spts = [detect_spikes(trace_raw,
                                     thresh=thresh,
                                     edge='falling',
-                                    contact=i)['data'] for i in sweeps]
+                                    contact=i)['data'] for i in range(len(sweeps))]
 
     print 'Detecting triggers...'
     trigger_spts = [detect_spikes(trigger_raw,
                                   thresh='4',
                                   edge='rising',
-                                  contact=i)['data'] for i in sweeps]
+                                  contact=i)['data'] for i in range(len(sweeps))]
 
     # data window
     half_window = int(window / 1000 / x_int)
@@ -120,6 +120,7 @@ def get_weights(dat_file,
 
             indices.append(peak_index)
 
+        print 'num spikes:', len(indices)
         trace_spike_indices.append(np.array(indices))
 
     trace_spike_indices = np.array(trace_spike_indices)
@@ -147,6 +148,7 @@ def get_weights(dat_file,
 
             indices.append(peak_index)
 
+        print 'num triggers:', len(indices)
         trigger_spike_indices.append(np.array(indices))
 
     trigger_spike_indices = np.array(trigger_spike_indices)
@@ -273,8 +275,8 @@ def get_slices_texs(folder, which='all'):
     if which != 'all':
         # which is not zero indexed; adjust
         try:
-            log_files = [log_files[i - 1] for i in which]
-            tex_files = [tex_files[i - 1] for i in which]
+            log_files = [log_files[i - 1] for i in range(len(which))]
+            tex_files = [tex_files[i - 1] for i in range(len(which))]
         except TypeError:
             log_files = [log_files[which - 1]]
             tex_files = [tex_files[which - 1]]
