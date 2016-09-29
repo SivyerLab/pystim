@@ -247,15 +247,16 @@ def get_slices_texs(folder, which='all'):
     Gets slices from file
 
     :param folder: folder with slices and numpy arrays
+    :param which: which sweeps to include
     :return:
     """
-    print folder
+    # print folder
     try:
         folder = os.path.abspath(folder)
         files = os.listdir(folder)
         files = map(lambda x: os.path.join(folder, x), files)
 
-    except TypeError:
+    except (TypeError, AttributeError):  # win: TypeError, darwin: AttrError
         files = []
         for fold in folder:
             fold = os.path.abspath(fold)

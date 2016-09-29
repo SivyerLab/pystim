@@ -2330,9 +2330,9 @@ class MyMenuBar(wx.MenuBar):
         log_dir = os.path.abspath(self.frame.stim_params['logs_dir'])
         prompt = 'Select folder(s) with desired JumpStim logs'
         folder_select_dialog = mdd.MultiDirDialog(self.frame,
-                                                 message=prompt,
-                                                 defaultPath=log_dir,
-                                                 agwStyle=mdd.DD_MULTIPLE)
+                                                  message=prompt,
+                                                  defaultPath=log_dir,
+                                                  agwStyle=mdd.DD_MULTIPLE)
 
         # to exit out of dialog on cancel
         if folder_select_dialog.ShowModal() == wx.ID_CANCEL:
@@ -2344,7 +2344,9 @@ class MyMenuBar(wx.MenuBar):
             jump_paths = map(lambda x: x.split()[2].replace(')',
                              '').replace('(', ''), jump_paths)
             jump_paths = map(os.path.abspath, jump_paths)
-        # TODO: add handling for darwin
+        elif platform == 'darwin':
+            jump_paths = map(lambda x: x.replace('Macintosh HD', ''),
+                             jump_paths)
 
         try:
             for jump in jump_paths:
@@ -2375,8 +2377,8 @@ class MyMenuBar(wx.MenuBar):
                       jump_logs=jump_paths,
                       group=int(wave_details['group']),
                       series=int(wave_details['series']),
-                      sweep=map(int, wave_details['sweep'].replace(',',
-                          '').split()),
+                      sweep=map(int, wave_details['sweep'].replace(' ',
+                          '').split(',')),
                       data_trace=int(wave_details['data_trace']),
                       trigger_trace=int(wave_details['trigger_trace']),
                       thresh=wave_details['thresh'],
@@ -2385,15 +2387,15 @@ class MyMenuBar(wx.MenuBar):
                       latency=int(wave_details['latency'])
                       )
 
-        for k, v in kwargs.iteritems():
-            print k, v
+        # for k, v in kwargs.iteritems():
+        #     print k, v
 
-        # try:
-        #     import process_data
-        #     process_data.main(**kwargs)
-        # except Exception as e:
-        #     print 'Something went wrong: {}'.format(e)
-        #     return
+        try:
+            import process_data
+            process_data.main(**kwargs)
+        except Exception as e:
+            print 'Something went wrong: {}'.format(e)
+            return
 
     def prompt_wave_details(self):
         """
@@ -2417,12 +2419,12 @@ class MyMenuBar(wx.MenuBar):
 
             ('data_trace',
              {'label': 'data trace',
-              'default': ''}
+              'default': '1'}
              ),
 
             ('trigger_trace',
              {'label': 'trigger trace',
-              'default': ''}
+              'default': '3'}
              ),
 
             ('thresh',
@@ -2454,7 +2456,7 @@ class MyMenuBar(wx.MenuBar):
         inputs = []
 
         for tag, values in params.iteritems():
-            label = wx.StaticText(dlg, label=tag + ':')
+            label = wx.StaticText(dlg, label=values['label'] + ':')
             ctrl = TextCtrlTag(dlg,
                                size=(-1, -1),
                                tag=tag,
