@@ -16,6 +16,8 @@ import cv2
 import os
 import re
 
+from collections import deque
+
 
 def get_weights(dat_file,
                 group,
@@ -120,7 +122,7 @@ def get_weights(dat_file,
 
             indices.append(peak_index)
 
-        print 'num spikes:', len(indices)
+        print '    num spikes:', len(indices)
         trace_spike_indices.append(np.array(indices))
 
     trace_spike_indices = np.array(trace_spike_indices)
@@ -148,7 +150,7 @@ def get_weights(dat_file,
 
             indices.append(peak_index)
 
-        print 'num triggers:', len(indices)
+        print '   num triggers:', len(indices)
         trigger_spike_indices.append(np.array(indices))
 
     trigger_spike_indices = np.array(trigger_spike_indices)
@@ -286,7 +288,7 @@ def get_slices_texs(folder, which='all'):
     return slices, tex_files
 
 
-def get_rec_field(slices, texs, weights):
+def get_rec_field(slices, texs, weights, num_frames=3):
     """
 
     :param slices:
@@ -301,18 +303,27 @@ def get_rec_field(slices, texs, weights):
                         slices[0].display_size[0],
                         4), dtype=np.float64)
 
-    print '\nBuilding receptive field...'
+    counter = 0
 
+    print '\nBuilding receptive field...'
     for i, slice in enumerate(slices):
         tex = np.load(texs[i]).astype(np.float64)
+
+        slice_deque = deque([], maxlen=num_frames)
 
         for j, slice_ind in enumerate(tqdm(slice.slice_locs)):
             tex_slice = tex[slice_ind[0]:slice_ind[1],
                             slice_ind[2]:slice_ind[3]]
 
-            cap_sum += (tex_slice * weights[i][j])
+            slice_deque.append(tex_slice)
 
-    cap_sum /= sum_weights
+            for deq_slice in slice_deque:
+                cap_sum += (deq_slice * weights[i][j])
+                counter += weights[i][j]
+
+    # cap_sum /= sum_weights
+    cap_sum /= counter
+    print counter, sum_weights
     cap_sum = cap_sum.astype(np.uint8)
 
     print 'Done'
@@ -328,9 +339,11 @@ def main(**kwargs):
                                    )
 
     kwargs.pop('jump_logs')
+    num_frames = kwargs.pop('num_frames')
+
     weights = get_weights(**kwargs)
 
-    rec_field = get_rec_field(slices, texs, weights)
+    rec_field = get_rec_field(slices, texs, weights, num_frames)
     return rec_field
     # cv2.imwrite('rec_field.png', rec_field.copy())
 
@@ -362,7 +375,8 @@ if __name__ == '__main__':
                   center_on='max',
                   # center_on='min',
                   window=0.75,
-                  latency=10)
+                  latency=10,
+                  num_frames=3)
 
     img = main(**kwargs)
     # cv2.imshow('img', img)

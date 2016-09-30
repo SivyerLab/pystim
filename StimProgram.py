@@ -1249,7 +1249,7 @@ class MovingStim(StaticStim):
             off_x = (GlobalDefaults['display_size'][0] + max_size) / 2
             off_y = (GlobalDefaults['display_size'][1] + max_size) / 2
 
-            for i in range(self.move_delay):
+            for i in xrange(self.move_delay):
                 self.x_array = scipy.append(self.x_array, off_x)
                 self.y_array = scipy.append(self.y_array, off_y)
 
@@ -1339,7 +1339,7 @@ class RandomlyMovingStim(MovingStim):
         self.end_stim = super(MovingStim, self).draw_times() - self.end_delay
 
         if self.trigger:
-            for x in range(int(self.duration / self.num_frames + 0.99)):
+            for x in xrange(int(self.duration / self.num_frames + 0.99)):
                 trigger_frame = self.num_frames * x + self.start_stim
                 if trigger_frame not in MyWindow.frame_trigger_list:
                     MyWindow.frame_trigger_list.add(trigger_frame)
@@ -1451,7 +1451,7 @@ class TableStim(MovingStim):
         off_x = (GlobalDefaults['display_size'][0] + max_size) / 2
         off_y = (GlobalDefaults['display_size'][1] + max_size) / 2
 
-        for i in range(self.move_delay):
+        for i in xrange(self.move_delay):
             self.x_array = scipy.append(self.x_array, off_x)
             self.y_array = scipy.append(self.y_array, off_y)
 
@@ -1599,7 +1599,7 @@ class TableStim(MovingStim):
             trigger_list = map(int, trigger_list)
             self.trigger_frames = []
 
-            for i in range(len(trigger_list)):
+            for i in xrange(len(trigger_list)):
                 if trigger_list[i] == 1:
                     self.trigger_frames.append(i)
 
@@ -1836,8 +1836,8 @@ def board_texture_class(bases, **kwargs):
             # array of coordinates for each element
             xys = []
             # populate xys
-            for y in range(self.num_check / -2, self.num_check / 2):
-                for x in range(self.num_check / -2, self.num_check / 2):
+            for y in xrange(self.num_check / -2, self.num_check / 2):
+                for x in xrange(self.num_check / -2, self.num_check / 2):
                     xys.append((self.check_size[0] * x,
                                 self.check_size[1] * y))
 
@@ -1874,7 +1874,7 @@ def board_texture_class(bases, **kwargs):
                 # randomly populate for a random checkerboard
                 elif self.check_type == 'random':
                     self.index = numpy.concatenate(self.index[:])
-                    for i in range(len(self.index)):
+                    for i in xrange(len(self.index)):
                         self.index[i] = self.fill_random.randint(0, 1)
 
                 # use index to assign colors for board and random

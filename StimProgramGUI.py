@@ -2388,7 +2388,8 @@ class MyMenuBar(wx.MenuBar):
                       thresh=wave_details['thresh'],
                       center_on=wave_details['center_on'],
                       window=float(wave_details['window']),
-                      latency=int(wave_details['latency'])
+                      latency=int(wave_details['latency']),
+                      num_frames=int(wave_details['num_frames'])
                       )
 
         # for k, v in kwargs.iteritems():
@@ -2473,12 +2474,18 @@ class MyMenuBar(wx.MenuBar):
              {'label': 'latency (ms)',
               'default': '10'}
              ),
+
+            ('num_frames',
+             {'label': 'prev. frames to avg',
+              'default': '3'}
+             ),
             ])
 
         dlg = wx.Dialog(parent=None, title='Wave details')
 
         # inputs sizer
-        inputs_sizer = wx.FlexGridSizer(rows=9, cols=2, vgap=5, hgap=5)
+        inputs_sizer = wx.FlexGridSizer(rows=len(params), cols=2, vgap=5,
+                                        hgap=5)
 
         inputs = []
 
