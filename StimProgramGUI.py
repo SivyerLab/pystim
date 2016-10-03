@@ -749,7 +749,8 @@ class Parameters(object):
               'label'   : 'mirror window',
               'choices' : ['True', 'False'],
               'default' : config_dict['small_win'],
-              'is_child': False}
+              'is_child': False,
+              'hide'    : True}
              ),
 
             ('log',
@@ -2250,6 +2251,9 @@ class MyMenuBar(wx.MenuBar):
                                                    'Capture run and create '
                                                    'video',
                                                    kind=wx.ITEM_CHECK)
+        self.options_mirror = options_menu.Append(wx.ID_ANY, 'mirror',
+                                                   'Make small mirror window',
+                                                   kind=wx.ITEM_CHECK)
         # options submenu
         options_tools = wx.Menu()
         tools_rec_map = options_tools.Append(wx.ID_ANY,
@@ -2267,6 +2271,7 @@ class MyMenuBar(wx.MenuBar):
         self.Bind(wx.EVT_MENU, self.on_view_stims, view_stims)
         self.Bind(wx.EVT_MENU, self.on_options_log, self.options_log)
         self.Bind(wx.EVT_MENU, self.on_options_capture, self.options_capture)
+        self.Bind(wx.EVT_MENU, self.on_options_mirror, self.options_mirror)
         self.Bind(wx.EVT_MENU, self.on_options_tools_rec_map, tools_rec_map)
 
     def on_file_quit(self, event):
@@ -2320,6 +2325,18 @@ class MyMenuBar(wx.MenuBar):
 
         self.frame.parameters.set_param_value('global', 'capture', val)
         StimProgram.GlobalDefaults['capture'] = val
+
+    def on_options_mirror(self, event):
+        """
+        Handles toggling capturing
+
+        :param event:
+        :return:
+        """
+        val = self.options_mirror.IsChecked()
+
+        self.frame.parameters.set_param_value('global', 'small_win', val)
+        StimProgram.GlobalDefaults['small_win'] = val
 
     def on_options_tools_rec_map(self, event):
         """
