@@ -274,16 +274,21 @@ def get_slices_texs(folder, which='all'):
 
     tex_files = [i for i in files if os.path.splitext(i)[1] == '.npy']
 
-    if which != 'all':
-        # which is not zero indexed; adjust
-        try:
-            log_files = [log_files[i - 1] for i in range(len(which))]
-            tex_files = [tex_files[i - 1] for i in range(len(which))]
-        except TypeError:
-            log_files = [log_files[which - 1]]
-            tex_files = [tex_files[which - 1]]
+    # if which != 'all':
+    #     # which is not zero indexed; adjust
+    #     try:
+    #         log_files = [log_files[i - 1] for i in range(len(which))]
+    #         tex_files = [tex_files[i - 1] for i in range(len(which))]
+    #     except TypeError:
+    #         log_files = [log_files[which - 1]]
+    #         tex_files = [tex_files[which - 1]]
+
+    assert len(which) == len(log_files), 'length of which and num log files ' \
+                                         'mismatch:\nnum sweeps = {}\nlogs = ' \
+                                         '{}'.format(len(which), log_files)
 
     slices = [Slicer(log) for log in log_files]
+    # print tex_files, log_files
 
     return slices, tex_files
 
@@ -319,11 +324,12 @@ def get_rec_field(slices, texs, weights, num_frames=3):
 
             for deq_slice in slice_deque:
                 cap_sum += (deq_slice * weights[i][j])
+                # np.add(cap_sum, deq_slice * weights[i][j], cap_sum)
                 counter += weights[i][j]
 
     # cap_sum /= sum_weights
     cap_sum /= counter
-    print counter, sum_weights
+    # print counter, sum_weights
     cap_sum = cap_sum.astype(np.uint8)
 
     print 'Done'
@@ -357,17 +363,15 @@ if __name__ == '__main__':
                                "\data\R2P_160817_04-jump_onds.dat")
 
     folder = [r'./jump_logs/on-ds']
-    jump_logs = [r"C:\Users\Alex\PycharmProjects\StimulusProgram\psychopy"
-                 r"\logs\2016_09_22\14h54m20s",
-                 r"C:\Users\Alex\PycharmProjects\StimulusProgram\psychopy"
-                 r"\logs\2016_09_22\14h54m27s"]
+    jump_logs = [r"C:\Users\Alex\PycharmProjects\StimulusProgram\psychopy\logs\2016_09_22\14h54m20s",
+                 r"C:\Users\Alex\PycharmProjects\StimulusProgram\psychopy\logs\2016_09_22\14h54m27s"]
 
     kwargs = dict(dat_file=dat_file,
                   jump_logs=jump_logs,
                   group=1,
                   series=3,  # change according to file
                   # sweep=[1, 2, 3, 4, 5],
-                  sweep=[1, 2],
+                  sweep=[1, 2, 3],
                   # sweep=1,
                   data_trace=1,
                   trigger_trace=3,
