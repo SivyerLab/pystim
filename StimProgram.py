@@ -2087,13 +2087,13 @@ def log_stats(count_reps, reps, count_frames, num_frames, elapsed_time,
         if stim_list[i].parameters['shape'] != 'annulus':
 
             if stim_list[i].stim_type == 'RandomlyMovingStim':
-                file_name = 'Randomlog_' + current_time_string + '_' + '.txt'
+                file_name = 'Randomlog_' + current_time_string + '.txt'
 
             if stim_list[i].stim_type == 'MovingStim':
-                file_name = 'Movinglog_' + current_time_string + '_' + '.txt'
+                file_name = 'Movinglog_' + current_time_string + '.txt'
 
             if stim_list[i].stim_type == 'ImageJumpStim':
-                file_name = 'Jumpinglog_' + current_time_string + '_' + '.txt'
+                file_name = 'Jumpinglog_' + current_time_string + '.txt'
 
             if stim_list[i].stim_type in ['RandomlyMovingStim', 'MovingStim']:
 
