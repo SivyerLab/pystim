@@ -43,7 +43,7 @@ class Parameters(object):
         self.stim_params = None
 
         # init params
-        config_file = os.path.abspath('./psychopy/config.ini')
+        config_file = os.path.abspath('./stimprogram/psychopy/config.ini')
         self.gui_params, self.stim_params, config_dict = self.read_config_file(
             config_file)
         self.init_params(config_dict)

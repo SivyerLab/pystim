@@ -47,11 +47,11 @@ try:
 except ImportError:
     has_u3 = False
 
-__author__ = "Alexander Tomlinson"
+__author__  = "Alexander Tomlinson"
 __license__ = "GPL"
 __version__ = "1.1"
-__email__ = "tomlinsa@ohsu.edu"
-__status__ = "Beta"
+__email__   = "tomlinsa@ohsu.edu"
+__status__  = "Beta"
 
 # to suppress extra warnings, uncomment next 2 lines
 # from psychopy import logging
@@ -61,7 +61,7 @@ __status__ = "Beta"
 defaults = dict(logs_dir='.\\psychopy\\logs\\',
                 monitor='blank')
 config = ConfigParser.ConfigParser()
-config.read(os.path.abspath('./psychopy/config.ini'))
+config.read(os.path.abspath('./stimprogram/psychopy/config.ini'))
 
 
 class StimInfo(object):
