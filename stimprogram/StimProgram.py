@@ -80,7 +80,7 @@ class StimInfo(object):
         self.parameters = parameters
         self.number = number
 
-    def __str__(self):
+    def __repr__(self):
         """For printing information about the stim's parameters.
 
         :return: formatted string of parameter dictionary
@@ -97,7 +97,7 @@ class StimInfo(object):
 
 
 class GlobalDefaultsMeta(type):
-    """Metaclass to redefine get item and set item for :py:class:`GlobalDefaults`.
+    """Metaclass to redefine get and set item for :py:class:`GlobalDefaults`.
     """
     def __getitem__(self, key):
         return self.defaults[key]
@@ -107,8 +107,7 @@ class GlobalDefaultsMeta(type):
 
 
 class GlobalDefaults(object):
-    """Class with global constants, such as window information. Uses dictionary
-    to simulate 'mutable static class variables'
+    """Class with global constants, such as window information.
 
     TODO: better, more pythonic, way to do this
 
@@ -225,7 +224,7 @@ class GlobalDefaults(object):
         if small_win is not None:
             self.defaults['small_win'] = small_win
 
-    def __str__(self):
+    def __repr__(self):
         """For pretty printing dictionary of global defaults.
         """
         to_print = '\nGlobal Parameters: \n'
@@ -242,7 +241,6 @@ class GlobalDefaults(object):
 class MyWindow(object):
     """Class with static methods for window management and triggering.
     """
-
     # Class attributes
     #: Psychopy window instances.
     win = None
@@ -1377,20 +1375,31 @@ class RandomlyMovingStim(MovingStim):
 class TableStim(MovingStim):
     """Class where stim motion is determined by a table of radial coordinates.
 
-    Table can be a text file with new line separated values, or an Igor file
-    in binary wave/packed experiment format. If polar, first column is distance
-    from center of window in micrometers, and second column is either 0 or 1,
-    for whether or not to trigger. If xy, first and second column are xy
-    coordinates, respectively, and third column is whether or not to trigger.
+    Table can be a text file with tab or space separated values and newlines
+    between rows, or an Igor file in binary wave/packed experiment format.
     Trigger will occur right before frame where indicated position is
     flipped. First and last coordinate will always trigger (if stim is set to
     trigger).
 
-    For a binary wave file, values must be for coordinates, and triggering
-    will only happen on first coordinate. For packed experiment files,
-    leave wave names as 'wave0' and 'wave1', where 'wave0' is coordinates and
-    'wave1' is whether or not to trigger (if polar), or as 'wave0', 'wave1',
-    'wave2' (if xy).
+    For a binary wave file, accepted formats are polar and coordinate,
+    and triggering will only happen on first coordinate. For packed
+    experiment files, leave wave names as 'wave0' and 'wave1', where 'wave0'
+    is coordinates and 'wave1' is whether or not to trigger (if polar),
+    or as 'wave0', 'wave1', 'wave2' (if xy).
+
+    There are 3 table types: polar, coordinate, or direction. Their formats
+    are as follows.
+
+    Polar: Tab or space separated values. Each line must include both a
+    radius, and then whether or not to trigger for that frame (as a 0 or 1).
+
+    Coordinate: Tab or space separated values. Each line must include an x
+    coordinate, a y coordinate, and whether or not to trigger (as 0 or 1).
+
+    Direction: Tab or space separated values. Each line must include a
+    movement speed (pix/sec), a duration (ms), and a direction in degrees.
+    Optionally, direction can be replaced with '$' (dollar sign), and the
+    direction will default to the global default (Can also do use '-$').
     """
     def __init__(self, **kwargs):
         """Passes parameters up to super.
