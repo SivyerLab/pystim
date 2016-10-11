@@ -1,18 +1,20 @@
 """
 Program for presenting visual stimuli to patch clamped retinal neurons.
+
+Stuck on python 2.7 because of u3 (labjackpython) dependency
 """
 
 # Copyright (C) 2016 Alexander Tomlinson
 # Distributed under the terms of the GNU General Public License (GPL).
 
 from GammaCorrection import GammaValues  # unused, but necessary for pickling
-from psychopy.tools.coordinatetools import pol2cart
 from psychopy.tools.typetools import uint8_float, float_uint8
+from psychopy.tools.coordinatetools import pol2cart
 from psychopy import visual, core, event, filters
 from time import strftime, localtime
+from tqdm import tqdm, trange
 from random import Random
 from PIL import Image
-from tqdm import tqdm, trange
 
 import scipy, scipy.signal
 import sortedcontainers
@@ -58,8 +60,6 @@ __status__  = "Beta"
 # logging.console.setLevel(logging.CRITICAL)
 
 # read ini file
-defaults = dict(logs_dir='.\\psychopy\\logs\\',
-                monitor='blank')
 config = ConfigParser.ConfigParser()
 config.read(os.path.abspath('./stimprogram/psychopy/config.ini'))
 
@@ -134,6 +134,7 @@ class GlobalDefaults(object):
      offset the center of the window.
     """
 
+    # allow static __getitem__ and __setitem__
     __metaclass__ = GlobalDefaultsMeta
 
     #: Dictionary of default defaults.
@@ -303,8 +304,6 @@ class MyWindow(object):
                                      viewPos=GlobalDefaults['offset'],
                                      viewScale=GlobalDefaults['scale'],
                                      screen=GlobalDefaults['screen_num'],
-                                     # monitor=config.get('StimProgram',
-                                     #                    'monitor')
                                      )
 
         MyWindow.win.mouseVisible = True,
@@ -326,6 +325,7 @@ class MyWindow(object):
     @staticmethod
     def change_color(color):
         """Static method to live update the background of the window.
+        TODO: maybe implement classproperty wrapper to make setter
 
         :param color: RGB list used to change global defaults.
         """
@@ -341,6 +341,8 @@ class MyWindow(object):
                 if MyWindow.small_win is not None:
                     MyWindow.small_win.color = color
 
+                # need to flip twice because of how color is updated on back
+                # buffer
                 MyWindow.flip()
                 MyWindow.flip()
 
@@ -378,8 +380,6 @@ class MyWindow(object):
                                            # viewPos=GlobalDefaults['offset'],
                                            viewScale=scaled_scale,
                                            screen=0,
-                                           monitor=config.get('StimProgram',
-                                                              'monitor'),
                                            waitBlanking=False,
                                            do_vsync=False)
 
@@ -399,7 +399,6 @@ class MyWindow(object):
         (2.0). Ensure high enough sampling rate to reliably detect triggers.
         Set to use flexible IO #4.
         """
-
         if has_u3:
             try:
                 # voltage spike; 0 is low, 1 is high, on flexible IO #4
@@ -720,51 +719,29 @@ class StaticStim(StimDefaults):
     def make_stim(self):
         """Creates instance of psychopy stim object.
         """
-        # if self.fill_mode != 'image':
-        if True:
-            self.stim = visual.GratingStim(win=MyWindow.win,
-                                           size=self.gen_size(),
-                                           mask=self.gen_mask(),
-                                           tex=self.gen_texture(),
-                                           pos=self.location,
-                                           phase=self.phase,
-                                           ori=self.orientation,
-                                           autoLog=False,
-                                           texRes=2**10)
+        self.stim = visual.GratingStim(win=MyWindow.win,
+                                       size=self.gen_size(),
+                                       mask=self.gen_mask(),
+                                       tex=self.gen_texture(),
+                                       pos=self.location,
+                                       phase=self.phase,
+                                       ori=self.orientation,
+                                       autoLog=False,
+                                       texRes=2**10)
 
-            self.stim.sf *= self.sf
+        self.stim.sf *= self.sf
 
-            if MyWindow.small_win is not None:
-                self.small_stim = visual.GratingStim(win=MyWindow.small_win,
-                                                     size=self.stim.size,
-                                                     mask=self.stim.mask,
-                                                     tex=self.stim.tex,
-                                                     pos=self.location,
-                                                     phase=self.phase,
-                                                     ori=self.orientation,
-                                                     autoLog=False)
+        if MyWindow.small_win is not None:
+            self.small_stim = visual.GratingStim(win=MyWindow.small_win,
+                                                 size=self.stim.size,
+                                                 mask=self.stim.mask,
+                                                 tex=self.stim.tex,
+                                                 pos=self.location,
+                                                 phase=self.phase,
+                                                 ori=self.orientation,
+                                                 autoLog=False)
 
-                self.small_stim.sf *= self.sf
-
-        elif self.fill_mode == 'image':
-            image = scipy.misc.toimage(numpy.rot90(self.gen_texture(), 2))
-
-            self.stim = visual.ImageStim(win=MyWindow.win,
-                                         size=self.gen_size(),
-                                         mask=self.gen_mask(),
-                                         image=image,
-                                         pos=self.location,
-                                         ori=self.orientation,
-                                         autoLog=False)
-
-            if MyWindow.small_win is not None:
-                self.small_stim = visual.ImageStim(win=MyWindow.small_win,
-                                                   size=self.stim.size,
-                                                   mask=self.stim.mask,
-                                                   image=image,
-                                                   pos=self.location,
-                                                   ori=self.orientation,
-                                                   autoLog=False)
+            self.small_stim.sf *= self.sf
 
     def draw_times(self):
         """Determines during which frames stim should be drawn, based on desired
@@ -772,14 +749,14 @@ class StaticStim(StimDefaults):
 
         :return: last frame number as int
         """
+        # round up
         self.start_stim = int(self.delay + 0.99)
 
         if self.trigger:
             if self.start_stim not in MyWindow.frame_trigger_list:
                 MyWindow.frame_trigger_list.add(self.start_stim)
 
-        self.end_stim = self.duration
-        self.end_stim += self.start_stim
+        self.end_stim = self.duration + self.start_stim
         self.end_stim = int(self.end_stim + 0.99)
         self.end_delay = int(self.end_delay + 0.99)
 
@@ -800,12 +777,12 @@ class StaticStim(StimDefaults):
         """
         # check if within animation range
         if self.start_stim <= frame < self.end_stim:
-            # adjust colors based on timing
+            # adjust colors and phase based on timing
             if self.fill_mode not in ['movie', 'image'] and self.timing != \
                     'step':
                 self.gen_timing(frame)
 
-                # move phase
+            if self.fill_mode != 'movie':
                 self.gen_phase()
 
             # draw to back buffer
@@ -820,7 +797,6 @@ class StaticStim(StimDefaults):
 
         :return: tuple of high, low, delta, and background
         """
-
         background = GlobalDefaults['background']
         # scale from (-1, 1) to (0, 1), for math reasons
         background = (numpy.array(background, dtype='float') + 1) / 2
@@ -836,8 +812,7 @@ class StaticStim(StimDefaults):
             high = numpy.append(high, self.alpha)
             low = numpy.append(low, self.alpha)
 
-            delta = (high[self.contrast_channel] - low[
-                self.contrast_channel])
+            delta = (high[self.contrast_channel] - low[self.contrast_channel])
 
             color = high, low, delta, background
 
@@ -1399,11 +1374,10 @@ class TableStim(MovingStim):
     Direction: Tab or space separated values. Each line must include a
     movement speed (pix/sec), a duration (ms), and a direction in degrees.
     Optionally, direction can be replaced with '$' (dollar sign), and the
-    direction will default to the global default (Can also do use '-$').
+    direction will default to the global default (can also do use '-$').
     """
     def __init__(self, **kwargs):
-        """Passes parameters up to super.
-        """
+        """Passes parameters up to super."""
         super(TableStim, self).__init__(**kwargs)
 
         # instance attributes
