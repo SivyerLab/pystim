@@ -2413,7 +2413,7 @@ class MyMenuBar(wx.MenuBar):
         #     print k, v
 
         try:
-            import process_data
+            from heka_reader import process_data
             rec_field = process_data.main(**kwargs)
         except Exception as e:
             print traceback.print_exc()

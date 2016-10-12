@@ -883,9 +883,8 @@ class StaticStim(StimDefaults):
         size = (max(self.gen_size()),) * 2  # square tuple of largest size
         # not needed for images
         if self.fill_mode != 'image':
-            texture = numpy.full(size + (4,), -1, dtype=numpy.float)    # make
-            # array, adding rgba
-            # turn colors off, set alpha
+            texture = numpy.full(size + (4,), -1, dtype=numpy.float)  # make
+            # black rgba array, set alpha
             texture[:, :, 3] = self.alpha
 
         high, low, delta, background = self.gen_rgb()
