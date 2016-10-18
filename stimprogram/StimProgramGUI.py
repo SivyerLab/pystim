@@ -659,7 +659,7 @@ class Parameters(object):
 
             ('position',
              {'type'    : 'list',
-              'label'   : 'win position (xy)',
+              'label'   : 'win pos (pix xy)',
               'default' : config_dict['position'],
               'is_child': False}
              ),
@@ -1183,7 +1183,8 @@ class InputPanel(wx.Panel):
                 else:
                     self.sub_panel_dict[param][item].Hide()
             # redraw
-            self.Fit()
+            self.Layout()
+            self.Refresh()
 
         # some params need to edit global defaults of StimProgram on the fly
         # instead of at window instantiation
@@ -2603,27 +2604,17 @@ class MyFrame(wx.Frame):
         self.input_nb = wx.Notebook(self)
 
         # instantiate panels with notebook as parent
-        self.panel_shape = InputPanel(self.parameters.get_params('shape'),
-                                      self.input_nb,
-                                      'shape')
+        notebook_info = [[self.parameters.shape_param,
+                          self.parameters.timing_param,
+                          self.parameters.fill_param,
+                          self.parameters.motion_param],
+                         ['shape', 'timing', 'fill', 'motion']]
 
-        self.panel_timing = InputPanel(self.parameters.timing_param,
-                                       self.input_nb,
-                                       'timing')
+        pages = [InputPanel(params, self.input_nb, name) for params, name in
+                 zip(*notebook_info)]
 
-        self.panel_move = InputPanel(self.parameters.motion_param,
-                                     self.input_nb,
-                                     'motion')
-
-        self.panel_fill = InputPanel(self.parameters.fill_param,
-                                     self.input_nb,
-                                     'fill')
-
-        # add panels to notebook
-        self.input_nb.AddPage(self.panel_shape, "Shape")
-        self.input_nb.AddPage(self.panel_timing, "Time")
-        self.input_nb.AddPage(self.panel_fill, " Fill ")
-        self.input_nb.AddPage(self.panel_move, "Motion")
+        for page, name in zip(pages, ['Shape', 'Time', 'Fill', 'Motion']):
+            self.input_nb.AddPage(page, name)
 
         # instantiate global panel
         self.panel_global = GlobalPanel(self.parameters.global_default_param,
@@ -2637,40 +2628,24 @@ class MyFrame(wx.Frame):
         panel_row.Add(self.panel_global, proportion=1, flag=wx.EXPAND)
 
         # create buttons
-        self.run_button = wx.Button(self, label="Run")
-        self.stop_button = wx.Button(self, label="Stop")
-        self.win_button = wx.Button(self, label="Window")
-        self.exit_button = wx.Button(self, label="Exit")
+        button_labels = ['Run', 'Stop', 'Window', 'Exit']
+        buttons = [wx.Button(self, label=label) for label in button_labels]
 
-        # binders
-        self.Bind(wx.EVT_BUTTON, self.on_run_button, self.run_button)
-        self.Bind(wx.EVT_BUTTON, self.on_win_button, self.win_button)
-        self.Bind(wx.EVT_BUTTON, self.on_stop_button, self.stop_button)
-        self.Bind(wx.EVT_BUTTON, self.on_exit_button, self.exit_button)
+        button_callback = [self.on_run_button,
+                           self.on_stop_button,
+                           self.on_win_button,
+                           self.on_exit_button]
 
         # sizer for buttons under panel_row
         stim_buttons_sizer = wx.BoxSizer(wx.HORIZONTAL)
 
-        # add to sizer
-        stim_buttons_sizer.Add(self.run_button,
-                               proportion=1,
-                               border=5,
-                               flag=wx.LEFT | wx.RIGHT)
-
-        stim_buttons_sizer.Add(self.stop_button,
-                               proportion=1,
-                               border=5,
-                               flag=wx.LEFT | wx.RIGHT)
-
-        stim_buttons_sizer.Add(self.win_button,
-                               proportion=1,
-                               border=5,
-                               flag=wx.LEFT | wx.RIGHT)
-
-        stim_buttons_sizer.Add(self.exit_button,
-                               proportion=1,
-                               border=5,
-                               flag=wx.LEFT | wx.RIGHT)
+        # set binders and add to sizer
+        for button, button_func in zip(buttons, button_callback):
+            self.Bind(wx.EVT_BUTTON, button_func, button)
+            stim_buttons_sizer.Add(button,
+                                   proportion=1,
+                                   border=5,
+                                   flag=wx.LEFT | wx.RIGHT)
 
         # sizer for input and global panels and buttons
         panel_button_sizer = wx.BoxSizer(wx.VERTICAL)
@@ -2704,8 +2679,6 @@ class MyFrame(wx.Frame):
         frame_sizer.Add(panel_button_sizer)
 
         # status bar
-        # self.CreateStatusBar(1)
-        # self.SetStatusText('hi there')
         self.status_bar = MyStatusBar(self)
         self.SetStatusBar(self.status_bar)
 
