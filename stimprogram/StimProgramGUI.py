@@ -89,7 +89,8 @@ class Parameters(object):
     def try_cast(self, value):
         """
         Helper method to attempt to cast parameters from strings to proper
-        int/float/bool, or map list values to int or float
+        int/float/bool, or map list values to int or float.
+        TODO: look into ast.literal_eval()
 
         :param value: variable being casted, passed from ini file or gui so
          always string. Skip if string
@@ -783,7 +784,10 @@ class TextCtrlTag(wx.TextCtrl):
         self.tag = kwargs.pop('tag', None)
         # tag2 used in list type parameters
         self.tag2 = kwargs.pop('tag2', None)
-        wx.TextCtrl.__init__(self, *args, **kwargs)
+        wx.TextCtrl.__init__(self,
+                             *args,
+                             validator=TextCtrlValidator(),
+                             **kwargs)
 
     def set_value(self, value):
         """
@@ -857,7 +861,10 @@ class FilePickerCtrlTag(wx.FilePickerCtrl):
         # pop out tag if present from args/kwargs
         self.tag = kwargs.pop('tag', None)
         self.category = kwargs.pop('category', None)
-        wx.FilePickerCtrl.__init__(self, *args, **kwargs)
+        wx.FilePickerCtrl.__init__(self, *args,
+                                   message='Path to file',
+                                   style=wx.FLP_USE_TEXTCTRL | wx.FLP_SMALL,
+                                   **kwargs)
 
     def set_value(self, value):
         """
@@ -880,7 +887,7 @@ class TextCtrlValidator(wx.PyValidator):
     """
     def __init__(self):
         """
-        normal constructor
+        Normal init.
         """
         wx.PyValidator.__init__(self)
 
@@ -908,6 +915,7 @@ class TextCtrlValidator(wx.PyValidator):
             text_box.SetBackgroundColour('white')
             text_box.Refresh()
             return True
+
         except ValueError:
             try:
                 value = float(value)
@@ -981,7 +989,7 @@ class InputPanel(wx.Panel):
         Checks if param is child of another and only generates
         parent params, then generates subpanel with associated child
         params. Differentiates between input types (text, dropdown,
-        list (i.e. multiple text fields).
+        list (i.e. multiple text fields)).
 
         :param category:
         """
@@ -1001,8 +1009,8 @@ class InputPanel(wx.Panel):
                     ctrl = TextCtrlTag(self,
                                        size=(120, -1),
                                        tag=param,
-                                       value=str(param_info['default']),
-                                       validator=TextCtrlValidator())
+                                       value=str(param_info['default']))
+
                     # add control to dict of all controls
                     if param in self.all_controls.keys():
                         # append because duplicates of some controls
@@ -1033,10 +1041,7 @@ class InputPanel(wx.Panel):
                 elif param_type == 'path':
                     ctrl = FilePickerCtrlTag(self,
                                              tag=param,
-                                             category=self.category,
-                                             message='Path to file',
-                                             style=wx.FLP_USE_TEXTCTRL |
-                                                   wx.FLP_SMALL)
+                                             category=self.category)
                     # add control to dict of all controls
                     if param in self.all_controls.keys():
                         self.all_controls[param].append(ctrl)
@@ -1064,8 +1069,7 @@ class InputPanel(wx.Panel):
                                            tag2=i,
                                            size=((120 / length - (5 * (
                                                length - 1)) / length), -1),
-                                           value=str(param_info['default'][i]),
-                                           validator=TextCtrlValidator())
+                                           value=str(param_info['default'][i]))
 
                         ctrl_name = param + '[' + str(i) + ']'
 
