@@ -12,6 +12,7 @@ pyglet.options['shadow_window'] = False
 
 from GammaCorrection import GammaValues  # unused, but necessary for pickling
 from collections import OrderedDict
+from ast import literal_eval
 from copy import deepcopy
 from sys import platform
 from PIL import Image
@@ -89,44 +90,16 @@ class Parameters(object):
     def try_cast(self, value):
         """
         Helper method to attempt to cast parameters from strings to proper
-        int/float/bool, or map list values to int or float.
-        TODO: look into ast.literal_eval()
+        int/float/bool/list. Uses ast.literal_eval(), see relevant
+        documentation.
 
         :param value: variable being casted, passed from ini file or gui so
-         always string. Skip if string
+         always string. Skip if already string
         :return: casted or unchanged variable
         """
-        if isinstance(value, basestring) and value != '':
-            # first look for lists
-            if value[0] == '[':
-                try:
-                    # map to int
-                    value = map(int, value.strip('[]').split(','))
-                except ValueError:
-                    try:
-                        # map to float if int mapping fails
-                        value = map(float, value.strip('[]').split(','))
-                    except ValueError:
-                        pass
-            # cast non lists
-            else:
-                try:
-                    value = int(value)
-                except ValueError:
-                    try:
-                        value = float(value)
-                    except ValueError:
-                        # check if string is 'None' or bool
-                        if value == 'None':
-                            value = None
-                        elif value == 'True':
-                            value = True
-                        elif value == 'False':
-                            value = False
-                        else:
-                            pass
-
-        else:
+        try:
+            value = literal_eval(value)
+        except ValueError:  # for strings that should remain strings
             pass
 
         return value
@@ -163,16 +136,6 @@ class Parameters(object):
 
         return gamma_mons
 
-    def get_params(self, category):
-        """
-        Getter
-
-        :param category: which dictionary the param is in
-        """
-        trans = self.trans(category)
-
-        return deepcopy(trans)
-
     def get_global_params(self):
         """
         Getter.
@@ -185,22 +148,6 @@ class Parameters(object):
             global_dict[param] = self.global_default_param[param]['default']
 
         return global_dict
-
-    def get_gui_params(self):
-        """
-        Getter
-
-        :return: dictionary of gui settings
-        """
-        return self.gui_params
-
-    def get_stim_params(self):
-        """
-        Getter
-
-        :return: dictionary of stim settings
-        """
-        return self.stim_params
 
     def get_merged_params(self):
         """
@@ -1074,7 +1021,7 @@ class InputPanel(wx.Panel):
 
                     # iterate through list of child params and create copy of
                     # dict entry found in param dict. Need to make copy or
-                    # else changes will make changes wrong dict
+                    # else changes will make changes in wrong dict
                     for child_param in child_params:
                         child_param_dict[child_param] = deepcopy(
                             self.params[child_param])
@@ -2606,8 +2553,8 @@ class MyFrame(wx.Frame):
 
         # instantiate parameters
         self.parameters = Parameters()
-        self.gui_params = self.parameters.get_gui_params()
-        self.stim_params = self.parameters.get_stim_params()
+        self.gui_params = self.parameters.gui_params
+        self.stim_params = self.parameters.stim_params
 
         # instance attributes
         self.win_open = False
