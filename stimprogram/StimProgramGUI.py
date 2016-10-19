@@ -1006,50 +1006,20 @@ class InputPanel(wx.Panel):
                 # input widgets, depending on type
                 if param_type == 'text':
                     # make control
-                    ctrl = TextCtrlTag(self,
-                                       size=(120, -1),
-                                       tag=param,
-                                       value=str(param_info['default']))
-
-                    # add control to dict of all controls
-                    if param in self.all_controls.keys():
-                        # append because duplicates of some controls
-                        self.all_controls[param].append(ctrl)
-                    else:
-                        self.all_controls[param] = [ctrl]
-                    # bind events to methods
-                    self.Bind(wx.EVT_TEXT, self.input_update, ctrl)
-                    self.Bind(wx.EVT_CONTEXT_MENU, self.on_right_click, ctrl)
+                    ctrl = self.make_ctrls(param_type,
+                                           tag=param,
+                                           value=param_info['default'])
 
                 elif param_type == 'choice':
-                    ctrl = ChoiceCtrlTag(self,
-                                         tag=param,
-                                         choices=param_info['choices'])
-                    # add control to dict of all controls
-                    if param in self.all_controls.keys():
-                        self.all_controls[param].append(ctrl)
-                    else:
-                        self.all_controls[param] = [ctrl]
-
-                    # on win32, choice still defaults to blank, so manually
-                    # set selection to default for aesthetic reasons
-                    ctrl.SetStringSelection(str(param_info['default']))
-
-                    self.Bind(wx.EVT_CHOICE, self.input_update, ctrl)
-                    self.Bind(wx.EVT_CONTEXT_MENU, self.on_right_click, ctrl)
+                    ctrl = self.make_ctrls(param_type,
+                                           tag=param,
+                                           choices=param_info['choices'],
+                                           default=param_info['default'])
 
                 elif param_type == 'path':
-                    ctrl = FilePickerCtrlTag(self,
-                                             tag=param,
-                                             category=self.category)
-                    # add control to dict of all controls
-                    if param in self.all_controls.keys():
-                        self.all_controls[param].append(ctrl)
-                    else:
-                        self.all_controls[param] = [ctrl]
-
-                    self.Bind(wx.EVT_FILEPICKER_CHANGED, self.input_update,
-                              ctrl)
+                    ctrl = self.make_ctrls(param_type,
+                                           tag=param,
+                                           category=self.category)
 
                 elif param_type == 'list':
                     # get length of list for sizer and TextCtrl sizing
@@ -1064,29 +1034,15 @@ class InputPanel(wx.Panel):
                     # purposes
                     # TODO: find a better way to size list TextCtrl
                     for i in range(length):
-                        ctrl = TextCtrlTag(self,
-                                           tag=param,
-                                           tag2=i,
-                                           size=((120 / length - (5 * (
-                                               length - 1)) / length), -1),
-                                           value=str(param_info['default'][i]))
-
-                        ctrl_name = param + '[' + str(i) + ']'
-
-                        # add control to dict of all controls
-                        if param in self.all_controls.keys():
-                            self.all_controls[ctrl_name].append(ctrl)
-                        else:
-                            self.all_controls[ctrl_name] = [ctrl]
+                        size = ((120 / length - (5 * (length - 1)) / length), -1)
+                        ctrl = self.make_ctrls(param_type,
+                                               tag=param,
+                                               tag2=i,
+                                               size=size,
+                                               value=param_info['default'][i])
 
                         # add to sizer
                         list_sizer.Add(ctrl)
-                        self.Bind(wx.EVT_TEXT,
-                                  self.input_update,
-                                  ctrl)
-                        self.Bind(wx.EVT_CONTEXT_MENU,
-                                  self.on_right_click,
-                                  ctrl)
 
                     # set ctrl to sizer in order to be added to grid_sizer
                     ctrl = list_sizer
@@ -1142,6 +1098,63 @@ class InputPanel(wx.Panel):
 
                 # increment grid counter
                 self.grid_counter += 1
+
+    def make_ctrls(self, param_type, tag, **kwargs):
+        """
+        Makes controls for create_inputs().
+
+        :param type:
+        :param tag:
+        :param kwargs:
+        :return: proper control
+        """
+        # make control
+        if param_type == 'text':
+            ctrl = TextCtrlTag(self,
+                               size=(120, -1),
+                               tag=tag,
+                               value=str(kwargs['value']))
+
+        elif param_type == 'choice':
+            ctrl = ChoiceCtrlTag(self,
+                                 tag=tag,
+                                 choices=kwargs['choices'])
+
+            # on win32, choice still displays as blank, so manually set
+            # selection to default for aesthetic reasons
+            ctrl.SetStringSelection(str(kwargs['default']))
+
+        elif param_type == 'path':
+            ctrl = FilePickerCtrlTag(self,
+                                     tag=tag,
+                                     category=kwargs['category'])
+
+        elif param_type == 'list':
+            ctrl = TextCtrlTag(self,
+                               size=kwargs['size'],
+                               tag=tag,
+                               tag2=kwargs['tag2'],
+                               value=str(kwargs['value']))
+
+            tag = tag + '[' + str(kwargs['tag2']) + ']'
+
+        # add control to dict of all controls
+        if tag in self.all_controls.keys():
+            # append because duplicates of some controls
+            self.all_controls[tag].append(ctrl)
+        else:
+            self.all_controls[tag] = [ctrl]
+
+        # bind events to proper methods
+        binders = {'text'  : wx.EVT_TEXT,
+                   'choice': wx.EVT_CHOICE,
+                   'path'  : wx.EVT_FILEPICKER_CHANGED,
+                   'list'  : wx.EVT_TEXT}
+
+        self.Bind(binders[param_type], self.input_update, ctrl)
+        self.Bind(wx.EVT_CONTEXT_MENU, self.on_right_click, ctrl)
+
+        return ctrl
 
     def input_update(self, event):
         """
