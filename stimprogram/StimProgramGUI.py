@@ -77,17 +77,18 @@ class Parameters(object):
 
         # cast, so that lists are not strings for proper set up of controls
         for key, value in default_config_dict.iteritems():
-            default_config_dict[key] = self.try_cast(value)
+            default_config_dict[key] = Parameters.lit_eval(value)
 
         for key, value in gui_config_dict.iteritems():
-            gui_config_dict[key] = self.try_cast(value)
+            gui_config_dict[key] = Parameters.lit_eval(value)
 
         for key, value in stim_config_dict.iteritems():
-            stim_config_dict[key] = self.try_cast(value)
+            stim_config_dict[key] = Parameters.lit_eval(value)
 
         return gui_config_dict, stim_config_dict, default_config_dict
 
-    def try_cast(self, value):
+    @staticmethod
+    def lit_eval(value):
         """
         Helper method to attempt to cast parameters from strings to proper
         int/float/bool/list. Uses ast.literal_eval(), see relevant
@@ -99,7 +100,7 @@ class Parameters(object):
         """
         try:
             value = literal_eval(value)
-        except ValueError:  # for strings that should remain strings
+        except (SyntaxError, ValueError):  # for strings
             pass
 
         return value
@@ -179,7 +180,7 @@ class Parameters(object):
         """
         trans = self.trans(category)
 
-        value = self.try_cast(value)
+        value = Parameters.lit_eval(value)
 
         if index is None:
             trans[param]['default'] = value
@@ -2177,7 +2178,7 @@ class MyGrid(wx.Frame):
                 if values[i] is None:
                     values[i] = values[i - 1]
 
-            values = map(self.parameters.try_cast, values)
+            values = map(Parameters.lit_eval, values)
             to_return[param] = values
 
         return to_return
