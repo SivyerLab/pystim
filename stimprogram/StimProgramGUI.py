@@ -919,7 +919,7 @@ class InputPanel(wx.Panel):
         self.grid_sizer = wx.GridBagSizer(hgap=5, vgap=5)
 
         # create inputs and add to sizers
-        self.create_inputs(category)
+        self.create_inputs()
 
         # nest and place sizers
         panel_sizer = wx.BoxSizer()
@@ -931,15 +931,13 @@ class InputPanel(wx.Panel):
         # set sizer for panel
         self.SetSizer(panel_sizer)
 
-    def create_inputs(self, category):
+    def create_inputs(self):
         """
         Method to recursively generate label and input widgets.
         Checks if param is child of another and only generates
         parent params, then generates subpanel with associated child
         params. Differentiates between input types (text, dropdown,
         list (i.e. multiple text fields)).
-
-        :param category:
         """
 
         # iterate through params in param dict
@@ -952,22 +950,8 @@ class InputPanel(wx.Panel):
                 param_type = param_info['type']
 
                 # input widgets, depending on type
-                if param_type == 'text':
-                    # make control
-                    ctrl = self.make_ctrls(param_type,
-                                           tag=param,
-                                           value=param_info['default'])
-
-                elif param_type == 'choice':
-                    ctrl = self.make_ctrls(param_type,
-                                           tag=param,
-                                           choices=param_info['choices'],
-                                           default=param_info['default'])
-
-                elif param_type == 'path':
-                    ctrl = self.make_ctrls(param_type,
-                                           tag=param,
-                                           category=self.category)
+                if param_type in ['text', 'choice', 'path']:
+                    ctrl = self.make_ctrls(param, param_info)
 
                 elif param_type == 'list':
                     # get length of list for sizer and TextCtrl sizing
@@ -980,15 +964,12 @@ class InputPanel(wx.Panel):
                     # of the input in the param list
                     # also resize TextCtrl so lengths match up for aesthetic
                     # purposes
-                    # TODO: find a better way to size list TextCtrl
                     for i in range(length):
                         size = ((120 / length - (5 * (length - 1)) / length), -1)
-                        ctrl = self.make_ctrls(param_type,
-                                               tag=param,
+                        ctrl = self.make_ctrls(param,
+                                               param_info,
                                                tag2=i,
-                                               size=size,
-                                               value=param_info['default'][i])
-
+                                               size=size)
                         # add to sizer
                         list_sizer.Add(ctrl)
 
@@ -1033,7 +1014,7 @@ class InputPanel(wx.Panel):
 
                     # make sub panel with new dict
                     self.sub_panel_dict[param][choice] = InputPanel(
-                        child_param_dict, self, category)
+                        child_param_dict, self, self.category)
 
                 # add panels to subpanel sizer
                 for panel in self.sub_panel_dict[param].itervalues():
@@ -1047,7 +1028,7 @@ class InputPanel(wx.Panel):
                 # increment grid counter
                 self.grid_counter += 1
 
-    def make_ctrls(self, param_type, tag, **kwargs):
+    def make_ctrls(self, tag, param_info, **kwargs):
         """
         Makes controls for create_inputs().
 
@@ -1056,35 +1037,38 @@ class InputPanel(wx.Panel):
         :param kwargs:
         :return: proper control
         """
+        param_type = param_info['type']
+
         # make control
         if param_type == 'text':
             ctrl = TextCtrlTag(self,
                                size=(120, -1),
                                tag=tag,
-                               value=str(kwargs['value']))
+                               value=str(param_info['default']))
 
         elif param_type == 'choice':
             ctrl = ChoiceCtrlTag(self,
                                  tag=tag,
-                                 choices=kwargs['choices'])
+                                 choices=param_info['choices'])
 
             # on win32, choice still displays as blank, so manually set
             # selection to default for aesthetic reasons
-            ctrl.SetStringSelection(str(kwargs['default']))
+            ctrl.SetStringSelection(str(param_info['default']))
 
         elif param_type == 'path':
             ctrl = FilePickerCtrlTag(self,
                                      tag=tag,
-                                     category=kwargs['category'])
+                                     category=self.category)
 
         elif param_type == 'list':
+            i = kwargs['tag2']
             ctrl = TextCtrlTag(self,
                                size=kwargs['size'],
                                tag=tag,
-                               tag2=kwargs['tag2'],
-                               value=str(kwargs['value']))
+                               tag2=i,
+                               value=str(param_info['default'][i]))
 
-            tag = tag + '[' + str(kwargs['tag2']) + ']'
+            tag = tag + '[' + str(i) + ']'
 
         # add control to dict of all controls
         if tag in self.all_controls.keys():
