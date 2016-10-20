@@ -932,7 +932,11 @@ class StaticStim(StimDefaults):
 
         elif self.fill_mode == 'image':
             # get pic from file
-            pic_name = os.path.basename(self.image_filename)
+            try:
+                pic_name = os.path.basename(self.image_filename)
+            except TypeError:
+                raise IOError('Make sure image exists and location is correct')
+
             filename, file_ext = os.path.splitext(pic_name)
 
             if file_ext != '.iml':
