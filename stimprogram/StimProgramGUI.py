@@ -21,6 +21,7 @@ import StimProgram
 import subprocess
 import traceback
 import cPickle
+import json
 import os
 
 import wx.lib.agw.multidirdialog as mdd
@@ -721,6 +722,15 @@ class Parameters(object):
              )
             ])
 
+        with open('./stimprogram/psychopy/json.txt.', 'r') as f:
+            params = json.load(f, object_pairs_hook=OrderedDict)
+
+        self.shape_param = params['shape_param']
+        self.timing_param = params['timing_param']
+        self.fill_param = params['fill_param']
+        self.motion_param = params['motion_param']
+        self.global_default_param = params['global_default_param']
+
 
 class TextCtrlTag(wx.TextCtrl):
     """
@@ -992,7 +1002,7 @@ class InputPanel(wx.Panel):
                 # and Hide()
                 self.sub_panel_dict[param] = {}
 
-                # single box sizer so that subpanels can occupy the same
+                # single box sizer so that subpanels can occupy a single
                 # space in the panel's gridbox sizer
                 subpanel_sizer = wx.BoxSizer(wx.VERTICAL)
 
@@ -1018,12 +1028,13 @@ class InputPanel(wx.Panel):
 
                 # add panels to subpanel sizer
                 for panel in self.sub_panel_dict[param].itervalues():
-                    subpanel_sizer.Add(panel, proportion=1)
+                    subpanel_sizer.Add(panel, proportion=1, flag=wx.EXPAND)
 
                 # add subpanel sizer to panel sizer, spanning both columns
                 self.grid_sizer.Add(subpanel_sizer,
                                     pos=(self.grid_counter, 0),
-                                    span=(1, 2))
+                                    span=(1, 2),
+                                    flag=wx.EXPAND)
 
                 # increment grid counter
                 self.grid_counter += 1

@@ -1,0 +1,633 @@
+{
+    "shape_param": {
+        "shape": {
+            "type": "choice", 
+            "label": "shape", 
+            "choices": [
+                "circle", 
+                "rectangle", 
+                "annulus"
+            ], 
+            "default": "circle", 
+            "is_child": false, 
+            "children": {
+                "annulus": [
+                    "inner_diameter", 
+                    "outer_diameter"
+                ], 
+                "circle": [
+                    "outer_diameter"
+                ], 
+                "rectangle": [
+                    "size"
+                ]
+            }
+        }, 
+        "orientation": {
+            "type": "text", 
+            "label": "orientation", 
+            "default": 0, 
+            "is_child": false
+        }, 
+        "location": {
+            "type": "list", 
+            "label": "location (um)", 
+            "default": [
+                0, 
+                0
+            ], 
+            "is_child": false
+        }, 
+        "size": {
+            "type": "list", 
+            "label": "size (um)", 
+            "default": [
+                50, 
+                100
+            ], 
+            "is_child": true
+        }, 
+        "inner_diameter": {
+            "type": "text", 
+            "label": "inner diameter (um)", 
+            "default": 50, 
+            "is_child": true
+        }, 
+        "outer_diameter": {
+            "type": "text", 
+            "label": "outer diameter (um)", 
+            "default": 100, 
+            "is_child": true
+        }
+    }, 
+    "timing_param": {
+        "delay": {
+            "type": "text", 
+            "label": "start delay", 
+            "default": 0, 
+            "is_child": false
+        }, 
+        "duration": {
+            "type": "text", 
+            "label": "duration", 
+            "default": 0.5, 
+            "is_child": false
+        }, 
+        "end_delay": {
+            "type": "text", 
+            "label": "end delay", 
+            "default": 0, 
+            "is_child": false
+        }, 
+        "force_stop": {
+            "type": "text", 
+            "label": "end (non 0 overrides)", 
+            "default": 0, 
+            "is_child": false
+        }, 
+        "trigger": {
+            "type": "choice", 
+            "label": "trigger", 
+            "choices": [
+                "True", 
+                "False"
+            ], 
+            "default": true, 
+            "is_child": false
+        }
+    }, 
+    "fill_param": {
+        "color_mode": {
+            "type": "choice", 
+            "label": "color mode", 
+            "choices": [
+                "intensity", 
+                "rgb"
+            ], 
+            "default": "intensity", 
+            "is_child": false, 
+            "children": {
+                "rgb": [
+                    "color", 
+                    "contrast_channel"
+                ], 
+                "intensity": [
+                    "intensity", 
+                    "contrast_channel"
+                ]
+            }
+        }, 
+        "color": {
+            "type": "list", 
+            "label": "color (RGB)", 
+            "default": [
+                -1, 
+                1, 
+                -1
+            ], 
+            "is_child": true
+        }, 
+        "contrast_channel": {
+            "type": "choice", 
+            "label": "channel", 
+            "choices": [
+                "green", 
+                "red", 
+                "blue"
+            ], 
+            "default": "green", 
+            "is_child": true
+        }, 
+        "intensity": {
+            "type": "text", 
+            "label": "intensity", 
+            "default": 1, 
+            "is_child": true
+        }, 
+        "timing": {
+            "type": "choice", 
+            "label": "timing", 
+            "choices": [
+                "step", 
+                "sine", 
+                "square", 
+                "sawtooth", 
+                "linear"
+            ], 
+            "default": "step", 
+            "is_child": false, 
+            "children": {
+                "sine": [
+                    "period_mod", 
+                    "intensity_dir"
+                ], 
+                "square": [
+                    "period_mod", 
+                    "intensity_dir"
+                ], 
+                "linear": [
+                    "intensity_dir"
+                ], 
+                "sawtooth": [
+                    "period_mod", 
+                    "intensity_dir"
+                ]
+            }
+        }, 
+        "fill_mode": {
+            "type": "choice", 
+            "label": "fill mode", 
+            "choices": [
+                "uniform", 
+                "sine", 
+                "square", 
+                "concentric", 
+                "checkerboard", 
+                "image", 
+                "movie"
+            ], 
+            "default": "uniform", 
+            "is_child": false, 
+            "children": {
+                "square": [
+                    "intensity_dir", 
+                    "sf", 
+                    "phase", 
+                    "phase_speed"
+                ], 
+                "movie": [
+                    "movie_filename", 
+                    "movie_size"
+                ], 
+                "image": [
+                    "image_filename", 
+                    "image_size", 
+                    "phase", 
+                    "phase_speed", 
+                    "image_channel"
+                ], 
+                "checkerboard": [
+                    "check_size", 
+                    "num_check", 
+                    "phase", 
+                    "fill_seed", 
+                    "check_type", 
+                    "intensity_dir"
+                ], 
+                "concentric": [
+                    "intensity_dir", 
+                    "sf", 
+                    "phase", 
+                    "phase_speed"
+                ], 
+                "sine": [
+                    "intensity_dir", 
+                    "sf", 
+                    "phase", 
+                    "phase_speed"
+                ]
+            }
+        }, 
+        "alpha": {
+            "type": "text", 
+            "label": "alpha", 
+            "default": 1, 
+            "is_child": false
+        }, 
+        "intensity_dir": {
+            "type": "choice", 
+            "label": "contrast dir", 
+            "choices": [
+                "single", 
+                "both"
+            ], 
+            "default": "both", 
+            "is_child": true
+        }, 
+        "check_type": {
+            "type": "choice", 
+            "label": "fill type", 
+            "choices": [
+                "board", 
+                "random", 
+                "noise", 
+                "noisy noise"
+            ], 
+            "default": "board", 
+            "is_child": true
+        }, 
+        "sf": {
+            "type": "text", 
+            "label": "spatial frequency", 
+            "default": 1, 
+            "is_child": true
+        }, 
+        "phase": {
+            "type": "list", 
+            "label": "phase (cycles)", 
+            "default": [
+                0, 
+                0
+            ], 
+            "is_child": true
+        }, 
+        "phase_speed": {
+            "type": "list", 
+            "label": "phase speed (hz)", 
+            "default": [
+                0, 
+                0
+            ], 
+            "is_child": true
+        }, 
+        "image_channel": {
+            "type": "choice", 
+            "label": "color channel", 
+            "choices": [
+                "all", 
+                "red", 
+                "green", 
+                "blue"
+            ], 
+            "default": "all", 
+            "is_child": true
+        }, 
+        "fill_seed": {
+            "type": "text", 
+            "label": "fill seed", 
+            "default": 1, 
+            "is_child": true
+        }, 
+        "check_size": {
+            "type": "list", 
+            "label": "check size (xy um)", 
+            "default": [
+                50, 
+                50
+            ], 
+            "is_child": true
+        }, 
+        "num_check": {
+            "type": "text", 
+            "label": "number of checks", 
+            "default": 64, 
+            "is_child": true
+        }, 
+        "image_filename": {
+            "type": "path", 
+            "label": "filename", 
+            "default": null, 
+            "is_child": true
+        }, 
+        "image_size": {
+            "type": "list", 
+            "label": "size (xy um)", 
+            "default": [
+                100, 
+                100
+            ], 
+            "is_child": true
+        }, 
+        "movie_filename": {
+            "type": "path", 
+            "label": "filename", 
+            "default": null, 
+            "is_child": true
+        }, 
+        "movie_size": {
+            "type": "list", 
+            "label": "movie size (xy)", 
+            "default": [
+                100, 
+                100
+            ], 
+            "is_child": true
+        }, 
+        "period_mod": {
+            "type": "text", 
+            "label": "frequency (hz)", 
+            "default": 1, 
+            "is_child": true
+        }
+    }, 
+    "motion_param": {
+        "move_type": {
+            "type": "choice", 
+            "label": "move type", 
+            "choices": [
+                "static", 
+                "moving", 
+                "table", 
+                "random", 
+                "jump"
+            ], 
+            "default": "static", 
+            "is_child": false, 
+            "children": {
+                "jump": [
+                    "num_jumps", 
+                    "move_delay", 
+                    "move_seed", 
+                    "shuffle", 
+                    "blend_jumps"
+                ], 
+                "table": [
+                    "table_filename", 
+                    "table_type", 
+                    "start_dir", 
+                    "num_dirs", 
+                    "move_delay", 
+                    "ori_with_dir"
+                ], 
+                "random": [
+                    "speed", 
+                    "travel_distance", 
+                    "move_seed"
+                ], 
+                "moving": [
+                    "speed", 
+                    "start_dir", 
+                    "num_dirs", 
+                    "start_radius", 
+                    "move_delay", 
+                    "ori_with_dir"
+                ]
+            }
+        }, 
+        "speed": {
+            "type": "text", 
+            "label": "speed (um/s)", 
+            "default": 300, 
+            "is_child": true
+        }, 
+        "start_dir": {
+            "type": "text", 
+            "label": "start direction", 
+            "default": 90, 
+            "is_child": true
+        }, 
+        "num_dirs": {
+            "type": "text", 
+            "label": "number of dirs", 
+            "default": 1, 
+            "is_child": true
+        }, 
+        "start_radius": {
+            "type": "text", 
+            "label": "start radius (um)", 
+            "default": 100, 
+            "is_child": true
+        }, 
+        "move_delay": {
+            "type": "text", 
+            "label": "move delay (s)", 
+            "default": 0, 
+            "is_child": true
+        }, 
+        "ori_with_dir": {
+            "type": "choice", 
+            "label": "orient with dir", 
+            "choices": [
+                "True", 
+                "False"
+            ], 
+            "default": false, 
+            "is_child": true
+        }, 
+        "travel_distance": {
+            "type": "text", 
+            "label": "travel distance (um)", 
+            "default": 50, 
+            "is_child": true
+        }, 
+        "move_seed": {
+            "type": "text", 
+            "label": "move seed", 
+            "default": 1, 
+            "is_child": true
+        }, 
+        "table_filename": {
+            "type": "path", 
+            "label": "filename", 
+            "default": null, 
+            "is_child": true
+        }, 
+        "table_type": {
+            "type": "choice", 
+            "label": "table type", 
+            "choices": [
+                "polar", 
+                "coordinate", 
+                "directions"
+            ], 
+            "default": "polar", 
+            "is_child": true
+        }, 
+        "num_jumps": {
+            "type": "text", 
+            "label": "number of jumps", 
+            "default": 5, 
+            "is_child": true
+        }, 
+        "shuffle": {
+            "type": "choice", 
+            "label": "shuffle", 
+            "choices": [
+                "True", 
+                "False"
+            ], 
+            "default": false, 
+            "is_child": true
+        }, 
+        "blend_jumps": {
+            "type": "choice", 
+            "label": "blend jumps", 
+            "choices": [
+                "True", 
+                "False"
+            ], 
+            "default": false, 
+            "is_child": true
+        }
+    }, 
+    "global_default_param": {
+        "display_size": {
+            "type": "list", 
+            "label": "display size (pixels)", 
+            "default": [
+                400, 
+                400
+            ], 
+            "is_child": false
+        }, 
+        "position": {
+            "type": "list", 
+            "label": "win pos (pix xy)", 
+            "default": [
+                0, 
+                0
+            ], 
+            "is_child": false
+        }, 
+        "offset": {
+            "type": "list", 
+            "label": "center offset (pix)", 
+            "default": [
+                0, 
+                0
+            ], 
+            "is_child": false
+        }, 
+        "scale": {
+            "type": "list", 
+            "label": "scale (xy)", 
+            "default": [
+                1, 
+                1
+            ], 
+            "is_child": false
+        }, 
+        "pix_per_micron": {
+            "type": "text", 
+            "label": "pix per micron", 
+            "default": 1, 
+            "is_child": false
+        }, 
+        "frame_rate": {
+            "type": "text", 
+            "label": "frame rate", 
+            "default": 60, 
+            "is_child": false
+        }, 
+        "protocol_reps": {
+            "type": "text", 
+            "label": "protocol reps", 
+            "default": 1, 
+            "is_child": false
+        }, 
+        "trigger_wait": {
+            "type": "text", 
+            "label": "start trigger wait", 
+            "default": 0, 
+            "is_child": false
+        }, 
+        "background": {
+            "type": "list", 
+            "label": "background (RGB)", 
+            "default": [
+                -1, 
+                0, 
+                -1
+            ], 
+            "is_child": false
+        }, 
+        "pref_dir": {
+            "type": "text", 
+            "label": "preferred dir", 
+            "default": -1, 
+            "is_child": false
+        }, 
+        "screen_num": {
+            "type": "choice", 
+            "label": "screen number", 
+            "choices": [
+                "1", 
+                "2"
+            ], 
+            "default": 2, 
+            "is_child": false
+        }, 
+        "gamma_correction": {
+            "type": "choice", 
+            "label": "gamma monitor", 
+            "choices": [
+                "default"
+            ], 
+            "default": "default", 
+            "is_child": false
+        }, 
+        "fullscreen": {
+            "type": "choice", 
+            "label": "fullscreen", 
+            "choices": [
+                "True", 
+                "False"
+            ], 
+            "default": false, 
+            "is_child": false
+        }, 
+        "small_win": {
+            "type": "choice", 
+            "label": "mirror window", 
+            "choices": [
+                "True", 
+                "False"
+            ], 
+            "default": false, 
+            "is_child": false, 
+            "hide": true
+        }, 
+        "log": {
+            "type": "choice", 
+            "label": "log", 
+            "choices": [
+                "True", 
+                "False"
+            ], 
+            "default": true, 
+            "is_child": false, 
+            "hide": true
+        }, 
+        "capture": {
+            "type": "choice", 
+            "label": "capture", 
+            "choices": [
+                "True", 
+                "False"
+            ], 
+            "default": false, 
+            "is_child": false, 
+            "hide": true
+        }
+    }
+}
