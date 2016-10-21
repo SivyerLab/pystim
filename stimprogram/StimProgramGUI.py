@@ -212,7 +212,7 @@ class Parameters(object):
 
         :param config_dict: dictionary of defaults
         """
-        with open('./stimprogram/psychopy/json.txt.', 'r') as f:
+        with open('./stimprogram/psychopy/params_json.txt.', 'r') as f:
             params = json.load(f, object_pairs_hook=OrderedDict)
 
         for category in params.itervalues():
