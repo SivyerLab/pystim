@@ -69,7 +69,7 @@ class Parameters(object):
         for option in config.options('Defaults'):
             default_config_dict[option] = config.get('Defaults', option)
 
-        # make dict of gui options
+        # make dict of gui and stimprogram options
         for option in config.options('GUI'):
             gui_config_dict[option] = config.get('GUI', option)
 
@@ -212,7 +212,8 @@ class Parameters(object):
 
         :param config_dict: dictionary of defaults
         """
-        with open('./stimprogram/psychopy/params_json.txt.', 'r') as f:
+        json_path = os.path.abspath('./stimprogram/psychopy/params_json.txt.')
+        with open(json_path, 'r') as f:
             params = json.load(f, object_pairs_hook=OrderedDict)
 
         for category in params.itervalues():
@@ -607,11 +608,11 @@ class InputPanel(wx.Panel):
         # if dir selector, get new path
         if self.params[param]['type'] == 'path':
             value = event.GetPath()
+        # else get the new value from the widget
         else:
-            # else get the new value from the widget
             value = event.GetString()
 
-        # if in grid, leave choice as table and don't do anything
+        # if choice in grid, leave choice as table and don't do anything
         if isinstance(event.GetEventObject(), ChoiceCtrlTag):
             if param in self.frame.grid.control_dict:
                 event.Skip()
@@ -644,27 +645,15 @@ class InputPanel(wx.Panel):
         # instead of at window instantiation
         global_params = self.parameters.get_global_params()
 
-        if param == 'log':
-            StimProgram.GlobalDefaults['log'] = global_params['log']
+        if param in ['log', 'protocol_reps', 'pref_dir', 'capture']:
+            StimProgram.GlobalDefaults[param] = global_params[param]
 
-        if param == 'trigger_wait':
+        elif param == 'trigger_wait':
             StimProgram.GlobalDefaults['trigger_wait'] = \
                 int(global_params['trigger_wait'] * 1.0 * global_params[
                     'frame_rate'] + 0.99)
 
-        if param == 'protocol_reps':
-            StimProgram.GlobalDefaults['protocol_reps'] = \
-                global_params['protocol_reps']
-
-        if param == 'pref_dir':
-            StimProgram.GlobalDefaults['pref_dir'] = \
-                global_params['pref_dir']
-
-        if param == 'capture':
-            StimProgram.GlobalDefaults['capture'] = \
-                global_params['capture']
-
-        if param == 'background':
+        elif param == 'background':
             StimProgram.MyWindow.change_color(global_params['background'])
 
     def on_right_click(self, event):
@@ -1252,7 +1241,7 @@ class DirPanel(wx.Panel):
         panel_sizer = wx.BoxSizer(wx.VERTICAL)
 
         # file browser
-        default_dir = self.frame.gui_params['saved_stim_dir']
+        default_dir = os.path.abspath(self.frame.gui_params['saved_stim_dir'])
         self.browser = wx.FileCtrl(self,
                                    wildCard='*.txt',
                                    size=(200, -1),
