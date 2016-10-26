@@ -66,25 +66,17 @@ class Parameters(object):
         stim_config_dict = {}
 
         # make dict of options
-        for option in config.options('Defaults'):
-            default_config_dict[option] = config.get('Defaults', option)
+        for option_dict, section in zip([default_config_dict,
+                                         gui_config_dict,
+                                         stim_config_dict],
+                                        ['Defaults', 'GUI', 'StimProgram']):
 
-        # make dict of gui and stimprogram options
-        for option in config.options('GUI'):
-            gui_config_dict[option] = config.get('GUI', option)
+            for option in config.options(section):
+                option_dict[option] = config.get(section, option)
 
-        for option in config.options('StimProgram'):
-            stim_config_dict[option] = config.get('StimProgram', option)
-
-        # cast, so that lists are not strings for proper set up of controls
-        for key, value in default_config_dict.iteritems():
-            default_config_dict[key] = Parameters.lit_eval(value)
-
-        for key, value in gui_config_dict.iteritems():
-            gui_config_dict[key] = Parameters.lit_eval(value)
-
-        for key, value in stim_config_dict.iteritems():
-            stim_config_dict[key] = Parameters.lit_eval(value)
+            # cast, for proper set up of controls
+            for key, value in option_dict.iteritems():
+                option_dict[key] = Parameters.lit_eval(value)
 
         return gui_config_dict, stim_config_dict, default_config_dict
 
@@ -216,6 +208,7 @@ class Parameters(object):
         with open(json_path, 'r') as f:
             params = json.load(f, object_pairs_hook=OrderedDict)
 
+        # set defaults
         for category in params.itervalues():
             for k, param in category.iteritems():
                 param['default'] = config_dict[k]
@@ -687,10 +680,6 @@ class GlobalPanel(InputPanel):
         # super initiation
         super(GlobalPanel, self).__init__(parent, params, category)
 
-        # instance variables
-        self.frame = self.GetTopLevelParent()
-        self.parameters = self.frame.parameters
-
         # move items down a few slots to insert spacers and titles
         for item in reversed(self.grid_sizer.GetChildren()):
             x, y = item.GetPosTuple()
@@ -962,29 +951,26 @@ class ListPanel(wx.Panel):
         :return: converted string
         """
 
-        if stim_type == 'StaticStim':
-            stim_type = 'static'
-        elif stim_type == 'MovingStim':
-            stim_type = 'moving'
-        elif stim_type == 'RandomlyMovingStim':
-            stim_type = 'random'
-        elif stim_type == 'TableStim':
-            stim_type = 'table'
-        elif stim_type == 'ImageJumpStim':
-            stim_type = 'jump'
+        class_names = ['StaticStim',
+                       'MovingStim',
+                       'RandomlyMovingStim',
+                       'TableStim',
+                       'ImageJumpStim']
 
-        elif stim_type == 'static':
-            stim_type = 'StaticStim'
-        elif stim_type == 'moving':
-            stim_type = 'MovingStim'
-        elif stim_type == 'random':
-            stim_type = 'RandomlyMovingStim'
-        elif stim_type == 'table':
-            stim_type = 'TableStim'
-        elif stim_type == 'jump':
-            stim_type = 'ImageJumpStim'
+        label_names = ['static',
+                       'moving',
+                       'random',
+                       'table',
+                       'jump']
 
-        return stim_type
+        if stim_type in class_names:
+            return label_names[class_names.index(stim_type)]
+
+        elif stim_type in label_names:
+            return class_names[label_names.index(stim_type)]
+
+        else:
+            raise AttributeError('Wrong label or stim class')
 
     def on_add_button(self, event):
         """

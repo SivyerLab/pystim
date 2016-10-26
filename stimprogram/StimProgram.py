@@ -601,6 +601,7 @@ class StimDefaults(object):
         self.num_jumps = num_jumps
         self.shuffle = shuffle
         self.blend_jumps = blend_jumps
+
         self.contrast_channel = ['red', 'green', 'blue'].\
             index(contrast_channel)
         self.image_channel = ['red', 'green', 'blue', 'all'].\
@@ -662,7 +663,8 @@ class StimDefaults(object):
 
         if movie_size is not None:
             self.movie_size = [movie_size[0] * GlobalDefaults[
-                'pix_per_micron'], movie_size[1] * GlobalDefaults[
+                'pix_per_micron'],
+                               movie_size[1] * GlobalDefaults[
                 'pix_per_micron']]
         else:
             self.movie_size = [100, 100]
@@ -678,7 +680,8 @@ class StimDefaults(object):
 
         if check_size is not None:
             self.check_size = [check_size[0] * GlobalDefaults[
-                'pix_per_micron'], check_size[1] * GlobalDefaults[
+                'pix_per_micron'],
+                               check_size[1] * GlobalDefaults[
                 'pix_per_micron']]
         else:
             self.check_size = [100, 100]
@@ -1666,7 +1669,7 @@ class ImageJumpStim(StaticStim):
                                                autoLog=False,
                                                texRes=2**10)
 
-                # want to shuffle scaled tex, so draw to back and pull then
+                # want to shuffle scaled tex, so draw to back and pull, then
                 # shuffle that
                 temp_stim.draw()
                 image = MyWindow.win._getRegionOfFrame(buffer='back')
