@@ -1036,14 +1036,14 @@ class ListPanel(wx.Panel):
 
         # print self.stims_to_run_w_grid
 
-    def on_remove_button(self, event):
+    def on_remove_button(self, event, clear_all=False):
         """
         Removes stims from stim list. If none selected, clears all.
 
         :param event:
         """
         # if any selected, iterate through and delete
-        if self.list_control.GetSelectedItemCount() > 0:
+        if self.list_control.GetSelectedItemCount() > 0 and not clear_all:
             for i in range(self.list_control.GetSelectedItemCount()):
                 selected = self.list_control.GetFirstSelected()
                 # remove from stims to run
@@ -1406,7 +1406,12 @@ class DirPanel(wx.Panel):
                 os.system('open ' + path)
 
         else:
-            self.on_load_button(event)
+            state = wx.GetMouseState()
+            if state.ControlDown():
+                self.on_load_button(event)
+            else:
+                self.frame.list_panel.on_remove_button(event, clear_all=True)
+                self.on_load_button(event)
 
 
 class MyGrid(wx.Frame):
