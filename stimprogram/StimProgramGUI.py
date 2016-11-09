@@ -1406,8 +1406,7 @@ class DirPanel(wx.Panel):
                 os.system('open ' + path)
 
         else:
-            state = wx.GetMouseState()
-            if state.ControlDown():
+            if wx.GetMouseState().ControlDown():
                 self.on_load_button(event)
             else:
                 self.frame.list_panel.on_remove_button(event, clear_all=True)

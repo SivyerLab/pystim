@@ -31,18 +31,14 @@ They are listed below:
 
 - psychopy (see psychopy `documentation <http://www.psychopy.org/documentation.html>`_ for required `dependencies <http://www.psychopy.org/installation.html#essential-packages>`_).
 - `wxPython <http://www.wxpython.org/download.php)>`_ (for GUI)
-- pyglet
 - sortedcontainers (also available through pip)
-- numpy
-- scipy
-- PIL (use Pillow)
 
 Optional libraries:
 
 - tabulate (for formatting logs)
 - igor (for parsing tables)
 - `u3 <https://labjack.com/support/software/examples/ud/labjackpython>`_ (for triggering from LabJack)
-- `ffmpeg <https://www.ffmpeg.org/>`_ (or making movies from captured frames)
+- `ffmpeg <https://www.ffmpeg.org/>`_ (for making movies from captured frames)
 
 Psychopy requires some small editing to source for it to work (changing 5 
 lines). Instructions :doc:`here <detailedinstall>`.
