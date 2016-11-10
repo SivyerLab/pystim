@@ -61,7 +61,7 @@ __status__  = "Beta"
 
 # read ini file
 config = ConfigParser.ConfigParser()
-config.read(os.path.abspath('./stimprogram/psychopy/config.ini'))
+config.read(os.path.abspath('../stimprogram/psychopy/config.ini'))
 
 
 class StimInfo(object):
@@ -874,6 +874,7 @@ class StaticStim(StimDefaults):
 
         return stim_mask
 
+
     def gen_texture(self):
         """Generates texture for stim object. Textures are 3D numpy arrays
         (size*size*4). The 3rd dimension is RGB and Alpha (transparency)
@@ -963,14 +964,9 @@ class StaticStim(StimDefaults):
 
             # if .iml
             else:
-                with open(self.image_filename, 'rb') as raw_image:
-                    image_bytes = raw_image.read()
-
-                image_array = array.array('H', image_bytes)
-                image_array.byteswap()
-
-                image = numpy.array(image_array, dtype='uint16').reshape(
-                    1024, 1536)
+                image = numpy.fromfile(self.image_filename, dtype='uint16')
+                image.byteswap(True)
+                image = image.reshape(1024, 1536)
 
                 maxi = image.max()
                 if maxi <= 4095:
@@ -978,20 +974,23 @@ class StaticStim(StimDefaults):
 
                 image = image.astype(numpy.float64)
 
-                image = image / maxi
+                image /= maxi
 
                 if self.image_channel != 3:
                     texture = numpy.zeros((1024, 1536, 3))
                     texture[:, :, self.image_channel] = image
 
-                    texture = texture * 2 - 1
+                    texture *= 2
+                    texture -= 1
 
                     # add alpha values
                     texture = numpy.insert(texture, 3, self.alpha, axis=2)
 
                 # .iml are gray scale by default
                 else:
-                    texture = image * 2 - 1
+                    image *= 2
+                    image -= 1
+                    texture = image
 
             texture = numpy.rot90(texture, 2)
 
@@ -1072,7 +1071,6 @@ class StaticStim(StimDefaults):
 
         texture[:, :, self.contrast_channel] = color
 
-        # print texture[0][0][1]
         self.stim.tex = texture
 
         if self.small_stim is not None:
@@ -1081,7 +1079,8 @@ class StaticStim(StimDefaults):
     def gen_phase(self):
         """Changes phase of stim on each frame draw.
         """
-        self.stim.phase += (self.phase_speed[0], self.phase_speed[1])
+        if any(self.phase_speed):
+            self.stim.phase += (self.phase_speed[0], self.phase_speed[1])
 
     def set_rgb(self, rgb):
         """Color setter.
@@ -2184,7 +2183,6 @@ def log_stats(count_reps, reps, count_frames, num_frames, elapsed_time,
                                           )
 
     return current_time_string
-
 
 def main(stim_list, verbose=True):
     """Function to create stims and run program. Creates instances of stim

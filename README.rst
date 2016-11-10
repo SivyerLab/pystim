@@ -52,6 +52,4 @@ for license rights and limitations.
 Screen Shots
 ------------
 
-Main screen with queued stims (Windows 7):
-
-.. image:: ../screenshots/screens.gif
+Screenshots are available in the /docs/screenshots/ folder.
