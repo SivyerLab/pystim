@@ -15,6 +15,7 @@ from time import strftime, localtime
 from tqdm import tqdm, trange
 from random import Random
 from PIL import Image
+from math import ceil
 
 import scipy, scipy.signal
 import sortedcontainers
@@ -314,9 +315,12 @@ class MyWindow(object):
     def close_win():
         """Static method to close window. Also closes labjack if present.
         """
-        if has_u3:
+        if has_u3 and MyWindow.d is not None:
             MyWindow.d.close()
+            MyWindow.d = None
+
         MyWindow.win.close()
+        MyWindow.win = None
 
         if MyWindow.small_win is not None:
             MyWindow.small_win.close()
@@ -325,7 +329,7 @@ class MyWindow(object):
     @staticmethod
     def change_color(color):
         """Static method to live update the background of the window.
-        TODO: maybe implement classproperty wrapper to make setter
+        TODO: implement classproperty to make setter
 
         :param color: RGB list used to change global defaults.
         """
@@ -334,7 +338,7 @@ class MyWindow(object):
                 GlobalDefaults['background'] = color
 
                 if MyWindow.gamma_mon is not None:
-                    color = color = MyWindow.gamma_mon(color)
+                    color = MyWindow.gamma_mon(color)
 
                 MyWindow.win.color = color
 
@@ -352,7 +356,7 @@ class MyWindow(object):
     @staticmethod
     def make_small_win():
         """
-        Makes a small window to see what's being show on the projector
+        Makes a small window to see what's being show on the projector.
         """
         if GlobalDefaults['display_size'][0] > GlobalDefaults[
                 'display_size'][1]:
@@ -389,15 +393,16 @@ class MyWindow(object):
         """
         if MyWindow.win is not None:
             MyWindow.win.flip()
+
             if MyWindow.small_win is not None:
                 MyWindow.small_win.flip()
 
     @staticmethod
     def send_trigger():
         """Triggers recording device by sending short voltage spike from LabJack
-        U3-HV. Spike last approximately 0.4 ms if connected via high speed USB
+        U3-HV. Spike lasts approximately 0.4 ms if connected via high speed USB
         (2.0). Ensure high enough sampling rate to reliably detect triggers.
-        Set to use flexible IO #4.
+        Set to use flexible IO #4 (FIO4).
         """
         if has_u3:
             try:
@@ -753,20 +758,19 @@ class StaticStim(StimDefaults):
         :return: last frame number as int
         """
         # round up
-        self.start_stim = int(self.delay + 0.99)
+        self.start_stim = int(ceil(self.delay))
 
         if self.trigger:
             if self.start_stim not in MyWindow.frame_trigger_list:
                 MyWindow.frame_trigger_list.add(self.start_stim)
 
-        self.end_stim = self.duration + self.start_stim
-        self.end_stim = int(self.end_stim + 0.99)
-        self.end_delay = int(self.end_delay + 0.99)
+        self.end_stim = int(ceil(self.duration + self.start_stim))
+        self.end_delay = int(ceil(self.end_delay))
 
         self.draw_duration = self.end_stim - self.start_stim
 
         if self.force_stop != 0:
-            self.end_stim = int(self.force_stop + 0.99)
+            self.end_stim = int(ceil(self.force_stop))
             self.end_delay = 0
 
         return self.end_stim + self.end_delay
@@ -790,6 +794,7 @@ class StaticStim(StimDefaults):
 
             # draw to back buffer
             self.stim.draw(MyWindow.win)
+
             if self.small_stim is not None:
                 self.small_stim.draw(MyWindow.small_win)
 
@@ -801,7 +806,7 @@ class StaticStim(StimDefaults):
         :return: tuple of high, low, delta, and background
         """
         background = GlobalDefaults['background']
-        # scale from (-1, 1) to (0, 1), for math reasons
+        # scale from (-1, 1) to (0, 1), for math and psychopy reasons
         background = (numpy.array(background, dtype='float') + 1) / 2
         background = background[self.contrast_channel]
 
@@ -874,7 +879,6 @@ class StaticStim(StimDefaults):
 
         return stim_mask
 
-
     def gen_texture(self):
         """Generates texture for stim object. Textures are 3D numpy arrays
         (size*size*4). The 3rd dimension is RGB and Alpha (transparency)
@@ -887,8 +891,8 @@ class StaticStim(StimDefaults):
         size = (max(self.gen_size()),) * 2  # square tuple of largest size
         # not needed for images
         if self.fill_mode != 'image':
-            texture = numpy.full(size + (4,), -1, dtype=numpy.float)  # make
-            # black rgba array, set alpha
+            # make black rgba array, set alpha
+            texture = numpy.full(size + (4,), -1, dtype=numpy.float)
             texture[:, :, 3] = self.alpha
 
         high, low, delta, background = self.gen_rgb()
@@ -965,7 +969,7 @@ class StaticStim(StimDefaults):
             # if .iml
             else:
                 image = numpy.fromfile(self.image_filename, dtype='uint16')
-                image.byteswap(True)
+                image.byteswap(True)  # changes endianness
                 image = image.reshape(1024, 1536)
 
                 maxi = image.max()
@@ -2183,6 +2187,7 @@ def log_stats(count_reps, reps, count_frames, num_frames, elapsed_time,
                                           )
 
     return current_time_string
+
 
 def main(stim_list, verbose=True):
     """Function to create stims and run program. Creates instances of stim
