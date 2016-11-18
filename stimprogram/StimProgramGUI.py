@@ -46,8 +46,6 @@ class Parameters(object):
 
         # init params
         config_file = os.path.abspath('../stimprogram/psychopy/config.ini')
-        print os.path.exists(config_file)
-        print config_file
         self.gui_params, self.stim_params, config_dict = self.read_config_file(
             config_file)
         self.init_params(config_dict)
@@ -206,7 +204,7 @@ class Parameters(object):
 
         :param config_dict: dictionary of defaults
         """
-        json_path = os.path.abspath('../stimprogram/psychopy/params_json.txt.')
+        json_path = os.path.abspath('../stimprogram/psychopy/params_json.txt')
         with open(json_path, 'r') as f:
             params = json.load(f, object_pairs_hook=OrderedDict)
 
@@ -910,23 +908,33 @@ class ListPanel(wx.Panel):
         # add remove buttons
         self.add_button = wx.Button(self, id=wx.ID_ADD)
         self.remove_button = wx.Button(self, id=wx.ID_REMOVE)
+        self.update_button = wx.Button(self, label='Update')
+
+        self.add_button.SetMinSize((55, 26))
+        self.remove_button.SetMinSize((55, 26))
+        self.update_button.SetMinSize((55, 26))
 
         # sizer for add and remove buttons
-        add_remove_sizer = wx.BoxSizer(wx.HORIZONTAL)
+        add_remove_update_sizer = wx.BoxSizer(wx.HORIZONTAL)
 
         # add buttons to sizer
-        add_remove_sizer.Add(self.add_button,
+        add_remove_update_sizer.Add(self.add_button,
                              proportion=1,
                              flag=wx.LEFT | wx.RIGHT,
                              border=5)
 
-        add_remove_sizer.Add(self.remove_button,
+        add_remove_update_sizer.Add(self.remove_button,
+                             proportion=1,
+                             flag=wx.LEFT | wx.RIGHT,
+                             border=5)
+
+        add_remove_update_sizer.Add(self.update_button,
                              proportion=1,
                              flag=wx.LEFT | wx.RIGHT,
                              border=5)
 
         # add up down sizer to panel sizer
-        panel_sizer.Add(add_remove_sizer,
+        panel_sizer.Add(add_remove_update_sizer,
                         proportion=0,
                         flag=wx.TOP | wx.BOTTOM | wx.ALIGN_CENTER_HORIZONTAL |
                              wx.ALIGN_CENTER_VERTICAL,
@@ -937,6 +945,7 @@ class ListPanel(wx.Panel):
         self.Bind(wx.EVT_BUTTON, self.on_down_button, self.down_button)
         self.Bind(wx.EVT_BUTTON, self.on_add_button, self.add_button)
         self.Bind(wx.EVT_BUTTON, self.on_remove_button, self.remove_button)
+        self.Bind(wx.EVT_BUTTON, self.on_update_button, self.update_button)
 
         # sizer for double click on list item
         self.Bind(wx.EVT_LIST_ITEM_ACTIVATED, self.on_double_click,
@@ -974,17 +983,18 @@ class ListPanel(wx.Panel):
         else:
             raise AttributeError('Wrong label or stim class')
 
-    def on_add_button(self, event):
+    def on_add_button(self, event, insert_pos=None):
         """
         Makes call to add to list with proper params
 
         :param event:
+        :param insert_pos:
         """
         param_dict = self.parameters.get_merged_params()
         stim_type = param_dict.pop('move_type')
         grid_dict = self.frame.grid.get_grid_dict()
 
-        self.add_to_list(stim_type, param_dict, grid_dict)
+        self.add_to_list(stim_type, param_dict, grid_dict, insert_pos)
 
     def add_to_list(self, stim_type, param_dict, grid_dict, insert_pos=None):
         """
@@ -1064,6 +1074,19 @@ class ListPanel(wx.Panel):
             del self.stims_to_run[:]
             del self.stims_to_run_w_grid[:]
 
+    def on_update_button(self, event):
+        """
+        Removes stims and adds stim to list, in essence updating/refreshing
+        the currently selected stim.
+
+        :param event:
+        """
+        # if any selected, iterate through and delete
+        if self.list_control.GetSelectedItemCount() == 1:
+            index = self.list_control.GetFirstSelected()
+            self.on_remove_button(event)
+            self.on_add_button(event, index)
+
     def on_up_button(self, event):
         """
         Moves a stim up in the list by removing it and reinserting it into
@@ -1087,7 +1110,7 @@ class ListPanel(wx.Panel):
                 # remove
                 self.on_remove_button(event)
 
-                # readd
+                # re-add
                 self.add_to_list(stim_type, param_dict, grid_dict, index - 1)
 
                 # reset stim numbers in stims to run
