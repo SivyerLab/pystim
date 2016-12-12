@@ -31,7 +31,7 @@ They are listed below:
 
 - psychopy (see psychopy `documentation <http://www.psychopy.org/documentation.html>`_ for required `dependencies <http://www.psychopy.org/installation.html#essential-packages>`_).
 - sortedcontainers (available through pip)
-- `wxPython <http://www.wxpython.org/download.php)>`_ (for GUI)
+- `wxPython <http://www.wxpython.org/download.php>`_ (for GUI)
 
 Optional libraries:
 
