@@ -2263,17 +2263,23 @@ class MyFrame(wx.Frame):
             self.status_bar.set_background(wx.NullColour)
             self.status_bar.set_text_color(wx.BLACK)
             self.status_bar.set_status_text('running...')
-            fps, time, time_stamp = StimProgram.main(
+            fps, time, dropped, time_stamp = StimProgram.main(
                 self.list_panel.stims_to_run)
 
             if time != 'error':
                 status_text = 'Last run: {0:.2f} fps, '.format(fps) \
-                              + '{0:.2f} seconds.'.format(time)
+                              + '{0:.2f} seconds, '.format(time) \
+                              + '{} dropped.'.format(dropped)
 
                 if time_stamp is not None:
                     status_text += ' Timestamp: {}'.format(time_stamp)
 
                 self.status_bar.set_status_text(status_text)
+
+                if dropped != 0:
+                    self.status_bar.set_background(wx.BLUE)
+                    self.status_bar.set_text_color(wx.WHITE)
+
             # if error
             else:
                 self.status_bar.set_status_text('Error: {}'.format(fps))

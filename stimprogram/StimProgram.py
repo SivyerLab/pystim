@@ -2274,7 +2274,8 @@ def main(stim_list, verbose=True):
                 save_loc = os.path.join(capture_dir, save_dir)
                 os.makedirs(save_loc)
 
-            # MyWindow.win.recordFrameIntervals = True
+            MyWindow.win.recordFrameIntervals = True
+            MyWindow.win.frameIntervals = []
 
             # for frame in xrange(num_frames):
             # trange for pretty, low overhead (on the order of ns), progress
@@ -2318,8 +2319,10 @@ def main(stim_list, verbose=True):
             # get elapsed time for fps
             count_elapsed_time += elapsed_time.getTime()
 
-            # MyWindow.win.recordFrameIntervals = False
+            MyWindow.win.recordFrameIntervals = False
             # MyWindow.win.saveFrameIntervals()
+            f = numpy.array(MyWindow.win.frameIntervals)
+            dropped = (f > f.mean() + 4*f.std()).sum()
 
             # stop movies from continuing in background
             for stim in to_animate:
@@ -2356,7 +2359,8 @@ def main(stim_list, verbose=True):
                    (num_frames)),
         print "Average fps: {0:.2f} hz.". \
             format((count_reps * (num_frames) + count_frames) /
-                   count_elapsed_time)
+                   count_elapsed_time),
+        print "{} frame(s) dropped.".format(dropped)
         print "Elapsed time: {0:.3f} seconds.\n". \
             format(count_elapsed_time)
 
@@ -2410,7 +2414,7 @@ def main(stim_list, verbose=True):
 
         print '\nDONE'
 
-    return fps, count_elapsed_time, time_stamp
+    return fps, count_elapsed_time, dropped, time_stamp
 
 if __name__ == '__main__':
     pass
