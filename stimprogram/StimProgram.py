@@ -2322,7 +2322,7 @@ def main(stim_list, verbose=True):
             MyWindow.win.recordFrameIntervals = False
             # MyWindow.win.saveFrameIntervals()
             f = numpy.array(MyWindow.win.frameIntervals)
-            dropped = (f > f.mean() + 4*f.std()).sum()
+            dropped = (f > (f.mean() + 4*f.std())).sum()
 
             # stop movies from continuing in background
             for stim in to_animate:
