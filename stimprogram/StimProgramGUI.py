@@ -1471,8 +1471,14 @@ class MyParamGrid(wx.Frame):
                       'motion parameters': self.parameters.motion_param}
 
         row_ind = 0
-        # for k, v in param_dict.iteritems():
+        for k, v in param_dict.iteritems():
+            self.grid.SetCellValue(row_ind, 0, k.upper())
+            self.grid.SetReadOnly(row_ind, 0)
+            row_ind += 1
 
+            for param in v.iterkeys():
+                self.grid.SetCellValue(row_ind, 0, param)
+                row_ind += 1
 
         # sizer for grid
         grid_sizer = wx.BoxSizer(wx.VERTICAL)
@@ -1509,6 +1515,20 @@ class MyParamGrid(wx.Frame):
         """
         self.hide_grid()
         self.frame.menu_bar.options_override.Check(False)
+
+    def get_grid_dict(self):
+        """
+        Makes a dict of rows with entered values, ignoring headers
+        :return:
+        """
+        ret = {}
+
+        for i in range(self.grid.GetNumberRows()):
+            val = self.grid.GetCellValue(i, 1)
+            if val:
+                ret[self.grid.GetCellValue(i, 0)] = Parameters.lit_eval(val)
+
+        return ret
 
 
 class MyGrid(wx.Frame):
@@ -1724,7 +1744,7 @@ class MyGrid(wx.Frame):
 
         :return: edited dictionary of params and values in grid
         """
-        to_return = {}
+        ret = {}
         to_edit = deepcopy(self.control_dict)
 
         for param, values in to_edit.iteritems():
@@ -1745,9 +1765,9 @@ class MyGrid(wx.Frame):
                     values[i] = values[i - 1]
 
             values = map(Parameters.lit_eval, values)
-            to_return[param] = values
+            ret[param] = values
 
-        return to_return
+        return ret
 
 
 class MyMenuBar(wx.MenuBar):
@@ -1886,6 +1906,8 @@ class MyMenuBar(wx.MenuBar):
 
         if val:
             self.frame.param_grid.show_grid()
+        else:
+            self.frame.param_grid.hide_grid()
 
     def on_options_tools_rec_map(self, event):
         """
@@ -2346,16 +2368,25 @@ class MyFrame(wx.Frame):
 
     def run(self):
         """
-        Method for running stims.
+        Method for running stims. Makes changes based on param grid if necessary.
         """
         # try/except, so that uncaught errors thrown by StimProgram can be
         # caught to avoid hanging.
+        to_run = deepcopy(self.list_panel.stims_to_run)
+
+        if self.param_grid.grid_shown:
+            edits = self.param_grid.get_grid_dict()
+
+            for stim in to_run:
+                for k, v in edits.iteritems():
+                    stim.parameters[k] = v
+
         try:
             self.status_bar.set_background(wx.NullColour)
             self.status_bar.set_text_color(wx.BLACK)
             self.status_bar.set_status_text('running...')
-            fps, time, dropped, time_stamp = StimProgram.main(
-                self.list_panel.stims_to_run)
+
+            fps, time, dropped, time_stamp = StimProgram.main(to_run)
 
             if time != 'error':
                 status_text = 'Last run: {0:.2f} fps, '.format(fps) \
