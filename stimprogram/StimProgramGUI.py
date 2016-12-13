@@ -1478,6 +1478,7 @@ class MyParamGrid(wx.Frame):
 
             for param in v.iterkeys():
                 self.grid.SetCellValue(row_ind, 0, param)
+                self.grid.SetReadOnly(row_ind, 0)
                 row_ind += 1
 
         # sizer for grid
@@ -1489,6 +1490,8 @@ class MyParamGrid(wx.Frame):
 
         # catch close to only hide grid
         self.Bind(wx.EVT_CLOSE, self.on_close_button)
+        self.Bind(wx.grid.EVT_GRID_CELL_RIGHT_CLICK,
+                  self.on_grid_cell_right_click)
 
     def show_grid(self):
         """
@@ -1515,6 +1518,18 @@ class MyParamGrid(wx.Frame):
         """
         self.hide_grid()
         self.frame.menu_bar.options_override.Check(False)
+
+    def on_grid_cell_right_click(self, event):
+        """
+        Removes contents of cell.
+
+        :param event:
+        """
+        row = event.GetRow()
+        col = event.GetCol()
+
+        if col == 1:
+            self.grid.SetCellValue(row, col, '')
 
     def get_grid_dict(self):
         """
