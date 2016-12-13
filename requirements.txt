@@ -9,7 +9,7 @@ Pillow
 sortedcontainers
 tqdm
 PsychoPy  # along with it's dependencies since pip won't install them
-# currently: pip install numpy scipy matplotlib pandas pyopengl pyglet pillow moviepy lxml openpyxl configobj psychopy
+# current dependencies: pip install numpy scipy matplotlib pandas pyopengl pyglet pillow moviepy lxml openpyxl configobj psychopy
 
 ## optional
 # LabJackPython (needs manual install)
