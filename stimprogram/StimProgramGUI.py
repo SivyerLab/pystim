@@ -1438,6 +1438,79 @@ class DirPanel(wx.Panel):
                 self.on_load_button(event)
 
 
+class MyParamGrid(wx.Frame):
+    """
+    Class for grid of all params to override stim params.
+    """
+    def __init__(self, parent):
+        """
+        Constructor
+
+        :param parent:
+        """
+        # call to super
+        super(MyParamGrid, self).__init__(parent, title='Parameter override')
+
+        # instance attributes
+        self.frame = parent
+        self.parameters = self.frame.parameters
+        self.grid_shown = False
+
+        # panel to hold everything
+        panel = wx.Panel(self)
+
+        # make grid
+        self.grid = wx.grid.Grid(panel)
+        self.grid.CreateGrid(50, 2)
+        self.grid.SetColLabelValue(0, 'Parameter')
+        self.grid.SetColLabelValue(1, 'Value')
+
+        param_dict = {'shape parameters': self.parameters.shape_param,
+                      'timing parameters': self.parameters.timing_param,
+                      'fill parameters': self.parameters.fill_param,
+                      'motion parameters': self.parameters.motion_param}
+
+        row_ind = 0
+        # for k, v in param_dict.iteritems():
+
+
+        # sizer for grid
+        grid_sizer = wx.BoxSizer(wx.VERTICAL)
+        grid_sizer.Add(self.grid, proportion=1, flag=wx.EXPAND)
+
+        # set sizer
+        panel.SetSizer(grid_sizer)
+
+        # catch close to only hide grid
+        self.Bind(wx.EVT_CLOSE, self.on_close_button)
+
+    def show_grid(self):
+        """
+        Method to show grid. Unminimizes and brings to front.
+        """
+        self.Iconize(False)
+        self.Show()
+        self.Raise()
+        self.grid_shown = True
+
+    def hide_grid(self):
+        """
+        Method to hide grid.
+        """
+        self.Hide()
+        self.grid_shown = False
+
+    def on_close_button(self, event):
+        """
+        Catches close in order to only hide. Otherwise frame object is
+        deleted and loses all data.
+
+        :param event:
+        """
+        self.hide_grid()
+        self.frame.menu_bar.options_override.Check(False)
+
+
 class MyGrid(wx.Frame):
     """
     Class for grid window.
@@ -1713,6 +1786,10 @@ class MyMenuBar(wx.MenuBar):
         self.options_mirror = options_menu.Append(wx.ID_ANY, 'mirror',
                                                    'Make small mirror window',
                                                    kind=wx.ITEM_CHECK)
+        self.options_override = options_menu.Append(wx.ID_ANY, 'global override',
+                                                    'Override parameters',
+                                                    kind=wx.ITEM_CHECK)
+
         # options submenu
         options_tools = wx.Menu()
         tools_rec_map = options_tools.Append(wx.ID_ANY,
@@ -1731,6 +1808,7 @@ class MyMenuBar(wx.MenuBar):
         self.Bind(wx.EVT_MENU, self.on_options_log, self.options_log)
         self.Bind(wx.EVT_MENU, self.on_options_capture, self.options_capture)
         self.Bind(wx.EVT_MENU, self.on_options_mirror, self.options_mirror)
+        self.Bind(wx.EVT_MENU, self.on_options_override, self.options_override)
         self.Bind(wx.EVT_MENU, self.on_options_tools_rec_map, tools_rec_map)
 
     def on_file_quit(self, event):
@@ -1796,6 +1874,18 @@ class MyMenuBar(wx.MenuBar):
 
         self.frame.parameters.set_param_value('global', 'small_win', val)
         StimProgram.GlobalDefaults['small_win'] = val
+
+    def on_options_override(self, event):
+        """
+        Handles toggling to bring up grid of all params
+
+        :param event:
+        :return:
+        """
+        val = self.options_override.IsChecked()
+
+        if val:
+            self.frame.param_grid.show_grid()
 
     def on_options_tools_rec_map(self, event):
         """
@@ -2057,6 +2147,7 @@ class MyFrame(wx.Frame):
 
         # make grid
         self.grid = MyGrid(self)
+        self.param_grid = MyParamGrid(self)
 
         # notebook to hold input panels
         self.input_nb = wx.Notebook(self)

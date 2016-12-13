@@ -2335,9 +2335,10 @@ def main(stim_list, verbose=True):
                 break
 
             count_reps += 1
+
     except Exception as e:
         traceback.print_exc()
-        return str(e), 'error', None
+        return str(e), 'error', None, None
 
     # one last flip to clear window if still open
     try:
