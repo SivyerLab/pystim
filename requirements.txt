@@ -19,6 +19,7 @@ igor
 ## needs to be installed manually (or with conda):
 # wxpython
 # labjackpython needs to be manually installed as well (on win32, need driver also, see labjack site)
+# ffmpeg (if want to make videos of stims)
 
 # compiled windows binaries of popular python libraries
 # can be found at http://www.lfd.uci.edu/~gohlke/pythonlibs/
