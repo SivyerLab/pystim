@@ -40,8 +40,8 @@ Optional libraries:
 - `u3 <https://labjack.com/support/software/examples/ud/labjackpython>`_ (for triggering from LabJack)
 - `ffmpeg <https://www.ffmpeg.org/>`_ (for making movies from captured frames)
 
-Psychopy requires some small editing to source for it to work (changing 5 
-lines). Instructions :doc:`here <detailedinstall>`.
+Psychopy requires some small editing to source for it to work as of version 1.84.2 (fixed on current master on github).
+See docs for detailed instructions. An install walkthrough is also available in the requirements file.
 
 Licensing
 ---------
