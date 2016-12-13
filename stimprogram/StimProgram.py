@@ -15,6 +15,7 @@ from time import strftime, localtime
 from tqdm import tqdm, trange
 from random import Random
 from PIL import Image
+from math import ceil
 
 import scipy, scipy.signal
 import sortedcontainers
@@ -61,7 +62,7 @@ __status__  = "Beta"
 
 # read ini file
 config = ConfigParser.ConfigParser()
-config.read(os.path.abspath('./stimprogram/psychopy/config.ini'))
+config.read(os.path.abspath('../stimprogram/psychopy/config.ini'))
 
 
 class StimInfo(object):
@@ -314,9 +315,12 @@ class MyWindow(object):
     def close_win():
         """Static method to close window. Also closes labjack if present.
         """
-        if has_u3:
+        if has_u3 and MyWindow.d is not None:
             MyWindow.d.close()
+            MyWindow.d = None
+
         MyWindow.win.close()
+        MyWindow.win = None
 
         if MyWindow.small_win is not None:
             MyWindow.small_win.close()
@@ -325,7 +329,7 @@ class MyWindow(object):
     @staticmethod
     def change_color(color):
         """Static method to live update the background of the window.
-        TODO: maybe implement classproperty wrapper to make setter
+        TODO: implement classproperty to make setter
 
         :param color: RGB list used to change global defaults.
         """
@@ -334,7 +338,7 @@ class MyWindow(object):
                 GlobalDefaults['background'] = color
 
                 if MyWindow.gamma_mon is not None:
-                    color = color = MyWindow.gamma_mon(color)
+                    color = MyWindow.gamma_mon(color)
 
                 MyWindow.win.color = color
 
@@ -352,7 +356,7 @@ class MyWindow(object):
     @staticmethod
     def make_small_win():
         """
-        Makes a small window to see what's being show on the projector
+        Makes a small window to see what's being show on the projector.
         """
         if GlobalDefaults['display_size'][0] > GlobalDefaults[
                 'display_size'][1]:
@@ -389,15 +393,16 @@ class MyWindow(object):
         """
         if MyWindow.win is not None:
             MyWindow.win.flip()
+
             if MyWindow.small_win is not None:
                 MyWindow.small_win.flip()
 
     @staticmethod
     def send_trigger():
         """Triggers recording device by sending short voltage spike from LabJack
-        U3-HV. Spike last approximately 0.4 ms if connected via high speed USB
+        U3-HV. Spike lasts approximately 0.4 ms if connected via high speed USB
         (2.0). Ensure high enough sampling rate to reliably detect triggers.
-        Set to use flexible IO #4.
+        Set to use flexible IO #4 (FIO4).
         """
         if has_u3:
             try:
@@ -753,20 +758,19 @@ class StaticStim(StimDefaults):
         :return: last frame number as int
         """
         # round up
-        self.start_stim = int(self.delay + 0.99)
+        self.start_stim = int(ceil(self.delay))
 
         if self.trigger:
             if self.start_stim not in MyWindow.frame_trigger_list:
                 MyWindow.frame_trigger_list.add(self.start_stim)
 
-        self.end_stim = self.duration + self.start_stim
-        self.end_stim = int(self.end_stim + 0.99)
-        self.end_delay = int(self.end_delay + 0.99)
+        self.end_stim = int(ceil(self.duration + self.start_stim))
+        self.end_delay = int(ceil(self.end_delay))
 
         self.draw_duration = self.end_stim - self.start_stim
 
         if self.force_stop != 0:
-            self.end_stim = int(self.force_stop + 0.99)
+            self.end_stim = int(ceil(self.force_stop))
             self.end_delay = 0
 
         return self.end_stim + self.end_delay
@@ -790,6 +794,7 @@ class StaticStim(StimDefaults):
 
             # draw to back buffer
             self.stim.draw(MyWindow.win)
+
             if self.small_stim is not None:
                 self.small_stim.draw(MyWindow.small_win)
 
@@ -801,7 +806,7 @@ class StaticStim(StimDefaults):
         :return: tuple of high, low, delta, and background
         """
         background = GlobalDefaults['background']
-        # scale from (-1, 1) to (0, 1), for math reasons
+        # scale from (-1, 1) to (0, 1), for math and psychopy reasons
         background = (numpy.array(background, dtype='float') + 1) / 2
         background = background[self.contrast_channel]
 
@@ -886,8 +891,8 @@ class StaticStim(StimDefaults):
         size = (max(self.gen_size()),) * 2  # square tuple of largest size
         # not needed for images
         if self.fill_mode != 'image':
-            texture = numpy.full(size + (4,), -1, dtype=numpy.float)  # make
-            # black rgba array, set alpha
+            # make black rgba array, set alpha
+            texture = numpy.full(size + (4,), -1, dtype=numpy.float)
             texture[:, :, 3] = self.alpha
 
         high, low, delta, background = self.gen_rgb()
@@ -963,14 +968,9 @@ class StaticStim(StimDefaults):
 
             # if .iml
             else:
-                with open(self.image_filename, 'rb') as raw_image:
-                    image_bytes = raw_image.read()
-
-                image_array = array.array('H', image_bytes)
-                image_array.byteswap()
-
-                image = numpy.array(image_array, dtype='uint16').reshape(
-                    1024, 1536)
+                image = numpy.fromfile(self.image_filename, dtype='uint16')
+                image.byteswap(True)  # changes endianness
+                image = image.reshape(1024, 1536)
 
                 maxi = image.max()
                 if maxi <= 4095:
@@ -978,20 +978,23 @@ class StaticStim(StimDefaults):
 
                 image = image.astype(numpy.float64)
 
-                image = image / maxi
+                image /= maxi
 
                 if self.image_channel != 3:
                     texture = numpy.zeros((1024, 1536, 3))
                     texture[:, :, self.image_channel] = image
 
-                    texture = texture * 2 - 1
+                    texture *= 2
+                    texture -= 1
 
                     # add alpha values
                     texture = numpy.insert(texture, 3, self.alpha, axis=2)
 
                 # .iml are gray scale by default
                 else:
-                    texture = image * 2 - 1
+                    image *= 2
+                    image -= 1
+                    texture = image
 
             texture = numpy.rot90(texture, 2)
 
@@ -1072,7 +1075,6 @@ class StaticStim(StimDefaults):
 
         texture[:, :, self.contrast_channel] = color
 
-        # print texture[0][0][1]
         self.stim.tex = texture
 
         if self.small_stim is not None:
@@ -1081,7 +1083,8 @@ class StaticStim(StimDefaults):
     def gen_phase(self):
         """Changes phase of stim on each frame draw.
         """
-        self.stim.phase += (self.phase_speed[0], self.phase_speed[1])
+        if any(self.phase_speed):
+            self.stim.phase += (self.phase_speed[0], self.phase_speed[1])
 
     def set_rgb(self, rgb):
         """Color setter.
@@ -2271,7 +2274,8 @@ def main(stim_list, verbose=True):
                 save_loc = os.path.join(capture_dir, save_dir)
                 os.makedirs(save_loc)
 
-            # MyWindow.win.recordFrameIntervals = True
+            MyWindow.win.recordFrameIntervals = True
+            MyWindow.win.frameIntervals = []
 
             # for frame in xrange(num_frames):
             # trange for pretty, low overhead (on the order of ns), progress
@@ -2315,8 +2319,10 @@ def main(stim_list, verbose=True):
             # get elapsed time for fps
             count_elapsed_time += elapsed_time.getTime()
 
-            # MyWindow.win.recordFrameIntervals = False
+            MyWindow.win.recordFrameIntervals = False
             # MyWindow.win.saveFrameIntervals()
+            f = numpy.array(MyWindow.win.frameIntervals)
+            dropped = (f > (f.mean() + 4*f.std())).sum()
 
             # stop movies from continuing in background
             for stim in to_animate:
@@ -2329,9 +2335,10 @@ def main(stim_list, verbose=True):
                 break
 
             count_reps += 1
+
     except Exception as e:
         traceback.print_exc()
-        return str(e), 'error', None
+        return str(e), 'error', None, None
 
     # one last flip to clear window if still open
     try:
@@ -2353,7 +2360,8 @@ def main(stim_list, verbose=True):
                    (num_frames)),
         print "Average fps: {0:.2f} hz.". \
             format((count_reps * (num_frames) + count_frames) /
-                   count_elapsed_time)
+                   count_elapsed_time),
+        print "{} frame(s) dropped.".format(dropped)
         print "Elapsed time: {0:.3f} seconds.\n". \
             format(count_elapsed_time)
 
@@ -2407,7 +2415,7 @@ def main(stim_list, verbose=True):
 
         print '\nDONE'
 
-    return fps, count_elapsed_time, time_stamp
+    return fps, count_elapsed_time, dropped, time_stamp
 
 if __name__ == '__main__':
     pass

@@ -30,8 +30,8 @@ requires several libraries, along with their associated dependencies, to run.
 They are listed below:
 
 - psychopy (see psychopy `documentation <http://www.psychopy.org/documentation.html>`_ for required `dependencies <http://www.psychopy.org/installation.html#essential-packages>`_).
-- `wxPython <http://www.wxpython.org/download.php)>`_ (for GUI)
-- sortedcontainers (also available through pip)
+- sortedcontainers (available through pip)
+- `wxPython <http://www.wxpython.org/download.php>`_ (for GUI)
 
 Optional libraries:
 
@@ -52,6 +52,4 @@ for license rights and limitations.
 Screen Shots
 ------------
 
-Main screen with queued stims (Windows 7):
-
-.. image:: ../screenshots/screens.gif
+Screenshots are available in the /docs/screenshots/ folder.

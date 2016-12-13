@@ -1,20 +1,42 @@
-scipy
+# conda is the recommended environment manager.
+
+# included with conda
 numpy
+scipy
 Pillow
-PsychoPy
-pyglet
+
+# not on conda, use pip
 sortedcontainers
+tqdm
+PsychoPy  # along with it's dependencies since pip won't install them
+# current dependencies: pip install numpy scipy matplotlib pandas pyopengl pyglet pillow moviepy lxml openpyxl configobj psychopy
+
+## optional
+# LabJackPython (needs manual install)
 tabulate
 igor
 
-## need to be installed manually
+## needs to be installed manually (or with conda):
 # wxpython
-
-## optional
-# LabJackPython
-# tabulate
-# igor
+# labjackpython needs to be manually installed as well (on win32, need driver also, see labjack site)
 
 # compiled windows binaries of popular python libraries
 # can be found at http://www.lfd.uci.edu/~gohlke/pythonlibs/
-# if having problems installing
+# if having problems installing on windows (conda resolves this problem though)
+
+# WALKTHROUGH
+# ($ means run in terminal/cmd)
+# install conda
+# create conda stimulus program environment
+# $ conda create -y --name sp_env python=2.7
+# activate conda env:
+# $ activate sp_env
+# install conda packages:
+# $ conda install -y numpy scipy Pillow matplotlib pandas pyopengl lxml openpyxl configobj
+# install pip packages:
+# $ pip install tabulate igor sortedcontainers tqdm moviepy pyglet psychopy
+# install wxpython:
+# conda install -y wxpython
+# download repository and navigate to where stimprogramGUI.py is located
+# run GUI:
+# $ python stimgprogramGUI.py

@@ -45,7 +45,7 @@ class Parameters(object):
         self.stim_params = None
 
         # init params
-        config_file = os.path.abspath('./stimprogram/psychopy/config.ini')
+        config_file = os.path.abspath('../stimprogram/psychopy/config.ini')
         self.gui_params, self.stim_params, config_dict = self.read_config_file(
             config_file)
         self.init_params(config_dict)
@@ -204,7 +204,7 @@ class Parameters(object):
 
         :param config_dict: dictionary of defaults
         """
-        json_path = os.path.abspath('./stimprogram/psychopy/params_json.txt.')
+        json_path = os.path.abspath('../stimprogram/psychopy/params_json.txt')
         with open(json_path, 'r') as f:
             params = json.load(f, object_pairs_hook=OrderedDict)
 
@@ -908,23 +908,33 @@ class ListPanel(wx.Panel):
         # add remove buttons
         self.add_button = wx.Button(self, id=wx.ID_ADD)
         self.remove_button = wx.Button(self, id=wx.ID_REMOVE)
+        self.update_button = wx.Button(self, label='Update')
+
+        self.add_button.SetMinSize((55, 26))
+        self.remove_button.SetMinSize((55, 26))
+        self.update_button.SetMinSize((55, 26))
 
         # sizer for add and remove buttons
-        add_remove_sizer = wx.BoxSizer(wx.HORIZONTAL)
+        add_remove_update_sizer = wx.BoxSizer(wx.HORIZONTAL)
 
         # add buttons to sizer
-        add_remove_sizer.Add(self.add_button,
+        add_remove_update_sizer.Add(self.add_button,
                              proportion=1,
                              flag=wx.LEFT | wx.RIGHT,
                              border=5)
 
-        add_remove_sizer.Add(self.remove_button,
+        add_remove_update_sizer.Add(self.remove_button,
+                             proportion=1,
+                             flag=wx.LEFT | wx.RIGHT,
+                             border=5)
+
+        add_remove_update_sizer.Add(self.update_button,
                              proportion=1,
                              flag=wx.LEFT | wx.RIGHT,
                              border=5)
 
         # add up down sizer to panel sizer
-        panel_sizer.Add(add_remove_sizer,
+        panel_sizer.Add(add_remove_update_sizer,
                         proportion=0,
                         flag=wx.TOP | wx.BOTTOM | wx.ALIGN_CENTER_HORIZONTAL |
                              wx.ALIGN_CENTER_VERTICAL,
@@ -935,6 +945,7 @@ class ListPanel(wx.Panel):
         self.Bind(wx.EVT_BUTTON, self.on_down_button, self.down_button)
         self.Bind(wx.EVT_BUTTON, self.on_add_button, self.add_button)
         self.Bind(wx.EVT_BUTTON, self.on_remove_button, self.remove_button)
+        self.Bind(wx.EVT_BUTTON, self.on_update_button, self.update_button)
 
         # sizer for double click on list item
         self.Bind(wx.EVT_LIST_ITEM_ACTIVATED, self.on_double_click,
@@ -972,17 +983,18 @@ class ListPanel(wx.Panel):
         else:
             raise AttributeError('Wrong label or stim class')
 
-    def on_add_button(self, event):
+    def on_add_button(self, event, insert_pos=None):
         """
         Makes call to add to list with proper params
 
         :param event:
+        :param insert_pos:
         """
         param_dict = self.parameters.get_merged_params()
         stim_type = param_dict.pop('move_type')
         grid_dict = self.frame.grid.get_grid_dict()
 
-        self.add_to_list(stim_type, param_dict, grid_dict)
+        self.add_to_list(stim_type, param_dict, grid_dict, insert_pos)
 
     def add_to_list(self, stim_type, param_dict, grid_dict, insert_pos=None):
         """
@@ -1062,6 +1074,19 @@ class ListPanel(wx.Panel):
             del self.stims_to_run[:]
             del self.stims_to_run_w_grid[:]
 
+    def on_update_button(self, event):
+        """
+        Removes stims and adds stim to list, in essence updating/refreshing
+        the currently selected stim.
+
+        :param event:
+        """
+        # if any selected, iterate through and delete
+        if self.list_control.GetSelectedItemCount() == 1:
+            index = self.list_control.GetFirstSelected()
+            self.on_remove_button(event)
+            self.on_add_button(event, index)
+
     def on_up_button(self, event):
         """
         Moves a stim up in the list by removing it and reinserting it into
@@ -1085,7 +1110,7 @@ class ListPanel(wx.Panel):
                 # remove
                 self.on_remove_button(event)
 
-                # readd
+                # re-add
                 self.add_to_list(stim_type, param_dict, grid_dict, index - 1)
 
                 # reset stim numbers in stims to run
@@ -1413,6 +1438,99 @@ class DirPanel(wx.Panel):
                 self.on_load_button(event)
 
 
+class MyParamGrid(wx.Frame):
+    """
+    Class for grid of all params to override stim params.
+    """
+    def __init__(self, parent):
+        """
+        Constructor
+
+        :param parent:
+        """
+        # call to super
+        super(MyParamGrid, self).__init__(parent, title='Parameter override')
+
+        # instance attributes
+        self.frame = parent
+        self.parameters = self.frame.parameters
+        self.grid_shown = False
+
+        # panel to hold everything
+        panel = wx.Panel(self)
+
+        # make grid
+        self.grid = wx.grid.Grid(panel)
+        self.grid.CreateGrid(50, 2)
+        self.grid.SetColLabelValue(0, 'Parameter')
+        self.grid.SetColLabelValue(1, 'Value')
+
+        param_dict = {'shape parameters': self.parameters.shape_param,
+                      'timing parameters': self.parameters.timing_param,
+                      'fill parameters': self.parameters.fill_param,
+                      'motion parameters': self.parameters.motion_param}
+
+        row_ind = 0
+        for k, v in param_dict.iteritems():
+            self.grid.SetCellValue(row_ind, 0, k.upper())
+            self.grid.SetReadOnly(row_ind, 0)
+            row_ind += 1
+
+            for param in v.iterkeys():
+                self.grid.SetCellValue(row_ind, 0, param)
+                row_ind += 1
+
+        # sizer for grid
+        grid_sizer = wx.BoxSizer(wx.VERTICAL)
+        grid_sizer.Add(self.grid, proportion=1, flag=wx.EXPAND)
+
+        # set sizer
+        panel.SetSizer(grid_sizer)
+
+        # catch close to only hide grid
+        self.Bind(wx.EVT_CLOSE, self.on_close_button)
+
+    def show_grid(self):
+        """
+        Method to show grid. Unminimizes and brings to front.
+        """
+        self.Iconize(False)
+        self.Show()
+        self.Raise()
+        self.grid_shown = True
+
+    def hide_grid(self):
+        """
+        Method to hide grid.
+        """
+        self.Hide()
+        self.grid_shown = False
+
+    def on_close_button(self, event):
+        """
+        Catches close in order to only hide. Otherwise frame object is
+        deleted and loses all data.
+
+        :param event:
+        """
+        self.hide_grid()
+        self.frame.menu_bar.options_override.Check(False)
+
+    def get_grid_dict(self):
+        """
+        Makes a dict of rows with entered values, ignoring headers
+        :return:
+        """
+        ret = {}
+
+        for i in range(self.grid.GetNumberRows()):
+            val = self.grid.GetCellValue(i, 1)
+            if val:
+                ret[self.grid.GetCellValue(i, 0)] = Parameters.lit_eval(val)
+
+        return ret
+
+
 class MyGrid(wx.Frame):
     """
     Class for grid window.
@@ -1626,7 +1744,7 @@ class MyGrid(wx.Frame):
 
         :return: edited dictionary of params and values in grid
         """
-        to_return = {}
+        ret = {}
         to_edit = deepcopy(self.control_dict)
 
         for param, values in to_edit.iteritems():
@@ -1647,9 +1765,9 @@ class MyGrid(wx.Frame):
                     values[i] = values[i - 1]
 
             values = map(Parameters.lit_eval, values)
-            to_return[param] = values
+            ret[param] = values
 
-        return to_return
+        return ret
 
 
 class MyMenuBar(wx.MenuBar):
@@ -1688,6 +1806,10 @@ class MyMenuBar(wx.MenuBar):
         self.options_mirror = options_menu.Append(wx.ID_ANY, 'mirror',
                                                    'Make small mirror window',
                                                    kind=wx.ITEM_CHECK)
+        self.options_override = options_menu.Append(wx.ID_ANY, 'global override',
+                                                    'Override parameters',
+                                                    kind=wx.ITEM_CHECK)
+
         # options submenu
         options_tools = wx.Menu()
         tools_rec_map = options_tools.Append(wx.ID_ANY,
@@ -1706,6 +1828,7 @@ class MyMenuBar(wx.MenuBar):
         self.Bind(wx.EVT_MENU, self.on_options_log, self.options_log)
         self.Bind(wx.EVT_MENU, self.on_options_capture, self.options_capture)
         self.Bind(wx.EVT_MENU, self.on_options_mirror, self.options_mirror)
+        self.Bind(wx.EVT_MENU, self.on_options_override, self.options_override)
         self.Bind(wx.EVT_MENU, self.on_options_tools_rec_map, tools_rec_map)
 
     def on_file_quit(self, event):
@@ -1771,6 +1894,20 @@ class MyMenuBar(wx.MenuBar):
 
         self.frame.parameters.set_param_value('global', 'small_win', val)
         StimProgram.GlobalDefaults['small_win'] = val
+
+    def on_options_override(self, event):
+        """
+        Handles toggling to bring up grid of all params
+
+        :param event:
+        :return:
+        """
+        val = self.options_override.IsChecked()
+
+        if val:
+            self.frame.param_grid.show_grid()
+        else:
+            self.frame.param_grid.hide_grid()
 
     def on_options_tools_rec_map(self, event):
         """
@@ -2032,6 +2169,7 @@ class MyFrame(wx.Frame):
 
         # make grid
         self.grid = MyGrid(self)
+        self.param_grid = MyParamGrid(self)
 
         # notebook to hold input panels
         self.input_nb = wx.Notebook(self)
@@ -2230,25 +2368,40 @@ class MyFrame(wx.Frame):
 
     def run(self):
         """
-        Method for running stims.
+        Method for running stims. Makes changes based on param grid if necessary.
         """
         # try/except, so that uncaught errors thrown by StimProgram can be
         # caught to avoid hanging.
+        to_run = deepcopy(self.list_panel.stims_to_run)
+
+        if self.param_grid.grid_shown:
+            edits = self.param_grid.get_grid_dict()
+
+            for stim in to_run:
+                for k, v in edits.iteritems():
+                    stim.parameters[k] = v
+
         try:
             self.status_bar.set_background(wx.NullColour)
             self.status_bar.set_text_color(wx.BLACK)
             self.status_bar.set_status_text('running...')
-            fps, time, time_stamp = StimProgram.main(
-                self.list_panel.stims_to_run)
+
+            fps, time, dropped, time_stamp = StimProgram.main(to_run)
 
             if time != 'error':
                 status_text = 'Last run: {0:.2f} fps, '.format(fps) \
-                              + '{0:.2f} seconds.'.format(time)
+                              + '{0:.2f} seconds, '.format(time) \
+                              + '{} dropped.'.format(dropped)
 
                 if time_stamp is not None:
                     status_text += ' Timestamp: {}'.format(time_stamp)
 
                 self.status_bar.set_status_text(status_text)
+
+                if dropped != 0:
+                    self.status_bar.set_background(wx.BLUE)
+                    self.status_bar.set_text_color(wx.WHITE)
+
             # if error
             else:
                 self.status_bar.set_status_text('Error: {}'.format(fps))
