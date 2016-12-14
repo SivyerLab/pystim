@@ -600,11 +600,11 @@
 
         "gamma_correction": {
             "type": "choice", 
-            "label": "gamma monitor", 
+            "label": "gamma correct",
             "choices": [
-                "default"
+                "None"
             ], 
-            "default": "default", 
+            "default": "None",
             "is_child": false
         },
 

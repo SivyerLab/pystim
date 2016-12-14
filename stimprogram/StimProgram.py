@@ -565,6 +565,7 @@ class StimDefaults(object):
                  image_size=None,
                  image_filename=None,
                  table_filename=None,
+                 jitter_filename=None,
                  table_type='polar',
                  trigger=False,
                  move_delay=0,
@@ -600,6 +601,7 @@ class StimDefaults(object):
         self.ori_with_dir = ori_with_dir
         self.movie_filename = movie_filename
         self.image_filename = image_filename
+        self.jitter_filename = jitter_filename
         self.table_filename = table_filename
         self.table_type = table_type
         self.trigger = trigger
@@ -735,7 +737,8 @@ class StaticStim(StimDefaults):
                                        phase=self.phase,
                                        ori=self.orientation,
                                        autoLog=False,
-                                       texRes=2**10)
+                                       texRes=2**10,
+                                       units='pix')
 
         self.stim.sf *= self.sf
 
@@ -2319,10 +2322,12 @@ def main(stim_list, verbose=True):
             # get elapsed time for fps
             count_elapsed_time += elapsed_time.getTime()
 
-            MyWindow.win.recordFrameIntervals = False
             # MyWindow.win.saveFrameIntervals()
+            MyWindow.win.recordFrameIntervals = False
             f = numpy.array(MyWindow.win.frameIntervals)
-            dropped = (f > (f.mean() + 4*f.std())).sum()
+            print f*1000
+            cutoff = 1. / GlobalDefaults['frame_rate'] + 0.005  # 5 ms range
+            dropped = (f > cutoff).sum()
 
             # stop movies from continuing in background
             for stim in to_animate:
