@@ -4,9 +4,9 @@
 numpy
 scipy
 Pillow
+sortedcontainers
 
 # not on conda, use pip
-sortedcontainers
 tqdm
 PsychoPy  # along with it's dependencies since pip won't install them
 # current dependencies: pip install numpy scipy matplotlib pandas pyopengl pyglet pillow moviepy lxml openpyxl configobj psychopy
@@ -33,9 +33,9 @@ igor
 # activate conda env:
 # $ activate sp_env
 # install conda packages:
-# $ conda install -y numpy scipy Pillow matplotlib pandas pyopengl lxml openpyxl configobj
+# $ conda install -y numpy scipy Pillow matplotlib pandas pyopengl lxml openpyxl configobj sortedcontainers
 # install pip packages:
-# $ pip install tabulate igor sortedcontainers tqdm moviepy pyglet psychopy
+# $ pip install tabulate igor tqdm moviepy pyglet psychopy
 # install wxpython:
 # conda install -y wxpython
 # download repository and navigate to where stimprogramGUI.py is located
