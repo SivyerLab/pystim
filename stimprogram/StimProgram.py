@@ -2325,7 +2325,7 @@ def main(stim_list, verbose=True):
             # MyWindow.win.saveFrameIntervals()
             MyWindow.win.recordFrameIntervals = False
             f = numpy.array(MyWindow.win.frameIntervals)
-            print f*1000
+            # print f*1000
             cutoff = 1. / GlobalDefaults['frame_rate'] + 0.005  # 5 ms range
             dropped = (f > cutoff).sum()
 
