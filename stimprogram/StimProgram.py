@@ -2264,8 +2264,6 @@ def main(stim_list, verbose=True):
                     MyWindow.flip()
 
             index = 0
-            # clock for timing
-            elapsed_time = core.MonotonicClock()
 
             if GlobalDefaults['capture']:
                 capture_dir = os.path.abspath('./psychopy/captures/')
@@ -2279,6 +2277,9 @@ def main(stim_list, verbose=True):
 
             MyWindow.win.recordFrameIntervals = True
             MyWindow.win.frameIntervals = []
+
+            # clock for timing
+            elapsed_time = core.MonotonicClock()
 
             # for frame in xrange(num_frames):
             # trange for pretty, low overhead (on the order of ns), progress
