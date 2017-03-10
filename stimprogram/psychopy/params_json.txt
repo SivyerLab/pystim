@@ -137,8 +137,9 @@
             "type": "choice", 
             "label": "channel", 
             "choices": [
-                "green", 
-                "red", 
+                "all",
+                "red",
+                "green",
                 "blue"
             ], 
             "default": "green", 
