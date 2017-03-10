@@ -1824,13 +1824,16 @@ class MyMenuBar(wx.MenuBar):
         self.options_override = options_menu.Append(wx.ID_ANY, 'global override',
                                                     'Override parameters',
                                                     kind=wx.ITEM_CHECK)
+        self.options_framepack = options_menu.Append(wx.ID_ANY, 'framepack',
+                                                    'Split RGB frames into monochrome triplets',
+                                                    kind=wx.ITEM_CHECK)
 
         # options submenu
         options_tools = wx.Menu()
         tools_rec_map = options_tools.Append(wx.ID_ANY,
                                              'Map receptive field',
                                              'Generate receptive field map')
-        options_menu.AppendMenu(wx.ID_ANY, 'Tools', options_tools)
+        options_menu.AppendMenu(wx.ID_ANY, 'tools', options_tools)
 
         # add top level menus to menu bar
         self.Append(file_menu, '&File')
@@ -1844,6 +1847,7 @@ class MyMenuBar(wx.MenuBar):
         self.Bind(wx.EVT_MENU, self.on_options_capture, self.options_capture)
         self.Bind(wx.EVT_MENU, self.on_options_mirror, self.options_mirror)
         self.Bind(wx.EVT_MENU, self.on_options_override, self.options_override)
+        self.Bind(wx.EVT_MENU, self.on_options_framepack, self.options_framepack)
         self.Bind(wx.EVT_MENU, self.on_options_tools_rec_map, tools_rec_map)
 
     def on_file_quit(self, event):
@@ -1923,6 +1927,18 @@ class MyMenuBar(wx.MenuBar):
             self.frame.param_grid.show_grid()
         else:
             self.frame.param_grid.hide_grid()
+
+    def on_options_framepack(self, event):
+        """
+        Handles toggling capturing
+
+        :param event:
+        :return:
+        """
+        val = self.options_framepack.IsChecked()
+
+        # self.frame.parameters.set_param_value('global', 'framepack', val)
+        StimProgram.GlobalDefaults['framepack'] = val
 
     def on_options_tools_rec_map(self, event):
         """
