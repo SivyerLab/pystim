@@ -8,6 +8,7 @@ Stuck on python 2.7 because of u3 (labjackpython) dependency
 # Distributed under the terms of the GNU General Public License (GPL).
 
 from GammaCorrection import GammaValues  # unused, but necessary for pickling
+from psychopy.visual.windowframepack import ProjectorFramePacker
 from psychopy.tools.typetools import uint8_float, float_uint8
 from psychopy.tools.coordinatetools import pol2cart
 from psychopy import visual, core, event, filters
@@ -154,7 +155,8 @@ class GlobalDefaults(object):
                     gamma_correction='default',
                     trigger_wait=6,
                     capture=False,
-                    small_win=False)
+                    small_win=False,
+                    framepack=False)
 
     def __init__(self,
                  frame_rate=None,
@@ -172,7 +174,8 @@ class GlobalDefaults(object):
                  gamma_correction=None,
                  offset=None,
                  capture=None,
-                 small_win=None):
+                 small_win=None,
+                 framepack=None):
         """
         Populate defaults if passed; units converted as necessary.
         """
@@ -226,6 +229,9 @@ class GlobalDefaults(object):
         if small_win is not None:
             self.defaults['small_win'] = small_win
 
+        if framepack is not None:
+            self.defaults['small_win'] = framepack
+
     def __repr__(self):
         """For pretty printing dictionary of global defaults.
         """
@@ -256,6 +262,8 @@ class MyWindow(object):
     #: List of frames to trigger on
     frame_trigger_list = sortedcontainers.SortedList()
     frame_trigger_list.add(sys.maxint)  # need an extra last value for indexing
+
+    framepacker = None
 
     @staticmethod
     def make_win():
@@ -305,6 +313,7 @@ class MyWindow(object):
                                      viewPos=GlobalDefaults['offset'],
                                      viewScale=GlobalDefaults['scale'],
                                      screen=GlobalDefaults['screen_num'],
+                                     useFBO=True,
                                      )
 
         MyWindow.win.mouseVisible = True,
@@ -2154,7 +2163,7 @@ def log_stats(count_reps, reps, count_frames, num_frames, elapsed_time,
                 cap = float_uint8(to_animate[i].orig_tex)
                 save_name = path + file_name[:-3] + 'npy'
                 numpy.save(save_name, numpy.flipud(cap))
-                print cap.shape, cap.dtype
+                # print cap.shape, cap.dtype
 
                 with open((path + file_name), 'w') as f:
 
@@ -2275,6 +2284,9 @@ def main(stim_list, verbose=True):
                 save_loc = os.path.join(capture_dir, save_dir)
                 os.makedirs(save_loc)
 
+            if GlobalDefaults['framepack']:
+                MyWindow.framepacker = ProjectorFramePacker(MyWindow.win)
+
             MyWindow.win.recordFrameIntervals = True
             MyWindow.win.frameIntervals = []
 
@@ -2348,6 +2360,13 @@ def main(stim_list, verbose=True):
 
     # one last flip to clear window if still open
     try:
+        if GlobalDefaults['framepack']:
+            MyWindow.framepacker.flipCounter = 0
+            MyWindow.win.clearBuffer()
+            MyWindow.flip()
+            MyWindow.win.clearBuffer()
+            MyWindow.flip()
+            MyWindow.win.clearBuffer()
         MyWindow.flip()
     except AttributeError:
         pass
@@ -2386,15 +2405,18 @@ def main(stim_list, verbose=True):
         save_name = 'capture_video' + current_time_string + '.mpg'
         save_name_gray = 'capture_video' + current_time_string + '_gray.mpg'
 
+
         args = ['ffmpeg',
                 '-f', 'image2',
                 '-framerate', str(GlobalDefaults['frame_rate']),
-                '-i', os.path.join(save_loc, 'capture_%05d.png'),
+                '-i', os.path.join(save_loc, '"capture_%05d.png"'),
                 '-b:v', '20M',
                 os.path.join(save_loc, save_name)]
 
         # make movie using ffmpeg
         print 'ffmpeg...'
+        print save_loc
+        print os.path.join(save_loc, 'capture_%05d.png')
         process = subprocess.Popen(args,
                                    stdout=subprocess.PIPE,
                                    stderr=subprocess.PIPE)
