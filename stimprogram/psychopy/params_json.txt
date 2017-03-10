@@ -519,14 +519,14 @@
 
         "display_size": {
             "type": "list", 
-            "label": "display size (pixels)", 
+            "label": "win size (pixels)",
             "default": [400, 400],
             "is_child": false
         },
 
         "position": {
             "type": "list", 
-            "label": "win pos (pix xy)", 
+            "label": "win pos (pixels)",
             "default": [0, 0],
             "is_child": false
         },
@@ -628,6 +628,18 @@
             ], 
             "default": false, 
             "is_child": false, 
+            "hide": true
+        },
+
+        "framepack": {
+            "type": "choice",
+            "label": "framepack",
+            "choices": [
+                "True",
+                "False"
+            ],
+            "default": false,
+            "is_child": false,
             "hide": true
         },
 
