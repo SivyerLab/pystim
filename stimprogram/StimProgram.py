@@ -834,6 +834,10 @@ class StaticStim(StimDefaults):
 
             delta = (high[self.contrast_channel] - low[self.contrast_channel])
 
+            # unscale high/low (only used by board texture)
+            # high = high * 2.0 - 1
+            # low = low * 2.0 - 1
+
             color = high, low, delta, background
 
         elif self.color_mode == 'intensity':
@@ -1864,7 +1868,10 @@ def board_texture_class(bases, **kwargs):
                     low = MyWindow.gamma_mon(low,
                                              channel=self.contrast_channel)
 
-                self.colors[:, self.contrast_channel] = low
+                if len(low.shape) == 0:
+                    self.colors[:, self.contrast_channel] = low
+                else:
+                    self.colors[:] = low[:3]
 
                 # index to know how to color elements in array
                 self.index = numpy.zeros((self.num_check, self.num_check))
@@ -1882,8 +1889,11 @@ def board_texture_class(bases, **kwargs):
                         self.index[i] = self.fill_random.randint(0, 1)
 
                 # use index to assign colors for board and random
-                self.colors[numpy.where(self.index),
-                            self.contrast_channel] = high
+                if len(low.shape) == 0:
+                    self.colors[numpy.where(self.index),
+                                self.contrast_channel] = high
+                else:
+                    self.colors[numpy.where(self.index)] = high[:3]
 
             elif self.check_type in ['noise', 'noisy noise']:
                 numpy.random.seed(self.fill_seed)
@@ -2364,9 +2374,9 @@ def main(stim_list, verbose=True):
             MyWindow.framepacker.flipCounter = 0
             MyWindow.win.clearBuffer()
             MyWindow.flip()
-            MyWindow.win.clearBuffer()
+            # MyWindow.win.clearBuffer()
             MyWindow.flip()
-            MyWindow.win.clearBuffer()
+            # MyWindow.win.clearBuffer()
         MyWindow.flip()
     except AttributeError:
         pass
