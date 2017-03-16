@@ -16,6 +16,7 @@ To run, StimProgram requires the following (found in ``requirements.txt``):
 - numpy
 - scipy
 - PIL (use Pillow)
+- tqdm
 
 Optional libraries:
 
@@ -30,33 +31,27 @@ websites.
 
 On Windows machines, pip will sometimes fail to build some libraries. Compiled
 versions of these binaries can be found `here <http://www.lfd.uci.edu/~gohlke/pythonlibs/>`_.
+Or preferrably use a package manager like `Anaconda <https://www.continuum.io/anaconda-overview>`_.
 
 
 Psychopy source changes
 -----------------------
 
-The following changes to the psychopy source code (version 1.83.1) are
+The following changes to the psychopy source code (version 1.84.2) are
 necessary to run the application. This has been fixed for subsequent
 releases. Psychopy source can be found in the python site-packages folder.
 
 1. In order to allow simultaneous offsetting and scaling of the pyglet
-   window, lines 621-625 in::
+   window, line 297 in::
 
     /psychopy/visual/window.py
 
    need to be changed to the following:
 
    .. code-block:: python
-      :lineno-start: 621
+      :lineno-start: 297
 
-      # GL.glMatrixMode(GL.GL_MODELVIEW)
-      if self.viewScale is not None:
-          scale = self.viewScale
-      else:
-          scale = [1, 1]
+      if self.viewOri != 0. and self.viewPos is not None:
 
 
-2. In order to allow capturing of window frames to generate screen captures,
-   line 950 in the same file needs to be updated to be compatible with the
-   latest release of PIL. In the same file, ``fromstring()`` needs to be
-   changed to ``frombytes()``.
+2. TODO: small window changes (small window not vsynced)
