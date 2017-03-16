@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*-
+#man_pagesdcmd# -*- coding: utf-8 -*-
 #
 # Stimulus Program documentation build configuration file, created by
 # sphinx-quickstart on Thu Feb 04 11:17:06 2016.
@@ -18,7 +18,8 @@ import os
 # If extensions (or modules to document with autodoc) are in another directory,
 # add these directories to sys.path here. If the directory is relative to the
 # documentation root, use os.path.abspath to make it absolute, like shown here.
-sys.path.insert(0, os.path.abspath('C:\Users\Alex\PycharmProjects\StimulusProgram'))
+sys.path.insert(0, os.path.abspath('C:\Users\Alex\PycharmProjects\StimulusProgram\stimprogram'))
+sys.path.insert(0, os.path.abspath('C:\Users\Alex\Anaconda3\envs\stimprogram\Lib\site-packages'))
 
 # -- General configuration ------------------------------------------------
 
@@ -31,7 +32,7 @@ sys.path.insert(0, os.path.abspath('C:\Users\Alex\PycharmProjects\StimulusProgra
 extensions = [
     'sphinx.ext.autodoc',
     'sphinx.ext.intersphinx',
-    'sphinx.ext.mathjax',
+    # 'sphinx.ext.mathjax',
     'sphinx.ext.viewcode',
     'rst2pdf.pdfbuilder'
 ]

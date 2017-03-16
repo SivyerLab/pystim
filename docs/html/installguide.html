@@ -1,0 +1,190 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Install walkthrough &#8212; Stimulus Program 1.1 documentation</title>
+    
+    <link rel="stylesheet" href="_static/sphinxdoc.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '1.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Usage guide" href="usageguide.html" />
+    <link rel="prev" title="Detailed install instruction" href="detailedinstall.html" /> 
+  </head>
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="usageguide.html" title="Usage guide"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="detailedinstall.html" title="Detailed install instruction"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">Stimulus Program 1.1 documentation</a> &#187;</li> 
+      </ul>
+    </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Install walkthrough</a><ul>
+<li><a class="reference internal" href="#setting-up-environment">Setting up environment</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="detailedinstall.html"
+                        title="previous chapter">Detailed install instruction</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="usageguide.html"
+                        title="next chapter">Usage guide</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/installguide.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="install-walkthrough">
+<h1>Install walkthrough<a class="headerlink" href="#install-walkthrough" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="setting-up-environment">
+<h2>Setting up environment<a class="headerlink" href="#setting-up-environment" title="Permalink to this headline">¶</a></h2>
+<p><a class="reference external" href="https://www.continuum.io/anaconda-overview">Anaconda</a> is a great package manager that will make setting up the
+to run Stimprogram much simpler. The following walkthrough uses Anaconda, and lines of code are to be entered in the
+terminal/command line.</p>
+<ol class="arabic">
+<li><p class="first">Install Anaconda (environment manager)</p>
+</li>
+<li><p class="first">Install <a class="reference external" href="https://git-scm.com/downloads">Git</a> (version control tool)</p>
+</li>
+<li><p class="first">Create the python environment for the Stimprogram:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">conda</span> <span class="n">create</span> <span class="o">-</span><span class="n">y</span> <span class="o">--</span><span class="n">name</span> <span class="n">sp_env</span> <span class="n">python</span><span class="o">=</span><span class="mf">2.7</span>
+</pre></div>
+</div>
+</li>
+<li><p class="first">Activate the newly created environment:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">activate</span> <span class="n">sp_env</span>
+</pre></div>
+</div>
+</li>
+<li><p class="first">Install the packages that are necessary and included with conda (may take a bit and look like nothing is happening as the end, just be patient):</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">conda</span> <span class="n">install</span> <span class="o">-</span><span class="n">y</span> <span class="n">numpy</span> <span class="n">scipy</span> <span class="n">Pillow</span> <span class="n">matplotlib</span> <span class="n">pandas</span> <span class="n">pyopengl</span> <span class="n">lxml</span> <span class="n">openpyxl</span> <span class="n">configobj</span> <span class="n">sortedcontainers</span>
+</pre></div>
+</div>
+</li>
+<li><p class="first">Install the packages that are necessary and not included with conda:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">pip</span> <span class="n">install</span> <span class="n">tabulate</span> <span class="n">igor</span> <span class="n">tqdm</span> <span class="n">moviepy</span> <span class="n">pyglet</span> <span class="n">psychopy</span> <span class="n">labjackpython</span>
+</pre></div>
+</div>
+</li>
+<li><p class="first">Install wxpython (gui interface):</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">conda</span> <span class="n">install</span> <span class="o">-</span><span class="n">y</span> <span class="o">-</span><span class="n">c</span> <span class="n">anaconda</span> <span class="n">wxpython</span><span class="o">=</span><span class="mf">3.0</span><span class="o">.</span><span class="mf">0.0</span>
+</pre></div>
+</div>
+</li>
+<li><p class="first">Navigate to where you want to save the stimprogram repository:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">cd</span> <span class="n">C</span><span class="p">:</span><span class="o">/</span><span class="n">your</span><span class="o">/</span><span class="n">location</span><span class="o">/</span><span class="n">of</span><span class="o">/</span><span class="n">choice</span>
+</pre></div>
+</div>
+</li>
+<li><p class="first">Download the repository (a new folder will be automatically created for it):</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">git</span> <span class="n">clone</span> <span class="n">https</span><span class="p">:</span><span class="o">//</span><span class="n">github</span><span class="o">.</span><span class="n">com</span><span class="o">/</span><span class="n">awctomlinson</span><span class="o">/</span><span class="n">StimulusProgram</span><span class="o">.</span><span class="n">git</span>
+</pre></div>
+</div>
+</li>
+<li><p class="first">Navigate into the stimprogram folder:</p>
+<p>cd StimulusProgram</p>
+</li>
+<li><p class="first">Navigate into the code folder:</p>
+<p>cd Stimprogram</p>
+</li>
+</ol>
+<p>12. Make necessary changes to psychopy source in &#8220;Anaconda3envsstimprogramLibsite-packagespsychopyvisual&#8221;. Line
+297 needs to be changed to:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">viewOri</span> <span class="o">!=</span> <span class="mf">0.</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">viewPos</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+</pre></div>
+</div>
+<ol class="arabic" start="13">
+<li><p class="first">Run the stimprogram:</p>
+<p>python StimProgramGUI.py</p>
+</li>
+<li><p class="first">If want triggering, install the labjack driver from the labjack site. If want video saving, install ffmpeg.</p>
+</li>
+</ol>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="usageguide.html" title="Usage guide"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="detailedinstall.html" title="Detailed install instruction"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">Stimulus Program 1.1 documentation</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2016, Alexander Tomlinson.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.1.
+    </div>
+  </body>
+</html>

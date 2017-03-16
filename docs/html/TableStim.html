@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>Table Stim &mdash; Stimulus Program 1.1 documentation</title>
+    <title>Table Stim &#8212; Stimulus Program 1.1 documentation</title>
     
     <link rel="stylesheet" href="_static/sphinxdoc.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
@@ -17,15 +17,15 @@
         VERSION:     '1.1',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
-        HAS_SOURCE:  true
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
       };
     </script>
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
-    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
-    <link rel="top" title="Stimulus Program 1.1 documentation" href="index.html" />
-    <link rel="up" title="StimProgram module" href="StimProgram.html" />
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="Checkerboard Stim" href="BoardTexture.html" />
     <link rel="prev" title="Randomly Moving Stim" href="RandomlyMovingStim.html" /> 
   </head>
@@ -45,8 +45,8 @@
         <li class="right" >
           <a href="RandomlyMovingStim.html" title="Randomly Moving Stim"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">Stimulus Program 1.1 documentation</a> &raquo;</li>
-          <li class="nav-item nav-item-1"><a href="StimProgram.html" accesskey="U">StimProgram module</a> &raquo;</li> 
+        <li class="nav-item nav-item-0"><a href="index.html">Stimulus Program 1.1 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="StimProgram.html" accesskey="U">StimProgram module</a> &#187;</li> 
       </ul>
     </div>
       <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
@@ -60,21 +60,18 @@
   <div role="note" aria-label="source link">
     <h3>This Page</h3>
     <ul class="this-page-menu">
-      <li><a href="_sources/TableStim.txt"
+      <li><a href="_sources/TableStim.rst.txt"
             rel="nofollow">Show Source</a></li>
     </ul>
    </div>
 <div id="searchbox" style="display: none" role="search">
   <h3>Quick search</h3>
     <form class="search" action="search.html" method="get">
-      <input type="text" name="q" />
-      <input type="submit" value="Go" />
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
       <input type="hidden" name="check_keywords" value="yes" />
       <input type="hidden" name="area" value="default" />
     </form>
-    <p class="searchtip" style="font-size: 90%">
-    Enter search terms or a module, class or function name.
-    </p>
 </div>
 <script type="text/javascript">$('#searchbox').show(0);</script>
         </div>
@@ -92,16 +89,26 @@
 <em class="property">class </em><code class="descclassname">StimProgram.</code><code class="descname">TableStim</code><span class="sig-paren">(</span><em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/StimProgram.html#TableStim"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#StimProgram.TableStim" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="MovingStim.html#StimProgram.MovingStim" title="StimProgram.MovingStim"><code class="xref py py-class docutils literal"><span class="pre">StimProgram.MovingStim</span></code></a></p>
 <p>Class where stim motion is determined by a table of radial coordinates.</p>
-<p>Table can be a text file with new line separated values, or an Igor file
-in binary wave/packed experiment format. First column is distance from
-center of window in micrometers, and second column either 0 or 1,
-for whether or not to trigger. Trigger will occur right before frame where
-indicated position is flipped. First and last coordinate will always
-trigger (if stim is set to trigger).</p>
-<p>For a binary wave file, values must be for coordinates, and triggering
-will only happen on first coordinate. For packed experiment files,
-leave wave names as &#8216;wave0&#8217; and &#8216;wave1&#8217;, where &#8216;wave0&#8217; is coordinates and
-&#8216;wave1&#8217; is whether or not to trigger.</p>
+<p>Table can be a text file with tab or space separated values and newlines
+between rows, or an Igor file in binary wave/packed experiment format.
+Trigger will occur right before frame where indicated position is
+flipped. First and last coordinate will always trigger (if stim is set to
+trigger).</p>
+<p>For a binary wave file, accepted formats are polar and coordinate,
+and triggering will only happen on first coordinate. For packed
+experiment files, leave wave names as &#8216;wave0&#8217; and &#8216;wave1&#8217;, where &#8216;wave0&#8217;
+is coordinates and &#8216;wave1&#8217; is whether or not to trigger (if polar),
+or as &#8216;wave0&#8217;, &#8216;wave1&#8217;, &#8216;wave2&#8217; (if xy).</p>
+<p>There are 3 table types: polar, coordinate, or direction. Their formats
+are as follows.</p>
+<p>Polar: Tab or space separated values. Each line must include both a
+radius, and then whether or not to trigger for that frame (as a 0 or 1).</p>
+<p>Coordinate: Tab or space separated values. Each line must include an x
+coordinate, a y coordinate, and whether or not to trigger (as 0 or 1).</p>
+<p>Direction: Tab or space separated values. Each line must include a
+movement speed (pix/sec), a duration (ms), and a direction in degrees.
+Optionally, direction can be replaced with &#8216;$&#8217; (dollar sign), and the
+direction will default to the global default (can also do use &#8216;-$&#8217;).</p>
 <dl class="method">
 <dt id="StimProgram.TableStim.draw_times">
 <code class="descname">draw_times</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/StimProgram.html#TableStim.draw_times"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#StimProgram.TableStim.draw_times" title="Permalink to this definition">¶</a></dt>
@@ -146,21 +153,6 @@ having the igor module.</li>
 </table>
 </dd></dl>
 
-<dl class="method">
-<dt id="StimProgram.TableStim.get_next_pos">
-<code class="descname">get_next_pos</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/StimProgram.html#TableStim.get_next_pos"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#StimProgram.TableStim.get_next_pos" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns the next coordinate from x, y_array for animate to set the
-position of the stim for the next frame.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">x, y coordinate as tuple</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
 </dd></dl>
 
 </div>
@@ -186,13 +178,13 @@ position of the stim for the next frame.</p>
         <li class="right" >
           <a href="RandomlyMovingStim.html" title="Randomly Moving Stim"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">Stimulus Program 1.1 documentation</a> &raquo;</li>
-          <li class="nav-item nav-item-1"><a href="StimProgram.html" >StimProgram module</a> &raquo;</li> 
+        <li class="nav-item nav-item-0"><a href="index.html">Stimulus Program 1.1 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="StimProgram.html" >StimProgram module</a> &#187;</li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">
-        &copy; Copyright 2016, Alexander Tomlinson.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.3.5.
+        &#169; Copyright 2016, Alexander Tomlinson.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.1.
     </div>
   </body>
 </html>

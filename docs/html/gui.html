@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>gui module &mdash; Stimulus Program 1.1 documentation</title>
+    <title>gui module &#8212; Stimulus Program 1.1 documentation</title>
     
     <link rel="stylesheet" href="_static/sphinxdoc.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
@@ -17,14 +17,15 @@
         VERSION:     '1.1',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
-        HAS_SOURCE:  true
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
       };
     </script>
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
-    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
-    <link rel="top" title="Stimulus Program 1.1 documentation" href="index.html" />
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="GammaCorrection module" href="GammaCorrection.html" />
     <link rel="prev" title="Other functions" href="StimProgramOtherMethods.html" /> 
   </head>
@@ -44,7 +45,7 @@
         <li class="right" >
           <a href="StimProgramOtherMethods.html" title="Other functions"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">Stimulus Program 1.1 documentation</a> &raquo;</li> 
+        <li class="nav-item nav-item-0"><a href="index.html">Stimulus Program 1.1 documentation</a> &#187;</li> 
       </ul>
     </div>
       <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
@@ -58,21 +59,18 @@
   <div role="note" aria-label="source link">
     <h3>This Page</h3>
     <ul class="this-page-menu">
-      <li><a href="_sources/gui.txt"
+      <li><a href="_sources/gui.rst.txt"
             rel="nofollow">Show Source</a></li>
     </ul>
    </div>
 <div id="searchbox" style="display: none" role="search">
   <h3>Quick search</h3>
     <form class="search" action="search.html" method="get">
-      <input type="text" name="q" />
-      <input type="submit" value="Go" />
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
       <input type="hidden" name="check_keywords" value="yes" />
       <input type="hidden" name="area" value="default" />
     </form>
-    <p class="searchtip" style="font-size: 90%">
-    Enter search terms or a module, class or function name.
-    </p>
 </div>
 <script type="text/javascript">$('#searchbox').show(0);</script>
         </div>
@@ -89,7 +87,7 @@
 <dl class="class">
 <dt id="StimProgramGUI.Parameters">
 <em class="property">class </em><code class="descclassname">StimProgramGUI.</code><code class="descname">Parameters</code><a class="reference internal" href="_modules/StimProgramGUI.html#Parameters"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#StimProgramGUI.Parameters" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference external" href="https://docs.python.org/library/functions.html#object" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">object</span></code></a></p>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/2/library/functions.html#object" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">object</span></code></a></p>
 <p>Model to hold parameter data.</p>
 <dl class="method">
 <dt id="StimProgramGUI.Parameters.read_config_file">
@@ -108,17 +106,18 @@ are stored.</p>
 </table>
 </dd></dl>
 
-<dl class="method">
-<dt id="StimProgramGUI.Parameters.try_cast">
-<code class="descname">try_cast</code><span class="sig-paren">(</span><em>value</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/StimProgramGUI.html#Parameters.try_cast"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#StimProgramGUI.Parameters.try_cast" title="Permalink to this definition">¶</a></dt>
+<dl class="staticmethod">
+<dt id="StimProgramGUI.Parameters.lit_eval">
+<em class="property">static </em><code class="descname">lit_eval</code><span class="sig-paren">(</span><em>value</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/StimProgramGUI.html#Parameters.lit_eval"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#StimProgramGUI.Parameters.lit_eval" title="Permalink to this definition">¶</a></dt>
 <dd><p>Helper method to attempt to cast parameters from strings to proper
-int/float/bool, or map list values to int or float</p>
+int/float/bool/list. Uses ast.literal_eval(), see relevant
+documentation.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>value</strong> &#8211; variable being casted, passed from ini file or gui so
-always string. Skip if string</td>
+always string. Skip if already string</td>
 </tr>
 <tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">casted or unchanged variable</td>
 </tr>
@@ -157,20 +156,6 @@ always string. Skip if string</td>
 </dd></dl>
 
 <dl class="method">
-<dt id="StimProgramGUI.Parameters.get_params">
-<code class="descname">get_params</code><span class="sig-paren">(</span><em>category</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/StimProgramGUI.html#Parameters.get_params"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#StimProgramGUI.Parameters.get_params" title="Permalink to this definition">¶</a></dt>
-<dd><p>Getter</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>category</strong> &#8211; which dictionary the param is in</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
 <dt id="StimProgramGUI.Parameters.get_global_params">
 <code class="descname">get_global_params</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/StimProgramGUI.html#Parameters.get_global_params"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#StimProgramGUI.Parameters.get_global_params" title="Permalink to this definition">¶</a></dt>
 <dd><p>Getter.</p>
@@ -179,20 +164,6 @@ always string. Skip if string</td>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">dictionary of default values from global defaults</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
-<dt id="StimProgramGUI.Parameters.get_gui_params">
-<code class="descname">get_gui_params</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/StimProgramGUI.html#Parameters.get_gui_params"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#StimProgramGUI.Parameters.get_gui_params" title="Permalink to this definition">¶</a></dt>
-<dd><p>Getter</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">dictionary of gui settings</td>
 </tr>
 </tbody>
 </table>
@@ -258,7 +229,7 @@ defaults</td>
 <dl class="method">
 <dt id="StimProgramGUI.Parameters.init_params">
 <code class="descname">init_params</code><span class="sig-paren">(</span><em>config_dict</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/StimProgramGUI.html#Parameters.init_params"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#StimProgramGUI.Parameters.init_params" title="Permalink to this definition">¶</a></dt>
-<dd><p>Initializes dictionaries of parameters</p>
+<dd><p>Initializes dictionaries of parameters from json</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -422,17 +393,31 @@ of GlobalPanel.</p>
 </table>
 <dl class="method">
 <dt id="StimProgramGUI.InputPanel.create_inputs">
-<code class="descname">create_inputs</code><span class="sig-paren">(</span><em>category</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/StimProgramGUI.html#InputPanel.create_inputs"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#StimProgramGUI.InputPanel.create_inputs" title="Permalink to this definition">¶</a></dt>
+<code class="descname">create_inputs</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/StimProgramGUI.html#InputPanel.create_inputs"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#StimProgramGUI.InputPanel.create_inputs" title="Permalink to this definition">¶</a></dt>
 <dd><p>Method to recursively generate label and input widgets.
 Checks if param is child of another and only generates
 parent params, then generates subpanel with associated child
 params. Differentiates between input types (text, dropdown,
-list (i.e. multiple text fields).</p>
+list (i.e. multiple text fields)).</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="StimProgramGUI.InputPanel.make_ctrls">
+<code class="descname">make_ctrls</code><span class="sig-paren">(</span><em>tag</em>, <em>param_info</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/StimProgramGUI.html#InputPanel.make_ctrls"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#StimProgramGUI.InputPanel.make_ctrls" title="Permalink to this definition">¶</a></dt>
+<dd><p>Makes controls for create_inputs().</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>category</strong> &#8211; </td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>type</strong> &#8211; </li>
+<li><strong>tag</strong> &#8211; </li>
+<li><strong>kwargs</strong> &#8211; </li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">proper control</p>
+</td>
 </tr>
 </tbody>
 </table>
@@ -555,13 +540,17 @@ and up/down buttons.</p>
 
 <dl class="method">
 <dt id="StimProgramGUI.ListPanel.on_add_button">
-<code class="descname">on_add_button</code><span class="sig-paren">(</span><em>event</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/StimProgramGUI.html#ListPanel.on_add_button"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#StimProgramGUI.ListPanel.on_add_button" title="Permalink to this definition">¶</a></dt>
+<code class="descname">on_add_button</code><span class="sig-paren">(</span><em>event</em>, <em>insert_pos=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/StimProgramGUI.html#ListPanel.on_add_button"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#StimProgramGUI.ListPanel.on_add_button" title="Permalink to this definition">¶</a></dt>
 <dd><p>Makes call to add to list with proper params</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>event</strong> &#8211; </td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>event</strong> &#8211; </li>
+<li><strong>insert_pos</strong> &#8211; </li>
+</ul>
+</td>
 </tr>
 </tbody>
 </table>
@@ -590,8 +579,23 @@ when moving stims up and down</li>
 
 <dl class="method">
 <dt id="StimProgramGUI.ListPanel.on_remove_button">
-<code class="descname">on_remove_button</code><span class="sig-paren">(</span><em>event</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/StimProgramGUI.html#ListPanel.on_remove_button"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#StimProgramGUI.ListPanel.on_remove_button" title="Permalink to this definition">¶</a></dt>
+<code class="descname">on_remove_button</code><span class="sig-paren">(</span><em>event</em>, <em>clear_all=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/StimProgramGUI.html#ListPanel.on_remove_button"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#StimProgramGUI.ListPanel.on_remove_button" title="Permalink to this definition">¶</a></dt>
 <dd><p>Removes stims from stim list. If none selected, clears all.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>event</strong> &#8211; </td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="StimProgramGUI.ListPanel.on_update_button">
+<code class="descname">on_update_button</code><span class="sig-paren">(</span><em>event</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/StimProgramGUI.html#ListPanel.on_update_button"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#StimProgramGUI.ListPanel.on_update_button" title="Permalink to this definition">¶</a></dt>
+<dd><p>Removes stims and adds stim to list, in essence updating/refreshing
+the currently selected stim.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -693,6 +697,61 @@ proper position.</p>
 </tr>
 </tbody>
 </table>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="StimProgramGUI.MyParamGrid">
+<em class="property">class </em><code class="descclassname">StimProgramGUI.</code><code class="descname">MyParamGrid</code><span class="sig-paren">(</span><em>parent</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/StimProgramGUI.html#MyParamGrid"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#StimProgramGUI.MyParamGrid" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">wx._windows.Frame</span></code></p>
+<p>Class for grid of all params to override stim params.</p>
+<dl class="method">
+<dt id="StimProgramGUI.MyParamGrid.show_grid">
+<code class="descname">show_grid</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/StimProgramGUI.html#MyParamGrid.show_grid"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#StimProgramGUI.MyParamGrid.show_grid" title="Permalink to this definition">¶</a></dt>
+<dd><p>Method to show grid. Unminimizes and brings to front.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="StimProgramGUI.MyParamGrid.hide_grid">
+<code class="descname">hide_grid</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/StimProgramGUI.html#MyParamGrid.hide_grid"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#StimProgramGUI.MyParamGrid.hide_grid" title="Permalink to this definition">¶</a></dt>
+<dd><p>Method to hide grid.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="StimProgramGUI.MyParamGrid.on_close_button">
+<code class="descname">on_close_button</code><span class="sig-paren">(</span><em>event</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/StimProgramGUI.html#MyParamGrid.on_close_button"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#StimProgramGUI.MyParamGrid.on_close_button" title="Permalink to this definition">¶</a></dt>
+<dd><p>Catches close in order to only hide. Otherwise frame object is
+deleted and loses all data.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>event</strong> &#8211; </td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="StimProgramGUI.MyParamGrid.on_grid_cell_right_click">
+<code class="descname">on_grid_cell_right_click</code><span class="sig-paren">(</span><em>event</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/StimProgramGUI.html#MyParamGrid.on_grid_cell_right_click"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#StimProgramGUI.MyParamGrid.on_grid_cell_right_click" title="Permalink to this definition">¶</a></dt>
+<dd><p>Removes contents of cell.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>event</strong> &#8211; </td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="StimProgramGUI.MyParamGrid.get_grid_dict">
+<code class="descname">get_grid_dict</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/StimProgramGUI.html#MyParamGrid.get_grid_dict"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#StimProgramGUI.MyParamGrid.get_grid_dict" title="Permalink to this definition">¶</a></dt>
+<dd><p>Makes a dict of rows with entered values, ignoring headers
+:return:</p>
 </dd></dl>
 
 </dd></dl>
@@ -803,6 +862,155 @@ row/column header right clicked.</p>
 </dd></dl>
 
 <dl class="class">
+<dt id="StimProgramGUI.MyMenuBar">
+<em class="property">class </em><code class="descclassname">StimProgramGUI.</code><code class="descname">MyMenuBar</code><span class="sig-paren">(</span><em>parent</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/StimProgramGUI.html#MyMenuBar"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#StimProgramGUI.MyMenuBar" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">wx._core.MenuBar</span></code></p>
+<p>Class for custom menu bar.</p>
+<dl class="method">
+<dt id="StimProgramGUI.MyMenuBar.on_file_quit">
+<code class="descname">on_file_quit</code><span class="sig-paren">(</span><em>event</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/StimProgramGUI.html#MyMenuBar.on_file_quit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#StimProgramGUI.MyMenuBar.on_file_quit" title="Permalink to this definition">¶</a></dt>
+<dd><p>Handles quitting.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="StimProgramGUI.MyMenuBar.on_view_logs">
+<code class="descname">on_view_logs</code><span class="sig-paren">(</span><em>event</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/StimProgramGUI.html#MyMenuBar.on_view_logs"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#StimProgramGUI.MyMenuBar.on_view_logs" title="Permalink to this definition">¶</a></dt>
+<dd><p>Handles request to view logs</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="StimProgramGUI.MyMenuBar.on_view_stims">
+<code class="descname">on_view_stims</code><span class="sig-paren">(</span><em>event</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/StimProgramGUI.html#MyMenuBar.on_view_stims"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#StimProgramGUI.MyMenuBar.on_view_stims" title="Permalink to this definition">¶</a></dt>
+<dd><p>Handles request to view stims</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="StimProgramGUI.MyMenuBar.on_options_log">
+<code class="descname">on_options_log</code><span class="sig-paren">(</span><em>event</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/StimProgramGUI.html#MyMenuBar.on_options_log"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#StimProgramGUI.MyMenuBar.on_options_log" title="Permalink to this definition">¶</a></dt>
+<dd><p>Handles toggling logging</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>event</strong> &#8211; </td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="StimProgramGUI.MyMenuBar.on_options_capture">
+<code class="descname">on_options_capture</code><span class="sig-paren">(</span><em>event</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/StimProgramGUI.html#MyMenuBar.on_options_capture"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#StimProgramGUI.MyMenuBar.on_options_capture" title="Permalink to this definition">¶</a></dt>
+<dd><p>Handles toggling capturing</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>event</strong> &#8211; </td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="StimProgramGUI.MyMenuBar.on_options_mirror">
+<code class="descname">on_options_mirror</code><span class="sig-paren">(</span><em>event</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/StimProgramGUI.html#MyMenuBar.on_options_mirror"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#StimProgramGUI.MyMenuBar.on_options_mirror" title="Permalink to this definition">¶</a></dt>
+<dd><p>Handles toggling capturing</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>event</strong> &#8211; </td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="StimProgramGUI.MyMenuBar.on_options_override">
+<code class="descname">on_options_override</code><span class="sig-paren">(</span><em>event</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/StimProgramGUI.html#MyMenuBar.on_options_override"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#StimProgramGUI.MyMenuBar.on_options_override" title="Permalink to this definition">¶</a></dt>
+<dd><p>Handles toggling to bring up grid of all params</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>event</strong> &#8211; </td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="StimProgramGUI.MyMenuBar.on_options_framepack">
+<code class="descname">on_options_framepack</code><span class="sig-paren">(</span><em>event</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/StimProgramGUI.html#MyMenuBar.on_options_framepack"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#StimProgramGUI.MyMenuBar.on_options_framepack" title="Permalink to this definition">¶</a></dt>
+<dd><p>Handles toggling capturing</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>event</strong> &#8211; </td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="StimProgramGUI.MyMenuBar.on_options_tools_rec_map">
+<code class="descname">on_options_tools_rec_map</code><span class="sig-paren">(</span><em>event</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/StimProgramGUI.html#MyMenuBar.on_options_tools_rec_map"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#StimProgramGUI.MyMenuBar.on_options_tools_rec_map" title="Permalink to this definition">¶</a></dt>
+<dd><p>Handles request to map receptive field_rect</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>event</strong> &#8211; </td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="StimProgramGUI.MyMenuBar.prompt_wave_details">
+<code class="descname">prompt_wave_details</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/StimProgramGUI.html#MyMenuBar.prompt_wave_details"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#StimProgramGUI.MyMenuBar.prompt_wave_details" title="Permalink to this definition">¶</a></dt>
+<dd><p>Dialog to prompt for details about the heka file.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="StimProgramGUI.MyStatusBar">
+<em class="property">class </em><code class="descclassname">StimProgramGUI.</code><code class="descname">MyStatusBar</code><span class="sig-paren">(</span><em>parent</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/StimProgramGUI.html#MyStatusBar"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#StimProgramGUI.MyStatusBar" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">wx._windows.StatusBar</span></code></p>
+<p>Class for custom status bar to color background on errors.</p>
+<dl class="method">
+<dt id="StimProgramGUI.MyStatusBar.set_status_text">
+<code class="descname">set_status_text</code><span class="sig-paren">(</span><em>text</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/StimProgramGUI.html#MyStatusBar.set_status_text"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#StimProgramGUI.MyStatusBar.set_status_text" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="StimProgramGUI.MyStatusBar.set_background">
+<code class="descname">set_background</code><span class="sig-paren">(</span><em>color</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/StimProgramGUI.html#MyStatusBar.set_background"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#StimProgramGUI.MyStatusBar.set_background" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="StimProgramGUI.MyStatusBar.set_text_color">
+<code class="descname">set_text_color</code><span class="sig-paren">(</span><em>color</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/StimProgramGUI.html#MyStatusBar.set_text_color"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#StimProgramGUI.MyStatusBar.set_text_color" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
 <dt id="StimProgramGUI.MyFrame">
 <em class="property">class </em><code class="descclassname">StimProgramGUI.</code><code class="descname">MyFrame</code><a class="reference internal" href="_modules/StimProgramGUI.html#MyFrame"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#StimProgramGUI.MyFrame" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">wx._windows.Frame</span></code></p>
@@ -824,7 +1032,7 @@ row/column header right clicked.</p>
 <dl class="method">
 <dt id="StimProgramGUI.MyFrame.run">
 <code class="descname">run</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/StimProgramGUI.html#MyFrame.run"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#StimProgramGUI.MyFrame.run" title="Permalink to this definition">¶</a></dt>
-<dd><p>Method for running stims.</p>
+<dd><p>Method for running stims. Makes changes based on param grid if necessary.</p>
 </dd></dl>
 
 <dl class="method">
@@ -901,12 +1109,12 @@ various params from global panel.</p>
         <li class="right" >
           <a href="StimProgramOtherMethods.html" title="Other functions"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">Stimulus Program 1.1 documentation</a> &raquo;</li> 
+        <li class="nav-item nav-item-0"><a href="index.html">Stimulus Program 1.1 documentation</a> &#187;</li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">
-        &copy; Copyright 2016, Alexander Tomlinson.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.3.5.
+        &#169; Copyright 2016, Alexander Tomlinson.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.1.
     </div>
   </body>
 </html>

@@ -12,6 +12,7 @@ Guides
 
    readmelink
    detailedinstall
+   installguide
    usageguide
    LICENSE
 
