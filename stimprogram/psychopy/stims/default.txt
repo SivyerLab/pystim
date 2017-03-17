@@ -2,14 +2,14 @@
 (dp2
 Vcontrast_channel
 p3
-Vgreen
+S'green'
 p4
 sVshuffle
 p5
 I00
 sVcheck_type
 p6
-Vboard
+S'board'
 p7
 sVcolor
 p8
@@ -27,7 +27,7 @@ p13
 I1
 sVtiming
 p14
-Vstep
+S'step'
 p15
 sVintensity
 p16
@@ -48,7 +48,7 @@ p21
 I100
 sVcolor_mode
 p22
-Vintensity
+S'intensity'
 p23
 sVspeed
 p24
@@ -65,7 +65,7 @@ p28
 I90
 sVfill_mode
 p29
-Vuniform
+S'uniform'
 p30
 sVtrigger
 p31
@@ -107,7 +107,7 @@ p44
 I00
 sVimage_channel
 p45
-Vall
+S'all'
 p46
 sVimage_size
 p47
@@ -124,7 +124,7 @@ p51
 I1
 sVtable_type
 p52
-Vpolar
+S'polar'
 p53
 sVmove_seed
 p54
@@ -145,7 +145,7 @@ I100
 aI100
 asVshape
 p60
-Vcircle
+S'circle'
 p61
 sVorientation
 p62
@@ -155,7 +155,7 @@ p63
 I50
 sVintensity_dir
 p64
-Vboth
+S'both'
 p65
 sVsf
 p66

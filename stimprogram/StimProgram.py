@@ -879,6 +879,10 @@ class StaticStim(StimDefaults):
 
         color = high, low, delta, background
 
+        print 'high      :', high
+        print 'low       :', low
+        print 'delta     :', delta
+        print 'background:', background
         return color
 
     def gen_size(self):
@@ -922,11 +926,11 @@ class StaticStim(StimDefaults):
 
         # make array
         size = (max(self.gen_size()),) * 2  # square tuple of largest size
-        print size
+        print self.contrast_channel
         # not needed for images
         if self.fill_mode != 'image':
             # make black rgba array
-            texture = numpy.full(size + (4,), -1, dtype=numpy.float)
+            texture = numpy.full(size + (4,), 0, dtype=numpy.float)
 
         high, low, delta, background = self.gen_rgb()
 
@@ -937,40 +941,30 @@ class StaticStim(StimDefaults):
             else:
                 texture[:, :, ] = high
 
-        elif self.fill_mode == 'sine':
+        elif self.fill_mode in ['sine', 'square', 'concentric']:
             # scale
             delta = (delta + 1) / 2
             background = (background + 1) / 2
             # make color grating
-            sin_grating = (filters.makeGrating(size[0], gratType='sin',
-                                         cycles=1))
+            if self.fill_mode == 'sine':
+                grating = filters.makeGrating(size[0], gratType='sin', cycles=1)
+            elif self.fill_mode == 'square':
+                grating = filters.makeGrating(size[0], gratType='sqr', cycles=1)
+            elif self.fill_mode == 'concentric':
+                grating = scipy.sin(filters.makeRadialMatrix(size[0]) * 2 - 1)
+
             # fill texture array
             if self.contrast_channel != 3:
-                texture[:, :, self.contrast_channel] = delta[self.contrast_channel]
-                texture[:, :, self.contrast_channel] *= sin_grating
+                texture[:, :, self.contrast_channel] = delta
+                texture[:, :, self.contrast_channel] *= grating
                 texture[:, :, self.contrast_channel] += background[self.contrast_channel]
             else:
-                texture[:, :, ] = delta
+                texture[:, :, 0:3] = delta
+                texture[:, :, 0:3] *= numpy.dstack((grating, grating, grating))
+                texture[:, :, 0:3] += background
 
+            texture = texture * 2 - 1
             texture[:, :, 3] = self.alpha
-
-        elif self.fill_mode == 'square':
-            # adjust color
-            color = (filters.makeGrating(size[0], gratType='sqr',
-                                         cycles=1)) * delta + background
-            # unscale
-            color = color * 2 - 1
-            # color array
-            texture[:, :, self.contrast_channel] = color
-
-        elif self.fill_mode == 'concentric':
-            # adjust color
-            color = scipy.sin(filters.makeRadialMatrix(size[0]) * 2 - 1) * \
-                delta + background
-            # unscale
-            color = color * 2 - 1
-            # color array
-            texture[:, :, self.contrast_channel] = color
 
         elif self.fill_mode == 'image':
             # get pic from file
@@ -1036,7 +1030,7 @@ class StaticStim(StimDefaults):
         if MyWindow.gamma_mon is not None:
             texture = MyWindow.gamma_mon(texture)
 
-        # make center see through if annuli
+        # make center see-through if annulus
         if self.shape == 'annulus':
             radius = filters.makeRadialMatrix(self.outer_diameter,
                                               radius=1.0 / self.outer_diameter)
