@@ -344,6 +344,8 @@ class MyWindow(object):
         """
         try:
             if MyWindow.win is not None:
+                color = numpy.clip(color, -1, 1)
+
                 GlobalDefaults['background'] = color
 
                 if MyWindow.gamma_mon is not None:
@@ -359,7 +361,7 @@ class MyWindow(object):
                 MyWindow.flip()
                 MyWindow.flip()
 
-        except (ValueError, AttributeError):
+        except (ValueError, AttributeError, TypeError):
             pass
 
     @staticmethod
@@ -618,7 +620,8 @@ class StimDefaults(object):
         self.shuffle = shuffle
         self.blend_jumps = blend_jumps
 
-        self.contrast_channel = ['red', 'green', 'blue'].\
+
+        self.contrast_channel = ['red', 'green', 'blue', 'all'].\
             index(contrast_channel)
         self.image_channel = ['red', 'green', 'blue', 'all'].\
             index(image_channel)
@@ -818,49 +821,63 @@ class StaticStim(StimDefaults):
         :return: tuple of high, low, delta, and background
         """
         background = GlobalDefaults['background']
-        # scale from (-1, 1) to (0, 1), for math and psychopy reasons
-        background = (numpy.array(background, dtype='float') + 1) / 2
-        background = background[self.contrast_channel]
+        intensity = self.intensity
+        rgb = self.color
+        alpha = self.alpha
+        # scale from (-1, 1) to (0, 1), for math and psychopy reasons, and clip to range(0, 1)
+        background = numpy.clip((numpy.array(background, dtype='float') + 1) / 2, 0, 1)
+        rgb = numpy.clip((numpy.array(rgb, dtype='float') + 1) / 2, 0, 1)
+        intensity = numpy.clip(intensity, 0, 1)
+        alpha = numpy.clip(alpha, 0, 1)
+
+        assert self.color_mode in ['rgb', 'intensity']
 
         if self.color_mode == 'rgb':
-            # scale
-            high = (numpy.array(self.color, dtype='float') + 1) / 2
-            low = (numpy.array(GlobalDefaults['background'], dtype='float') +
-                   1) / 2
+            high = rgb
 
-            # append alpha
-            high = numpy.append(high, self.alpha)
-            low = numpy.append(low, self.alpha)
+            # get difference between high and background (high can be below background, doesn't matter,
+            # just want change)
+            # clip at every step
+            delta = numpy.clip(high - background, 0, 1)
 
-            delta = (high[self.contrast_channel] - low[self.contrast_channel])
+            # low is high, but on the other side of the background
+            low = numpy.clip(background - delta, 0, 1)
 
-            # unscale high/low (only used by board texture)
-            # high = high * 2.0 - 1
-            # low = low * 2.0 - 1
-
-            color = high, low, delta, background
-
-        elif self.color_mode == 'intensity':
-
+        else:
             # get change relative to background
             delta = background * self.intensity
 
             # get high and low
-            high = background + delta
-            low = background - delta
+            high = numpy.clip(background + delta, 0, 1)
+            low = numpy.clip(background - delta, 0, 1)
 
-            # if single direction, bring middle up to halfway between high
-            # and background
-            if self.intensity_dir == 'single':
-                low += delta
-                delta /= 2
-                background += delta
+            # recalculate delta because of clipping
+            delta = (high - low) / 2
 
-            # unscale high/low (only used by board texture)
-            high = high * 2.0 - 1
-            low = low * 2.0 - 1
+        # if single direction, bring middle (background) up to halfway between high
+        # and background
+        if self.intensity_dir == 'single':
+            low += delta
+            delta /= 2
+            background += delta
 
-            color = high, low, delta, background
+        # append alpha
+        high = numpy.append(high, alpha)
+        low = numpy.append(low, alpha)
+
+        # unscale all back to (-1, 1)
+        high = high * 2 - 1
+        low = low * 2 - 1
+        delta = delta * 2 - 1
+        background = background * 2 - 1
+
+        # if only want single channel, isolate
+        if self.contrast_channel != 3:
+            high = high[self.contrast_channel]
+            low = low[self.contrast_channel]
+            delta = delta[self.contrast_channel]
+
+        color = high, low, delta, background
 
         return color
 
@@ -905,36 +922,37 @@ class StaticStim(StimDefaults):
 
         # make array
         size = (max(self.gen_size()),) * 2  # square tuple of largest size
+        print size
         # not needed for images
         if self.fill_mode != 'image':
-            # make black rgba array, set alpha
+            # make black rgba array
             texture = numpy.full(size + (4,), -1, dtype=numpy.float)
-            texture[:, :, 3] = self.alpha
 
         high, low, delta, background = self.gen_rgb()
 
         if self.fill_mode == 'uniform':
-            if self.color_mode == 'rgb':
-                # unscale
-                color = high * 2 - 1
-                # color array
-                texture[:, :, ] = color
-            elif self.color_mode == 'intensity':
-                # adjust
-                color = background + delta
-                # unscale
-                color = color * 2 - 1
-                # color array
-                texture[:, :, self.contrast_channel] = color
+            if self.contrast_channel != 3:
+                texture[:, :, self.contrast_channel] = high
+                texture[:, :, 3] = self.alpha
+            else:
+                texture[:, :, ] = high
 
         elif self.fill_mode == 'sine':
-            # adjust color
-            color = (filters.makeGrating(size[0], gratType='sin',
-                                         cycles=1)) * delta + background
-            # unscale
-            color = color * 2 - 1
-            # color array
-            texture[:, :, self.contrast_channel] = color
+            # scale
+            delta = (delta + 1) / 2
+            background = (background + 1) / 2
+            # make color grating
+            sin_grating = (filters.makeGrating(size[0], gratType='sin',
+                                         cycles=1))
+            # fill texture array
+            if self.contrast_channel != 3:
+                texture[:, :, self.contrast_channel] = delta[self.contrast_channel]
+                texture[:, :, self.contrast_channel] *= sin_grating
+                texture[:, :, self.contrast_channel] += background[self.contrast_channel]
+            else:
+                texture[:, :, ] = delta
+
+            texture[:, :, 3] = self.alpha
 
         elif self.fill_mode == 'square':
             # adjust color
