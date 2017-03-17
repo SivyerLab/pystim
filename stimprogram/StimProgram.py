@@ -922,6 +922,7 @@ class StaticStim(StimDefaults):
 
         # make array
         size = (max(self.gen_size()),) * 2  # square tuple of largest size
+        print size
         # not needed for images
         if self.fill_mode != 'image':
             # make black rgba array
@@ -930,29 +931,28 @@ class StaticStim(StimDefaults):
         high, low, delta, background = self.gen_rgb()
 
         if self.fill_mode == 'uniform':
-            # if self.color_mode == 'rgb':
-            #     # color array
-            #     texture[:, :, ] = high
-            # elif self.color_mode == 'intensity':
-            #     # color array
-            #     texture[:, :, self.contrast_channel] = high
-            #     texture[:, :, 3] = self.alpha
-
             if self.contrast_channel != 3:
                 texture[:, :, self.contrast_channel] = high
                 texture[:, :, 3] = self.alpha
-
             else:
                 texture[:, :, ] = high
 
         elif self.fill_mode == 'sine':
-            # adjust color
-            color = (filters.makeGrating(size[0], gratType='sin',
-                                         cycles=1)) * delta + background
-            # unscale
-            color = color * 2 - 1
-            # color array
-            texture[:, :, self.contrast_channel] = color
+            # scale
+            delta = (delta + 1) / 2
+            background = (background + 1) / 2
+            # make color grating
+            sin_grating = (filters.makeGrating(size[0], gratType='sin',
+                                         cycles=1))
+            # fill texture array
+            if self.contrast_channel != 3:
+                texture[:, :, self.contrast_channel] = delta[self.contrast_channel]
+                texture[:, :, self.contrast_channel] *= sin_grating
+                texture[:, :, self.contrast_channel] += background[self.contrast_channel]
+            else:
+                texture[:, :, ] = delta
+
+            texture[:, :, 3] = self.alpha
 
         elif self.fill_mode == 'square':
             # adjust color
