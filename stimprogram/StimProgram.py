@@ -147,7 +147,7 @@ class GlobalDefaults(object):
                     display_size=[400, 400],
                     position=[0, 0],
                     protocol_reps=1,
-                    background=[-1, 0, -1],
+                    background=[0, 0, 0],
                     pref_dir=-1,
                     fullscreen=False,
                     log=False,
@@ -1070,6 +1070,7 @@ class StaticStim(StimDefaults):
 
         # scale back to [0, 1]
         delta = (delta + 1) / 2
+        print delta
         background = (background + 1) / 2
 
         if self.timing == 'sine':
@@ -2253,6 +2254,26 @@ def log_stats(count_reps, reps, count_frames, num_frames, elapsed_time,
     return current_time_string
 
 
+def stim_factory(stim):
+    stim_map = {'static': StaticStim,
+                'moving': MovingStim,
+                'table' : TableStim,
+                'random': RandomlyMovingStim,
+                'jump'  : ImageJumpStim}
+
+    # checkerboards and movies have conditional inheritance based on move type, so instantiate
+    # those with functions, the rest as normal
+
+    if stim.parameters['fill_mode'] == 'checkerboard':
+        return board_texture_class(stim_map[stim.stim_type], **stim.parameters)
+
+    elif stim.parameters['fill_mode'] == 'movie':
+        return movie_stim_class(stim_map[stim.stim_type], **stim.parameters)
+
+    else:
+        return stim_map[stim.stim_type](**stim.parameters)
+
+
 def main(stim_list, verbose=True):
     """Function to create stims and run program. Creates instances of stim
     types, and makes necessary calls to animate stims and flip window.
@@ -2287,22 +2308,7 @@ def main(stim_list, verbose=True):
             to_animate = []
 
             for stim in stim_list:
-                # print stim.number
-                # checkerboard and movie inheritance depends on motion type,
-                # so instantiate accordingly
-                if stim.parameters['fill_mode'] == 'checkerboard':
-                    to_animate.append(board_texture_class(globals()[
-                        stim.stim_type], **stim.parameters))
-
-                elif stim.parameters['fill_mode'] == 'movie':
-                    to_animate.append(movie_stim_class(globals()
-                                      [stim.stim_type], **stim.parameters))
-
-                # all other stims, instantiate by looking up class in
-                # globals(), and passing dictionary of parameters
-                else:
-                    to_animate.append(globals()[
-                        stim.stim_type](**stim.parameters))
+                to_animate.append(stim_factory(stim))
 
             # generate stims
             for stim in to_animate:

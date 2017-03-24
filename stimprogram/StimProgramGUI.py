@@ -978,7 +978,7 @@ class ListPanel(wx.Panel):
             return label_names[class_names.index(stim_type)]
 
         elif stim_type in label_names:
-            return class_names[label_names.index(stim_type)]
+            return stim_type
 
         else:
             raise AttributeError('Wrong label or stim class')
@@ -1027,7 +1027,7 @@ class ListPanel(wx.Panel):
         self.list_control.SetColumnWidth(3, wx.LIST_AUTOSIZE)
 
         # convert from stim type label to StimProgram instance
-        stim_type = self.convert_stim_type(stim_type)
+        # stim_type = self.convert_stim_type(stim_type)
 
         # stim info instance to store and grid control_dict instance to store
         stim_info = StimProgram.StimInfo(stim_type, param_dict, insert_pos)
@@ -1101,7 +1101,8 @@ class ListPanel(wx.Panel):
             if index > 0:
                 # get params
                 stim = self.stims_to_run[index]
-                stim_type = self.convert_stim_type(stim.stim_type)
+                # stim_type = self.convert_stim_type(stim.stim_type)
+                stim_type = stim.stim_type
                 param_dict = stim.parameters
 
                 # get grid dict
@@ -1131,7 +1132,8 @@ class ListPanel(wx.Panel):
             if index < self.list_control.GetItemCount() - 1:
                 # get params
                 stim = self.stims_to_run[index]
-                stim_type = self.convert_stim_type(stim.stim_type)
+                # stim_type = self.convert_stim_type(stim.stim_type)
+                stim_type = stim.stim_type
                 param_dict = stim.parameters
 
                 # get grid dict
@@ -1159,7 +1161,8 @@ class ListPanel(wx.Panel):
         # copy so adding move type doesn't affect StimInfo instance
         params = deepcopy(stim.parameters)
 
-        stim_type = self.convert_stim_type(stim.stim_type)
+        # stim_type = self.convert_stim_type(stim.stim_type)
+        stim_type = stim.stim_type
         params['move_type'] = stim_type
 
         # compatibility for old checkerboards
@@ -1406,7 +1409,9 @@ class DirPanel(wx.Panel):
                     params['check_type'] = 'checkerboard'
 
             # convert from StimProgram instance label to stim type
+            print stim_type
             stim_type = self.frame.list_panel.convert_stim_type(stim_type)
+            print stim_type
 
             # load
             self.frame.list_panel.add_to_list(stim_type, params, grid_dict)
