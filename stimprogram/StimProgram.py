@@ -887,8 +887,8 @@ class StaticStim(StimDefaults):
 
         print 'high      :', high
         print 'low       :', low
-        print 'delta     :', delta
         print 'background:', background
+        print 'delta     :', delta
 
         self.colors = color
         return color
@@ -1929,8 +1929,15 @@ def board_texture_class(bases, **kwargs):
 
             elif self.check_type in ['noise', 'noisy noise']:
                 numpy.random.seed(self.fill_seed)
-                self.colors[:, self.contrast_channel] = numpy.random.uniform(
-                    low=low, high=high, size=self.num_check**2)
+
+                if len(low.shape) == 0:
+                    self.colors[:, self.contrast_channel] = numpy.random.uniform(
+                        low=low, high=high, size=self.num_check**2)
+                else:
+                    r = numpy.random.uniform(low=low[0], high=high[0], size=self.num_check**2)
+                    g = numpy.random.uniform(low=low[1], high=high[1], size=self.num_check**2)
+                    b = numpy.random.uniform(low=low[2], high=high[2], size=self.num_check**2)
+                    self.colors[:] = numpy.dstack([r, g, b])
 
                 # gamma correct
                 if MyWindow.gamma_mon is not None:
@@ -1969,9 +1976,14 @@ def board_texture_class(bases, **kwargs):
 
             :param frame: current frame number
             """
-            if self.check_type == 'noisy noise':
+            if len(self.low.shape) == 0:
                 self.colors[:, self.contrast_channel] = numpy.random.uniform(
                     low=self.low, high=self.high, size=self.num_check**2)
+            else:
+                r = numpy.random.uniform(low=self.low[0], high=self.high[0], size=self.num_check**2)
+                g = numpy.random.uniform(low=self.low[1], high=self.high[1], size=self.num_check**2)
+                b = numpy.random.uniform(low=self.low[2], high=self.high[2], size=self.num_check**2)
+                self.colors[:] = numpy.dstack([r, g, b])
 
                 # gamma correct
                 if MyWindow.gamma_mon is not None:
@@ -2380,7 +2392,7 @@ def main(stim_list, verbose=True):
             # MyWindow.win.saveFrameIntervals()
             MyWindow.win.recordFrameIntervals = False
             f = numpy.array(MyWindow.win.frameIntervals)
-            print; print f*1000
+            # print; print f*1000
             if GlobalDefaults['framepack']:
                 cutoff = 1. / GlobalDefaults['frame_rate'] * 3 + 0.005  # 5 ms range
             else:
