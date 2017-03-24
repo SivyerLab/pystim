@@ -802,9 +802,12 @@ class StaticStim(StimDefaults):
         # check if within animation range
         if self.start_stim <= frame < self.end_stim:
             # adjust colors and phase based on timing
-            if self.fill_mode not in ['movie', 'image'] and self.timing != \
-                    'step':
-                self.gen_timing(frame)
+            if self.fill_mode not in ['movie', 'image']:
+                if self.fill_mode == 'checkerboard' and self.check_type == 'noisy noise':
+                    self.gen_timing(frame)
+
+                elif self.timing != 'step':
+                    self.gen_timing(frame)
 
             if self.fill_mode != 'movie':
                 self.gen_phase()
@@ -833,8 +836,6 @@ class StaticStim(StimDefaults):
 
         # and scale alpha
         alpha = (numpy.clip(alpha, -1, 1) + 1) / 2.
-
-
 
         assert self.color_mode in ['rgb', 'intensity']
 
@@ -1882,10 +1883,7 @@ def board_texture_class(bases, **kwargs):
                                 self.check_size[1] * y))
 
             # get colors
-            high, low, _, _ = self.gen_rgb()
-            # print high, low
-            self.high = high
-            self.low = low
+            self.high, self.low, _, _ = self.gen_rgb()
 
             # array of rgbs for each element (2D)
             self.colors = numpy.full((self.num_check ** 2, 3), -1,
@@ -1895,15 +1893,15 @@ def board_texture_class(bases, **kwargs):
 
                 # gamma correct high and low
                 if MyWindow.gamma_mon is not None:
-                    high = MyWindow.gamma_mon(high,
+                    high = MyWindow.gamma_mon(self.high,
                                               channel=self.contrast_channel)
-                    low = MyWindow.gamma_mon(low,
+                    low = MyWindow.gamma_mon(self.low,
                                              channel=self.contrast_channel)
 
-                if len(low.shape) == 0:
-                    self.colors[:, self.contrast_channel] = low
+                if len(self.low.shape) == 0:
+                    self.colors[:, self.contrast_channel] = self.low
                 else:
-                    self.colors[:] = low[:3]
+                    self.colors[:] = self.low[:3]
 
                 # index to know how to color elements in array
                 self.index = numpy.zeros((self.num_check, self.num_check))
@@ -1921,22 +1919,22 @@ def board_texture_class(bases, **kwargs):
                         self.index[i] = self.fill_random.randint(0, 1)
 
                 # use index to assign colors for board and random
-                if len(low.shape) == 0:
+                if len(self.low.shape) == 0:
                     self.colors[numpy.where(self.index),
-                                self.contrast_channel] = high
+                                self.contrast_channel] = self.high
                 else:
-                    self.colors[numpy.where(self.index)] = high[:3]
+                    self.colors[numpy.where(self.index)] = self.high[:3]
 
             elif self.check_type in ['noise', 'noisy noise']:
                 numpy.random.seed(self.fill_seed)
 
-                if len(low.shape) == 0:
+                if len(self.low.shape) == 0:
                     self.colors[:, self.contrast_channel] = numpy.random.uniform(
-                        low=low, high=high, size=self.num_check**2)
+                        low=self.low, high=self.high, size=self.num_check**2)
                 else:
-                    r = numpy.random.uniform(low=low[0], high=high[0], size=self.num_check**2)
-                    g = numpy.random.uniform(low=low[1], high=high[1], size=self.num_check**2)
-                    b = numpy.random.uniform(low=low[2], high=high[2], size=self.num_check**2)
+                    r = numpy.random.uniform(low=self.low[0], high=self.high[0], size=self.num_check**2)
+                    g = numpy.random.uniform(low=self.low[1], high=self.high[1], size=self.num_check**2)
+                    b = numpy.random.uniform(low=self.low[2], high=self.high[2], size=self.num_check**2)
                     self.colors[:] = numpy.dstack([r, g, b])
 
                 # gamma correct
@@ -1985,11 +1983,11 @@ def board_texture_class(bases, **kwargs):
                 b = numpy.random.uniform(low=self.low[2], high=self.high[2], size=self.num_check**2)
                 self.colors[:] = numpy.dstack([r, g, b])
 
-                # gamma correct
-                if MyWindow.gamma_mon is not None:
-                    self.colors = MyWindow.gamma_mon(self.colors)
+            # gamma correct
+            if MyWindow.gamma_mon is not None:
+                self.colors = MyWindow.gamma_mon(self.colors)
 
-                self.stim.setColors(self.colors)
+            self.stim.setColors(self.colors)
 
         def gen_phase(self):
             """ElementArrayStim does not support texture phase.
