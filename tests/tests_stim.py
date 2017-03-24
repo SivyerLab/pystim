@@ -1,10 +1,10 @@
 # NEED MUCH MORE COVERAGE
 
-import StimProgram
+from stimprogram import StimProgram
 import unittest
-import mock
+# import mock
 import numpy
-import u3
+# import u3
 
 
 # class TestTrigger(unittest.TestCase):
@@ -58,17 +58,19 @@ class TestGenMask(unittest.TestCase):
 
 class TestGenRGB(unittest.TestCase):
 
-    def test_bg0_mode_rgb(self):
+    def test_bg0_mode_rgb_green(self):
         stim = StimProgram.StaticStim(contrast_channel='green',
                                       color_mode='rgb',
                                       color=[1, 1, 1],
                                       alpha=1)
 
-        self.assertTupleEqual(stim.gen_rgb()[2:], (0.5, 0.5))
-        numpy.allclose(stim.gen_rgb()[0], numpy.array([1, 1, 1, 1]))
-        numpy.allclose(stim.gen_rgb()[1], numpy.array([0, 0.5, 0, 1]))
+        high, low, delta, background = stim.gen_rgb()
+        self.assertEqual(high, 1.0)
+        self.assertEqual(low, -1.0)
+        self.assertEqual(delta, 0.0)
+        numpy.testing.assert_array_equal(background, numpy.array([0, 0, 0]))
 
-    def test_bg0_mode_intensity_both(self):
+    def test_bg0_mode_intensity_both_green(self):
         stim = StimProgram.StaticStim(contrast_channel='green',
                                       color_mode='intensity',
                                       intensity_dir='both',
@@ -76,11 +78,13 @@ class TestGenRGB(unittest.TestCase):
                                       color=[1, 1, 1],
                                       alpha=1)
 
-        self.assertTupleEqual(stim.gen_rgb()[2:], (0.5, 0.5))
-        numpy.allclose(stim.gen_rgb()[0], numpy.array([1]))
-        numpy.allclose(stim.gen_rgb()[1], numpy.array([-1]))
+        high, low, delta, background = stim.gen_rgb()
+        self.assertEqual(high, 1.0)
+        self.assertEqual(low, -1.0)
+        self.assertEqual(delta, 0.0)
+        numpy.testing.assert_array_equal(background, numpy.array([0, 0, 0]))
 
-    def test_bg0_mode_negintensity_both(self):
+    def test_bg0_mode_negintensity_both_green(self):
         stim = StimProgram.StaticStim(contrast_channel='green',
                                       color_mode='intensity',
                                       intensity_dir='both',
@@ -88,11 +92,13 @@ class TestGenRGB(unittest.TestCase):
                                       color=[1, 1, 1],
                                       alpha=1)
 
-        self.assertTupleEqual(stim.gen_rgb()[2:], (-0.5, 0.5))
-        numpy.allclose(stim.gen_rgb()[0], numpy.array([-1]))
-        numpy.allclose(stim.gen_rgb()[1], numpy.array([1]))
+        high, low, delta, background = stim.gen_rgb()
+        self.assertEqual(high, -1.0)
+        self.assertEqual(low, 1.0)
+        self.assertEqual(delta, -2.0)
+        numpy.testing.assert_array_equal(background, numpy.array([0, 0, 0]))
 
-    def test_bg0_mode_intensity_single(self):
+    def test_bg0_mode_intensity_single_green(self):
         stim = StimProgram.StaticStim(contrast_channel='green',
                                       color_mode='intensity',
                                       intensity_dir='single',
@@ -100,11 +106,13 @@ class TestGenRGB(unittest.TestCase):
                                       color=[1, 1, 1],
                                       alpha=1)
 
-        self.assertTupleEqual(stim.gen_rgb()[2:], (0.25, 0.75))
-        numpy.allclose(stim.gen_rgb()[0], numpy.array([1]))
-        numpy.allclose(stim.gen_rgb()[1], numpy.array([0]))
+        high, low, delta, background = stim.gen_rgb()
+        self.assertEqual(high, 1.0)
+        self.assertEqual(low, 0.0)
+        self.assertEqual(delta, -0.5)
+        numpy.testing.assert_array_equal(background, numpy.array([0.5, 0.5, 0.5]))
 
-    def test_bg0_mode_negintensity_single(self):
+    def test_bg0_mode_negintensity_single_green(self):
         stim = StimProgram.StaticStim(contrast_channel='green',
                                       color_mode='intensity',
                                       intensity_dir='single',
@@ -112,9 +120,11 @@ class TestGenRGB(unittest.TestCase):
                                       color=[1, 1, 1],
                                       alpha=1)
 
-        self.assertTupleEqual(stim.gen_rgb()[2:], (-0.25, 0.25))
-        numpy.allclose(stim.gen_rgb()[0], numpy.array([-1]))
-        numpy.allclose(stim.gen_rgb()[1], numpy.array([0]))
+        high, low, delta, background = stim.gen_rgb()
+        self.assertEqual(high, -1.0)
+        self.assertEqual(low, 0.0)
+        self.assertEqual(delta, -1.5)
+        numpy.testing.assert_array_equal(background, numpy.array([-0.5, -0.5, -0.5]))
 
 
 if __name__ == '__main__':

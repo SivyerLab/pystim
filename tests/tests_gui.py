@@ -1,7 +1,7 @@
 # NEED MUCH MORE COVERAGE
 
-from GammaCorrection import GammaValues
-import StimProgramGUI
+from stimprogram.GammaCorrection import GammaValues
+from stimprogram import StimProgramGUI
 import unittest
 import os
 
