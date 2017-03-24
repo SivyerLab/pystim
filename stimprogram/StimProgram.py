@@ -2254,6 +2254,56 @@ def log_stats(count_reps, reps, count_frames, num_frames, elapsed_time,
     return current_time_string
 
 
+def save_movie(current_time, save_loc):
+    """
+    Saves movies to file from saved pngs
+    :param current_time:
+    :param save_loc:
+    :return:
+    """
+    current_time_string = strftime('%Y_%m_%d_%H%M%S', current_time)
+    save_name = 'capture_video' + current_time_string + '.mpg'
+    save_name_gray = 'capture_video' + current_time_string + '_gray.mpg'
+
+    args = ['ffmpeg',
+            '-f', 'image2',
+            '-framerate', str(GlobalDefaults['frame_rate']),
+            '-i', os.path.join(save_loc, '"capture_%05d.png"'),
+            '-b:v', '20M',
+            os.path.join(save_loc, save_name)]
+
+    # make movie using ffmpeg
+    print 'ffmpeg...'
+    print save_loc
+    print os.path.join(save_loc, 'capture_%05d.png')
+    process = subprocess.Popen(args,
+                               stdout=subprocess.PIPE,
+                               stderr=subprocess.PIPE)
+    stdout, stderr = process.communicate()
+
+    args2 = ['ffmpeg',
+             '-i', os.path.join(save_loc, save_name),
+             '-vf', 'format=gray',
+             '-qscale', '0',
+             os.path.join(save_loc, save_name_gray)]
+
+    print '\ngrayscale conversion...'
+
+    process = subprocess.Popen(args2,
+                               stdout=subprocess.PIPE,
+                               stderr=subprocess.PIPE)
+    stdout, stderr = process.communicate()
+
+    # print stdout, stderr
+
+    # delete .pngs
+    # to_delete = [f for f in os.listdir(save_loc) if f.endswith('.png')]
+    # for f in to_delete:
+    #     os.remove(os.path.join(save_loc, f))
+
+    print '\nDONE'
+
+
 def stim_factory(stim):
     stim_map = {'static': StaticStim,
                 'moving': MovingStim,
@@ -2462,47 +2512,7 @@ def main(stim_list, verbose=True):
 
     # save movie
     if GlobalDefaults['capture']:
-        current_time_string = strftime('%Y_%m_%d_%H%M%S', current_time)
-        save_name = 'capture_video' + current_time_string + '.mpg'
-        save_name_gray = 'capture_video' + current_time_string + '_gray.mpg'
-
-
-        args = ['ffmpeg',
-                '-f', 'image2',
-                '-framerate', str(GlobalDefaults['frame_rate']),
-                '-i', os.path.join(save_loc, '"capture_%05d.png"'),
-                '-b:v', '20M',
-                os.path.join(save_loc, save_name)]
-
-        # make movie using ffmpeg
-        print 'ffmpeg...'
-        print save_loc
-        print os.path.join(save_loc, 'capture_%05d.png')
-        process = subprocess.Popen(args,
-                                   stdout=subprocess.PIPE,
-                                   stderr=subprocess.PIPE)
-        stdout, stderr = process.communicate()
-
-        args2 = ['ffmpeg',
-                 '-i', os.path.join(save_loc, save_name),
-                 '-vf', 'format=gray',
-                 '-qscale', '0',
-                 os.path.join(save_loc, save_name_gray)]
-
-        print '\ngrayscale conversion...'
-
-        process = subprocess.Popen(args2,
-                                   stdout=subprocess.PIPE,
-                                   stderr=subprocess.PIPE)
-        stdout, stderr = process.communicate()
-        # print stdout, stderr
-
-        # delete .pngs
-        # to_delete = [f for f in os.listdir(save_loc) if f.endswith('.png')]
-        # for f in to_delete:
-        #     os.remove(os.path.join(save_loc, f))
-
-        print '\nDONE'
+        save_movie(current_time, save_loc)
 
     return fps, count_elapsed_time, dropped, time_stamp
 
