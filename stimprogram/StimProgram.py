@@ -732,6 +732,8 @@ class StaticStim(StimDefaults):
         self.small_stim = None
         self.contrast_adj_rgb = None
 
+        self.colors = None
+
         # seed fill and move randoms
         self.fill_random = Random()
         self.fill_random.seed(self.fill_seed)
@@ -825,10 +827,14 @@ class StaticStim(StimDefaults):
         rgb = self.color
         alpha = self.alpha
         # scale from (-1, 1) to (0, 1), for math and psychopy reasons, and clip to range(0, 1)
-        background = numpy.clip((numpy.array(background, dtype='float') + 1) / 2, 0, 1)
+        background = numpy.clip((numpy.array(background, dtype='float') + 1) / 2., 0, 1)
         rgb = numpy.clip((numpy.array(rgb, dtype='float') + 1) / 2, 0, 1)
         intensity = numpy.clip(intensity, 0, 1)
-        alpha = numpy.clip(alpha, 0, 1)
+
+        # and scale alpha
+        alpha = (numpy.clip(alpha, -1, 1) + 1) / 2.
+
+
 
         assert self.color_mode in ['rgb', 'intensity']
 
@@ -852,13 +858,13 @@ class StaticStim(StimDefaults):
             low = numpy.clip(background - delta, 0, 1)
 
             # recalculate delta because of clipping
-            delta = (high - low) / 2
+            delta = (high - low) / 2.
 
         # if single direction, bring middle (background) up to halfway between high
         # and background
         if self.intensity_dir == 'single':
             low += delta
-            delta /= 2
+            delta /= 2.
             background += delta
 
         # append alpha
@@ -883,6 +889,8 @@ class StaticStim(StimDefaults):
         print 'low       :', low
         print 'delta     :', delta
         print 'background:', background
+
+        self.colors = color
         return color
 
     def gen_size(self):
@@ -926,13 +934,15 @@ class StaticStim(StimDefaults):
 
         # make array
         size = (max(self.gen_size()),) * 2  # square tuple of largest size
-        print self.contrast_channel
         # not needed for images
         if self.fill_mode != 'image':
             # make black rgba array
             texture = numpy.full(size + (4,), 0, dtype=numpy.float)
 
-        high, low, delta, background = self.gen_rgb()
+        if self.colors is not None:
+            high, low, delta, background = self.colors
+        else:
+            high, low, delta, background = self.gen_rgb()
 
         if self.fill_mode == 'uniform':
             if self.contrast_channel != 3:
@@ -1052,7 +1062,14 @@ class StaticStim(StimDefaults):
         time_fraction = stim_frame_num * 1.0 / self.draw_duration
         texture = self.stim.tex
 
-        _, _, delta, background = self.gen_rgb()
+        if self.colors is not None:
+            _, _, delta, background = self.colors
+        else:
+            _, _, delta, background = self.gen_rgb()
+
+        # scale back to [0, 1]
+        delta = (delta + 1) / 2
+        background = (background + 1) / 2
 
         if self.timing == 'sine':
             # adjust color
@@ -1062,8 +1079,7 @@ class StaticStim(StimDefaults):
 
             elif self.intensity_dir == 'single':
                 color = scipy.sin(self.period_mod * scipy.pi *
-                                  time_fraction - scipy.pi / 2) * delta + \
-                    background
+                                  time_fraction - scipy.pi / 2) * delta + background
 
         elif self.timing == 'square':
             if self.intensity_dir == 'both':
@@ -1101,7 +1117,11 @@ class StaticStim(StimDefaults):
         if MyWindow.gamma_mon is not None and self.fill_mode not in ['image']:
             color = MyWindow.gamma_mon(color, channel=self.contrast_channel)
 
-        texture[:, :, self.contrast_channel] = color
+        # fill texture array
+        if self.contrast_channel != 3:
+            texture[:, :, self.contrast_channel] = color
+        else:
+            texture[:, :, 0:3] = color
 
         self.stim.tex = texture
 
@@ -2360,8 +2380,11 @@ def main(stim_list, verbose=True):
             # MyWindow.win.saveFrameIntervals()
             MyWindow.win.recordFrameIntervals = False
             f = numpy.array(MyWindow.win.frameIntervals)
-            # print; print f*1000
-            cutoff = 1. / GlobalDefaults['frame_rate'] + 0.005  # 5 ms range
+            print; print f*1000
+            if GlobalDefaults['framepack']:
+                cutoff = 1. / GlobalDefaults['frame_rate'] * 3 + 0.005  # 5 ms range
+            else:
+                cutoff = 1. / GlobalDefaults['frame_rate'] + 0.005  # 5 ms range
             dropped = (f > cutoff).sum()
 
             # stop movies from continuing in background
