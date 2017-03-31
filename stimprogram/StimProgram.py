@@ -886,10 +886,10 @@ class StaticStim(StimDefaults):
 
         color = high, low, delta, background
 
-        print 'high      :', high
-        print 'low       :', low
-        print 'background:', background
-        print 'delta     :', delta
+        # print 'high      :', high
+        # print 'low       :', low
+        # print 'background:', background
+        # print 'delta     :', delta
 
         self.colors = color
         return color
@@ -936,9 +936,11 @@ class StaticStim(StimDefaults):
         # make array
         size = (max(self.gen_size()),) * 2  # square tuple of largest size
         # not needed for images
-        if self.fill_mode != 'image':
+        if self.fill_mode != 'image':# and self.fill_mode != 'uniform':
             # make black rgba array
-            texture = numpy.full(size + (4,), 0, dtype=numpy.float)
+            texture = numpy.full(size + (4,), 0, dtype=numpy.float32)
+        # elif self.fill_mode == 'uniform':
+        #     texture = numpy.array([0, 0, 0, 1], dtype=numpy.float32)
 
         if self.colors is not None:
             high, low, delta, background = self.colors
@@ -948,9 +950,12 @@ class StaticStim(StimDefaults):
         if self.fill_mode == 'uniform':
             if self.contrast_channel != 3:
                 texture[:, :, self.contrast_channel] = high
-                texture[:, :, 3] = self.alpha
             else:
                 texture[:, :, ] = high
+
+            # unscale
+            texture = texture * 2 - 1
+            texture[:, :, 3] = self.alpha
 
         elif self.fill_mode in ['sine', 'square', 'concentric']:
             # scale
@@ -1047,8 +1052,10 @@ class StaticStim(StimDefaults):
                                               radius=1.0 / self.outer_diameter)
             texture[numpy.where(radius < self.inner_diameter)] = [0, 0, 0, -1]
 
+        print texture[0][0]
         return texture
 
+    # @profile
     def gen_timing(self, frame):
         """Adjusts color values of stims based on desired timing in desired
         channel(i.e. as a function of current frame over draw time).
@@ -1070,7 +1077,6 @@ class StaticStim(StimDefaults):
 
         # scale back to [0, 1]
         delta = (delta + 1) / 2
-        print delta
         background = (background + 1) / 2
 
         if self.timing == 'sine':
@@ -2374,7 +2380,7 @@ def main(stim_list, verbose=True):
             if GlobalDefaults['trigger_wait'] != 0:
                 MyWindow.win.callOnFlip(MyWindow.send_trigger)
                 # print 'trigger'
-            MyWindow.flip()
+            # MyWindow.flip()
 
             if GlobalDefaults['trigger_wait'] != 0:
                 for y in xrange(GlobalDefaults['trigger_wait'] - 1):
@@ -2402,8 +2408,7 @@ def main(stim_list, verbose=True):
             elapsed_time = core.MonotonicClock()
 
             # for frame in xrange(num_frames):
-            # trange for pretty, low overhead (on the order of ns), progress
-            # bar in stdout
+            # trange for pretty, low overhead (on the order of ns), progress bar in stdout
             for frame in trange(num_frames):
                 for stim in to_animate:
                     stim.animate(frame)
@@ -2446,12 +2451,14 @@ def main(stim_list, verbose=True):
             # MyWindow.win.saveFrameIntervals()
             MyWindow.win.recordFrameIntervals = False
             f = numpy.array(MyWindow.win.frameIntervals)
-            # print; print f*1000
+            print; print f*1000
             if GlobalDefaults['framepack']:
                 cutoff = 1. / GlobalDefaults['frame_rate'] * 3 + 0.005  # 5 ms range
             else:
                 cutoff = 1. / GlobalDefaults['frame_rate'] + 0.005  # 5 ms range
             dropped = (f > cutoff).sum()
+            print (f > cutoff).nonzero()
+            print f[(f > cutoff).nonzero()] * 1000
 
             # stop movies from continuing in background
             for stim in to_animate:
@@ -2471,14 +2478,15 @@ def main(stim_list, verbose=True):
 
     # one last flip to clear window if still open
     try:
+        MyWindow.flip()
         if GlobalDefaults['framepack']:
             MyWindow.framepacker.flipCounter = 0
+            MyWindow.flip()
             MyWindow.win.clearBuffer()
             MyWindow.flip()
-            # MyWindow.win.clearBuffer()
+            MyWindow.win.clearBuffer()
             MyWindow.flip()
-            # MyWindow.win.clearBuffer()
-        MyWindow.flip()
+            MyWindow.win.clearBuffer()
     except AttributeError:
         pass
 

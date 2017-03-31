@@ -1409,9 +1409,7 @@ class DirPanel(wx.Panel):
                     params['check_type'] = 'checkerboard'
 
             # convert from StimProgram instance label to stim type
-            print stim_type
             stim_type = self.frame.list_panel.convert_stim_type(stim_type)
-            print stim_type
 
             # load
             self.frame.list_panel.add_to_list(stim_type, params, grid_dict)
