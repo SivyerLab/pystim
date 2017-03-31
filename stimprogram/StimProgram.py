@@ -743,6 +743,9 @@ class StaticStim(StimDefaults):
     def make_stim(self):
         """Creates instance of psychopy stim object.
         """
+        if self.timing != 'step':
+            self.fill_mode = 'uniform'
+
         self.stim = visual.GratingStim(win=MyWindow.win,
                                        size=self.gen_size(),
                                        mask=self.gen_mask(),
@@ -936,11 +939,11 @@ class StaticStim(StimDefaults):
         # make array
         size = (max(self.gen_size()),) * 2  # square tuple of largest size
         # not needed for images
-        if self.fill_mode != 'image':# and self.fill_mode != 'uniform':
+        if self.fill_mode != 'image':
+            if self.fill_mode == 'uniform':
+                size = (1, 1)
             # make black rgba array
             texture = numpy.full(size + (4,), 0, dtype=numpy.float32)
-        # elif self.fill_mode == 'uniform':
-        #     texture = numpy.array([0, 0, 0, 1], dtype=numpy.float32)
 
         if self.colors is not None:
             high, low, delta, background = self.colors
@@ -1052,7 +1055,6 @@ class StaticStim(StimDefaults):
                                               radius=1.0 / self.outer_diameter)
             texture[numpy.where(radius < self.inner_diameter)] = [0, 0, 0, -1]
 
-        print texture[0][0]
         return texture
 
     # @profile
