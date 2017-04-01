@@ -230,7 +230,7 @@ class GlobalDefaults(object):
             self.defaults['small_win'] = small_win
 
         if framepack is not None:
-            self.defaults['small_win'] = framepack
+            self.defaults['framepack'] = framepack
 
     def __repr__(self):
         """For pretty printing dictionary of global defaults.
@@ -390,13 +390,14 @@ class MyWindow(object):
                                            allowGUI=True,
                                            color=GlobalDefaults['background'],
                                            size=scaled_size,
-                                           pos=[0, 0],
+                                           pos=[10, 10],
                                            fullscr=False,
                                            # viewPos=GlobalDefaults['offset'],
                                            viewScale=scaled_scale,
                                            screen=0,
                                            waitBlanking=False,
-                                           do_vsync=False)
+                                           # do_vsync=False
+                                           )
 
     @staticmethod
     def flip():
@@ -794,7 +795,7 @@ class StaticStim(StimDefaults):
             self.end_delay = 0
 
         return self.end_stim + self.end_delay
-
+    # @profile
     def animate(self, frame):
         """Method for drawing stim objects to back buffer. Checks if object
         should be drawn. Back buffer is brought to front with calls to flip()
