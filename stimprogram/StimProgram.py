@@ -2454,14 +2454,14 @@ def main(stim_list, verbose=True):
             # MyWindow.win.saveFrameIntervals()
             MyWindow.win.recordFrameIntervals = False
             f = numpy.array(MyWindow.win.frameIntervals)
-            print; print f*1000
+            # print; print f*1000
             if GlobalDefaults['framepack']:
                 cutoff = 1. / GlobalDefaults['frame_rate'] * 3 + 0.005  # 5 ms range
             else:
                 cutoff = 1. / GlobalDefaults['frame_rate'] + 0.005  # 5 ms range
             dropped = (f > cutoff).sum()
-            print (f > cutoff).nonzero()
-            print f[(f > cutoff).nonzero()] * 1000
+            # print (f > cutoff).nonzero()
+            # print f[(f > cutoff).nonzero()] * 1000
 
             # stop movies from continuing in background
             for stim in to_animate:

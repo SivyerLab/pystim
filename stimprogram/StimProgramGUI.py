@@ -1940,7 +1940,7 @@ class MyMenuBar(wx.MenuBar):
         """
         val = self.options_framepack.IsChecked()
 
-        # self.frame.parameters.set_param_value('global', 'framepack', val)
+        self.frame.parameters.set_param_value('global', 'framepack', val)
         StimProgram.GlobalDefaults['framepack'] = val
 
     def on_options_tools_rec_map(self, event):
