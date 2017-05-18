@@ -1,6 +1,6 @@
 # NEED MUCH MORE COVERAGE
 
-from stimprogram import StimProgram
+from pyStim import pyStim
 import unittest
 # import mock
 import numpy
@@ -25,44 +25,44 @@ import numpy
 class TestGenSize(unittest.TestCase):
 
     def test_is_image(self):
-        stim = StimProgram.StaticStim(fill_mode='image',
-                                      image_size=[100,100])
+        stim = pyStim.StaticStim(fill_mode='image',
+                                 image_size=[100,100])
         self.assertTupleEqual(stim.gen_size(), (100, 100))
 
     def test_is_rectangle(self):
-        stim = StimProgram.StaticStim(shape='rectangle',
-                                      size=[100, 200])
+        stim = pyStim.StaticStim(shape='rectangle',
+                                 size=[100, 200])
         self.assertTupleEqual(stim.gen_size(), (100, 200))
 
     def test_is_annulus(self):
-        stim = StimProgram.StaticStim(shape='annulus',
-                                      outer_diameter=40,
-                                      inner_diameter=10)
+        stim = pyStim.StaticStim(shape='annulus',
+                                 outer_diameter=40,
+                                 inner_diameter=10)
         self.assertTupleEqual(stim.gen_size(), (40, 40))
 
 
 class TestGenMask(unittest.TestCase):
 
     def test_is_annulus(self):
-        stim = StimProgram.StaticStim(shape='annulus')
+        stim = pyStim.StaticStim(shape='annulus')
         self.assertEqual(stim.gen_mask(), 'circle')
 
     def test_is_circle(self):
-        stim = StimProgram.StaticStim(shape='circle')
+        stim = pyStim.StaticStim(shape='circle')
         self.assertEqual(stim.gen_mask(), 'circle')
 
     def test_is_rectangle(self):
-        stim = StimProgram.StaticStim(shape='rectangle')
+        stim = pyStim.StaticStim(shape='rectangle')
         self.assertIsNone(stim.gen_mask())
 
 
 class TestGenRGB(unittest.TestCase):
 
     def test_bg0_mode_rgb_green(self):
-        stim = StimProgram.StaticStim(contrast_channel='green',
-                                      color_mode='rgb',
-                                      color=[1, 1, 1],
-                                      alpha=1)
+        stim = pyStim.StaticStim(contrast_channel='green',
+                                 color_mode='rgb',
+                                 color=[1, 1, 1],
+                                 alpha=1)
 
         high, low, delta, background = stim.gen_rgb()
         self.assertEqual(high, 1.0)
@@ -71,12 +71,12 @@ class TestGenRGB(unittest.TestCase):
         numpy.testing.assert_array_equal(background, numpy.array([0, 0, 0]))
 
     def test_bg0_mode_intensity_both_green(self):
-        stim = StimProgram.StaticStim(contrast_channel='green',
-                                      color_mode='intensity',
-                                      intensity_dir='both',
-                                      intensity=1,
-                                      color=[1, 1, 1],
-                                      alpha=1)
+        stim = pyStim.StaticStim(contrast_channel='green',
+                                 color_mode='intensity',
+                                 intensity_dir='both',
+                                 intensity=1,
+                                 color=[1, 1, 1],
+                                 alpha=1)
 
         high, low, delta, background = stim.gen_rgb()
         self.assertEqual(high, 1.0)
@@ -85,12 +85,12 @@ class TestGenRGB(unittest.TestCase):
         numpy.testing.assert_array_equal(background, numpy.array([0, 0, 0]))
 
     def test_bg0_mode_negintensity_both_green(self):
-        stim = StimProgram.StaticStim(contrast_channel='green',
-                                      color_mode='intensity',
-                                      intensity_dir='both',
-                                      intensity=-1,
-                                      color=[1, 1, 1],
-                                      alpha=1)
+        stim = pyStim.StaticStim(contrast_channel='green',
+                                 color_mode='intensity',
+                                 intensity_dir='both',
+                                 intensity=-1,
+                                 color=[1, 1, 1],
+                                 alpha=1)
 
         high, low, delta, background = stim.gen_rgb()
         self.assertEqual(high, -1.0)
@@ -99,12 +99,12 @@ class TestGenRGB(unittest.TestCase):
         numpy.testing.assert_array_equal(background, numpy.array([0, 0, 0]))
 
     def test_bg0_mode_intensity_single_green(self):
-        stim = StimProgram.StaticStim(contrast_channel='green',
-                                      color_mode='intensity',
-                                      intensity_dir='single',
-                                      intensity=1,
-                                      color=[1, 1, 1],
-                                      alpha=1)
+        stim = pyStim.StaticStim(contrast_channel='green',
+                                 color_mode='intensity',
+                                 intensity_dir='single',
+                                 intensity=1,
+                                 color=[1, 1, 1],
+                                 alpha=1)
 
         high, low, delta, background = stim.gen_rgb()
         self.assertEqual(high, 1.0)
@@ -113,12 +113,12 @@ class TestGenRGB(unittest.TestCase):
         numpy.testing.assert_array_equal(background, numpy.array([0.5, 0.5, 0.5]))
 
     def test_bg0_mode_negintensity_single_green(self):
-        stim = StimProgram.StaticStim(contrast_channel='green',
-                                      color_mode='intensity',
-                                      intensity_dir='single',
-                                      intensity=-1,
-                                      color=[1, 1, 1],
-                                      alpha=1)
+        stim = pyStim.StaticStim(contrast_channel='green',
+                                 color_mode='intensity',
+                                 intensity_dir='single',
+                                 intensity=-1,
+                                 color=[1, 1, 1],
+                                 alpha=1)
 
         high, low, delta, background = stim.gen_rgb()
         self.assertEqual(high, -1.0)

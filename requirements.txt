@@ -38,6 +38,6 @@ igor
 # $ pip install tabulate igor tqdm moviepy pyglet psychopy
 # install wxpython:
 # conda install -c anaconda wxpython=3.0.0.0
-# download repository and navigate to where stimprogramGUI.py is located
+# download repository and navigate to where pyStimGUI.py is located
 # run GUI:
-# $ python stimgprogramGUI.py
+# $ python pyStimGUI.py

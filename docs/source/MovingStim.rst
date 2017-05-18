@@ -1,7 +1,7 @@
 Moving Stim
 ===========
 
-.. autoclass:: StimProgram.MovingStim
+.. autoclass:: pyStim.MovingStim
    :members:
    :undoc-members:
    :show-inheritance:

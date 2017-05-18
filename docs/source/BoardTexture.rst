@@ -1,4 +1,4 @@
 Checkerboard Stim
 =================
 
-.. autofunction:: StimProgram.board_texture_class
+.. autofunction:: pyStim.board_texture_class

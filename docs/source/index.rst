@@ -1,8 +1,8 @@
 .. Stimulus Program documentation master file, created by
    sphinx-quickstart on Thu Feb 04 11:17:06 2016.
 
-Welcome to Stimulus Program's documentation!
-============================================
+Welcome to pyStim's documentation!
+==================================
 
 Guides
 ------
@@ -22,7 +22,7 @@ Documentation
 .. toctree::
    :maxdepth: 2
 
-   StimProgram
+   pyStim
    gui
    GammaCorrection
 

@@ -17,7 +17,7 @@ from copy import deepcopy
 from sys import platform
 from PIL import Image
 import ConfigParser
-import StimProgram
+import pyStim
 import subprocess
 import traceback
 import cPickle
@@ -45,7 +45,7 @@ class Parameters(object):
         self.stim_params = None
 
         # init params
-        config_file = os.path.abspath('../stimprogram/psychopy/config.ini')
+        config_file = os.path.abspath('../pyStim/psychopy/config.ini')
         self.gui_params, self.stim_params, config_dict = self.read_config_file(
             config_file)
         self.init_params(config_dict)
@@ -204,7 +204,7 @@ class Parameters(object):
 
         :param config_dict: dictionary of defaults
         """
-        json_path = os.path.abspath('../stimprogram/psychopy/params_json.txt')
+        json_path = os.path.abspath('../pyStim/psychopy/params_json.txt')
         with open(json_path, 'r') as f:
             params = json.load(f, object_pairs_hook=OrderedDict)
 
@@ -639,15 +639,15 @@ class InputPanel(wx.Panel):
         global_params = self.parameters.get_global_params()
 
         if param in ['log', 'protocol_reps', 'pref_dir', 'capture']:
-            StimProgram.GlobalDefaults[param] = global_params[param]
+            pyStim.GlobalDefaults[param] = global_params[param]
 
         elif param == 'trigger_wait':
-            StimProgram.GlobalDefaults['trigger_wait'] = \
+            pyStim.GlobalDefaults['trigger_wait'] = \
                 int(global_params['trigger_wait'] * 1.0 * global_params[
                     'frame_rate'] + 0.99)
 
         elif param == 'background':
-            StimProgram.MyWindow.change_color(global_params['background'])
+            pyStim.MyWindow.change_color(global_params['background'])
 
     def on_right_click(self, event):
         """
@@ -1030,7 +1030,7 @@ class ListPanel(wx.Panel):
         # stim_type = self.convert_stim_type(stim_type)
 
         # stim info instance to store and grid control_dict instance to store
-        stim_info = StimProgram.StimInfo(stim_type, param_dict, insert_pos)
+        stim_info = pyStim.StimInfo(stim_type, param_dict, insert_pos)
 
         # add to list of stims to run along with grid info
         if insert_pos is not None:
@@ -1891,7 +1891,7 @@ class MyMenuBar(wx.MenuBar):
         val = self.options_log.IsChecked()
 
         self.frame.parameters.set_param_value('global', 'log', val)
-        StimProgram.GlobalDefaults['log'] = val
+        pyStim.GlobalDefaults['log'] = val
 
     def on_options_capture(self, event):
         """
@@ -1903,7 +1903,7 @@ class MyMenuBar(wx.MenuBar):
         val = self.options_capture.IsChecked()
 
         self.frame.parameters.set_param_value('global', 'capture', val)
-        StimProgram.GlobalDefaults['capture'] = val
+        pyStim.GlobalDefaults['capture'] = val
 
     def on_options_mirror(self, event):
         """
@@ -1915,7 +1915,7 @@ class MyMenuBar(wx.MenuBar):
         val = self.options_mirror.IsChecked()
 
         self.frame.parameters.set_param_value('global', 'small_win', val)
-        StimProgram.GlobalDefaults['small_win'] = val
+        pyStim.GlobalDefaults['small_win'] = val
 
     def on_options_override(self, event):
         """
@@ -1941,7 +1941,7 @@ class MyMenuBar(wx.MenuBar):
         val = self.options_framepack.IsChecked()
 
         self.frame.parameters.set_param_value('global', 'framepack', val)
-        StimProgram.GlobalDefaults['framepack'] = val
+        pyStim.GlobalDefaults['framepack'] = val
 
     def on_options_tools_rec_map(self, event):
         """
@@ -2420,7 +2420,7 @@ class MyFrame(wx.Frame):
             self.status_bar.set_text_color(wx.BLACK)
             self.status_bar.set_status_text('running...')
 
-            fps, time, dropped, time_stamp = StimProgram.main(to_run)
+            fps, time, dropped, time_stamp = pyStim.main(to_run)
 
             if time != 'error':
                 status_text = 'Last run: {0:.2f} fps, '.format(fps) \
@@ -2454,7 +2454,7 @@ class MyFrame(wx.Frame):
         """
         if self.win_open:
             self.on_stop_button(event)
-            StimProgram.MyWindow.close_win()
+            pyStim.MyWindow.close_win()
             self.win_open = False
 
         else:
@@ -2469,9 +2469,9 @@ class MyFrame(wx.Frame):
 
             self.win_open = True
             # pass global defaults to stim program
-            StimProgram.GlobalDefaults(**global_defaults)
+            pyStim.GlobalDefaults(**global_defaults)
             # make window
-            StimProgram.MyWindow.make_win()
+            pyStim.MyWindow.make_win()
 
     def on_stop_button(self, event):
         """
@@ -2480,7 +2480,7 @@ class MyFrame(wx.Frame):
         :param event: event passed by binder
         """
         self.do_break = True
-        StimProgram.MyWindow.should_break = True
+        pyStim.MyWindow.should_break = True
 
     def on_exit_button(self, event):
         """
@@ -2490,7 +2490,7 @@ class MyFrame(wx.Frame):
         """
         if self.win_open:
             self.on_stop_button(event)
-            StimProgram.MyWindow.close_win()
+            pyStim.MyWindow.close_win()
         self.Close()
 
 

@@ -1,4 +1,4 @@
 Readme
 ======
 
-.. include:: C:\Users\Alex\PycharmProjects\StimulusProgram\README.rst
+.. include:: C:\Users\Alex\PycharmProjects\pyStim\README.rst

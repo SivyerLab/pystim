@@ -1,7 +1,7 @@
 # NEED MUCH MORE COVERAGE
 
-from stimprogram.GammaCorrection import GammaValues
-from stimprogram import StimProgramGUI
+from pyStim.GammaCorrection import GammaValues
+from pyStim import pyStimGUI
 import unittest
 import os
 
@@ -9,7 +9,7 @@ import os
 class TestParameters(unittest.TestCase):
 
     def setUp(self):
-        self.params = StimProgramGUI.Parameters()
+        self.params = pyStimGUI.Parameters()
 
     def test_read_config_file(self):
         a, b, = self.params.read_config_file(os.path.abspath(

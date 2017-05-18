@@ -18,7 +18,7 @@ import os
 # If extensions (or modules to document with autodoc) are in another directory,
 # add these directories to sys.path here. If the directory is relative to the
 # documentation root, use os.path.abspath to make it absolute, like shown here.
-sys.path.insert(0, os.path.abspath('C:\Users\Alex\PycharmProjects\StimulusProgram\stimprogram'))
+sys.path.insert(0, os.path.abspath('C:\Users\Alex\PycharmProjects\pyStim\syStim'))
 sys.path.insert(0, os.path.abspath('C:\Users\Alex\Anaconda3\envs\stimprogram\Lib\site-packages'))
 
 # -- General configuration ------------------------------------------------
@@ -52,7 +52,7 @@ source_suffix = '.rst'
 master_doc = 'index'
 
 # General information about the project.
-project = u'Stimulus Program'
+project = u'pyStim'
 copyright = u'2016, Alexander Tomlinson'
 author = u'Alexander Tomlinson'
 
@@ -206,7 +206,7 @@ html_static_path = ['_static']
 #html_search_scorer = 'scorer.js'
 
 # Output file base name for HTML help builder.
-htmlhelp_basename = 'StimulusProgramdoc'
+htmlhelp_basename = 'pyStimdoc'
 
 # -- Options for LaTeX output ---------------------------------------------
 
@@ -228,7 +228,7 @@ latex_elements = {
 # (source start file, target name, title,
 #  author, documentclass [howto, manual, or own class]).
 latex_documents = [
-    (master_doc, 'StimulusProgram.tex', u'Stimulus Program Documentation',
+    (master_doc, 'pyStim.tex', u'pyStim Documentation',
      u'Alexander Tomlinson', 'manual'),
 ]
 
@@ -258,7 +258,7 @@ latex_show_urls = True
 # One entry per manual page. List of tuples
 # (source start file, name, description, authors, manual section).
 man_pages = [
-    (master_doc, 'stimulusprogram', u'Stimulus Program Documentation',
+    (master_doc, 'pyStim', u'pyStim Documentation',
      [author], 1)
 ]
 
@@ -272,8 +272,8 @@ man_pages = [
 # (source start file, target name, title, author,
 #  dir menu entry, description, category)
 texinfo_documents = [
-    (master_doc, 'StimulusProgram', u'Stimulus Program Documentation',
-     author, 'StimulusProgram', 'One line description of project.',
+    (master_doc, 'pyStim', u'pyStim Documentation',
+     author, 'pyStim', 'Software to generate visual stimuli for use in visual neuroscience experiments.',
      'Miscellaneous'),
 ]
 

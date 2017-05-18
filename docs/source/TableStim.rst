@@ -1,7 +1,7 @@
 Table Stim
 ==========
 
-.. autoclass:: StimProgram.TableStim
+.. autoclass:: pyStim.TableStim
    :members:
    :undoc-members:
    :show-inheritance:

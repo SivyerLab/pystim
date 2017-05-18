@@ -1,7 +1,7 @@
 gui module
 ==========
 
-.. automodule:: StimProgramGUI
+.. automodule:: pyStimGUI
    :members:
    :undoc-members:
    :show-inheritance:

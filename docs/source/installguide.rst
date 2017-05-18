@@ -5,12 +5,12 @@ Setting up environment
 ----------------------
 
 `Anaconda <https://www.continuum.io/anaconda-overview>`_ is a great package manager that will make setting up the
-to run Stimprogram much simpler. The following walkthrough uses Anaconda, and lines of code are to be entered in the
-terminal/command line.
+environment to run pyStim much simpler. The following walkthrough uses Anaconda, and lines of code are to be
+entered in the terminal/command line.
 
 1. Install Anaconda (environment manager)
 2. Install `Git <https://git-scm.com/downloads>`_ (version control tool)
-3. Create the python environment for the Stimprogram::
+3. Create the python environment for the pyStim::
 
     conda create -y --name sp_env python=2.7
 
@@ -30,7 +30,7 @@ terminal/command line.
 
     conda install -y -c anaconda wxpython=3.0.0.0
 
-8. Navigate to where you want to save the stimprogram repository::
+8. Navigate to where you want to save the pyStim repository::
 
     cd C:/your/location/of/choice
 
@@ -38,21 +38,20 @@ terminal/command line.
 
     git clone https://github.com/awctomlinson/StimulusProgram.git
 
-10. Navigate into the stimprogram folder::
+10. Navigate into the pyStim folder::
 
     cd StimulusProgram
 
 11. Navigate into the code folder::
 
-    cd Stimprogram
+    cd pyStim
 
-12. Make necessary changes to psychopy source in "\Anaconda3\envs\stimprogram\Lib\site-packages\psychopy\visual". Line
-297 needs to be changed to::
+12. Make necessary changes to psychopy source in "\\Anaconda3\\envs\\pyStim\\Lib\\site-packages\\psychopy\\visual". Line 297 needs to be changed to::
 
     if self.viewOri != 0. and self.viewPos is not None:
 
-13. Run the stimprogram::
+13. Run the pyStim::
 
-    python StimProgramGUI.py
+    python pyStimGUI.py
 
 14. If want triggering, install the labjack driver from the labjack site. If want video saving, install ffmpeg.

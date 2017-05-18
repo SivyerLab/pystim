@@ -20,5 +20,5 @@ Other
 .. toctree::
    :maxdepth: 1
 
-   StimProgramOther
-   StimProgramOtherMethods
+   pyStimOther
+   pyStimOtherMethods
