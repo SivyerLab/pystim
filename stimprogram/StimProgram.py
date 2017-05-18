@@ -30,6 +30,11 @@ import copy
 import sys
 import os
 
+# mirror window test
+import pyglet
+GL = pyglet.gl
+from psychopy.visual import globalVars
+
 global has_igor
 try:
     from igor import binarywave, packed
@@ -264,6 +269,7 @@ class MyWindow(object):
     frame_trigger_list.add(sys.maxint)  # need an extra last value for indexing
 
     framepacker = None
+    mirror_counter = 0
 
     @staticmethod
     def make_win():
@@ -360,6 +366,9 @@ class MyWindow(object):
                 # buffer
                 MyWindow.flip()
                 MyWindow.flip()
+                if GlobalDefaults['framepack']:
+                    for i in range(5):
+                        MyWindow.flip()
 
         except (ValueError, AttributeError, TypeError):
             pass
@@ -396,6 +405,7 @@ class MyWindow(object):
                                            viewScale=scaled_scale,
                                            screen=0,
                                            waitBlanking=False,
+                                           useFBO=True,
                                            # do_vsync=False
                                            )
 
@@ -407,7 +417,13 @@ class MyWindow(object):
             MyWindow.win.flip()
 
             if MyWindow.small_win is not None:
-                MyWindow.small_win.flip()
+                if GlobalDefaults['framepack']:
+                    if MyWindow.mirror_counter % 3 == 2:
+                        MyWindow.small_win.flip()
+                    MyWindow.mirror_counter += 1
+
+                else:
+                    MyWindow.small_win.flip()
 
     @staticmethod
     def send_trigger():
@@ -795,7 +811,7 @@ class StaticStim(StimDefaults):
             self.end_delay = 0
 
         return self.end_stim + self.end_delay
-    # @profile
+
     def animate(self, frame):
         """Method for drawing stim objects to back buffer. Checks if object
         should be drawn. Back buffer is brought to front with calls to flip()
@@ -816,10 +832,18 @@ class StaticStim(StimDefaults):
             if self.fill_mode != 'movie':
                 self.gen_phase()
 
+            if self.small_stim is not None:
+                MyWindow.win.winHandle.switch_to()
+                globalVars.currWindow = MyWindow.win
+                GL.glBindFramebufferEXT(GL.GL_FRAMEBUFFER_EXT, MyWindow.win.frameBuffer)
+
             # draw to back buffer
             self.stim.draw(MyWindow.win)
 
             if self.small_stim is not None:
+                MyWindow.small_win.winHandle.switch_to()
+                globalVars.currWindow = MyWindow.small_win
+                GL.glBindFramebufferEXT(GL.GL_FRAMEBUFFER_EXT, MyWindow.small_win.frameBuffer)
                 self.small_stim.draw(MyWindow.small_win)
 
     def gen_rgb(self):
@@ -836,7 +860,7 @@ class StaticStim(StimDefaults):
         # scale from (-1, 1) to (0, 1), for math and psychopy reasons, and clip to range(0, 1)
         background = numpy.clip((numpy.array(background, dtype='float') + 1) / 2., 0, 1)
         rgb = numpy.clip((numpy.array(rgb, dtype='float') + 1) / 2, 0, 1)
-        intensity = numpy.clip(intensity, 0, 1)
+        intensity = numpy.clip(intensity, -1, 1)
 
         # and scale alpha
         alpha = (numpy.clip(alpha, -1, 1) + 1) / 2.
@@ -890,10 +914,10 @@ class StaticStim(StimDefaults):
 
         color = high, low, delta, background
 
-        # print 'high      :', high
-        # print 'low       :', low
-        # print 'background:', background
-        # print 'delta     :', delta
+        print 'high      :', high
+        print 'low       :', low
+        print 'background:', background
+        print 'delta     :', delta
 
         self.colors = color
         return color
@@ -944,7 +968,7 @@ class StaticStim(StimDefaults):
             if self.fill_mode == 'uniform':
                 size = (1, 1)
             # make black rgba array
-            texture = numpy.full(size + (4,), 0, dtype=numpy.float32)
+            texture = numpy.full(size + (4,), -1, dtype=numpy.float32)
 
         if self.colors is not None:
             high, low, delta, background = self.colors
@@ -958,7 +982,7 @@ class StaticStim(StimDefaults):
                 texture[:, :, ] = high
 
             # unscale
-            texture = texture * 2 - 1
+            # texture = texture * 2 - 1
             texture[:, :, 3] = self.alpha
 
         elif self.fill_mode in ['sine', 'square', 'concentric']:
@@ -1056,6 +1080,7 @@ class StaticStim(StimDefaults):
                                               radius=1.0 / self.outer_diameter)
             texture[numpy.where(radius < self.inner_diameter)] = [0, 0, 0, -1]
 
+        # print texture
         return texture
 
     # @profile
@@ -2481,15 +2506,23 @@ def main(stim_list, verbose=True):
 
     # one last flip to clear window if still open
     try:
+
+        if MyWindow.small_win is not None:
+            MyWindow.win.winHandle.switch_to()
+            globalVars.currWindow = MyWindow.win
+            GL.glBindFramebufferEXT(GL.GL_FRAMEBUFFER_EXT, MyWindow.win.frameBuffer)
+
+        MyWindow.win.clearBuffer()
+        if MyWindow.small_win is not None:
+            MyWindow.small_win.clearBuffer()
+
         MyWindow.flip()
         if GlobalDefaults['framepack']:
-            MyWindow.framepacker.flipCounter = 0
+            # need at least 5 flips (i.e. total of 6 if only 1 frame drawn)
             MyWindow.flip()
-            MyWindow.win.clearBuffer()
             MyWindow.flip()
-            MyWindow.win.clearBuffer()
             MyWindow.flip()
-            MyWindow.win.clearBuffer()
+            MyWindow.flip()
     except AttributeError:
         pass
 
