@@ -14,6 +14,7 @@ Guides
    detailedinstall
    installguide
    usageguide
+   lcr4500setup
    LICENSE
 
 Documentation

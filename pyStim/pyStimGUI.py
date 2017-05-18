@@ -1,5 +1,5 @@
 """
-GUI for StimProgram
+GUI for pyStim
 """
 
 # Copyright (C) 2016 Alexander Tomlinson

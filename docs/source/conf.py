@@ -18,7 +18,7 @@ import os
 # If extensions (or modules to document with autodoc) are in another directory,
 # add these directories to sys.path here. If the directory is relative to the
 # documentation root, use os.path.abspath to make it absolute, like shown here.
-sys.path.insert(0, os.path.abspath('C:\Users\Alex\PycharmProjects\pyStim\syStim'))
+sys.path.insert(0, os.path.abspath('C:\Users\Alex\PycharmProjects\pyStim\pyStim'))
 sys.path.insert(0, os.path.abspath('C:\Users\Alex\Anaconda3\envs\stimprogram\Lib\site-packages'))
 
 # -- General configuration ------------------------------------------------
@@ -313,10 +313,10 @@ autodoc_member_order = 'bysource'
 # would mean that specific document would be compressed
 # regardless of the global pdf_compressed setting.
 pdf_documents = [
- ('index', u'MyProject', u'Stimulus Program', u'Alexander Tomlinson'),
+ ('index', u'MyProject', u'pyStim', u'Alexander Tomlinson'),
 ]
 # A comma-separated list of custom stylesheets. Example:
-pdf_stylesheets = ['sphinx','kerning','a4']
+pdf_stylesheets = ['sphinx', 'kerning', 'a4']
 
 # A list of folders to search for stylesheets. Example:
 pdf_style_path = ['.', '_styles']
@@ -327,7 +327,7 @@ pdf_style_path = ['.', '_styles']
 #pdf_compressed = False
 
 # A colon-separated list of folders to search for fonts. Example:
-# pdf_font_path = ['/usr/share/fonts', '/usr/share/texmf-dist/fonts/']
+pdf_font_path = [r'C:\Windows\Fonts']
 
 # Language to be used for hyphenation support
 #pdf_language = "en_US"

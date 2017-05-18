@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>Table Stim &#8212; Stimulus Program 1.1 documentation</title>
+    <title>Table Stim &#8212; pyStim 1.1 documentation</title>
     
     <link rel="stylesheet" href="_static/sphinxdoc.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
@@ -45,8 +45,8 @@
         <li class="right" >
           <a href="RandomlyMovingStim.html" title="Randomly Moving Stim"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">Stimulus Program 1.1 documentation</a> &#187;</li>
-          <li class="nav-item nav-item-1"><a href="StimProgram.html" accesskey="U">StimProgram module</a> &#187;</li> 
+        <li class="nav-item nav-item-0"><a href="index.html">pyStim 1.1 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="pyStim.html" accesskey="U">StimProgram module</a> &#187;</li> 
       </ul>
     </div>
       <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
@@ -85,9 +85,9 @@
   <div class="section" id="table-stim">
 <h1>Table Stim<a class="headerlink" href="#table-stim" title="Permalink to this headline">¶</a></h1>
 <dl class="class">
-<dt id="StimProgram.TableStim">
-<em class="property">class </em><code class="descclassname">StimProgram.</code><code class="descname">TableStim</code><span class="sig-paren">(</span><em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/StimProgram.html#TableStim"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#StimProgram.TableStim" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="MovingStim.html#StimProgram.MovingStim" title="StimProgram.MovingStim"><code class="xref py py-class docutils literal"><span class="pre">StimProgram.MovingStim</span></code></a></p>
+<dt id="pyStim.TableStim">
+<em class="property">class </em><code class="descclassname">pyStim.</code><code class="descname">TableStim</code><span class="sig-paren">(</span><em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyStim.html#TableStim"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyStim.TableStim" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="MovingStim.html#pyStim.MovingStim" title="pyStim.MovingStim"><code class="xref py py-class docutils literal"><span class="pre">pyStim.MovingStim</span></code></a></p>
 <p>Class where stim motion is determined by a table of radial coordinates.</p>
 <p>Table can be a text file with tab or space separated values and newlines
 between rows, or an Igor file in binary wave/packed experiment format.
@@ -110,8 +110,8 @@ movement speed (pix/sec), a duration (ms), and a direction in degrees.
 Optionally, direction can be replaced with &#8216;$&#8217; (dollar sign), and the
 direction will default to the global default (can also do use &#8216;-$&#8217;).</p>
 <dl class="method">
-<dt id="StimProgram.TableStim.draw_times">
-<code class="descname">draw_times</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/StimProgram.html#TableStim.draw_times"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#StimProgram.TableStim.draw_times" title="Permalink to this definition">¶</a></dt>
+<dt id="pyStim.TableStim.draw_times">
+<code class="descname">draw_times</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyStim.html#TableStim.draw_times"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyStim.TableStim.draw_times" title="Permalink to this definition">¶</a></dt>
 <dd><p>Determines during which frames stim should be drawn, based on desired
 delay and duration times. Overrides super method.</p>
 <table class="docutils field-list" frame="void" rules="none">
@@ -125,15 +125,15 @@ delay and duration times. Overrides super method.</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="StimProgram.TableStim.gen_pos">
-<code class="descname">gen_pos</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/StimProgram.html#TableStim.gen_pos"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#StimProgram.TableStim.gen_pos" title="Permalink to this definition">¶</a></dt>
+<dt id="pyStim.TableStim.gen_pos">
+<code class="descname">gen_pos</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyStim.html#TableStim.gen_pos"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyStim.TableStim.gen_pos" title="Permalink to this definition">¶</a></dt>
 <dd><p>Overrides super method. Calls gen_pos_array() and resets frame
 counter.</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="StimProgram.TableStim.gen_pos_array">
-<code class="descname">gen_pos_array</code><span class="sig-paren">(</span><em>*args</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/StimProgram.html#TableStim.gen_pos_array"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#StimProgram.TableStim.gen_pos_array" title="Permalink to this definition">¶</a></dt>
+<dt id="pyStim.TableStim.gen_pos_array">
+<code class="descname">gen_pos_array</code><span class="sig-paren">(</span><em>*args</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyStim.html#TableStim.gen_pos_array"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyStim.TableStim.gen_pos_array" title="Permalink to this definition">¶</a></dt>
 <dd><p>Creates 2 arrays for x, y coordinates of stims for each frame.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -178,8 +178,8 @@ having the igor module.</li>
         <li class="right" >
           <a href="RandomlyMovingStim.html" title="Randomly Moving Stim"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">Stimulus Program 1.1 documentation</a> &#187;</li>
-          <li class="nav-item nav-item-1"><a href="StimProgram.html" >StimProgram module</a> &#187;</li> 
+        <li class="nav-item nav-item-0"><a href="index.html">pyStim 1.1 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="pyStim.html" >StimProgram module</a> &#187;</li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">

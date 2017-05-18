@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>Install walkthrough &#8212; Stimulus Program 1.1 documentation</title>
+    <title>Install walkthrough &#8212; pyStim 1.1 documentation</title>
     
     <link rel="stylesheet" href="_static/sphinxdoc.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
@@ -45,7 +45,7 @@
         <li class="right" >
           <a href="detailedinstall.html" title="Detailed install instruction"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">Stimulus Program 1.1 documentation</a> &#187;</li> 
+        <li class="nav-item nav-item-0"><a href="index.html">pyStim 1.1 documentation</a> &#187;</li> 
       </ul>
     </div>
       <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
@@ -94,14 +94,14 @@
 <div class="section" id="setting-up-environment">
 <h2>Setting up environment<a class="headerlink" href="#setting-up-environment" title="Permalink to this headline">¶</a></h2>
 <p><a class="reference external" href="https://www.continuum.io/anaconda-overview">Anaconda</a> is a great package manager that will make setting up the
-to run Stimprogram much simpler. The following walkthrough uses Anaconda, and lines of code are to be entered in the
-terminal/command line.</p>
+environment to run pyStim much simpler. The following walkthrough uses Anaconda, and lines of code are to be
+entered in the terminal/command line.</p>
 <ol class="arabic">
 <li><p class="first">Install Anaconda (environment manager)</p>
 </li>
 <li><p class="first">Install <a class="reference external" href="https://git-scm.com/downloads">Git</a> (version control tool)</p>
 </li>
-<li><p class="first">Create the python environment for the Stimprogram:</p>
+<li><p class="first">Create the python environment for the pyStim:</p>
 <div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">conda</span> <span class="n">create</span> <span class="o">-</span><span class="n">y</span> <span class="o">--</span><span class="n">name</span> <span class="n">sp_env</span> <span class="n">python</span><span class="o">=</span><span class="mf">2.7</span>
 </pre></div>
 </div>
@@ -126,7 +126,7 @@ terminal/command line.</p>
 </pre></div>
 </div>
 </li>
-<li><p class="first">Navigate to where you want to save the stimprogram repository:</p>
+<li><p class="first">Navigate to where you want to save the pyStim repository:</p>
 <div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">cd</span> <span class="n">C</span><span class="p">:</span><span class="o">/</span><span class="n">your</span><span class="o">/</span><span class="n">location</span><span class="o">/</span><span class="n">of</span><span class="o">/</span><span class="n">choice</span>
 </pre></div>
 </div>
@@ -136,21 +136,25 @@ terminal/command line.</p>
 </pre></div>
 </div>
 </li>
-<li><p class="first">Navigate into the stimprogram folder:</p>
-<p>cd StimulusProgram</p>
+<li><p class="first">Navigate into the pyStim folder:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">cd</span> <span class="n">StimulusProgram</span>
+</pre></div>
+</div>
 </li>
 <li><p class="first">Navigate into the code folder:</p>
-<p>cd Stimprogram</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">cd</span> <span class="n">pyStim</span>
+</pre></div>
+</div>
 </li>
-</ol>
-<p>12. Make necessary changes to psychopy source in &#8220;Anaconda3envsstimprogramLibsite-packagespsychopyvisual&#8221;. Line
-297 needs to be changed to:</p>
+<li><p class="first">Make necessary changes to psychopy source in &#8220;\Anaconda3\envs\pyStim\Lib\site-packages\psychopy\visual&#8221;. Line 297 needs to be changed to:</p>
 <div class="highlight-default"><div class="highlight"><pre><span></span><span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">viewOri</span> <span class="o">!=</span> <span class="mf">0.</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">viewPos</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
 </pre></div>
 </div>
-<ol class="arabic" start="13">
-<li><p class="first">Run the stimprogram:</p>
-<p>python StimProgramGUI.py</p>
+</li>
+<li><p class="first">Run the pyStim:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">python</span> <span class="n">pyStimGUI</span><span class="o">.</span><span class="n">py</span>
+</pre></div>
+</div>
 </li>
 <li><p class="first">If want triggering, install the labjack driver from the labjack site. If want video saving, install ffmpeg.</p>
 </li>
@@ -179,7 +183,7 @@ terminal/command line.</p>
         <li class="right" >
           <a href="detailedinstall.html" title="Detailed install instruction"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">Stimulus Program 1.1 documentation</a> &#187;</li> 
+        <li class="nav-item nav-item-0"><a href="index.html">pyStim 1.1 documentation</a> &#187;</li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">

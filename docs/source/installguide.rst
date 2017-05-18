@@ -40,18 +40,18 @@ entered in the terminal/command line.
 
 10. Navigate into the pyStim folder::
 
-    cd StimulusProgram
+        cd StimulusProgram
 
 11. Navigate into the code folder::
 
-    cd pyStim
+        cd pyStim
 
 12. Make necessary changes to psychopy source in "\\Anaconda3\\envs\\pyStim\\Lib\\site-packages\\psychopy\\visual". Line 297 needs to be changed to::
 
-    if self.viewOri != 0. and self.viewPos is not None:
+        if self.viewOri != 0. and self.viewPos is not None:
 
 13. Run the pyStim::
 
-    python pyStimGUI.py
+        python pyStimGUI.py
 
 14. If want triggering, install the labjack driver from the labjack site. If want video saving, install ffmpeg.

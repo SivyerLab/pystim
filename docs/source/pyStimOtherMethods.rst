@@ -1,6 +1,6 @@
 Other functions
 ===============
 
-.. autofunction:: StimProgram.main
+.. autofunction:: pyStim.main
 
-.. autofunction:: StimProgram.log_stats
+.. autofunction:: pyStim.log_stats

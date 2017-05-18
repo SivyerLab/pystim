@@ -1,4 +1,4 @@
 License
 =======
 
-.. include:: C:\Users\Alex\PycharmProjects\StimulusProgram\LICENSE.rst
+.. include:: C:\Users\Alex\PycharmProjects\pyStim\LICENSE.rst

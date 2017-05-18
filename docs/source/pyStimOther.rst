@@ -1,23 +1,23 @@
 Other classes
 =============
 
-.. autoclass:: StimProgram.StimInfo
+.. autoclass:: pyStim.StimInfo
    :members:
    :undoc-members:
    :show-inheritance:
 
-.. autoclass:: StimProgram.GlobalDefaultsMeta
+.. autoclass:: pyStim.GlobalDefaultsMeta
    :members:
    :undoc-members:
    :show-inheritance:
    :special-members: __getitem__, __setitem__
 
-.. autoclass:: StimProgram.GlobalDefaults
+.. autoclass:: pyStim.GlobalDefaults
    :members:
    :undoc-members:
    :show-inheritance:
 
-.. autoclass:: StimProgram.MyWindow
+.. autoclass:: pyStim.MyWindow
    :members:
    :undoc-members:
    :show-inheritance:

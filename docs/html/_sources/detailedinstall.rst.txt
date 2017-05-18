@@ -4,10 +4,10 @@ Detailed install instruction
 Python and required dependencies
 --------------------------------
 
-StimProgram is built and tested on Python 2.7.10 on both Windows and OSX. It is
+pyStim is built and tested on Python 2.7.10 on both Windows and OSX. It is
 not tested on Python 3 due to incompatible dependencies.
 
-To run, StimProgram requires the following (found in ``requirements.txt``):
+To run, pyStim requires the following (found in ``requirements.txt``):
 
 - psychopy (see psychopy `documentation <http://www.psychopy.org/documentation.html>`_ for required `dependencies <http://www.psychopy.org/installation.html#essential-packages>`_).
 - `wxPython <http://www.wxpython.org/download.php)>`_

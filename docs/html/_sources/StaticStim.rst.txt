@@ -1,7 +1,7 @@
 Static Stim
 ===========
 
-.. autoclass:: StimProgram.StaticStim
+.. autoclass:: pyStim.StaticStim
    :members:
    :undoc-members:
    :show-inheritance:
