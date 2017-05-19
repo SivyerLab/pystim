@@ -53,3 +53,5 @@ Screen Shots
 ------------
 
 Screenshots are available in the /docs/screenshots/ folder.
+
+.. image:: ..\screenshots\screens.GIF

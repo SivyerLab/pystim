@@ -24,5 +24,7 @@ Instructions
 2. Connect the USB and HDMI inputs between the computer and LCR.
 3. Install the LCR 4500 GUI and run it. The GUI should find and connect to the LCR automatically.
 4. Set the resolution of the LCR to 912 x 1140, with the frequency set to 60 hz.
-5. In the GUI, change the LCR to pattern sequence mode, and set up a pattern sequence with the parameters from figure 1.
+5. In the GUI, change the LCR to pattern sequence mode, and set up a pattern sequence with the parameters from screenshot below.
 6. Press “Send”, then “Validate”, then “Play”. The LCR 4500 should now be unpacking each frame into three separate monochrome frames, running at 180 hz.
+
+.. image:: ..\screenshots\lcr4500_180_setup.PNG

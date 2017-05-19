@@ -91,67 +91,78 @@
             
   <div class="section" id="install-walkthrough">
 <h1>Install walkthrough<a class="headerlink" href="#install-walkthrough" title="Permalink to this headline">¶</a></h1>
+<p>The following instructions are for Windows machines. The instructions are mostly similar for OSX, except for the
+wxpython install. See the wxpython site for details.</p>
 <div class="section" id="setting-up-environment">
 <h2>Setting up environment<a class="headerlink" href="#setting-up-environment" title="Permalink to this headline">¶</a></h2>
-<p><a class="reference external" href="https://www.continuum.io/anaconda-overview">Anaconda</a> is a great package manager that will make setting up the
+<p>Anaconda is a great package manager that will make setting up the
 environment to run pyStim much simpler. The following walkthrough uses Anaconda, and lines of code are to be
-entered in the terminal/command line.</p>
+entered in the terminal/command line. Unless otherwise noted, leave options as defaults. To open command prompt, hit
+windows + r, and enter &#8220;cmd&#8221;. A quick of the command prompt: to paste, right click the mouse and paste instead of
+doing ctrl + v.</p>
 <ol class="arabic">
-<li><p class="first">Install Anaconda (environment manager)</p>
+<li><p class="first">Install <a class="reference external" href="https://www.continuum.io/anaconda-overview">Anaconda</a> (environment manager) for python 3.6 to your user folder</p>
 </li>
 <li><p class="first">Install <a class="reference external" href="https://git-scm.com/downloads">Git</a> (version control tool)</p>
 </li>
-<li><p class="first">Create the python environment for the pyStim:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">conda</span> <span class="n">create</span> <span class="o">-</span><span class="n">y</span> <span class="o">--</span><span class="n">name</span> <span class="n">sp_env</span> <span class="n">python</span><span class="o">=</span><span class="mf">2.7</span>
+<li><p class="first">Create the python environment for the pyStim.</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">conda</span> <span class="n">create</span> <span class="o">-</span><span class="n">y</span> <span class="o">-</span><span class="n">n</span> <span class="n">sp_env</span> <span class="n">python</span><span class="o">=</span><span class="mf">2.7</span>
 </pre></div>
 </div>
 </li>
-<li><p class="first">Activate the newly created environment:</p>
+<li><p class="first">Activate the newly created environment. You know you will have successfully created and entered the environment when it prefixes the current path.</p>
 <div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">activate</span> <span class="n">sp_env</span>
 </pre></div>
 </div>
 </li>
-<li><p class="first">Install the packages that are necessary and included with conda (may take a bit and look like nothing is happening as the end, just be patient):</p>
+</ol>
+<img alt="_images/cmd_4.PNG" src="_images/cmd_4.PNG" />
+<ol class="arabic" start="5">
+<li><p class="first">Install the packages that are necessary and included with conda (may take 4-5 min and look like nothing is happening as the end, just be patient while the cursor is blinking).</p>
 <div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">conda</span> <span class="n">install</span> <span class="o">-</span><span class="n">y</span> <span class="n">numpy</span> <span class="n">scipy</span> <span class="n">Pillow</span> <span class="n">matplotlib</span> <span class="n">pandas</span> <span class="n">pyopengl</span> <span class="n">lxml</span> <span class="n">openpyxl</span> <span class="n">configobj</span> <span class="n">sortedcontainers</span>
 </pre></div>
 </div>
 </li>
-<li><p class="first">Install the packages that are necessary and not included with conda:</p>
+<li><p class="first">Install the packages that are necessary and not included with conda. If you run into any problems here, simply close the command window, reopen it then reactivate the env.</p>
 <div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">pip</span> <span class="n">install</span> <span class="n">tabulate</span> <span class="n">igor</span> <span class="n">tqdm</span> <span class="n">moviepy</span> <span class="n">pyglet</span> <span class="n">psychopy</span> <span class="n">labjackpython</span>
 </pre></div>
 </div>
 </li>
-<li><p class="first">Install wxpython (gui interface):</p>
+<li><p class="first">Install wxpython (gui interface).</p>
 <div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">conda</span> <span class="n">install</span> <span class="o">-</span><span class="n">y</span> <span class="o">-</span><span class="n">c</span> <span class="n">anaconda</span> <span class="n">wxpython</span><span class="o">=</span><span class="mf">3.0</span><span class="o">.</span><span class="mf">0.0</span>
 </pre></div>
 </div>
 </li>
-<li><p class="first">Navigate to where you want to save the pyStim repository:</p>
+<li><p class="first">Navigate to where you want to save the pyStim repository.</p>
 <div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">cd</span> <span class="n">C</span><span class="p">:</span><span class="o">/</span><span class="n">your</span><span class="o">/</span><span class="n">location</span><span class="o">/</span><span class="n">of</span><span class="o">/</span><span class="n">choice</span>
 </pre></div>
 </div>
 </li>
-<li><p class="first">Download the repository (a new folder will be automatically created for it):</p>
+<li><p class="first">Download the repository (a new folder will be automatically created for it).</p>
 <div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">git</span> <span class="n">clone</span> <span class="n">https</span><span class="p">:</span><span class="o">//</span><span class="n">github</span><span class="o">.</span><span class="n">com</span><span class="o">/</span><span class="n">awctomlinson</span><span class="o">/</span><span class="n">StimulusProgram</span><span class="o">.</span><span class="n">git</span>
 </pre></div>
 </div>
 </li>
-<li><p class="first">Navigate into the pyStim folder:</p>
+<li><p class="first">Navigate into the pyStim folder.</p>
 <div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">cd</span> <span class="n">StimulusProgram</span>
 </pre></div>
 </div>
 </li>
-<li><p class="first">Navigate into the code folder:</p>
+<li><p class="first">Navigate into the code folder.</p>
 <div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">cd</span> <span class="n">pyStim</span>
 </pre></div>
 </div>
 </li>
-<li><p class="first">Make necessary changes to psychopy source in &#8220;\Anaconda3\envs\pyStim\Lib\site-packages\psychopy\visual&#8221;. Line 297 needs to be changed to:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">viewOri</span> <span class="o">!=</span> <span class="mf">0.</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">viewPos</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+<li><p class="first">Make necessary changes to psychopy source in &#8220;\Anaconda3\envs\sp_env\Lib\site-packages\psychopy\visual\window.py&#8221;. If you are having trouble finding the &#8220;Anaconda3&#8221; folder, it is usually either in &#8220;C:\ProgramData&#8221; or your user folder. You can open &#8220;window.py&#8221; in any basic text editor. Line 297 needs to be changed from:</p>
+<div class="highlight-python"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>297</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">viewOri</span> <span class="ow">is</span> <span class="ow">not</span> <span class="mf">0.</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">viewPos</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
 </pre></div>
-</div>
+</td></tr></table></div>
+<p>to the following:</p>
+<div class="highlight-python"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>297</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">viewOri</span> <span class="o">!=</span> <span class="mf">0.</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">viewPos</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+</pre></div>
+</td></tr></table></div>
 </li>
-<li><p class="first">Run the pyStim:</p>
+<li><p class="first">Run the pyStim GUI.</p>
 <div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">python</span> <span class="n">pyStimGUI</span><span class="o">.</span><span class="n">py</span>
 </pre></div>
 </div>
@@ -188,7 +199,7 @@ entered in the terminal/command line.</p>
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2016, Alexander Tomlinson.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.1.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.6.
     </div>
   </body>
 </html>
