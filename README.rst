@@ -24,7 +24,7 @@ documentation on Psychopy can be found on the psychopy `website <www.psychopy.or
 Quick Install
 -------------
 
-Stimulus Program is tested and works on both OSX and Windows. It does 
+pyStim is tested and works on both OSX and Windows. It does
 not work with Python 3, due to incompatible dependencies. Stimulus Program
 requires several libraries, along with their associated dependencies, to run.
 They are listed below:
@@ -46,7 +46,7 @@ See docs for detailed instructions. An install walkthrough is also available in 
 Licensing
 ---------
 
-Stimulus Program is licensed under GNU GPL v3.0. See :doc:`license <LICENSE>`
+pyStim is licensed under GNU GPL v3.0. See :doc:`license <LICENSE>`
 for license rights and limitations.
 
 Screen Shots

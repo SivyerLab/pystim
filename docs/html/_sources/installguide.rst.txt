@@ -15,7 +15,7 @@ doing ctrl + v.
 
 1. Install `Anaconda <https://www.continuum.io/anaconda-overview>`_ (environment manager) for python 3.6 to your user folder
 2. Install `Git <https://git-scm.com/downloads>`_ (version control tool)
-3. Create the python environment for the pyStim. ::
+3. Create the python environment for pyStim. ::
 
     conda create -y -n sp_env python=2.7
 
@@ -24,9 +24,9 @@ doing ctrl + v.
     activate sp_env
 
 .. image:: ..\screenshots\cmd_4.jpg
-    :width: 800 px
+    :width: 600 px
 
-5. Install the packages that are necessary and included with conda (may take 4-5 min and look like nothing is happening as the end, just be patient while the cursor is blinking). ::
+5. Install the packages that are necessary and included with conda (may take 4-5 min and look like nothing is happening at the end, just be patient while the cursor is blinking). ::
 
     conda install -y numpy scipy Pillow matplotlib pandas pyopengl lxml openpyxl configobj sortedcontainers
 
