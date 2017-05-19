@@ -18,15 +18,14 @@ import os
 # If extensions (or modules to document with autodoc) are in another directory,
 # add these directories to sys.path here. If the directory is relative to the
 # documentation root, use os.path.abspath to make it absolute, like shown here.
-home = os.path.expanduser('~')
 user = os.environ.get('USERNAME')
 
-sys.path.insert(0, os.path.join(home, r'\PycharmProjects\pyStim\pyStim'))
-
 if user == 'Alex':
-    sys.path.insert(0, os.path.abspath('C:\Users\Alex\Anaconda3\envs\stimprogram\Lib\site-packages'))
+    sys.path.insert(0, os.path.abspath(r'C:\Users\Alex\PycharmProjects\SivyerLab_pyStim\pyStim'))
+    sys.path.insert(0, os.path.abspath(r'C:\Users\Alex\Anaconda3\envs\stimprogram\Lib\site-packages'))
 elif user == 'bensivyer':
-    sys.path.insert(0, os.path.abspath('C:\Users\Abensivyer\Anaconda3\envs\sp_env\Lib\site-packages'))
+    sys.path.insert(0, os.path.abspath(r'C:\Users\bensivyer\PycharmProjects\pyStim\pyStim'))
+    sys.path.insert(0, os.path.abspath(r'C:\Users\bensivyer\Anaconda3\envs\sp_env\Lib\site-packages'))
 
 # -- General configuration ------------------------------------------------
 
