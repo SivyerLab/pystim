@@ -23,7 +23,8 @@ doing ctrl + v.
 
     activate sp_env
 
-.. image:: ..\screenshots\cmd_4.PNG
+.. image:: ..\screenshots\cmd_4.jpg
+    :width: 800 px
 
 5. Install the packages that are necessary and included with conda (may take 4-5 min and look like nothing is happening as the end, just be patient while the cursor is blinking). ::
 
