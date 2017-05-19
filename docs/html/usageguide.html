@@ -26,7 +26,7 @@
     <script type="text/javascript" src="_static/doctools.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="License" href="LICENSE.html" />
+    <link rel="next" title="LCR 4500 quick setup" href="lcr4500setup.html" />
     <link rel="prev" title="Install walkthrough" href="installguide.html" /> 
   </head>
   <body role="document">
@@ -37,7 +37,10 @@
           <a href="genindex.html" title="General Index"
              accesskey="I">index</a></li>
         <li class="right" >
-          <a href="LICENSE.html" title="License"
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="lcr4500setup.html" title="LCR 4500 quick setup"
              accesskey="N">next</a> |</li>
         <li class="right" >
           <a href="installguide.html" title="Install walkthrough"
@@ -56,6 +59,7 @@
 <li><a class="reference internal" href="#directory-panel">Directory panel</a></li>
 <li><a class="reference internal" href="#tables">Tables</a></li>
 <li><a class="reference internal" href="#triggering">Triggering</a></li>
+<li><a class="reference internal" href="#framepacking">Framepacking</a></li>
 </ul>
 </li>
 </ul>
@@ -64,8 +68,8 @@
   <p class="topless"><a href="installguide.html"
                         title="previous chapter">Install walkthrough</a></p>
   <h4>Next topic</h4>
-  <p class="topless"><a href="LICENSE.html"
-                        title="next chapter">License</a></p>
+  <p class="topless"><a href="lcr4500setup.html"
+                        title="next chapter">LCR 4500 quick setup</a></p>
   <div role="note" aria-label="source link">
     <h3>This Page</h3>
     <ul class="this-page-menu">
@@ -237,6 +241,21 @@ defaults panel, if trigger wait is not zero, then when the run button is
 pressed, a trigger will be sent, the trigger wait period will elapse, then
 stims will start as normal and trigger and begin their animations.</p>
 </div>
+<div class="section" id="framepacking">
+<h2>Framepacking<a class="headerlink" href="#framepacking" title="Permalink to this headline">¶</a></h2>
+<p>pyStim is able to produce stimuli running at fps in excess of 60 hz. This is
+accomplished through the use of framepacking with a projector capable of
+interpreting such data (ex: LCR 4500). Individual monochrome frames are packed
+into the 3 RGB planes of a single 24 bit frame, thus allowing speeds of 3 times
+the actual framerate. The following directions are for using pyStim with an LCR
+4500 using such framepacking.</p>
+<ol class="arabic simple">
+<li>In &#8220;options&#8221;, enable the &#8220;framepack&#8221; options</li>
+<li>Set the resolution to 912x1140 and select the proper output (ex: screen num 2)</li>
+<li>Set the framerate to the target value (i.e. if running at 3x 60 hz for 180 hz, set to 180 hz)</li>
+<li>If the window was already generated, it needs to be regenerated. Stims should now be packing.</li>
+</ol>
+</div>
 </div>
 
 
@@ -252,7 +271,10 @@ stims will start as normal and trigger and begin their animations.</p>
           <a href="genindex.html" title="General Index"
              >index</a></li>
         <li class="right" >
-          <a href="LICENSE.html" title="License"
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="lcr4500setup.html" title="LCR 4500 quick setup"
              >next</a> |</li>
         <li class="right" >
           <a href="installguide.html" title="Install walkthrough"
@@ -262,7 +284,7 @@ stims will start as normal and trigger and begin their animations.</p>
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2016, Alexander Tomlinson.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.1.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.6.
     </div>
   </body>
 </html>

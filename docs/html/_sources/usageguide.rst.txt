@@ -136,3 +136,18 @@ and last frames, and also at any other frames set to trigger. In the global
 defaults panel, if trigger wait is not zero, then when the run button is
 pressed, a trigger will be sent, the trigger wait period will elapse, then
 stims will start as normal and trigger and begin their animations.
+
+Framepacking
+------------
+
+pyStim is able to produce stimuli running at fps in excess of 60 hz. This is
+accomplished through the use of framepacking with a projector capable of
+interpreting such data (ex: LCR 4500). Individual monochrome frames are packed
+into the 3 RGB planes of a single 24 bit frame, thus allowing speeds of 3 times
+the actual framerate. The following directions are for using pyStim with an LCR
+4500 using such framepacking.
+
+1. In "options", enable the "framepack" options
+2. Set the resolution to 912x1140 and select the proper output (ex: screen num 2)
+3. Set the framerate to the target value (i.e. if running at 3x 60 hz for 180 hz, set to 180 hz)
+4. If the window was already generated, it needs to be regenerated. Stims should now be packing.
