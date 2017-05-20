@@ -1,36 +1,35 @@
 Install walkthrough
 ===================
 
-The following instructions are for Windows machines. The instructions are mostly similar for OSX, except for the
-wxpython install. See the wxpython site for details.
+The following install instructions are for Windows machines.
 
 Setting up environment
 ----------------------
 
-Anaconda is a great package manager that will make setting up the
-environment to run pyStim much simpler. The following walkthrough uses Anaconda, and lines of code are to be
-entered in the terminal/command line. Unless otherwise noted, leave options as defaults. To open command prompt, hit
-windows + r, and enter "cmd". A quick of the command prompt: to paste, right click the mouse and paste instead of
-doing ctrl + v.
+The following walkthrough uses Anaconda, a Python environment manager. Unless otherwise noted, leave options as defaults.
+
+Enter lines of code in the terminal/command line.  To open the terminal command prompt, hit
+windows + r, and enter "cmd". **NOTE** to paste text copied from this guide into the terminal
+command: use mouse right click and paste. ctrl + v will not work.
 
 1. Install `Anaconda <https://www.continuum.io/anaconda-overview>`_ (environment manager) for python 3.6 to your user folder
 2. Install `Git <https://git-scm.com/downloads>`_ (version control tool)
-3. Create the python environment for the pyStim. ::
+3. Create the python environment for the pyStim by entering the following text into the terminal command. ::
 
     conda create -y -n sp_env python=2.7
 
-4. Activate the newly created environment. You know you will have successfully created and entered the environment when it prefixes the current path. ::
+4. Activate the newly created environment by entering the following code: (**NOTE**You know you will have successfully created and entered the environment when it prefixes the current path). ::
 
     activate sp_env
 
 .. image:: ..\screenshots\cmd_4.jpg
     :width: 800 px
 
-5. Install the packages that are necessary and included with conda (may take 4-5 min and look like nothing is happening at the end, just be patient while the cursor is blinking). ::
+5. Install the packages included with conda: (**NOTE** this may take ~5 min, wait while the _ is blinking). ::
 
     conda install -y numpy scipy Pillow matplotlib pandas pyopengl lxml openpyxl configobj sortedcontainers
 
-6. Install the packages that are necessary and not included with conda. If you run into any problems here, simply close the command window, reopen it then reactivate the env. ::
+6. Install the packages not included with conda. If you run into any problems here, simply close the command window, reopen it then reactivate the env. ::
 
     pip install tabulate igor tqdm moviepy pyglet psychopy labjackpython
 
@@ -42,19 +41,28 @@ doing ctrl + v.
 
     cd C:/your/location/of/choice
 
-9. Download the repository (a new folder will be automatically created for it). ::
+For example C:/Users/bensivyer/pycharm projects
+
+To copy the path location: go to your desired folder in Windows and click to the right of the foldername in the search bar
+and simply paste this text after "cd" in the terminal command
+
+.. image:: ..\screenshots\Copy_directory_path.jpg
+    :width: 800 px
+.. image:: ..\screenshots\Terminal_command.jpg
+    :width: 800 px
+
+**NOTE** do not name this folder pyStim :)
+
+9. Download the repository (a new repositry folder will be automatically created). ::
 
     git clone https://github.com/awctomlinson/StimulusProgram.git
 
-10. Navigate into the pyStim folder. ::
+10. Navigate into the pyStim folder and code folder. ::
 
-        cd StimulusProgram
+        cd pyStim/pyStim
 
-11. Navigate into the code folder. ::
-
-        cd pyStim
-
-12. Make necessary changes to psychopy source in "\\Anaconda3\\envs\\sp_env\\Lib\\site-packages\\psychopy\\visual\\window.py". If you are having trouble finding the "Anaconda3" folder, it is usually either in "C:\\ProgramData" or your user folder. You can open "window.py" in any basic text editor. Line 297 needs to be changed from:
+11. Make necessary changes to psychopy source in "\\Anaconda3\\envs\\sp_env\\Lib\\site-packages\\psychopy\\visual\\window.py". If you are having trouble finding the "Anaconda3" folder,
+it is usually either in "C:\\ProgramData" or your user folder. You can open "window.py" in any basic text editor. Line 297 needs to be changed from:
 
     .. code-block:: python
       :lineno-start: 297
@@ -69,8 +77,10 @@ doing ctrl + v.
        if self.viewOri != 0. and self.viewPos is not None:
 
 
-13. Run the pyStim GUI. ::
+12. Run the pyStim GUI. ::
 
         python pyStimGUI.py
 
-14. If want triggering, install the labjack driver from the labjack site. If want video saving, install ffmpeg.
+13. If want to trigger an external device using a labjack install the labjack driver from the labjack site:`Labjack driver instructions <https://labjack.com/support/software/examples/ud/labjackpython>`_
+
+To use the video saving function (i.e. to make an example video for a talk), install ffmpeg: `ffmpeg <https://ffmpeg.org/>`_
