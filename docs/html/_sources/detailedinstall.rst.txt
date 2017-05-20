@@ -1,13 +1,13 @@
-Detailed install instruction
-============================
+Detailed install instructions
+=============================
 
 Python and required dependencies
 --------------------------------
 
-pyStim is built and tested on Python 2.7.10 on both Windows and OSX. It is
-not tested on Python 3 due to incompatible dependencies.
+pyStim is created and tested using Python 2.7.10 on both Windows and OSX. pyStim is
+not supported on Python 3 because of incompatible dependencies.
 
-To run, pyStim requires the following (found in ``requirements.txt``):
+pyStim requires the following dependencies(found in ``requirements.txt``):
 
 - psychopy (see psychopy `documentation <http://www.psychopy.org/documentation.html>`_ for required `dependencies <http://www.psychopy.org/installation.html#essential-packages>`_).
 - `wxPython <http://www.wxpython.org/download.php)>`_
@@ -29,7 +29,7 @@ All of the above can be installed through pip, except for ``wxPython``,
 ``ffmpeg``, and ``u3``. These need to be installed from their respective
 websites.
 
-On Windows machines, pip will sometimes fail to build some libraries. Compiled
+pip will occasionally fail to build some libraries on Windows machines. Compiled
 versions of these binaries can be found `here <http://www.lfd.uci.edu/~gohlke/pythonlibs/>`_.
 Or preferrably use a package manager like `Anaconda <https://www.continuum.io/anaconda-overview>`_.
 
@@ -38,7 +38,7 @@ Psychopy source changes
 -----------------------
 
 The following changes to the psychopy source code (version 1.84.2) are
-necessary to run the application. This has been fixed for subsequent
+required to run the application. This has been fixed for subsequent
 releases. Psychopy source can be found in the python site-packages folder.
 
 1. In order to allow simultaneous offsetting and scaling of the pyglet

@@ -19,7 +19,7 @@ command: use mouse right click and paste. ctrl + v will not work.
 
     conda create -y -n sp_env python=2.7
 
-4. Activate the newly created environment by entering the following code: (**NOTE**You know you will have successfully created and entered the environment when it prefixes the current path). ::
+4. Activate the newly created environment by entering the following code: (**NOTE** You know you will have successfully created and entered the environment when it prefixes the current path). ::
 
     activate sp_env
 

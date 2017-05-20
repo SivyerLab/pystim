@@ -87,7 +87,7 @@
 <dl class="class">
 <dt id="pyStim.StimDefaults">
 <em class="property">class </em><code class="descclassname">pyStim.</code><code class="descname">StimDefaults</code><span class="sig-paren">(</span><em>shape='circle'</em>, <em>fill_mode='uniform'</em>, <em>orientation=0</em>, <em>size=None</em>, <em>outer_diameter=75</em>, <em>inner_diameter=40</em>, <em>check_size=None</em>, <em>num_check=64</em>, <em>check_type='board'</em>, <em>delay=0</em>, <em>duration=0.5</em>, <em>location=None</em>, <em>timing='step'</em>, <em>intensity=1</em>, <em>alpha=1</em>, <em>color=None</em>, <em>color_mode='intensity'</em>, <em>image_channel='all'</em>, <em>fill_seed=1</em>, <em>move_seed=1</em>, <em>speed=10</em>, <em>num_dirs=4</em>, <em>start_dir=0</em>, <em>start_radius=300</em>, <em>travel_distance=50</em>, <em>ori_with_dir=False</em>, <em>intensity_dir='both'</em>, <em>sf=1</em>, <em>phase=None</em>, <em>phase_speed=None</em>, <em>contrast_channel='green'</em>, <em>movie_filename=None</em>, <em>movie_size=None</em>, <em>period_mod=1</em>, <em>image_size=None</em>, <em>image_filename=None</em>, <em>table_filename=None</em>, <em>jitter_filename=None</em>, <em>table_type='polar'</em>, <em>trigger=False</em>, <em>move_delay=0</em>, <em>num_jumps=5</em>, <em>shuffle=False</em>, <em>blend_jumps=False</em>, <em>force_stop=0</em>, <em>end_delay=0</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyStim.html#StimDefaults"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyStim.StimDefaults" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/2/library/functions.html#object" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">object</span></code></a></p>
 <p>Super class to hold parameter defaults. GUI passes dictionary of all
 parameters, whether used to make stim or not.</p>
 <table class="docutils field-list" frame="void" rules="none">
@@ -95,72 +95,72 @@ parameters, whether used to make stim or not.</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>shape</strong> (<em>string</em>) &#8211; Shape of the stim, &#8216;circle&#8217;, &#8216;rectangle, or &#8216;annulus&#8217;.</li>
-<li><strong>fill_mode</strong> (<em>string</em>) &#8211; How the stim is filled. Can be &#8216;uniform&#8217;,
+<li><strong>shape</strong> (<a class="reference external" href="https://docs.python.org/2/library/string.html#module-string" title="(in Python v2.7)"><em>string</em></a>) &#8211; Shape of the stim, &#8216;circle&#8217;, &#8216;rectangle, or &#8216;annulus&#8217;.</li>
+<li><strong>fill_mode</strong> (<a class="reference external" href="https://docs.python.org/2/library/string.html#module-string" title="(in Python v2.7)"><em>string</em></a>) &#8211; How the stim is filled. Can be &#8216;uniform&#8217;,
 &#8216;sine&#8217;, &#8216;square&#8217;, &#8216;concentric&#8217;, &#8216;checkerboard&#8217;, &#8216;random&#8217;, &#8216;image&#8217;,
 or &#8216;movie&#8217;.</li>
-<li><strong>orientation</strong> (<em>float</em>) &#8211; Orientation of the stim, in degrees.</li>
+<li><strong>orientation</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#float" title="(in Python v2.7)"><em>float</em></a>) &#8211; Orientation of the stim, in degrees.</li>
 <li><strong>size</strong> (<em>list</em>) &#8211; Size of the stim, as an x, y list.</li>
-<li><strong>outer_diameter</strong> (<em>float</em>) &#8211; Size of circle, or outer diameter of
+<li><strong>outer_diameter</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#float" title="(in Python v2.7)"><em>float</em></a>) &#8211; Size of circle, or outer diameter of
 annulus, in micrometers.</li>
-<li><strong>inner_diameter</strong> (<em>float</em>) &#8211; Inner diameter of annulus, in micrometers.</li>
+<li><strong>inner_diameter</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#float" title="(in Python v2.7)"><em>float</em></a>) &#8211; Inner diameter of annulus, in micrometers.</li>
 <li><strong>check_size</strong> (<em>list</em>) &#8211; Size of each check in a checkerboard or randomly
 filled board, as an x, y list in micrometers.</li>
-<li><strong>num_check</strong> (<em>int</em>) &#8211; The number of checks in each direction.</li>
-<li><strong>delay</strong> (<em>float</em>) &#8211; The time to between the first frame and the stim
+<li><strong>num_check</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#int" title="(in Python v2.7)"><em>int</em></a>) &#8211; The number of checks in each direction.</li>
+<li><strong>delay</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#float" title="(in Python v2.7)"><em>float</em></a>) &#8211; The time to between the first frame and the stim
 appearing on screen. Rounds up to the nearest frame.</li>
-<li><strong>end_delay</strong> (<em>float</em>) &#8211; The time to between the last frame stim
+<li><strong>end_delay</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#float" title="(in Python v2.7)"><em>float</em></a>) &#8211; The time to between the last frame stim
 appearing on screen and the end of frames flipping. Rounds up to the
 nearest frame.</li>
-<li><strong>duration</strong> (<em>float</em>) &#8211; The duration for which the stim will animated.
+<li><strong>duration</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#float" title="(in Python v2.7)"><em>float</em></a>) &#8211; The duration for which the stim will animated.
 Rounds up to the nearest frame.</li>
 <li><strong>location</strong> (<em>list</em>) &#8211; Coordinates of the stim, as an x, y list.</li>
-<li><strong>timing</strong> (<em>string</em>) &#8211; How the stim appears on screen over time. For
+<li><strong>timing</strong> (<a class="reference external" href="https://docs.python.org/2/library/string.html#module-string" title="(in Python v2.7)"><em>string</em></a>) &#8211; How the stim appears on screen over time. For
 &#8216;step&#8217;, the stim appears immediately. Other options include &#8216;sine&#8217;,
 &#8216;sawtooth&#8217;, &#8216;square&#8217;, and &#8216;linear&#8217;.</li>
-<li><strong>period_mod</strong> (<em>float</em>) &#8211; For cyclic timing modes, the number of cycles.</li>
-<li><strong>alpha</strong> (<em>float</em>) &#8211; The transparency of the of the stim, between 0 and 1.
+<li><strong>period_mod</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#float" title="(in Python v2.7)"><em>float</em></a>) &#8211; For cyclic timing modes, the number of cycles.</li>
+<li><strong>alpha</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#float" title="(in Python v2.7)"><em>float</em></a>) &#8211; The transparency of the of the stim, between 0 and 1.
 Does not apply to checkerboard or random fill stims, or images and movies.</li>
-<li><strong>color_mode</strong> (<em>string</em>) &#8211; The way in which the color of the stim is
+<li><strong>color_mode</strong> (<a class="reference external" href="https://docs.python.org/2/library/string.html#module-string" title="(in Python v2.7)"><em>string</em></a>) &#8211; The way in which the color of the stim is
 determined. Can be either &#8216;intensity&#8217;, or &#8216;rgb&#8217;.</li>
-<li><strong>contrast_channel</strong> (<em>string</em>) &#8211; The color channel in which color is
+<li><strong>contrast_channel</strong> (<a class="reference external" href="https://docs.python.org/2/library/string.html#module-string" title="(in Python v2.7)"><em>string</em></a>) &#8211; The color channel in which color is
 displayed in intensity mode. For the RGB color mode, contrast channel is
 only used if a fill other than uniform is specified.</li>
-<li><strong>intensity</strong> (<em>float</em>) &#8211; The color of the stim relative to background,
+<li><strong>intensity</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#float" title="(in Python v2.7)"><em>float</em></a>) &#8211; The color of the stim relative to background,
 between -1 and 1. For  fills, the color will fluctuate between high and
 low values of the  specified intensity relative to background, and thus
 background values on either extreme must use low intensities or risk
 hitting the color ceiling/floor of the monitor.</li>
 <li><strong>color</strong> (<em>list</em>) &#8211; RGB color values of the stim, as a list of 3 values
 between -1 and 1.</li>
-<li><strong>fill_seed</strong> (<em>float</em>) &#8211; The seed for the random number generator for
+<li><strong>fill_seed</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#float" title="(in Python v2.7)"><em>float</em></a>) &#8211; The seed for the random number generator for
 random fills.</li>
-<li><strong>move_seed</strong> (<em>float</em>) &#8211; The seed for the random number generator for
+<li><strong>move_seed</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#float" title="(in Python v2.7)"><em>float</em></a>) &#8211; The seed for the random number generator for
 random movement.</li>
-<li><strong>speed</strong> (<em>float</em>) &#8211; The speed of moving stims, in micrometers per second.</li>
-<li><strong>num_dirs</strong> (<em>int</em>) &#8211; The number of directions radially moving stims will
+<li><strong>speed</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#float" title="(in Python v2.7)"><em>float</em></a>) &#8211; The speed of moving stims, in micrometers per second.</li>
+<li><strong>num_dirs</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#int" title="(in Python v2.7)"><em>int</em></a>) &#8211; The number of directions radially moving stims will
 travel in.</li>
-<li><strong>start_dir</strong> (<em>float</em>) &#8211; The start direction for radially moving stims.</li>
-<li><strong>start_radius</strong> (<em>float</em>) &#8211; The start radius for radially moving stims.</li>
-<li><strong>move_delay</strong> (<em>float</em>) &#8211; The amount of wait time between each move
+<li><strong>start_dir</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#float" title="(in Python v2.7)"><em>float</em></a>) &#8211; The start direction for radially moving stims.</li>
+<li><strong>start_radius</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#float" title="(in Python v2.7)"><em>float</em></a>) &#8211; The start radius for radially moving stims.</li>
+<li><strong>move_delay</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#float" title="(in Python v2.7)"><em>float</em></a>) &#8211; The amount of wait time between each move
 direction.</li>
-<li><strong>travel_distance</strong> (<em>float</em>) &#8211; The distance that randomly moving stims
+<li><strong>travel_distance</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#float" title="(in Python v2.7)"><em>float</em></a>) &#8211; The distance that randomly moving stims
 will travel before choosing a new direction.</li>
-<li><strong>sf</strong> (<em>float</em>) &#8211; The spatial frequency of a stim texture.</li>
+<li><strong>sf</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#float" title="(in Python v2.7)"><em>float</em></a>) &#8211; The spatial frequency of a stim texture.</li>
 <li><strong>phase</strong> (<em>list</em>) &#8211; The offset of texture in the stim. Units are in
 cycles, so integer phases will result in no discernible change.</li>
-<li><strong>movie_filename</strong> (<em>string</em>) &#8211; File path of the movie to be displayed.</li>
+<li><strong>movie_filename</strong> (<a class="reference external" href="https://docs.python.org/2/library/string.html#module-string" title="(in Python v2.7)"><em>string</em></a>) &#8211; File path of the movie to be displayed.</li>
 <li><strong>movie_size</strong> (<em>list</em>) &#8211; Size of the movie, as an x, y list, in micrometers.
 Keep aspect ratio or movie will be distorted.</li>
-<li><strong>image_filename</strong> (<em>string</em>) &#8211; File path of the image to be displayed.</li>
+<li><strong>image_filename</strong> (<a class="reference external" href="https://docs.python.org/2/library/string.html#module-string" title="(in Python v2.7)"><em>string</em></a>) &#8211; File path of the image to be displayed.</li>
 <li><strong>image_size</strong> (<em>list</em>) &#8211; Size of the image, as an x, y list, in micrometers.
 Keep aspect ratio or movie will be distorted.</li>
-<li><strong>table_filename</strong> (<em>string</em>) &#8211; File path of the table to be used for
+<li><strong>table_filename</strong> (<a class="reference external" href="https://docs.python.org/2/library/string.html#module-string" title="(in Python v2.7)"><em>string</em></a>) &#8211; File path of the table to be used for
 coordinates.</li>
-<li><strong>trigger</strong> (<em>bool</em>) &#8211; Whether or not to send a trigger for the stim.</li>
-<li><strong>num_jumps</strong> (<em>int</em>) &#8211; </li>
-<li><strong>jump_delay</strong> (<em>float</em>) &#8211; </li>
-<li><strong>force_stop</strong> (<em>float</em>) &#8211; time at which stim should end, overrides all
+<li><strong>trigger</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#bool" title="(in Python v2.7)"><em>bool</em></a>) &#8211; Whether or not to send a trigger for the stim.</li>
+<li><strong>num_jumps</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#int" title="(in Python v2.7)"><em>int</em></a>) &#8211; </li>
+<li><strong>jump_delay</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#float" title="(in Python v2.7)"><em>float</em></a>) &#8211; </li>
+<li><strong>force_stop</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#float" title="(in Python v2.7)"><em>float</em></a>) &#8211; time at which stim should end, overrides all
 other timing. Useful for moving and table stims.</li>
 </ul>
 </td>
