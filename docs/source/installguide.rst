@@ -1,7 +1,8 @@
 Install walkthrough
 ===================
 
-The following install instructions are for Windows machines.
+The following instructions are for Windows machines. The instructions are mostly similar for OSX, except for the
+wxpython install. See the wxpython site for details.
 
 Setting up environment
 ----------------------
@@ -23,7 +24,7 @@ command: use mouse right click and paste. ctrl + v will not work.
     activate sp_env
 
 .. image:: ..\screenshots\cmd_4.jpg
-    :width: 800 px
+    :width: 600 px
 
 5. Install the packages included with conda: (**NOTE** this may take ~5 min, wait while the _ is blinking). ::
 
