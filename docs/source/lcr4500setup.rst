@@ -27,4 +27,4 @@ Instructions
 5. In the GUI, change the LCR to pattern sequence mode, and set up a pattern sequence with the parameters from screenshot below.
 6. Press “Send”, then “Validate”, then “Play”. The LCR 4500 should now be unpacking each frame into three separate monochrome frames, running at 180 hz.
 
-.. image:: ..\screenshots\lcr4500_180_setup.PNG
+.. image:: ../screenshots/lcr4500_180_setup.PNG

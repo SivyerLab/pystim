@@ -23,7 +23,7 @@ command: use mouse right click and paste. Ctrl + v will not work.
 
     activate sp_env
 
-.. image:: ..\screenshots\cmd_4.jpg
+.. image:: ../screenshots/cmd_4.jpg
     :width: 600 px
 
 5. Install the packages included with conda: (**NOTE** this may take ~5 min, wait while the underscore is blinking). ::
@@ -47,9 +47,9 @@ For example C:/Users/bensivyer/PycharmProjects
 To copy the path location: go to your desired folder in Windows and click to the right of the foldername in the search bar
 and simply paste this text after "cd" in the terminal command
 
-.. image:: ..\screenshots\Copy_directory_path.jpg
+.. image:: ../screenshots/Copy_directory_path.jpg
     :width: 800 px
-.. image:: ..\screenshots\Terminal_command.jpg
+.. image:: ../screenshots/Terminal_command.jpg
     :width: 800 px
 
 9. Download the repository (a new repositry folder will be automatically created). ::
