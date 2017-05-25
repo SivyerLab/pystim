@@ -21,13 +21,13 @@ import os
 user = os.environ.get('USERNAME')
 
 if user == 'Alex':
-    sys.path.insert(0, os.path.abspath(r'C:\Users\Alex\PycharmProjects\SivyerLab_pyStim\pyStim'))
+    # sys.path.insert(0, os.path.abspath(r'C:\Users\Alex\PycharmProjects\SivyerLab_pyStim\pyStim'))
     sys.path.insert(0, os.path.abspath(r'C:\Users\Alex\Anaconda3\envs\stimprogram\Lib\site-packages'))
 elif user == 'bensivyer':
     sys.path.insert(0, os.path.abspath(r'C:\Users\bensivyer\PycharmProjects\pyStim\pyStim'))
     sys.path.insert(0, os.path.abspath(r'C:\Users\bensivyer\Anaconda3\envs\sp_env\Lib\site-packages'))
 else:
-    sys.path.insert(0, os.path.abspath(r'..\..\pyStim'))
+    sys.path.insert(0, os.path.abspath(r'..\..\pyStim\\'))
 
 # -- General configuration ------------------------------------------------
 
