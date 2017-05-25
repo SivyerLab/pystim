@@ -15,7 +15,6 @@ install:
 
   - conda create -y -n sp_env python=2.7
   - source activate sp_env
-  - activate sp_env
   - conda install -y numpy scipy Pillow matplotlib pandas pyopengl lxml openpyxl configobj sortedcontainers
   - pip install tabulate igor tqdm moviepy pyglet psychopy labjackpython
   - conda install -y -c anaconda wxpython=3.0.0.0
