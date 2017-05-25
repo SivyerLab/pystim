@@ -4,7 +4,7 @@ branches:
     - master
 python:
   - 2.7
-install: true
+install: pip install sphinx
 script:
   - cd docs
   - sphinx-build -W -b dummy source build/html
