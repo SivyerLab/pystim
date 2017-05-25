@@ -26,4 +26,4 @@ before_script:
 
 script:
   - cd docs
-  - sphinx-build -W -b dummy source build/html
+  - sphinx-build -W -b html source build/html
