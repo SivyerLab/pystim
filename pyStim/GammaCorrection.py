@@ -225,7 +225,7 @@ def make_correction(measured):
     Calculates a conversion spline of RGB values to corrected values to
     linearize screen luminosity.
 
-    :param list measured: Recorded values of screen luminosity. Passed by
+    :param measured: Recorded values of screen luminosity. Passed by
      gammaCorrect, pulled out of text file.
     :return: Tuple of spline, slope, and intercept
     """
@@ -350,7 +350,7 @@ class GammaValues(object):
         Calculates adjusted color value. Allows getting corrected values by
         making calls to instance.
 
-        :param list color: List of RGB values, scaled from -1 to 1, or color
+        :param color: List of RGB values, scaled from -1 to 1, or color
          from a single channel.
         :param int channel: If color is passed as a single number, channel is
          the color channel.

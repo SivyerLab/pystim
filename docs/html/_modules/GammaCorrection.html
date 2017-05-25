@@ -289,7 +289,7 @@
 <span class="sd">    Calculates a conversion spline of RGB values to corrected values to</span>
 <span class="sd">    linearize screen luminosity.</span>
 
-<span class="sd">    :param list measured: Recorded values of screen luminosity. Passed by</span>
+<span class="sd">    :param measured: Recorded values of screen luminosity. Passed by</span>
 <span class="sd">     gammaCorrect, pulled out of text file.</span>
 <span class="sd">    :return: Tuple of spline, slope, and intercept</span>
 <span class="sd">    &quot;&quot;&quot;</span>
@@ -414,7 +414,7 @@
 <span class="sd">        Calculates adjusted color value. Allows getting corrected values by</span>
 <span class="sd">        making calls to instance.</span>
 
-<span class="sd">        :param list color: List of RGB values, scaled from -1 to 1, or color</span>
+<span class="sd">        :param color: List of RGB values, scaled from -1 to 1, or color</span>
 <span class="sd">         from a single channel.</span>
 <span class="sd">        :param int channel: If color is passed as a single number, channel is</span>
 <span class="sd">         the color channel.</span>

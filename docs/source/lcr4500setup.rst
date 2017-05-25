@@ -16,7 +16,7 @@ Requirements
     * Male mini HDMI to male HDMI
 * Computer with sufficient CPU/GPU specs
 * LCR 4500 GUI (available from the LCR 4500 page above)
-* Stimulus software (`recommended <https://github.com/awctomlinson/StimulusProgram>`_)
+* Stimulus software (`pyStim <https://github.com/SivyerLab/pyStim>`_)
 
 Instructions
 ------------

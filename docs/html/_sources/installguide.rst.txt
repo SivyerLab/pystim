@@ -9,9 +9,9 @@ Setting up environment
 
 The following walkthrough uses Anaconda, a Python environment manager. Unless otherwise noted, leave options as defaults.
 
-Enter lines of code in the terminal/command line.  To open the terminal command prompt, hit
+Enter lines of code in the terminal/command line. To open the terminal command prompt, hit
 windows + r, and enter "cmd". **NOTE** to paste text copied from this guide into the terminal
-command: use mouse right click and paste. ctrl + v will not work.
+command: use mouse right click and paste. Ctrl + v will not work.
 
 1. Install `Anaconda <https://www.continuum.io/anaconda-overview>`_ (environment manager) for python 3.6 to your user folder
 2. Install `Git <https://git-scm.com/downloads>`_ (version control tool)
@@ -26,7 +26,7 @@ command: use mouse right click and paste. ctrl + v will not work.
 .. image:: ..\screenshots\cmd_4.jpg
     :width: 600 px
 
-5. Install the packages included with conda: (**NOTE** this may take ~5 min, wait while the _ is blinking). ::
+5. Install the packages included with conda: (**NOTE** this may take ~5 min, wait while the underscore is blinking). ::
 
     conda install -y numpy scipy Pillow matplotlib pandas pyopengl lxml openpyxl configobj sortedcontainers
 
@@ -42,7 +42,7 @@ command: use mouse right click and paste. ctrl + v will not work.
 
     cd C:/your/location/of/choice
 
-For example C:/Users/bensivyer/pycharm projects
+For example C:/Users/bensivyer/PycharmProjects
 
 To copy the path location: go to your desired folder in Windows and click to the right of the foldername in the search bar
 and simply paste this text after "cd" in the terminal command
@@ -51,8 +51,6 @@ and simply paste this text after "cd" in the terminal command
     :width: 800 px
 .. image:: ..\screenshots\Terminal_command.jpg
     :width: 800 px
-
-**NOTE** do not name this folder pyStim :)
 
 9. Download the repository (a new repositry folder will be automatically created). ::
 
@@ -82,6 +80,6 @@ it is usually either in "C:\\ProgramData" or your user folder. You can open "win
 
         python pyStimGUI.py
 
-13. If want to trigger an external device using a labjack install the labjack driver from the labjack site:`Labjack driver instructions <https://labjack.com/support/software/examples/ud/labjackpython>`_
+13. If want to trigger an external device using a labjack install the labjack driver from the labjack site: `Labjack driver instructions <https://labjack.com/support/software/examples/ud/labjackpython>`_
 
-To use the video saving function (i.e. to make an example video for a talk), install ffmpeg: `ffmpeg <https://ffmpeg.org/>`_
+To use the video saving function (i.e. to make an example video for a talk), install `ffmpeg <https://ffmpeg.org/>`_.

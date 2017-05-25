@@ -346,7 +346,7 @@ class MyWindow(object):
         """Static method to live update the background of the window.
         TODO: implement classproperty to make setter
 
-        :param color: RGB list used to change global defaults.
+        :param list color: RGB list used to change global defaults.
         """
         try:
             if MyWindow.win is not None:
@@ -732,7 +732,7 @@ class StimDefaults(object):
 
 class StaticStim(StimDefaults):
     """Class for generic non moving stims. Super class for other stim
-    types. Stim object instantiated in :py:func:`.make_stim`, and drawn with
+    types. Stim object instantiated in make_stim, and drawn with
     calls to animate().
     """
     def __init__(self, **kwargs):
@@ -1091,7 +1091,7 @@ class StaticStim(StimDefaults):
 
         TODO: precompute values
 
-        :param frame: current frame number
+        :param int frame: current frame number
         :return: list of rgb values as floats
         """
         stim_frame_num = frame - self.start_stim
@@ -1173,7 +1173,7 @@ class StaticStim(StimDefaults):
     def set_rgb(self, rgb):
         """Color setter.
 
-        :param rgb: tuple or list of rgb values
+        :param tuple rgb: tuple or list of rgb values
         """
         self.stim.setColor(rgb)
 
@@ -1234,7 +1234,7 @@ class MovingStim(StaticStim):
         """Method for animating moving stims. Moves stims appropriately,
         then makes call to animate of super.
 
-        :param frame: current frame number
+        :param int frame: current frame number
         """
         # check if within animation range
         if self.start_stim <= frame < self.end_stim:
@@ -1413,8 +1413,8 @@ class RandomlyMovingStim(MovingStim):
         return self.end_stim + self.end_delay
 
     def gen_pos(self):
-        """Makes calls to :py:func:`gen_start_pos` and
-        :py:func:`gen_pos_array` with proper variables to get new array of
+        """Makes calls to gen_start_pos` and
+        gen_pos_array with proper variables to get new array of
         position coordinates. Overrides super.
         """
         # update current position
@@ -1544,9 +1544,9 @@ class TableStim(MovingStim):
         """Creates 2 arrays for x, y coordinates of stims for each frame.
 
         :return: the x, y coordinates of the stim for every frame as 2 arrays
-        :raises ImportError: if attempts to load from an Igor file without
+        :raises: ImportError: if attempts to load from an Igor file without
          having the igor module.
-        :raises IOError: raised if file contents not properly formatted.
+        :raises: IOError: raised if file contents not properly formatted.
         """
         table = self.table_filename
         radii = None
@@ -1815,7 +1815,7 @@ class ImageJumpStim(StaticStim):
         """Method for animating moving stims. Pulls pixels drawn,
         then makes call to animate of super.
 
-        :param frame: current frame number
+        :param int frame: current frame number
         """
         # check if within animation range
         # clock = core.Clock()
@@ -2007,7 +2007,7 @@ def board_texture_class(bases, **kwargs):
         def gen_timing(self, frame):
             """ElementArrayStim does not support assigning alpha values.
 
-            :param frame: current frame number
+            :param int frame: current frame number
             """
             if len(self.low.shape) == 0:
                 self.colors[:, self.contrast_channel] = numpy.random.uniform(
@@ -2083,7 +2083,7 @@ def movie_stim_class(bases, **kwargs):
             should be drawn. Back buffer is brought to front with calls to
             flip() on the window.
 
-            :param frame: current frame number
+            :param int frame: current frame number
             """
             # check if within animation range
             if self.end_stim == (frame + 1):
@@ -2362,8 +2362,8 @@ def main(stim_list, verbose=True):
     """Function to create stims and run program. Creates instances of stim
     types, and makes necessary calls to animate stims and flip window.
 
-    :param stim_list: list of StimInfo classes.
-    :param verbose: whether or not to print stim info to console.
+    :param list stim_list: list of StimInfo classes.
+    :param boolean verbose: whether or not to print stim info to console.
     :return fps, count_elapsed_time, time_stamp: return stats about last run.
      If error was raised, fps is the error string, and count_elapsed_time is
      'error'.
