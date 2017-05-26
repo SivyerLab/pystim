@@ -16,7 +16,7 @@ install:
   - conda create -y -n sp_env python=2.7
   - source activate sp_env
   - conda install -y numpy scipy Pillow matplotlib pandas pyopengl lxml openpyxl configobj sortedcontainers sphinx
-  - pip install tabulate igor tqdm moviepy pyglet psychopy labjackpython
+  - pip install tabulate igor tqdm moviepy pyglet psychopy labjackpython rst2pdf
   - conda install -y -c anaconda wxpython=3.0.0.0
 
 before_script:
@@ -27,6 +27,7 @@ before_script:
 script:
   - cd docs
   - sphinx-build -W -b html source build/html
+  - sphinx-build -W -b pdf source build/pdf
 
 deploy:
   provider: pages
