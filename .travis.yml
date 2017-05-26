@@ -27,7 +27,7 @@ before_script:
 script:
   - cd docs
   - sphinx-build -W -b html source build/html
-  - sphinx-build -W -b pdf source build/pdf
+#  - sphinx-build -W -b pdf source build/pdf
 
 deploy:
   provider: pages
