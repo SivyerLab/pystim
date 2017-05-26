@@ -27,3 +27,11 @@ before_script:
 script:
   - cd docs
   - sphinx-build -W -b html source build/html
+
+deploy:
+  provider: pages
+  skip_cleanup: true
+  github_token: $travis_sphinx_ghpages
+  local_dir: ./build/html
+  on:
+    branch: master

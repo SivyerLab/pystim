@@ -9,7 +9,7 @@ Setting up environment
 
 The following walkthrough uses Anaconda, a Python environment manager. Unless otherwise noted, leave options as defaults.
 
-Enter lines of code in the terminal/command line. To open the terminal command prompt, hit
+Enter lines of code in the terminal/command line. To open the terminal/command prompt, hit
 windows + r, and enter "cmd". **NOTE** to paste text copied from this guide into the terminal
 command: use mouse right click and paste. Ctrl + v will not work.
 
