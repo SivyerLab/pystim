@@ -2,10 +2,12 @@ What is it?
 -----------
 
 pyStim uses the `Psychopy <www.psychopy.org>`_ library to create
-visual stimuli for use in a range of visual neuroscience experiments. It
-includes a GUI for ease of use. The program is capable of running at a
-minimum of 60 fps for moderately sized stimuli and triggering recording devices
-(using a LabJack U3).
+visual stimuli for use in our visual neuroscience experiments. It
+includes a graphic user interface and is capable of running at a
+minimum of 60 frames/sec and with the Texas Instruments LightCrafter
+4500 DLP is capable of running in excess of 180Hz. pyStim is designed
+to communicate with exterinal I/O devices (currently Labjack U3), which
+we use to trigger the aquisition of recording amplifiers. 
 
 Latest Version
 --------------
