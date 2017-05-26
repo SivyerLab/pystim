@@ -41,7 +41,7 @@ extensions = [
     'sphinx.ext.intersphinx',
     # 'sphinx.ext.mathjax',
     'sphinx.ext.viewcode',
-    # 'rst2pdf.pdfbuilder'
+    'rst2pdf.pdfbuilder'
 ]
 
 # Add any paths that contain templates here, relative to this directory.
@@ -334,7 +334,7 @@ pdf_style_path = ['.', '_styles']
 #pdf_compressed = False
 
 # A colon-separated list of folders to search for fonts. Example:
-pdf_font_path = [r'C:\Windows\Fonts']
+# pdf_font_path = [r'C:\Windows\Fonts']
 
 # Language to be used for hyphenation support
 #pdf_language = "en_US"
