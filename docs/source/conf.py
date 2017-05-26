@@ -357,7 +357,7 @@ pdf_style_path = ['.', '_styles']
 #pdf_inline_footnotes = True
 
 # verbosity level. 0 1 or 2
-pdf_verbosity = 2
+pdf_verbosity = 1
 
 # If false, no index is generated.
 pdf_use_index = False
