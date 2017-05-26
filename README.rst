@@ -1,7 +1,7 @@
 What is it?
 -----------
 
-Stimulus Program uses the `Psychopy <www.psychopy.org>`_ library to create
+pyStim uses the `Psychopy <www.psychopy.org>`_ library to create
 visual stimuli for use in a range of visual neuroscience experiments. It
 includes a GUI for ease of use. The program is capable of running at a
 minimum of 60 fps for moderately sized stimuli and triggering recording devices
@@ -18,14 +18,14 @@ Documentation
 -------------
 
 Documentation is included in HTML format in the docs/html/ directory. A
-version is available on github pages `here <http://sivyerlab.github.io/pystim/>`_. Further
+version is available on github pages `here <https://sivyerlab.github.io/pyStim/>`_. Further
 documentation on Psychopy can be found on the psychopy `website <www.psychopy.org>`_.
 
 Quick Install
 -------------
 
 pyStim is tested and works on both OSX and Windows. It does
-not work with Python 3, due to incompatible dependencies. Stimulus Program
+not work with Python 3, due to incompatible dependencies. pyStim
 requires several libraries, along with their associated dependencies, to run.
 They are listed below:
 
