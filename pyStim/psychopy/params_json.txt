@@ -593,7 +593,8 @@
             "label": "screen number", 
             "choices": [
                 "1", 
-                "2"
+                "2",
+                "3"
             ], 
             "default": 2, 
             "is_child": false
