@@ -1825,7 +1825,10 @@ class MyMenuBar(wx.MenuBar):
         self.options_log = options_menu.Append(wx.ID_ANY, 'log',
                                                'Save runs to log file',
                                                kind=wx.ITEM_CHECK)
-        self.options_log.Toggle()  # default to True
+
+        if self.frame.parameters.get_param_value('global', 'log'):
+            self.options_log.Toggle()  # default to True
+
         self.options_capture = options_menu.Append(wx.ID_ANY, 'capture',
                                                    'Capture run and create '
                                                    'video',
@@ -1836,9 +1839,13 @@ class MyMenuBar(wx.MenuBar):
         self.options_override = options_menu.Append(wx.ID_ANY, 'global override',
                                                     'Override parameters',
                                                     kind=wx.ITEM_CHECK)
+
         self.options_framepack = options_menu.Append(wx.ID_ANY, 'framepack',
                                                     'Split RGB frames into monochrome triplets',
                                                     kind=wx.ITEM_CHECK)
+
+        if self.frame.parameters.get_param_value('global', 'framepack'):
+            self.options_framepack.Toggle()  # default to True
 
         # options submenu
         options_tools = wx.Menu()
