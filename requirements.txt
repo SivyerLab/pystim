@@ -15,6 +15,7 @@ PsychoPy  # along with it's dependencies since pip won't install them
 # LabJackPython (needs manual install)
 tabulate
 igor
+pyusb  # to connect to LCR4500
 
 ## needs to be installed manually (or with conda):
 # wxpython
@@ -35,7 +36,7 @@ igor
 # install conda packages:
 # $ conda install -y numpy scipy Pillow matplotlib pandas pyopengl lxml openpyxl configobj sortedcontainers
 # install pip packages:
-# $ pip install tabulate igor tqdm moviepy pyglet psychopy
+# $ pip install tabulate igor tqdm moviepy pyglet psychopy pyusb
 # install wxpython:
 # conda install -c anaconda wxpython=3.0.0.0
 # download repository and navigate to where pyStimGUI.py is located
