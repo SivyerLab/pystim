@@ -41,16 +41,17 @@ Instructions for API control
 
 .. image:: ../screenshots/zadig_libusb.PNG
 
-7. You can now use the "Options/lcr 4500" commands from the menu bar.
-
-Whichever frequency you select, the video card needs to be set to 1/3 that frequency for the LCR4500. We have attached the necessary parameters for some of the higher frequencies.
+7. You can now use the "Options/lcr 4500" commands from the menu bar. Whichever frequency you select, the video card needs to be set to 1/3 that frequency for the LCR4500. We have attached the necessary parameters for some of the higher frequencies.
 
 .. image:: ../screenshots/lcr4500_commands.PNG
 
-**NOTE**: if toggling between "video_mode" and a pattern mode, due to a bug you will need to set the pattern mode twice. Going between pattern modes does not require this.
+**NOTE**: if toggling between "video mode" and a pattern mode, due to a bug you will need to set the pattern mode twice. Going between pattern modes does not require this.
 
 If you wish to return to using the GUI, this can be done by uninstalling the libusb driver through (in Windows) device manager. Be sure to select the option to "Delete the driver software".
 
+
+Custom resolution settings
+--------------------------
 
 .. image:: ../screenshots/120hz_settings.PNG
 
