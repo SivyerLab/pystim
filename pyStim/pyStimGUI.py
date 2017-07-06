@@ -228,6 +228,9 @@ class Parameters(object):
         self.motion_param = params['motion_param']
         self.global_default_param = params['global_default_param']
 
+        # add in gamma corrections
+        self.global_default_param['gamma_correction']['choices'] += self.get_gammas()
+
 
 class TextCtrlTag(wx.TextCtrl):
     """

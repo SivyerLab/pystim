@@ -604,9 +604,9 @@
             "type": "choice", 
             "label": "gamma correct",
             "choices": [
-                "None"
+                "default"
             ], 
-            "default": "None",
+            "default": "default",
             "is_child": false
         },
 
