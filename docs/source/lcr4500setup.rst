@@ -45,7 +45,7 @@ Instructions for API control
 
 .. image:: ../screenshots/lcr4500_commands.PNG
 
-**NOTE**: if toggling between "video mode" and a pattern mode, due to a bug you will need to set the pattern mode twice. Going between pattern modes does not require this.
+**NOTE**: In some cases, if toggling between "video mode" and a pattern mode, due to a bug you will need to set the pattern mode twice. Going between pattern modes does not require this. Be sure to power up the device if it is powered down.
 
 If you wish to return to using the GUI, this can be done by uninstalling the libusb driver through (in Windows) device manager. Be sure to select the option to "Delete the driver software".
 

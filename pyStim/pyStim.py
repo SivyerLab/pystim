@@ -25,7 +25,6 @@ import subprocess
 import traceback
 import cPickle
 import numpy
-import array
 import copy
 import sys
 import os
