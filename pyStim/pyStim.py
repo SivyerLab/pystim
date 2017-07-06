@@ -8,10 +8,14 @@ Stuck on python 2.7 because of u3 (labjackpython) dependency
 # Distributed under the terms of the GNU General Public License (GPL).
 
 from GammaCorrection import GammaValues  # unused, but necessary for pickling
+import cPickle
+
 from psychopy.visual.windowframepack import ProjectorFramePacker
-from psychopy.tools.typetools import uint8_float, float_uint8
 from psychopy.tools.coordinatetools import pol2cart
+from psychopy.tools.typetools import uint8_float, float_uint8
+# from psychopy.visual import globalVars
 from psychopy import visual, core, event, filters
+
 from time import strftime, localtime
 from tqdm import tqdm, trange
 from random import Random
@@ -19,20 +23,18 @@ from PIL import Image
 from math import ceil
 
 import scipy, scipy.signal
+import numpy
+
 import sortedcontainers
 import ConfigParser
 import subprocess
 import traceback
-import cPickle
-import numpy
 import copy
 import sys
 import os
 
-# mirror window test
 import pyglet
 GL = pyglet.gl
-from psychopy.visual import globalVars
 
 global has_igor
 try:
@@ -833,7 +835,7 @@ class StaticStim(StimDefaults):
 
             if self.small_stim is not None:
                 MyWindow.win.winHandle.switch_to()
-                globalVars.currWindow = MyWindow.win
+                visual.globalVars.currWindow = MyWindow.win
                 GL.glBindFramebufferEXT(GL.GL_FRAMEBUFFER_EXT, MyWindow.win.frameBuffer)
 
             # draw to back buffer
@@ -841,7 +843,7 @@ class StaticStim(StimDefaults):
 
             if self.small_stim is not None:
                 MyWindow.small_win.winHandle.switch_to()
-                globalVars.currWindow = MyWindow.small_win
+                visual.globalVars.currWindow = MyWindow.small_win
                 GL.glBindFramebufferEXT(GL.GL_FRAMEBUFFER_EXT, MyWindow.small_win.frameBuffer)
                 self.small_stim.draw(MyWindow.small_win)
 
@@ -2508,7 +2510,7 @@ def main(stim_list, verbose=True):
 
         if MyWindow.small_win is not None:
             MyWindow.win.winHandle.switch_to()
-            globalVars.currWindow = MyWindow.win
+            visual.globalVars.currWindow = MyWindow.win
             GL.glBindFramebufferEXT(GL.GL_FRAMEBUFFER_EXT, MyWindow.win.frameBuffer)
 
         MyWindow.win.clearBuffer()
