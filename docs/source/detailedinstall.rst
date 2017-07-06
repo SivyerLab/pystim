@@ -24,7 +24,7 @@ Optional libraries:
 - igor (for parsing igor tables)
 - `u3 <https://labjack.com/support/software/examples/ud/labjackpython>`_ (for triggering from LabJack)
 - `ffmpeg <https://www.ffmpeg.org/>`_ (for making movies from captured frames)
-- pyusb (for lcr4500 support)
+- pycrafter4500 (for lcr4500 support)
 
 All of the above can be installed through pip, except for ``wxPython``,
 ``ffmpeg``, and ``u3``. These need to be installed from their respective

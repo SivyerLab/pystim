@@ -22,16 +22,14 @@ import subprocess
 import traceback
 import cPickle
 import json
-import sys
 import os
 
 import wx.lib.agw.multidirdialog as mdd
 import wx, wx.grid
 
-sys.path.insert(1, 'C:\Users\Alex\PycharmProjects')
 global has_lcr
 try:
-    from pycrafter4500 import lcr4500
+    import pycrafter4500
     has_lcr = True
 except ImportError:
     has_lcr = False
@@ -1271,7 +1269,9 @@ class DirPanel(wx.Panel):
         self.browser = wx.FileCtrl(self,
                                    wildCard='*.txt',
                                    size=(200, -1),
-                                   defaultDirectory=default_dir)
+                                   defaultDirectory=default_dir,
+                                   # style=wx.FC_NOSHOWHIDDEN
+                                   )
 
         # add browser to panel
         panel_sizer.Add(self.browser,
@@ -2277,7 +2277,7 @@ class MyMenuBar(wx.MenuBar):
 
         :param event: required param
         """
-        lcr4500.power_down()
+        pycrafter4500.power_down()
 
     def on_options_lcr4500_video_on(self, event):
         """
@@ -2285,7 +2285,7 @@ class MyMenuBar(wx.MenuBar):
 
         :param event: required param
         """
-        lcr4500.power_up()
+        pycrafter4500.power_up()
 
     def on_options_lcr4500_video_mode(self, event):
         """
@@ -2293,7 +2293,7 @@ class MyMenuBar(wx.MenuBar):
 
         :param event: required param
         """
-        lcr4500.video_mode()
+        pycrafter4500.video_mode()
 
     def on_options_lcr4500_pattern_mode(self, event, **kwargs):
         """
@@ -2311,9 +2311,9 @@ class MyMenuBar(wx.MenuBar):
 
 
         if kwargs:
-            lcr4500.pattern_mode(**kwargs)
+            pycrafter4500.pattern_mode(**kwargs)
         else:
-            lcr4500.pattern_mode()
+            pycrafter4500.pattern_mode()
 
 
 class MyStatusBar(wx.StatusBar):

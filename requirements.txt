@@ -36,7 +36,7 @@ pyusb  # to connect to LCR4500
 # install conda packages:
 # $ conda install -y numpy scipy Pillow matplotlib pandas pyopengl lxml openpyxl configobj sortedcontainers
 # install pip packages:
-# $ pip install tabulate igor tqdm moviepy pyglet psychopy pyusb
+# $ pip install tabulate igor tqdm moviepy pyglet psychopy pyusb pycrafter4500
 # install wxpython:
 # conda install -c anaconda wxpython=3.0.0.0
 # download repository and navigate to where pyStimGUI.py is located

@@ -32,7 +32,7 @@ command: use mouse right click and paste. Ctrl + v will not work.
 
 6. Install the packages not included with conda. If you run into any problems here, simply close the command window, reopen it then reactivate the env. ::
 
-    pip install tabulate igor tqdm moviepy pyglet psychopy labjackpython pyusb
+    pip install tabulate igor tqdm moviepy pyglet psychopy labjackpython pyusb pycrafter4500
 
 7. Install wxpython (gui interface). ::
 

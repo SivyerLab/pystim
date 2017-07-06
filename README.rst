@@ -5,7 +5,7 @@ pyStim uses the `Psychopy <www.psychopy.org>`_ library to create
 visual stimuli for use in our visual neuroscience experiments. It
 includes a graphic user interface and is capable of running at a
 minimum of 60 frames/sec and with the Texas Instruments LightCrafter
-4500 DLP is capable of running in excess of 180Hz. pyStim is designed
+4500 DLP is capable of running in excess of 180 Hz. pyStim is designed
 to communicate with exterinal I/O devices (currently Labjack U3), which
 we use to trigger the aquisition of recording amplifiers. 
 
@@ -51,8 +51,8 @@ Licensing
 pyStim is licensed under GNU GPL v3.0. See :doc:`license <LICENSE>`
 for license rights and limitations.
 
-Screen Shots
-------------
+Screenshots
+-----------
 
 Screenshots are available in the /docs/screenshots/ folder.
 
