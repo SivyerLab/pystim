@@ -19,9 +19,8 @@ functional.
 Documentation
 -------------
 
-Documentation is included in HTML format in the docs/html/ directory. A
-version is available on github pages `here <https://sivyerlab.github.io/pyStim/>`_. Further
-documentation on Psychopy can be found on the psychopy `website <www.psychopy.org>`_.
+Documentation is available on github pages `here <https://sivyerlab.github.io/pyStim/>`_. The HTML documentation source
+can be found on the gh-pages branch. Further documentation on Psychopy can be found on the psychopy `website <www.psychopy.org>`_.
 
 Quick Install
 -------------
