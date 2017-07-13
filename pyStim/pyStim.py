@@ -2529,10 +2529,10 @@ def main(stim_list, verbose=True):
                 save_loc = os.path.join(capture_dir, save_dir)
                 os.makedirs(save_loc)
 
-            reps, elapsed_time, frames, dropped = animation_loop(to_animate, num_frames, current_time, save_loc)
+            rep, elapsed_time, frames, dropped = animation_loop(to_animate, num_frames, current_time, save_loc)
 
             count_elapsed_time += elapsed_time
-            count_reps += reps
+            count_reps += rep
             count_frames += frames
 
             if MyWindow.should_break:
