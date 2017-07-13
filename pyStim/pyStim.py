@@ -2374,24 +2374,18 @@ def stim_factory(stim):
         return stim_map[stim.stim_type](**stim.parameters)
 
 
-def animation_loop(to_animate, num_frames, current_time):
+def animation_loop(to_animate, num_frames, current_time, save_loc):
     """
-    Loop where animation gets carried out
+    Function where animation logic is carried out, along with other helper tasks
 
+    :param to_animate: list of stims being animated
+    :param num_frames: number of frames to animate for
+    :param current_time: time at call to animate
     :return:
     """
     index = 0
     reps = 0
     frames = 0
-
-    if GlobalDefaults['capture']:
-        capture_dir = os.path.abspath(config.get('StimProgram', 'capture_dir'))
-        if not os.path.exists(capture_dir):
-            os.makedirs(capture_dir)
-        current_time_string = strftime('%Y_%m_%d_%H%M%S', current_time)
-        save_dir = 'capture_' + current_time_string + '_' + str(to_animate[0])
-        save_loc = os.path.join(capture_dir, save_dir)
-        os.makedirs(save_loc)
 
     if GlobalDefaults['framepack']:
         MyWindow.framepacker = ProjectorFramePacker(MyWindow.win)
@@ -2520,13 +2514,21 @@ def main(stim_list, verbose=True):
             if GlobalDefaults['trigger_wait'] != 0:
                 MyWindow.win.callOnFlip(MyWindow.send_trigger)
                 # print 'trigger'
-            # MyWindow.flip()
-
-            if GlobalDefaults['trigger_wait'] != 0:
+                # MyWindow.flip()
                 for y in xrange(GlobalDefaults['trigger_wait'] - 1):
                     MyWindow.flip()
 
-            reps, elapsed_time, frames, dropped = animation_loop(to_animate, num_frames, current_time)
+            save_loc = None
+            if GlobalDefaults['capture']:
+                capture_dir = os.path.abspath(config.get('StimProgram', 'capture_dir'))
+                if not os.path.exists(capture_dir):
+                    os.makedirs(capture_dir)
+                current_time_string = strftime('%Y_%m_%d_%H%M%S', current_time)
+                save_dir = 'capture_' + current_time_string + '_' + str(to_animate[0])
+                save_loc = os.path.join(capture_dir, save_dir)
+                os.makedirs(save_loc)
+
+            reps, elapsed_time, frames, dropped = animation_loop(to_animate, num_frames, current_time, save_loc)
 
             count_elapsed_time += elapsed_time
             count_reps += reps
@@ -2555,6 +2557,7 @@ def main(stim_list, verbose=True):
             MyWindow.flip()
             MyWindow.flip()
             MyWindow.flip()
+
     except AttributeError:
         pass
 
