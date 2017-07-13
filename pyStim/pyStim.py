@@ -758,6 +758,14 @@ class StaticStim(StimDefaults):
         self.move_random = Random()
         self.move_random.seed(self.move_seed)
 
+    def __str__(self):
+        """
+        return name of instance
+
+        :return:
+        """
+        return type(self).__name__
+
     def make_stim(self):
         """Creates instance of psychopy stim object.
         """
@@ -2111,6 +2119,7 @@ def log_stats(count_reps, reps, count_frames, num_frames, elapsed_time,
     current_time = time_at_run
     current_time_string = strftime('%Y_%m_%d_%H%M%S', current_time)
 
+    # TODO: use pathlib
     if sys.platform == 'win32':
         # log folder
         path = config.get('StimProgram', 'logs_dir')
@@ -2365,6 +2374,104 @@ def stim_factory(stim):
         return stim_map[stim.stim_type](**stim.parameters)
 
 
+def animation_loop(to_animate, num_frames, current_time):
+    """
+    Loop where animation gets carried out
+
+    :return:
+    """
+    index = 0
+    reps = 0
+    frames = 0
+
+    if GlobalDefaults['capture']:
+        capture_dir = os.path.abspath(config.get('StimProgram', 'capture_dir'))
+        if not os.path.exists(capture_dir):
+            os.makedirs(capture_dir)
+        current_time_string = strftime('%Y_%m_%d_%H%M%S', current_time)
+        save_dir = 'capture_' + current_time_string + '_' + str(to_animate[0])
+        save_loc = os.path.join(capture_dir, save_dir)
+        os.makedirs(save_loc)
+
+    if GlobalDefaults['framepack']:
+        MyWindow.framepacker = ProjectorFramePacker(MyWindow.win)
+
+    MyWindow.win.recordFrameIntervals = True
+    MyWindow.win.frameIntervals = []
+
+    # clock for timing
+    elapsed_time_clock = core.MonotonicClock()
+
+    # for frame in xrange(num_frames):
+    # trange for pretty, low overhead (on the order of ns), progress bar in stdout
+    for frame in trange(num_frames):
+        for stim in to_animate:
+            stim.animate(frame)
+
+        if not GlobalDefaults['capture']:
+            MyWindow.flip()
+
+        # save as movie?
+        elif GlobalDefaults['capture']:
+            filename = os.path.join(save_loc,
+                                    'capture_' +
+                                    str(frame + 1).zfill(5) + '.png')
+            img = MyWindow.win._getRegionOfFrame(buffer='back')
+            img.save(filename, 'PNG')
+            sys.stdout.write('\r')
+            sys.stdout.write(str(int(frame / float(num_frames) * 100) +
+                                 1) + '%')
+            sys.stdout.flush()
+            MyWindow.win.clearBuffer()
+
+        if frame == MyWindow.frame_trigger_list[index]:
+            MyWindow.send_trigger()
+            # print frame, 'triggered'
+            index += 1
+
+        # escape key breaks if focus on window
+        for key in event.getKeys(keyList=['escape']):
+            if key in ['escape']:
+                MyWindow.should_break = True
+
+        # inner break
+        if MyWindow.should_break:
+            frames = frame + 1
+            # count_elapsed_time += elapsed_time.getTime()
+            break
+
+    # get elapsed time for fps
+    elapsed_time = elapsed_time_clock.getTime()
+
+    # MyWindow.win.saveFrameIntervals()
+    MyWindow.win.recordFrameIntervals = False
+    f = numpy.array(MyWindow.win.frameIntervals)
+    # print; print f*1000
+    if GlobalDefaults['framepack']:
+        cutoff = 1. / GlobalDefaults['frame_rate'] * 3 + 0.005  # 5 ms range
+    else:
+        cutoff = 1. / GlobalDefaults['frame_rate'] + 0.005  # 5 ms range
+    dropped = (f > cutoff).sum()
+    # print (f > cutoff).nonzero()
+    # print f[(f > cutoff).nonzero()] * 1000
+
+    # stop movies from continuing in background
+    for stim in to_animate:
+        if stim.fill_mode == 'movie':
+            stim.stim.pause()
+
+    # outer break
+    if MyWindow.should_break:
+        print '\n Interrupt!'
+        return 'break'
+
+    reps += 1
+
+    return reps, elapsed_time, frames
+
+
+
+
 def main(stim_list, verbose=True):
     """Function to create stims and run program. Creates instances of stim
     types, and makes necessary calls to animate stims and flip window.
@@ -2421,91 +2528,93 @@ def main(stim_list, verbose=True):
                 for y in xrange(GlobalDefaults['trigger_wait'] - 1):
                     MyWindow.flip()
 
-            index = 0
+            reps, elapsed_time, frames = animation_loop(to_animate, num_frames, current_time)
 
-            if GlobalDefaults['capture']:
-                capture_dir = os.path.abspath('./psychopy/captures/')
-                if not os.path.exists(capture_dir):
-                    os.makedirs(capture_dir)
-                current_time_string = strftime('%Y_%m_%d_%H%M%S', current_time)
-                save_dir = 'capture_' + current_time_string + '_' + stim_list[
-                    0].stim_type.lower()
-                save_loc = os.path.join(capture_dir, save_dir)
-                os.makedirs(save_loc)
-
-            if GlobalDefaults['framepack']:
-                MyWindow.framepacker = ProjectorFramePacker(MyWindow.win)
-
-            MyWindow.win.recordFrameIntervals = True
-            MyWindow.win.frameIntervals = []
-
-            # clock for timing
-            elapsed_time = core.MonotonicClock()
-
-            # for frame in xrange(num_frames):
-            # trange for pretty, low overhead (on the order of ns), progress bar in stdout
-            for frame in trange(num_frames):
-                for stim in to_animate:
-                    stim.animate(frame)
-
-                if not GlobalDefaults['capture']:
-                    MyWindow.flip()
-
-                # save as movie?
-                elif GlobalDefaults['capture']:
-                    filename = os.path.join(save_loc,
-                                            'capture_' +
-                                            str(frame + 1).zfill(5) + '.png')
-                    img = MyWindow.win._getRegionOfFrame(buffer='back')
-                    img.save(filename, 'PNG')
-                    sys.stdout.write('\r')
-                    sys.stdout.write(str(int(frame / float(num_frames) * 100) +
-                                         1) + '%')
-                    sys.stdout.flush()
-                    MyWindow.win.clearBuffer()
-
-                if frame == MyWindow.frame_trigger_list[index]:
-                    MyWindow.send_trigger()
-                    # print frame, 'triggered'
-                    index += 1
-
-                # escape key breaks if focus on window
-                for key in event.getKeys(keyList=['escape']):
-                    if key in ['escape']:
-                        MyWindow.should_break = True
-
-                # inner break
-                if MyWindow.should_break:
-                    count_frames = frame + 1
-                    # count_elapsed_time += elapsed_time.getTime()
-                    break
-
-            # get elapsed time for fps
-            count_elapsed_time += elapsed_time.getTime()
-
-            # MyWindow.win.saveFrameIntervals()
-            MyWindow.win.recordFrameIntervals = False
-            f = numpy.array(MyWindow.win.frameIntervals)
-            # print; print f*1000
-            if GlobalDefaults['framepack']:
-                cutoff = 1. / GlobalDefaults['frame_rate'] * 3 + 0.005  # 5 ms range
-            else:
-                cutoff = 1. / GlobalDefaults['frame_rate'] + 0.005  # 5 ms range
-            dropped = (f > cutoff).sum()
-            # print (f > cutoff).nonzero()
-            # print f[(f > cutoff).nonzero()] * 1000
-
-            # stop movies from continuing in background
-            for stim in to_animate:
-                if stim.fill_mode == 'movie':
-                    stim.stim.pause()
-
-            # outer break
-            if MyWindow.should_break:
-                print '\n Interrupt!'
-                break
-
-            count_reps += 1
+            # index = 0
+            #
+            # if GlobalDefaults['capture']:
+            #     capture_dir = os.path.abspath('./psychopy/captures/')
+            #     if not os.path.exists(capture_dir):
+            #         os.makedirs(capture_dir)
+            #     current_time_string = strftime('%Y_%m_%d_%H%M%S', current_time)
+            #     save_dir = 'capture_' + current_time_string + '_' + stim_list[
+            #         0].stim_type.lower()
+            #     save_loc = os.path.join(capture_dir, save_dir)
+            #     os.makedirs(save_loc)
+            #
+            # if GlobalDefaults['framepack']:
+            #     MyWindow.framepacker = ProjectorFramePacker(MyWindow.win)
+            #
+            # MyWindow.win.recordFrameIntervals = True
+            # MyWindow.win.frameIntervals = []
+            #
+            # # clock for timing
+            # elapsed_time = core.MonotonicClock()
+            #
+            # # for frame in xrange(num_frames):
+            # # trange for pretty, low overhead (on the order of ns), progress bar in stdout
+            # for frame in trange(num_frames):
+            #     for stim in to_animate:
+            #         stim.animate(frame)
+            #
+            #     if not GlobalDefaults['capture']:
+            #         MyWindow.flip()
+            #
+            #     # save as movie?
+            #     elif GlobalDefaults['capture']:
+            #         filename = os.path.join(save_loc,
+            #                                 'capture_' +
+            #                                 str(frame + 1).zfill(5) + '.png')
+            #         img = MyWindow.win._getRegionOfFrame(buffer='back')
+            #         img.save(filename, 'PNG')
+            #         sys.stdout.write('\r')
+            #         sys.stdout.write(str(int(frame / float(num_frames) * 100) +
+            #                              1) + '%')
+            #         sys.stdout.flush()
+            #         MyWindow.win.clearBuffer()
+            #
+            #     if frame == MyWindow.frame_trigger_list[index]:
+            #         MyWindow.send_trigger()
+            #         # print frame, 'triggered'
+            #         index += 1
+            #
+            #     # escape key breaks if focus on window
+            #     for key in event.getKeys(keyList=['escape']):
+            #         if key in ['escape']:
+            #             MyWindow.should_break = True
+            #
+            #     # inner break
+            #     if MyWindow.should_break:
+            #         count_frames = frame + 1
+            #         # count_elapsed_time += elapsed_time.getTime()
+            #         break
+            #
+            # # get elapsed time for fps
+            # count_elapsed_time += elapsed_time.getTime()
+            #
+            # # MyWindow.win.saveFrameIntervals()
+            # MyWindow.win.recordFrameIntervals = False
+            # f = numpy.array(MyWindow.win.frameIntervals)
+            # # print; print f*1000
+            # if GlobalDefaults['framepack']:
+            #     cutoff = 1. / GlobalDefaults['frame_rate'] * 3 + 0.005  # 5 ms range
+            # else:
+            #     cutoff = 1. / GlobalDefaults['frame_rate'] + 0.005  # 5 ms range
+            # dropped = (f > cutoff).sum()
+            # # print (f > cutoff).nonzero()
+            # # print f[(f > cutoff).nonzero()] * 1000
+            #
+            # # stop movies from continuing in background
+            # for stim in to_animate:
+            #     if stim.fill_mode == 'movie':
+            #         stim.stim.pause()
+            #
+            # # outer break
+            # if MyWindow.should_break:
+            #     print '\n Interrupt!'
+            #     break
+            #
+            # count_reps += 1
 
     except Exception as e:
         traceback.print_exc()
