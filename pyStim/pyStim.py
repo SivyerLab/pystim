@@ -924,10 +924,10 @@ class StaticStim(StimDefaults):
 
         color = high, low, delta, background
 
-        print 'high      :', high
-        print 'low       :', low
-        print 'background:', background
-        print 'delta     :', delta
+        # print 'high      :', high
+        # print 'low       :', low
+        # print 'background:', background
+        # print 'delta     :', delta
 
         self.colors = color
         return color
@@ -2120,40 +2120,28 @@ def log_stats(count_reps, reps, count_frames, num_frames, elapsed_time,
     current_time = time_at_run
     current_time_string = strftime('%Y_%m_%d_%H%M%S', current_time)
 
-    # TODO: use pathlib
-    if sys.platform == 'win32':
-        # log folder
-        path = config.get('StimProgram', 'logs_dir')
-        if not os.path.exists(path):
-            os.makedirs(path)
-        # day folder
-        path += strftime('%Y_%m_%d', current_time) + '\\'
-        if not os.path.exists(path):
-            os.makedirs(path)
-        # time folder
-        path += strftime('%Hh%Mm%Ss', current_time) + '\\'
-        if not os.path.exists(path):
-            os.makedirs(path)
+    path = config.get('StimProgram', 'logs_dir')
+    if not os.path.exists(path):
+        os.makedirs(path)
 
-    elif sys.platform == 'darwin':
-        # log folder
-        path = config.get('StimProgram', 'logs_dir')
-        if not os.path.exists(path):
-            os.makedirs(path)
-        # day folder
-        path += strftime('%Y_%m_%d', current_time) + '/'
-        if not os.path.exists(path):
-            os.makedirs(path)
-        # time folder
-        path += strftime('%Hh%Mm%Ss', current_time) + '/'
-        if not os.path.exists(path):
-            os.makedirs(path)
+    # day folder
+    # path += strftime('%Y_%m_%d', current_time) + '\\'
+    path = os.path.join(path, strftime('%Y_%m_%d', current_time))
+    if not os.path.exists(path):
+        os.makedirs(path)
+
+    # time folder
+    # path += strftime('%Hh%Mm%Ss', current_time) + '\\'
+    path = os.path.join(path, strftime('%Hh%Mm%Ss', current_time))
+
+    if not os.path.exists(path):
+        os.makedirs(path)
 
     # filename format: stimlog_[time]_[stimtype].txt
     file_name = 'stimlog_' + current_time_string + '_' + stim_list[
         0].stim_type.lower() + '.txt'
 
-    with open((path + file_name), 'w') as f:
+    with open(os.path.join(path, file_name), 'w') as f:
         f.write(strftime('%a, %d %b %Y %H:%M:%S', current_time))
 
         f.write("\n{} rep(s) of {} stim(s) generated. ".
@@ -2174,7 +2162,7 @@ def log_stats(count_reps, reps, count_frames, num_frames, elapsed_time,
 
         f.write('\n\n\n#BEGIN PICKLE#\n')
 
-    with open((path + file_name), 'ab') as f:
+    with open(os.path.join(path, file_name), 'ab') as f:
         # Pickle dump to be able to load parameters from log file of stim,
         # opened as binary, hence opening twice
         to_write = []
