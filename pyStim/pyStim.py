@@ -13,15 +13,15 @@ import cPickle
 from psychopy.visual.windowframepack import ProjectorFramePacker
 from psychopy.tools.coordinatetools import pol2cart
 from psychopy.tools.typetools import uint8_float, float_uint8
-# from psychopy.visual import globalVars
 from psychopy import visual, core, event, filters
+from psychopy.visual import globalVars
 
 from time import strftime, localtime
 from tqdm import tqdm, trange
-from random import Random
-from PIL import Image
-from math import ceil
 
+from random import Random
+from math import ceil
+from PIL import Image
 import scipy, scipy.signal
 import numpy
 
@@ -278,7 +278,6 @@ class MyWindow(object):
         gamma correction splines are present. Also instantiates labjack if
         present.
         """
-
         # create labjack instance
         global has_u3
         if has_u3:
@@ -379,6 +378,7 @@ class MyWindow(object):
         """
         Makes a small window to see what's being show on the projector.
         """
+        # TODO: fix small win
         if GlobalDefaults['display_size'][0] > GlobalDefaults[
                 'display_size'][1]:
             scaled_size = [400.0,
@@ -419,7 +419,7 @@ class MyWindow(object):
 
             if MyWindow.small_win is not None:
                 if GlobalDefaults['framepack']:
-                    if MyWindow.mirror_counter % 3 == 2:
+                    if MyWindow.mirror_counter % (GlobalDefaults['frame_rate'] // 60) == 2:
                         MyWindow.small_win.flip()
                     MyWindow.mirror_counter += 1
 
@@ -835,7 +835,7 @@ class StaticStim(StimDefaults):
 
             if self.small_stim is not None:
                 MyWindow.win.winHandle.switch_to()
-                visual.globalVars.currWindow = MyWindow.win
+                globalVars.currWindow = MyWindow.win
                 GL.glBindFramebufferEXT(GL.GL_FRAMEBUFFER_EXT, MyWindow.win.frameBuffer)
 
             # draw to back buffer
@@ -843,7 +843,7 @@ class StaticStim(StimDefaults):
 
             if self.small_stim is not None:
                 MyWindow.small_win.winHandle.switch_to()
-                visual.globalVars.currWindow = MyWindow.small_win
+                globalVars.currWindow = MyWindow.small_win
                 GL.glBindFramebufferEXT(GL.GL_FRAMEBUFFER_EXT, MyWindow.small_win.frameBuffer)
                 self.small_stim.draw(MyWindow.small_win)
 
@@ -2340,6 +2340,12 @@ def save_movie(current_time, save_loc):
 
 
 def stim_factory(stim):
+    """
+    Instantiates a stim class from a StimInfo class
+
+    :param stim: stim type with parameters
+    :return: a stim class from stim_map
+    """
     stim_map = {'static': StaticStim,
                 'moving': MovingStim,
                 'table' : TableStim,
@@ -2510,7 +2516,7 @@ def main(stim_list, verbose=True):
 
         if MyWindow.small_win is not None:
             MyWindow.win.winHandle.switch_to()
-            visual.globalVars.currWindow = MyWindow.win
+            globalVars.currWindow = MyWindow.win
             GL.glBindFramebufferEXT(GL.GL_FRAMEBUFFER_EXT, MyWindow.win.frameBuffer)
 
         MyWindow.win.clearBuffer()
