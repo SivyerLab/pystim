@@ -418,6 +418,7 @@ class MyWindow(object):
             MyWindow.win.flip()
 
             if MyWindow.small_win is not None:
+
                 if GlobalDefaults['framepack']:
                     if MyWindow.mirror_counter % (GlobalDefaults['frame_rate'] // 60) == 2:
                         MyWindow.small_win.flip()
@@ -2457,7 +2458,7 @@ def animation_loop(to_animate, num_frames, current_time, save_loc):
     # outer break
     if MyWindow.should_break:
         print '\n Interrupt!'
-        return 'break'
+        return reps, elapsed_time, frames, dropped
 
     reps += 1
 
@@ -2533,6 +2534,9 @@ def main(stim_list, verbose=True):
             count_elapsed_time += elapsed_time
             count_reps += reps
             count_frames += frames
+
+            if MyWindow.should_break:
+                break
 
     except Exception as e:
         traceback.print_exc()
