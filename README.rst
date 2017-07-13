@@ -19,7 +19,7 @@ functional.
 Documentation
 -------------
 
-Documentation is available on github pages `here <https://sivyerlab.github.io/pyStim/>`_. The source of the documentation
+Documentation is available on github pages `here <https://sivyerlab.github.io/pystim/>`_. The source of the documentation
 can be found in the code and in the /docs/source/ folder. Further documentation on Psychopy can be found on the
 psychopy `website <www.psychopy.org>`_.
 
