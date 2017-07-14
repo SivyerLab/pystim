@@ -11,7 +11,6 @@ Guides
    :maxdepth: 2
 
    readmelink
-   detailedinstall
    installguide
    usageguide
    lcr4500setup

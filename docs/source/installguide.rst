@@ -13,6 +13,9 @@ Enter lines of code in the terminal/command line. To open the terminal/command p
 windows + r, and enter "cmd". **NOTE** to paste text copied from this guide into the terminal
 command: use mouse right click and paste. Ctrl + v will not work.
 
+For windows, a cmd file is included in the repository that will run all the steps for you after 1 & 2. It still requires
+you to manually install Anaconda and Git first. Download the cmd file by itself and then run it.
+
 1. Install `Anaconda <https://www.continuum.io/anaconda-overview>`_ (environment manager) for python 3.6 to your user folder
 2. Install `Git <https://git-scm.com/downloads>`_ (version control tool)
 3. Create the python environment for the pyStim by entering the following text into the terminal command. ::
@@ -38,15 +41,15 @@ command: use mouse right click and paste. Ctrl + v will not work.
 
     conda install -y -c anaconda wxpython=3.0.0.0
 
-7.1 (OPTIONAL) If you wish to be able to save captures of your stims, install ffmpeg. ::
+8. (OPTIONAL) If you wish to be able to save captures of your stims, install ffmpeg. ::
 
     conda install -c conda-forge ffmpeg=3.2.4
 
-7.2 (OPTIONAL) If you wish to be able to playback movies, install avbin from this site. ::
+9. (OPTIONAL) If you wish to be able to playback movies, install avbin from this site. ::
 
     http://avbin.github.io/AVbin/Download.html
 
-8. Navigate to where you want to save the pyStim repository. ::
+10. Navigate to where you want to save the pyStim repository. ::
 
     cd C:/your/location/of/choice
 
@@ -60,34 +63,17 @@ and simply paste this text after "cd" in the terminal command
 .. image:: ../screenshots/Terminal_command.jpg
     :width: 800 px
 
-9. Download the repository (a new repositry folder will be automatically created). ::
+11. Download the repository (a new repositry folder will be automatically created). ::
 
     git clone https://github.com/awctomlinson/StimulusProgram.git
 
-10. Navigate into the pyStim folder and code folder. ::
+12. Navigate into the pyStim folder and code folder. ::
 
         cd pyStim/pyStim
 
-11. Make necessary changes to psychopy source in "\\Anaconda3\\envs\\sp_env\\Lib\\site-packages\\psychopy\\visual\\window.py". If you are having trouble finding the "Anaconda3" folder,
-it is usually either in "C:\\ProgramData" or your user folder. You can open "window.py" in any basic text editor. Line 297 needs to be changed from:
 
-    .. code-block:: python
-      :lineno-start: 297
-
-      if self.viewOri is not 0. and self.viewPos is not None:
-
-    to the following:
-
-    .. code-block:: python
-       :lineno-start: 297
-
-       if self.viewOri != 0. and self.viewPos is not None:
-
-
-12. Run the pyStim GUI. ::
+13. Run the pyStim GUI. ::
 
         python pyStimGUI.py
 
-13. If want to trigger an external device using a labjack install the labjack driver from the labjack site: `Labjack driver instructions <https://labjack.com/support/software/examples/ud/labjackpython>`_
-
-To use the video saving function (i.e. to make an example video for a talk), install `ffmpeg <https://ffmpeg.org/>`_.
+14. If want to trigger an external device using a labjack install the labjack driver from the labjack site: `Labjack driver instructions <https://labjack.com/support/software/examples/ud/labjackpython>`_
