@@ -43,7 +43,7 @@ you to manually install Anaconda and Git first. Download the cmd file by itself 
 
 8. (OPTIONAL) If you wish to be able to save captures of your stims, install ffmpeg. ::
 
-    conda install -c conda-forge ffmpeg=3.2.4
+    conda install -y -c conda-forge ffmpeg=3.2.4
 
 9. (OPTIONAL) If you wish to be able to playback movies, install avbin from this site. ::
 
