@@ -53,6 +53,7 @@ you to manually install Anaconda and Git first. Download the cmd file by itself 
 
     cd C:/your/location/of/choice
 
+
 For example C:/Users/bensivyer/PycharmProjects
 
 To copy the path location: go to your desired folder in Windows and click to the right of the foldername in the search bar
