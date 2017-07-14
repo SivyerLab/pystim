@@ -2290,9 +2290,9 @@ def log_stats(count_reps, reps, count_frames, num_frames, elapsed_time,
 def save_movie(current_time, save_loc):
     """
     Saves movies to file from saved pngs
-    :param current_time:
-    :param save_loc:
-    :return:
+
+    :param current_time: current time
+    :param save_loc: save location
     """
     current_time_string = strftime('%Y_%m_%d_%H%M%S', current_time)
     save_name = 'capture_video' + current_time_string + '.mpg'
@@ -2301,18 +2301,20 @@ def save_movie(current_time, save_loc):
     args = ['ffmpeg',
             '-f', 'image2',
             '-framerate', str(GlobalDefaults['frame_rate']),
-            '-i', os.path.join(save_loc, '"capture_%05d.png"'),
+            '-i', os.path.join(save_loc, 'capture_%05d.png'),
             '-b:v', '20M',
             os.path.join(save_loc, save_name)]
 
     # make movie using ffmpeg
     print 'ffmpeg...'
-    print save_loc
-    print os.path.join(save_loc, 'capture_%05d.png')
+    # print save_loc
+    # print os.path.join(save_loc, 'capture_%05d.png')
+
     process = subprocess.Popen(args,
                                stdout=subprocess.PIPE,
                                stderr=subprocess.PIPE)
     stdout, stderr = process.communicate()
+    print stdout, stderr
 
     args2 = ['ffmpeg',
              '-i', os.path.join(save_loc, save_name),
@@ -2326,14 +2328,14 @@ def save_movie(current_time, save_loc):
                                stdout=subprocess.PIPE,
                                stderr=subprocess.PIPE)
     stdout, stderr = process.communicate()
-
-    # print stdout, stderr
+    print stdout, stderr
 
     # delete .pngs
     # to_delete = [f for f in os.listdir(save_loc) if f.endswith('.png')]
     # for f in to_delete:
     #     os.remove(os.path.join(save_loc, f))
 
+    print 'Saved in: {}'.format(save_loc)
     print '\nDONE'
 
 
@@ -2370,7 +2372,6 @@ def animation_loop(to_animate, num_frames, current_time, save_loc):
     :param to_animate: list of stims being animated
     :param num_frames: number of frames to animate for
     :param current_time: time at call to animate
-    :return:
     """
     index = 0
     reps = 0

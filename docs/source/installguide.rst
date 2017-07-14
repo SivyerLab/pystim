@@ -38,6 +38,14 @@ command: use mouse right click and paste. Ctrl + v will not work.
 
     conda install -y -c anaconda wxpython=3.0.0.0
 
+7.1 (OPTIONAL) If you wish to be able to save captures of your stims, install ffmpeg. ::
+
+    conda install -c conda-forge ffmpeg=3.2.4
+
+7.2 (OPTIONAL) If you wish to be able to playback movies, install avbin from this site. ::
+
+    http://avbin.github.io/AVbin/Download.html
+
 8. Navigate to where you want to save the pyStim repository. ::
 
     cd C:/your/location/of/choice
