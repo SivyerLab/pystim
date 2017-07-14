@@ -43,7 +43,7 @@ Optional libraries:
 - `ffmpeg <https://www.ffmpeg.org/>`_ (for making movies from captured frames)
 
 Psychopy requires some small editing to source for it to work as of version 1.84.2 (fixed on current master on github).
-See docs for detailed instructions. An install walkthrough is also available in the requirements file.
+See docs for detailed instructions.
 
 Licensing
 ---------

@@ -1,0 +1,31 @@
+name: sp_env
+channels:
+- conda-forge
+- anaconda
+- defaults
+dependencies:
+- python=2.7.13
+- numpy
+- scipy
+- Pillow
+- matplotlib
+- pandas
+- pyopengl
+- lxml
+- openpyxl
+- configobj
+- sortedcontainers
+- pip:
+  - decorator==4.0.11
+  - et-xmlfile==1.0.1
+  - igor==0.3
+  - imageio==2.1.2
+  - labjackpython==1.201505
+  - moviepy==0.2.3.2
+  - psychopy==1.85.2
+  - pycrafter4500==0.4
+  - pyglet==1.2.4
+  - pyusb==1.0.0
+  - tabulate==0.7.7
+  - tqdm==4.14.0
+

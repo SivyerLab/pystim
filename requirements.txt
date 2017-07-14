@@ -9,36 +9,21 @@ sortedcontainers
 # not on conda, use pip
 tqdm
 PsychoPy  # along with it's dependencies since pip won't install them
-# current dependencies: pip install numpy scipy matplotlib pandas pyopengl pyglet pillow moviepy lxml openpyxl configobj psychopy
+# current dependencies: pip install numpy scipy matplotlib pandas pyopengl pyglet pillow moviepy lxml openpyxl configobj
 
 ## optional
 # LabJackPython (needs manual install)
 tabulate
 igor
 pyusb  # to connect to LCR4500
+pycrafter4500  # to connect to LCR4500
 
 ## needs to be installed manually (or with conda):
 # wxpython
 # labjackpython needs to be manually installed as well (on win32, need driver also, see labjack site)
 # ffmpeg (if want to make videos of stims)
+# avbin (for video playback)
 
 # compiled windows binaries of popular python libraries
 # can be found at http://www.lfd.uci.edu/~gohlke/pythonlibs/
 # if having problems installing on windows (conda resolves this problem though)
-
-# WALKTHROUGH
-# ($ means run in terminal/cmd)
-# install conda
-# create conda stimulus program environment
-# $ conda create -y --name sp_env python=2.7
-# activate conda env:
-# $ activate sp_env
-# install conda packages:
-# $ conda install -y numpy scipy Pillow matplotlib pandas pyopengl lxml openpyxl configobj sortedcontainers
-# install pip packages:
-# $ pip install tabulate igor tqdm moviepy pyglet psychopy pyusb pycrafter4500
-# install wxpython:
-# conda install -c anaconda wxpython=3.0.0.0
-# download repository and navigate to where pyStimGUI.py is located
-# run GUI:
-# $ python pyStimGUI.py
