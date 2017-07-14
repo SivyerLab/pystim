@@ -71,7 +71,6 @@ and simply paste this text after "cd" in the terminal command
 
         cd pyStim/pyStim
 
-
 13. Run the pyStim GUI. ::
 
         python pyStimGUI.py

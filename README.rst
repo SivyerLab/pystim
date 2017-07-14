@@ -1,7 +1,7 @@
 What is it?
 -----------
 
-pyStim uses the `Psychopy <www.psychopy.org>`_ library to create
+pyStim uses the `Psychopy <http://www.psychopy.org>`_ library to create
 visual stimuli for use in our visual neuroscience experiments. It
 includes a graphic user interface and is capable of running at a
 minimum of 60 frames/sec and with the Texas Instruments LightCrafter
@@ -21,7 +21,7 @@ Documentation
 
 Documentation is available on github pages `here <https://sivyerlab.github.io/pystim/>`_. The source of the documentation
 can be found in the code and in the /docs/source/ folder. Further documentation on Psychopy can be found on the
-psychopy `website <www.psychopy.org>`_.
+psychopy `website <http://www.psychopy.org>`_.
 
 Quick Install
 -------------
