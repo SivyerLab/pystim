@@ -1,5 +1,5 @@
-conda create -y -n test_env python=2.7
-call activate test_env
+conda create -y -n sp_env python=2.7
+call activate sp_env
 cmd /c "conda install -y numpy scipy Pillow matplotlib pandas pyopengl lxml openpyxl configobj sortedcontainers"
 pip install tabulate igor tqdm moviepy pyglet psychopy labjackpython pyusb pycrafter4500
 cmd /c "conda install -y -c anaconda wxpython=3.0.0.0"
