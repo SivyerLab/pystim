@@ -65,7 +65,7 @@ and simply paste this text after "cd" in the terminal command
 
 11. Download the repository (a new repositry folder will be automatically created). ::
 
-    git clone https://github.com/awctomlinson/StimulusProgram.git
+    git clone https://github.com/SivyerLab/pystim.git
 
 12. Navigate into the pyStim folder and code folder. ::
 
