@@ -53,6 +53,16 @@ you to manually install Anaconda and Git first. Download the cmd file by itself 
 
     cd C:/your/location/of/choice
 
+For example C:/Users/bensivyer/PycharmProjects
+
+To copy the path location: go to your desired folder in Windows and click to the right of the foldername in the search bar
+and simply paste this text after "cd" in the terminal command
+
+.. image:: ../screenshots/Copy_directory_path.jpg
+    :width: 800 px
+.. image:: ../screenshots/Terminal_command.jpg
+    :width: 800 px
+
 11. Download the repository (a new repositry folder will be automatically created). ::
 
     git clone https://github.com/awctomlinson/StimulusProgram.git

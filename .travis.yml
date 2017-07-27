@@ -31,7 +31,8 @@ before_script:
 script:
   # build documentation
   - cd docs
-  - sphinx-build -W -b html source build/html
+  - sphinx-build -b html source build/html
+  # sphinx-build -W -b html source build/html
   # sphinx-build -W -b pdf source build/pdf
 
 deploy:
