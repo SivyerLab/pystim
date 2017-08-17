@@ -47,7 +47,7 @@ import os.path
 import numpy
 # import sys
 # import copy_reg, types
-# import matplotlib.pyplot as plt
+import matplotlib.pyplot as plt
 
 # suppress extra warnings
 logging.console.setLevel(logging.CRITICAL)
@@ -165,7 +165,7 @@ def gammaCorrect():
     g_tuple = make_correction(g)
     b_tuple = make_correction(b)
 
-    # show_plot = raw_input('\nShow plots? Y, N: ')
+    show_plot = raw_input('\nShow plots? Y, N: ')
     # if show_plot == 'Y':
     #     plt.legend(loc=0)
     #     plt.show()
@@ -173,22 +173,22 @@ def gammaCorrect():
     gamma_correction = GammaValues(r_tuple, g_tuple, b_tuple)
 
     # GRAPHING STUFF TO TEST
-    # vals = [i * 1.0 / (51 - 1) * 2 - 1 for i in range(51)]
-    # corrected = [[], [], []]
-    # for i in range(len(vals)):
-    #     rgb = [vals[i]] * 3
-    #     rgb = gamma_correction(rgb)
-    #     corrected[0].append(rgb[0])
-    #     corrected[1].append(rgb[1])
-    #     corrected[2].append(rgb[2])
-    #
-    # if show_plot == 'Y':
-    #     plt.plot(vals, vals, 'k--', label='linear')
-    #     plt.plot(vals, corrected[0], 'r', label='red')
-    #     plt.plot(vals, corrected[1], 'g', label='green')
-    #     plt.plot(vals, corrected[2], 'b', label='blue')
-    #     plt.legend(loc=0)
-    #     plt.show()
+    vals = [i * 1.0 / (51 - 1) * 2 - 1 for i in range(51)]
+    corrected = [[], [], []]
+    for i in range(len(vals)):
+        rgb = [vals[i]] * 3
+        rgb = gamma_correction(rgb)
+        corrected[0].append(rgb[0])
+        corrected[1].append(rgb[1])
+        corrected[2].append(rgb[2])
+
+    if show_plot == 'Y':
+        plt.plot(vals, vals, 'k--', label='linear')
+        plt.plot(vals, corrected[0], 'r', label='red')
+        plt.plot(vals, corrected[1], 'g', label='green')
+        plt.plot(vals, corrected[2], 'b', label='blue')
+        plt.legend(loc=0)
+        plt.show()
 
     should_save = raw_input('\nSave? Y, N: ')
 
@@ -236,12 +236,22 @@ def make_correction(measured):
 
     # for spline, x must be increasing, so do check on values
     is_increasing = [x < y for x, y in zip(measured, measured[1:])]
+    # is_increasing = [x > y for x, y in zip(reversed(measured), list(reversed(measured))[1:])]
+    # print(list(reversed(is_increasing)))
 
     # remove non increasing values, going backwards to not change indices
     for i in range(len(is_increasing) - 1, -1, -1):
         if not is_increasing[i]:
-            del measured[i + 1]
-            del measured_at[i + 1]
+            # del measured[i + 1]
+            # del measured_at[i + 1]
+            del measured[i]
+            del measured_at[i]
+
+    print
+    print('measured and measured at')
+    for i in range(len(measured_at)):
+        print measured[i], measured_at[i]
+    print
 
     min = measured[0]
     max = measured[-1]
@@ -250,32 +260,34 @@ def make_correction(measured):
     slope, intercept, _, _, _ = stats.linregress([-1.0, 1.0], [min, max])
 
     # splines to fit to data
-    # spline = interpolate.InterpolatedUnivariateSpline(measured_at, measured)
+    spline = interpolate.InterpolatedUnivariateSpline(measured_at, measured)
     inverse_spline = interpolate.InterpolatedUnivariateSpline(measured,
                                                               measured_at)
 
     # ##GRAPHING STUFF TO TEST##
-    # linear = [i * slope + intercept for i in measured_at]
-    # spline_values = spline([i for i in measured_at])
-    # corrected_values = inverse_spline([i * slope + intercept for i in
-    #                                    measured_at])
-    # graph_corrected = spline([i for i in corrected_values])
+    linear = [i * slope + intercept for i in measured_at]
+    spline_values = spline([i for i in measured_at])
+    corrected_values = inverse_spline([i * slope + intercept for i in
+                                       measured_at])
+    graph_corrected = spline([i for i in corrected_values])
 
-    # for i in range(len(corrected_values)):
-    #     print "%.3f" % measured_at[i], "%.3f" % corrected_values[i]
+    print('measured at and corrected')
+    for i in range(len(corrected_values)):
+        print "%.3f" % measured_at[i], "%.3f" % corrected_values[i]
+    print
 
     to_plot = []
     # points
-    # to_plot.append(plt.plot(measured_at, measured, 'ro', label='measured'))
+    to_plot.append(plt.plot(measured_at, measured, 'ro', label='measured'))
     # fit
-    # to_plot.append(plt.plot(measured_at, spline_values,
-    #                         label='interpolated'))
+    to_plot.append(plt.plot(measured_at, spline_values,
+                            label='interpolated'))
     # corrected
-    # to_plot.append(plt.plot(measured_at, graph_corrected, label='corrected'))
+    to_plot.append(plt.plot(measured_at, graph_corrected, label='corrected'))
     # check against linear
-    # to_plot.append(plt.plot(measured_at, linear, label='linear'))
-    # plt.legend(loc=0)
-    # plt.show()
+    to_plot.append(plt.plot(measured_at, linear, label='linear'))
+    plt.legend(loc=0)
+    plt.show()
 
     return inverse_spline, slope, intercept, to_plot
 
@@ -356,6 +368,8 @@ class GammaValues(object):
          the color channel.
         :return: Adjusted list of RGB values, or single adjusted color.
         """
+        channel = None if channel == 3 else channel
+
         if channel is None:
             # if entire texture
             if len(numpy.shape(color)) == 3:

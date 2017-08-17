@@ -290,7 +290,7 @@ class MyWindow(object):
                 has_u3 = False
 
         # check if gamma splines present
-        gamma = GlobalDefaults['gamma_correction']
+        gamma = str(GlobalDefaults['gamma_correction'])
 
         if gamma != 'default':
             gamma_file = os.path.abspath('./psychopy/data/gammaTables.txt')
