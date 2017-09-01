@@ -1850,7 +1850,7 @@ class MyMenuBar(wx.MenuBar):
         if self.frame.parameters.get_param_value('global', 'framepack'):
             self.options_framepack.Toggle()  # default to True
 
-        # options submenu
+        # options sub menu
         options_tools = wx.Menu()
         tools_rec_map = options_tools.Append(wx.ID_ANY,
                                              'Map receptive field',
