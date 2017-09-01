@@ -1870,87 +1870,58 @@ class MyMenuBar(wx.MenuBar):
                                                         'video mode',
                                                         'set LCR4500 to video mode')
 
-            # not sure why this isn't working
-            # param_tuples = [
-            #     (120, 8, 'white'),
-            #     (120, 8, 'green'),
-            #     (180, 7, 'white'),
-            #     (180, 7, 'green'),
-            #     (222, 7, 'green'),
-            #     (222, 7, 'green'),
-            #     (360, 4, 'white'),
-            #     (360, 4, 'green'),
-            # ]
-            #
-            # for tup in param_tuples:
-            #     self.Bind(wx.EVT_MENU,
-            #               lambda event: self.on_options_lcr4500_pattern_mode(event,
-            #                                                                  fps=tup[0],
-            #                                                                  bit_depth=tup[1],
-            #                                                                  led_color=tup[2]),
-            #               options_lcr4500.Append(wx.ID_ANY,
-            #                                      '{} hz, {} bit, {}'.format(tup[0], tup[1], tup[2]),
-            #                                      'set LCR4500 to pattern mode at {} hz {} bit {}'.format(
-            #                                          tup[0], tup[1], tup[2])))
-            #
+            disp_str = '{} hz, {}, bit, {}'
+            set_str = 'set LCR4500 to pattern mode at {} hz {} bit {} LED'
 
             lcr4500_pattern_120hz_8bit_white = options_lcr4500.Append(wx.ID_ANY,
-                                                                       '120 hz, 8 bit, white',
-                                                                       'set LCR4500 to pattern mode at 120hz 8 bit white'
-                                                                       'LED')
+                                                                      disp_str.format(120, 8, 'white'),
+                                                                      set_str.format(120, 8, 'white'))
             lcr4500_pattern_120hz_8bit_green = options_lcr4500.Append(wx.ID_ANY,
-                                                                       '120 hz, 8 bit, green',
-                                                                       'set LCR4500 to pattern mode at 120hz 8 bit green'
-                                                                       'LED')
+                                                                      disp_str.format(120, 8, 'green'),
+                                                                      set_str.format(120, 8, 'green'))
             lcr4500_pattern_180hz_7bit_white = options_lcr4500.Append(wx.ID_ANY,
-                                                                       '180 hz, 7 bit, white',
-                                                                       'set LCR4500 to pattern mode at 180hz 7 bit all'
-                                                                       'LEDs')
+                                                                      disp_str.format(180, 7, 'white'),
+                                                                      set_str.format(180, 7, 'white'))
             lcr4500_pattern_180hz_7bit_green = options_lcr4500.Append(wx.ID_ANY,
-                                                                       '180 hz, 7 bit, green',
-                                                                       'set LCR4500 to pattern mode at 180hz 7 bit green'
-                                                                       'LED')
+                                                                      disp_str.format(180, 7, 'green'),
+                                                                      set_str.format(180, 7, 'green'))
             lcr4500_pattern_222hz_7bit_white = options_lcr4500.Append(wx.ID_ANY,
-                                                                       '222 hz, 7 bit, white',
-                                                                       'set LCR4500 to pattern mode at 222hz 7 bit all'
-                                                                       'LEDs')
+                                                                      disp_str.format(222, 7, 'white'),
+                                                                      set_str.format(222, 7, 'white'))
             lcr4500_pattern_222hz_7bit_green = options_lcr4500.Append(wx.ID_ANY,
-                                                                       '222 hz, 7 bit, green',
-                                                                       'set LCR4500 to pattern mode at 222hz 7 bit green'
-                                                                       'LED')
+                                                                      disp_str.format(222, 7, 'green'),
+                                                                      set_str.format(222, 7, 'green'))
             lcr4500_pattern_360hz_4bit_white = options_lcr4500.Append(wx.ID_ANY,
-                                                                       '360 hz, 4 bit, white',
-                                                                       'set LCR4500 to pattern mode at 360hz 4 bit white'
-                                                                       'LED')
+                                                                      disp_str.format(360, 4, 'white'),
+                                                                      set_str.format(360, 4, 'white'))
             lcr4500_pattern_360hz_4bit_green = options_lcr4500.Append(wx.ID_ANY,
-                                                                       '360 hz, 4 bit, green',
-                                                                       'set LCR4500 to pattern mode at 360hz 4 bit green'
-                                                                       'LED')
+                                                                      disp_str.format(360, 4, 'green'),
+                                                                      set_str.format(360, 4, 'green'))
 
             options_menu.AppendMenu(wx.ID_ANY, 'lcr 4500', options_lcr4500)
-
 
         # add top level menus to menu bar
         self.Append(file_menu, '&File')
         self.Append(view_menu, '&View')
         self.Append(options_menu, '&Options')
 
+        # TODO: convert all binding to use function
         def binder(bind_dict):
-            for evt, targets in bind_dict.iteritems():
-                for ctrl, target in targets.iteritems():
-                    self.Bind(evt, ctrl, target)
+            for evt, ctrls in bind_dict.iteritems():
+                for ctrl, target in ctrls.iteritems():
+                    self.Bind(evt, target, ctrl)
 
         to_bind = {
             wx.EVT_MENU: {
-                self.on_file_quit: file_quit,
-                self.on_view_logs: view_logs,
-                self.on_view_stims: view_stims,
-                self.on_options_log: self.options_log,
-                self.on_options_capture: self.options_capture,
-                self.on_options_mirror: self.options_mirror,
-                self.on_options_override: self.options_override,
-                self.on_options_framepack: self.options_framepack,
-                self.on_options_tools_rec_map: tools_rec_map,
+                file_quit: self.on_file_quit,
+                view_logs: self.on_view_logs,
+                view_stims: self.on_view_stims,
+                self.options_log: self.on_options_log,
+                self.options_capture: self.on_options_capture,
+                self.options_mirror: self.on_options_mirror,
+                self.options_override: self.on_options_override,
+                self.options_framepack: self.on_options_framepack,
+                tools_rec_map: self.on_options_tools_rec_map,
             }
         }
 
@@ -1958,64 +1929,62 @@ class MyMenuBar(wx.MenuBar):
 
         lcr_to_bind = {
             wx.EVT_MENU: {
-                self.on_options_lcr4500_video_off: lcr4500_video_off,
-                self.on_options_lcr4500_video_on: lcr4500_video_on,
-                self.on_options_lcr4500_video_mode: lcr4500_video_mode,
-                self.on_options_lcr4500_pattern_mode: lcr4500_pattern_222hz_7bit_white,
-
+                lcr4500_video_off: self.on_options_lcr4500_video_off,
+                lcr4500_video_on: self.on_options_lcr4500_video_on,
+                lcr4500_video_mode: self.on_options_lcr4500_video_mode,
             }
         }
 
         if has_lcr:
             binder(lcr_to_bind)
 
-            self.Bind(wx.EVT_MENU,
-                      lambda event: self.on_options_lcr4500_pattern_mode(event,
-                                                                         led_color='green'),
-                      lcr4500_pattern_222hz_7bit_green)
+            sequences = {
+                lcr4500_pattern_120hz_8bit_white: {
+                    'led_color': 'white',
+                    'fps': 120,
+                    'bit_depth': 8
+                },
+                lcr4500_pattern_120hz_8bit_green: {
+                    'led_color': 'green',
+                    'fps': 120,
+                    'bit_depth': 8
+                },
+                lcr4500_pattern_180hz_7bit_white: {
+                    'led_color': 'white',
+                    'fps': 180,
+                    'bit_depth': 7
+                },
+                lcr4500_pattern_180hz_7bit_green: {
+                    'led_color': 'green',
+                    'fps': 180,
+                    'bit_depth': 7
+                },
+                lcr4500_pattern_222hz_7bit_white: {
+                    'led_color': 'white',
+                    'fps': 222,
+                    'bit_depth': 7
+                },
+                lcr4500_pattern_222hz_7bit_green: {
+                    'led_color': 'green',
+                    'fps': 222,
+                    'bit_depth': 7
+                },
+                lcr4500_pattern_360hz_4bit_white: {
+                    'led_color': 'white',
+                    'fps': 360,
+                    'bit_depth': 4
+                },
+                lcr4500_pattern_360hz_4bit_green: {
+                    'led_color': 'green',
+                    'fps': 360,
+                    'bit_depth': 4
+                },
+            }
 
-            self.Bind(wx.EVT_MENU,
-                      lambda event: self.on_options_lcr4500_pattern_mode(event,
-                                                                         led_color='white',
-                                                                         fps=180,
-                                                                         bit_depth=7),
-                      lcr4500_pattern_180hz_7bit_white)
-
-            self.Bind(wx.EVT_MENU,
-                      lambda event: self.on_options_lcr4500_pattern_mode(event,
-                                                                         led_color='green',
-                                                                         fps=180,
-                                                                         bit_depth=7),
-                      lcr4500_pattern_180hz_7bit_green)
-
-            self.Bind(wx.EVT_MENU,
-                      lambda event: self.on_options_lcr4500_pattern_mode(event,
-                                                                         led_color='white',
-                                                                         fps=360,
-                                                                         bit_depth=4),
-                      lcr4500_pattern_360hz_4bit_white)
-
-            self.Bind(wx.EVT_MENU,
-                      lambda event: self.on_options_lcr4500_pattern_mode(event,
-                                                                         led_color='green',
-                                                                         fps=360,
-                                                                         bit_depth=4),
-                      lcr4500_pattern_360hz_4bit_green)
-
-            self.Bind(wx.EVT_MENU,
-                      lambda event: self.on_options_lcr4500_pattern_mode(event,
-                                                                         led_color='white',
-                                                                         fps=120,
-                                                                         bit_depth=8),
-                      lcr4500_pattern_120hz_8bit_white)
-
-            self.Bind(wx.EVT_MENU,
-                      lambda event: self.on_options_lcr4500_pattern_mode(event,
-                                                                         led_color='green',
-                                                                         # fps=122,
-                                                                         period=8335,
-                                                                         bit_depth=8),
-                      lcr4500_pattern_120hz_8bit_green)
+            for ctrl, kwargs in sequences.iteritems():
+                self.Bind(wx.EVT_MENU,
+                          lambda event, kwargs=kwargs: self.on_options_lcr4500_pattern_mode(event, **kwargs),
+                          ctrl)
 
 
     def on_file_quit(self, event):
@@ -2353,7 +2322,6 @@ class MyMenuBar(wx.MenuBar):
                 kwargs['led_color'] = 0b010
             if kwargs['led_color'] == 'white':
                 kwargs['led_color'] = 0b111
-
 
         if kwargs:
             pycrafter4500.pattern_mode(**kwargs)
