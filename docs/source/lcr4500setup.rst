@@ -10,7 +10,7 @@ Using the framepacking capabilities of the lightcrafter 4500, we are able to dis
 Requirements
 ------------
 * `DLP LightCrafter 4500 Development Module <http://www.ti.com/tool/dlplcr4500evm>`_ (LCR 4500)
-* Power supply for LCR 4500 (`recommended <https://www.digikey.com/product-detail/en/CENB1060A1203F01/271-2718-ND/2533054>`_)
+* Power supply for LCR 4500 (see LCR 4500 page for recommendations)
 * Appropriate connectors:
     * Male mini USB to male USB
     * Male mini HDMI to male HDMI

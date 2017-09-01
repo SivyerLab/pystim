@@ -320,6 +320,7 @@ class MyWindow(object):
                                      viewScale=GlobalDefaults['scale'],
                                      screen=GlobalDefaults['screen_num'],
                                      useFBO=True,
+                                     # waitBlanking=False
                                      )
 
         MyWindow.win.mouseVisible = True,
@@ -403,7 +404,7 @@ class MyWindow(object):
                                            pos=[10, 10],
                                            fullscr=False,
                                            # viewPos=GlobalDefaults['offset'],
-                                           viewScale=scaled_scale,
+                                           # viewScale=scaled_scale,
                                            screen=0,
                                            waitBlanking=False,
                                            useFBO=True,

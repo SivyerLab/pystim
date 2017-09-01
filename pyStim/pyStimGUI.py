@@ -1900,6 +1900,14 @@ class MyMenuBar(wx.MenuBar):
                                                                        '120 hz, 8 bit, green',
                                                                        'set LCR4500 to pattern mode at 120hz 8 bit green'
                                                                        'LED')
+            lcr4500_pattern_180hz_7bit_white = options_lcr4500.Append(wx.ID_ANY,
+                                                                       '180 hz, 7 bit, white',
+                                                                       'set LCR4500 to pattern mode at 180hz 7 bit all'
+                                                                       'LEDs')
+            lcr4500_pattern_180hz_7bit_green = options_lcr4500.Append(wx.ID_ANY,
+                                                                       '180 hz, 7 bit, green',
+                                                                       'set LCR4500 to pattern mode at 180hz 7 bit green'
+                                                                       'LED')
             lcr4500_pattern_222hz_7bit_white = options_lcr4500.Append(wx.ID_ANY,
                                                                        '222 hz, 7 bit, white',
                                                                        'set LCR4500 to pattern mode at 222hz 7 bit all'
@@ -1946,6 +1954,18 @@ class MyMenuBar(wx.MenuBar):
                       lambda event: self.on_options_lcr4500_pattern_mode(event,
                                                                          led_color='green'),
                       lcr4500_pattern_222hz_7bit_green)
+            self.Bind(wx.EVT_MENU,
+                      lambda event: self.on_options_lcr4500_pattern_mode(event,
+                                                                         led_color='white',
+                                                                         fps=180,
+                                                                         bit_depth=7),
+                      lcr4500_pattern_180hz_7bit_white)
+            self.Bind(wx.EVT_MENU,
+                      lambda event: self.on_options_lcr4500_pattern_mode(event,
+                                                                         led_color='green',
+                                                                         fps=180,
+                                                                         bit_depth=7),
+                      lcr4500_pattern_180hz_7bit_green)
             self.Bind(wx.EVT_MENU,
                       lambda event: self.on_options_lcr4500_pattern_mode(event,
                                                                          led_color='white',
