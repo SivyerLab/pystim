@@ -382,13 +382,13 @@ class MyWindow(object):
         # TODO: fix small win
         if GlobalDefaults['display_size'][0] > GlobalDefaults[
                 'display_size'][1]:
-            scaled_size = [400.0,
-                           400.0 / GlobalDefaults['display_size'][0] *
+            scaled_size = [750.0,
+                           750.0 / GlobalDefaults['display_size'][0] *
                            GlobalDefaults['display_size'][1]]
         else:
-            scaled_size = [400.0 / GlobalDefaults['display_size'][1] *
+            scaled_size = [750.0 / GlobalDefaults['display_size'][1] *
                            GlobalDefaults['display_size'][0],
-                           400.0]
+                           750.0]
 
         scaled_scale = [scaled_size[0] / GlobalDefaults['display_size'][0] *
                         GlobalDefaults['scale'][0],
@@ -2536,13 +2536,12 @@ def main(stim_list, verbose=True):
     try:
 
         if MyWindow.small_win is not None:
+            MyWindow.small_win.clearBuffer()
             MyWindow.win.winHandle.switch_to()
             globalVars.currWindow = MyWindow.win
             GL.glBindFramebufferEXT(GL.GL_FRAMEBUFFER_EXT, MyWindow.win.frameBuffer)
 
         MyWindow.win.clearBuffer()
-        if MyWindow.small_win is not None:
-            MyWindow.small_win.clearBuffer()
 
         MyWindow.flip()
         if GlobalDefaults['framepack']:
