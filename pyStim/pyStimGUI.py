@@ -1874,7 +1874,9 @@ class MyMenuBar(wx.MenuBar):
             # param_tuples = [
             #     (120, 8, 'white'),
             #     (120, 8, 'green'),
-            #     (222, 7, 'white'),
+            #     (180, 7, 'white'),
+            #     (180, 7, 'green'),
+            #     (222, 7, 'green'),
             #     (222, 7, 'green'),
             #     (360, 4, 'white'),
             #     (360, 4, 'green'),
@@ -1928,62 +1930,85 @@ class MyMenuBar(wx.MenuBar):
             options_menu.AppendMenu(wx.ID_ANY, 'lcr 4500', options_lcr4500)
 
 
-
         # add top level menus to menu bar
         self.Append(file_menu, '&File')
         self.Append(view_menu, '&View')
         self.Append(options_menu, '&Options')
 
-        self.Bind(wx.EVT_MENU, self.on_file_quit, file_quit)
-        self.Bind(wx.EVT_MENU, self.on_view_logs, view_logs)
-        self.Bind(wx.EVT_MENU, self.on_view_stims, view_stims)
-        self.Bind(wx.EVT_MENU, self.on_options_log, self.options_log)
-        self.Bind(wx.EVT_MENU, self.on_options_capture, self.options_capture)
-        self.Bind(wx.EVT_MENU, self.on_options_mirror, self.options_mirror)
-        self.Bind(wx.EVT_MENU, self.on_options_override, self.options_override)
-        self.Bind(wx.EVT_MENU, self.on_options_framepack, self.options_framepack)
-        self.Bind(wx.EVT_MENU, self.on_options_tools_rec_map, tools_rec_map)
+        def binder(bind_dict):
+            for evt, targets in bind_dict.iteritems():
+                for ctrl, target in targets.iteritems():
+                    self.Bind(evt, ctrl, target)
+
+        to_bind = {
+            wx.EVT_MENU: {
+                self.on_file_quit: file_quit,
+                self.on_view_logs: view_logs,
+                self.on_view_stims: view_stims,
+                self.on_options_log: self.options_log,
+                self.on_options_capture: self.options_capture,
+                self.on_options_mirror: self.options_mirror,
+                self.on_options_override: self.options_override,
+                self.on_options_framepack: self.options_framepack,
+                self.on_options_tools_rec_map: tools_rec_map,
+            }
+        }
+
+        binder(to_bind)
+
+        lcr_to_bind = {
+            wx.EVT_MENU: {
+                self.on_options_lcr4500_video_off: lcr4500_video_off,
+                self.on_options_lcr4500_video_on: lcr4500_video_on,
+                self.on_options_lcr4500_video_mode: lcr4500_video_mode,
+                self.on_options_lcr4500_pattern_mode: lcr4500_pattern_222hz_7bit_white,
+
+            }
+        }
 
         if has_lcr:
-            self.Bind(wx.EVT_MENU, self.on_options_lcr4500_video_off, lcr4500_video_off)
-            self.Bind(wx.EVT_MENU, self.on_options_lcr4500_video_on, lcr4500_video_on)
-            self.Bind(wx.EVT_MENU, self.on_options_lcr4500_video_mode, lcr4500_video_mode)
-            self.Bind(wx.EVT_MENU, self.on_options_lcr4500_pattern_mode, lcr4500_pattern_222hz_7bit_white)
+            binder(lcr_to_bind)
 
             self.Bind(wx.EVT_MENU,
                       lambda event: self.on_options_lcr4500_pattern_mode(event,
                                                                          led_color='green'),
                       lcr4500_pattern_222hz_7bit_green)
+
             self.Bind(wx.EVT_MENU,
                       lambda event: self.on_options_lcr4500_pattern_mode(event,
                                                                          led_color='white',
                                                                          fps=180,
                                                                          bit_depth=7),
                       lcr4500_pattern_180hz_7bit_white)
+
             self.Bind(wx.EVT_MENU,
                       lambda event: self.on_options_lcr4500_pattern_mode(event,
                                                                          led_color='green',
                                                                          fps=180,
                                                                          bit_depth=7),
                       lcr4500_pattern_180hz_7bit_green)
+
             self.Bind(wx.EVT_MENU,
                       lambda event: self.on_options_lcr4500_pattern_mode(event,
                                                                          led_color='white',
                                                                          fps=360,
                                                                          bit_depth=4),
                       lcr4500_pattern_360hz_4bit_white)
+
             self.Bind(wx.EVT_MENU,
                       lambda event: self.on_options_lcr4500_pattern_mode(event,
                                                                          led_color='green',
                                                                          fps=360,
                                                                          bit_depth=4),
                       lcr4500_pattern_360hz_4bit_green)
+
             self.Bind(wx.EVT_MENU,
                       lambda event: self.on_options_lcr4500_pattern_mode(event,
                                                                          led_color='white',
                                                                          fps=120,
                                                                          bit_depth=8),
                       lcr4500_pattern_120hz_8bit_white)
+
             self.Bind(wx.EVT_MENU,
                       lambda event: self.on_options_lcr4500_pattern_mode(event,
                                                                          led_color='green',
