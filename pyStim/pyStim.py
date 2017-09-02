@@ -263,6 +263,7 @@ class MyWindow(object):
     gamma_mon = None
     #: Used to break out of animation loop in :py:func:`main`.
     should_break = False
+    running = False
     #: Labjack U3 instance for triggering.
     d = None
     #: List of frames to trigger on
@@ -335,6 +336,9 @@ class MyWindow(object):
             MyWindow.d.close()
             MyWindow.d = None
 
+        MyWindow.should_break = True
+
+        # TODO: fix race condition, where window closes and gets set to None before main() finishes after breaking
         MyWindow.win.close()
         MyWindow.win = None
 
@@ -2481,6 +2485,7 @@ def main(stim_list, verbose=True):
 
     # to exit out of nested loops
     MyWindow.should_break = False
+    MyWindow.running = True
 
     # outer loop for number of reps
     try:
@@ -2585,6 +2590,8 @@ def main(stim_list, verbose=True):
     # save movie
     if GlobalDefaults['capture']:
         save_movie(current_time, save_loc)
+
+    MyWindow.running = False
 
     return fps, count_elapsed_time, dropped, time_stamp
 
