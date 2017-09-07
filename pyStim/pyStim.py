@@ -349,10 +349,10 @@ class MyWindow(object):
     @staticmethod
     def change_color(color):
         """Static method to live update the background of the window.
-        TODO: implement classproperty to make setter
 
         :param list color: RGB list used to change global defaults.
         """
+        # TODO: implement classproperty to make setter
         try:
             if MyWindow.win is not None:
                 color = numpy.clip(color, -1, 1)
@@ -978,9 +978,10 @@ class StaticStim(StimDefaults):
 
         # make array
         size = (max(self.gen_size()),) * 2  # square tuple of largest size
+        print size
         # not needed for images
         if self.fill_mode != 'image':
-            if self.fill_mode == 'uniform':
+            if self.fill_mode == 'uniform' and self.shape != 'annulus':
                 size = (1, 1)
             # make black rgba array
             texture = numpy.full(size + (4,), -1, dtype=numpy.float32)
@@ -1093,6 +1094,7 @@ class StaticStim(StimDefaults):
         if self.shape == 'annulus':
             radius = filters.makeRadialMatrix(self.outer_diameter,
                                               radius=1.0 / self.outer_diameter)
+            print texture.shape
             texture[numpy.where(radius < self.inner_diameter)] = [0, 0, 0, -1]
 
         # print texture
