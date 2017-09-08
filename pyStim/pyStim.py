@@ -895,7 +895,7 @@ class StaticStim(StimDefaults):
 
         else:
             # get change relative to background
-            delta = background * self.intensity
+            delta = background * intensity
 
             # get high and low
             high = numpy.clip(background + delta, 0, 1)
@@ -980,6 +980,7 @@ class StaticStim(StimDefaults):
 
         # make array
         size = (max(self.gen_size()),) * 2  # square tuple of largest size
+
         # not needed for images
         if self.fill_mode != 'image':
             if self.fill_mode == 'uniform' and self.shape != 'annulus':
