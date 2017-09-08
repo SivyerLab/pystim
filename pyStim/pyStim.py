@@ -887,8 +887,7 @@ class StaticStim(StimDefaults):
 
             # get difference between high and background (high can be below background, doesn't matter,
             # just want change)
-            # clip at every step
-            delta = numpy.clip(high - background, 0, 1)
+            delta = high - background
 
             # low is high, but on the other side of the background
             low = numpy.clip(background - delta, 0, 1)
@@ -986,7 +985,7 @@ class StaticStim(StimDefaults):
             if self.fill_mode == 'uniform' and self.shape != 'annulus':
                 size = (1, 1)
             # make black rgba array
-            texture = numpy.full(size + (4,), -1, dtype=numpy.float32)
+            texture = numpy.zeros(size + (4,), dtype=numpy.float32)
 
         if self.colors is not None:
             high, low, delta, background = self.colors
@@ -994,19 +993,22 @@ class StaticStim(StimDefaults):
             high, low, delta, background = self.gen_rgb()
 
         if self.fill_mode == 'uniform':
+
+            high = (high + 1) / 2
             if self.contrast_channel != 3:
                 texture[:, :, self.contrast_channel] = high
             else:
                 texture[:, :, ] = high
 
             # unscale
-            # texture = texture * 2 - 1
+            texture = texture * 2 - 1
             texture[:, :, 3] = self.alpha
 
         elif self.fill_mode in ['sine', 'square', 'concentric']:
             # scale
             delta = (delta + 1) / 2
             background = (background + 1) / 2
+
             # make color grating
             if self.fill_mode == 'sine':
                 grating = filters.makeGrating(size[0], gratType='sin', cycles=1)
@@ -1025,6 +1027,7 @@ class StaticStim(StimDefaults):
                 texture[:, :, 0:3] *= numpy.dstack((grating, grating, grating))
                 texture[:, :, 0:3] += background
 
+            # rescale and set alpha
             texture = texture * 2 - 1
             texture[:, :, 3] = self.alpha
 
