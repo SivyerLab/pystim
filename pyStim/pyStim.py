@@ -901,7 +901,7 @@ class StaticStim(StimDefaults):
             low = numpy.clip(background - delta, 0, 1)
 
             # recalculate delta because of clipping
-            delta = (high - low) / 2.
+            delta = (high - background)
 
         # if single direction, bring middle (background) up to halfway between high
         # and background
