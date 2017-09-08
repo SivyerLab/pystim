@@ -952,6 +952,8 @@ class StaticStim(StimDefaults):
         elif self.shape == 'rectangle':
             stim_size = (self.size[0], self.size[1])
 
+        stim_size = tuple(map(lambda x: int(round(x)), stim_size))
+
         return stim_size
 
     def gen_mask(self):
@@ -978,7 +980,6 @@ class StaticStim(StimDefaults):
 
         # make array
         size = (max(self.gen_size()),) * 2  # square tuple of largest size
-        print size
         # not needed for images
         if self.fill_mode != 'image':
             if self.fill_mode == 'uniform' and self.shape != 'annulus':
@@ -1094,7 +1095,6 @@ class StaticStim(StimDefaults):
         if self.shape == 'annulus':
             radius = filters.makeRadialMatrix(self.outer_diameter,
                                               radius=1.0 / self.outer_diameter)
-            print texture.shape
             texture[numpy.where(radius < self.inner_diameter)] = [0, 0, 0, -1]
 
         # print texture
