@@ -28,6 +28,8 @@ class TestGenRGB(object):
     # think in terms of the scaling back to 0, 1 interval
 
     def test_bg0_mode_rgb_channel_all_color_1(self):
+        pyStim.GlobalDefaults['background'] = [0., 0., 0.]
+
         stim = pyStim.StaticStim(contrast_channel='all',
                                  color_mode='rgb',
                                  color=[1, 1, 1],
@@ -45,6 +47,8 @@ class TestGenRGB(object):
                                       np.array([0., 0., 0.]))
 
     def test_bg0_mode_rgb_channel_all_color_05(self):
+        pyStim.GlobalDefaults['background'] = [0., 0., 0.]
+
         stim = pyStim.StaticStim(contrast_channel='all',
                                  color_mode='rgb',
                                  color=[0.5, -0.5, 0.5],
@@ -62,6 +66,8 @@ class TestGenRGB(object):
                                       np.array([0., 0., 0.]))
 
     def test_bg0_mode_rgb_channel_green_color_1(self):
+        pyStim.GlobalDefaults['background'] = [0., 0., 0.]
+
         stim = pyStim.StaticStim(contrast_channel='green',
                                  color_mode='rgb',
                                  color=[1, 1, 1],
@@ -76,6 +82,8 @@ class TestGenRGB(object):
                                       np.array([0., 0., 0.]))
 
     def test_bg0_mode_rgb_channel_green_color_05(self):
+        pyStim.GlobalDefaults['background'] = [0., 0., 0.]
+
         stim = pyStim.StaticStim(contrast_channel='green',
                                  color_mode='rgb',
                                  color=[0.5, 0.5, 0.5],
@@ -90,6 +98,8 @@ class TestGenRGB(object):
                                       np.array([0., 0., 0.]))
 
     def test_bg0_mode_intensity_channel_all_color_1(self):
+        pyStim.GlobalDefaults['background'] = [0., 0., 0.]
+
         stim = pyStim.StaticStim(contrast_channel='all',
                                  color_mode='intensity',
                                  intensity=1,
@@ -107,6 +117,8 @@ class TestGenRGB(object):
                                       np.array([0., 0., 0.]))
 
     def test_bg0_mode_intensity_channel_all_color_05(self):
+        pyStim.GlobalDefaults['background'] = [0., 0., 0.]
+
         stim = pyStim.StaticStim(contrast_channel='all',
                                  color_mode='intensity',
                                  intensity=0.5,
@@ -124,6 +136,8 @@ class TestGenRGB(object):
                                       np.array([0., 0., 0.]))
 
     def test_bg0_mode_intensity_channel_all_color_05_alpha_05(self):
+        pyStim.GlobalDefaults['background'] = [0., 0., 0.]
+
         stim = pyStim.StaticStim(contrast_channel='all',
                                  color_mode='intensity',
                                  intensity=0.5,
@@ -141,6 +155,8 @@ class TestGenRGB(object):
                                       np.array([0., 0., 0.]))
 
     def test_bg0_mode_intensity_channel_green_color_1(self):
+        pyStim.GlobalDefaults['background'] = [0., 0., 0.]
+
         stim = pyStim.StaticStim(contrast_channel='green',
                                  color_mode='intensity',
                                  intensity=1,
@@ -155,6 +171,10 @@ class TestGenRGB(object):
                                       np.array([0., 0., 0.]))
 
     def test_bg0_mode_intensity_channel_gren_color_05(self):
+        pyStim.GlobalDefaults['background'] = [0., 0., 0.]
+
+        pyStim.GlobalDefaults['background'] = [0., 0., 0.]
+
         stim = pyStim.StaticStim(contrast_channel='green',
                                  color_mode='intensity',
                                  intensity=0.5,
@@ -169,6 +189,8 @@ class TestGenRGB(object):
                                       np.array([0., 0., 0.]))
 
     def test_bg05_mode_rgb_channel_all_color_1(self):
+        pyStim.GlobalDefaults['background'] = [0., 0., 0.]
+
         pyStim.GlobalDefaults['background'] = [0.5, 0.5, 0.5]
 
         stim = pyStim.StaticStim(contrast_channel='all',
@@ -388,7 +410,9 @@ class TestGenMask(object):
 
 class TestGenTexture(object):
 
-    def test_uniform_channell_all_color_1(self):
+    def test_uniform_channel_all_color_1(self):
+        pyStim.GlobalDefaults['background'] = [0., 0., 0.]
+
         stim = pyStim.StaticStim(fill_mode='uniform',
                                  size=[4, 4],
                                  contrast_channel='all',
@@ -396,12 +420,13 @@ class TestGenTexture(object):
                                  color=[1, 1, 1],
                                  alpha=1)
         tex = stim.gen_texture()
-        print tex
 
         np.testing.assert_array_equal(tex,
                                       np.array([[[1.0, 1.0, 1.0, 1.0]]]))
 
     def test_uniform_channell_all_color_05(self):
+        pyStim.GlobalDefaults['background'] = [0., 0., 0.]
+
         stim = pyStim.StaticStim(fill_mode='uniform',
                                  size=[4, 4],
                                  contrast_channel='all',
@@ -413,7 +438,9 @@ class TestGenTexture(object):
         np.testing.assert_array_equal(tex,
                                       np.array([[[0.5, 0.5, 0.5, 0.5]]]))
 
-    def test_uniform_channell_green_color_1(self):
+    def test_uniform_channel_green_color_1(self):
+        pyStim.GlobalDefaults['background'] = [0., 0., 0.]
+
         stim = pyStim.StaticStim(fill_mode='uniform',
                                  size=[4, 4],
                                  contrast_channel='green',
@@ -421,12 +448,13 @@ class TestGenTexture(object):
                                  color=[1, 1, 1],
                                  alpha=1)
         tex = stim.gen_texture()
-        print tex
 
         np.testing.assert_array_equal(tex,
                                       np.array([[[-1.0, 1.0, -1.0, 1.0]]]))
 
-    def test_uniform_channell_green_color_05(self):
+    def test_uniform_channel_green_color_05(self):
+        pyStim.GlobalDefaults['background'] = [0., 0., 0.]
+
         stim = pyStim.StaticStim(fill_mode='uniform',
                                  size=[4, 4],
                                  contrast_channel='green',
@@ -437,3 +465,66 @@ class TestGenTexture(object):
 
         np.testing.assert_array_equal(tex,
                                       np.array([[[-1.0, 0.5, -1.0, 0.5]]]))
+
+    def test_sin_channel_all_color_1(self):
+        pyStim.GlobalDefaults['background'] = [0., 0., 0.]
+
+        stim = pyStim.StaticStim(fill_mode='sine',
+                                 shape='rectangle',
+                                 size=[4, 4],
+                                 contrast_channel='all',
+                                 color_mode='intensity',
+                                 intensity=1,
+                                 alpha=1)
+        tex = stim.gen_texture()[0, :, 0]
+
+        np.testing.assert_array_equal(tex,
+                                      np.array([0., 1.0, 0., -1.0]))
+
+    def test_square_channel_all_color_1(self):
+        pyStim.GlobalDefaults['background'] = [0., 0., 0.]
+
+        stim = pyStim.StaticStim(fill_mode='square',
+                                 shape='rectangle',
+                                 size=[4, 4],
+                                 contrast_channel='all',
+                                 color_mode='intensity',
+                                 intensity=1,
+                                 alpha=1)
+        tex = stim.gen_texture()[0, :, 0]
+
+        np.testing.assert_array_equal(tex,
+                                      np.array([1.0, 1.0, -1.0, -1.0]))
+
+    def test_concentric_channel_all_color_1(self):
+        pyStim.GlobalDefaults['background'] = [0., 0., 0.]
+
+        stim = pyStim.StaticStim(fill_mode='concentric',
+                                 shape='rectangle',
+                                 size=[4, 4],
+                                 contrast_channel='all',
+                                 color_mode='intensity',
+                                 intensity=1,
+                                 alpha=1)
+        tex = stim.gen_texture()[2, :, 0]
+
+        np.testing.assert_almost_equal(tex,
+                                       np.array([0.841471, 0., -0.841471, 0.]),
+                                       decimal=6)
+
+    def test_annulus(self):
+        pyStim.GlobalDefaults['background'] = [0., 0., 0.]
+
+        stim = pyStim.StaticStim(fill_mode='uniform',
+                                 shape='annulus',
+                                 outer_diameter=5,
+                                 inner_diameter=2,
+                                 contrast_channel='all',
+                                 color_mode='intensity',
+                                 intensity=1,
+                                 alpha=1)
+        tex = stim.gen_texture()[2, :, 3]
+
+        np.testing.assert_array_equal(tex,
+                                       np.array([1.0, 1.0, -1.0, -1.0, 1.0]))
+
