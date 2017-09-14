@@ -31,6 +31,7 @@ before_script:
 
 script:
   # run tests
+  - activate sp_env
   - py.test
   # build documentation
   - cd docs
