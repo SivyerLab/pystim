@@ -1836,9 +1836,25 @@ class MyMenuBar(wx.MenuBar):
                                                    'Capture run and create '
                                                    'video',
                                                    kind=wx.ITEM_CHECK)
+
         self.options_mirror = options_menu.Append(wx.ID_ANY, 'mirror',
                                                    'Make small mirror window',
                                                    kind=wx.ITEM_CHECK)
+        options_mirror_number = wx.Menu()
+        mirror_number_one = options_mirror_number.Append(wx.ID_ANY,
+                                                         '1',
+                                                         'screen #1',
+                                                         kind=wx.ITEM_RADIO)
+        mirror_number_two = options_mirror_number.Append(wx.ID_ANY,
+                                                         '2',
+                                                         'screen #2',
+                                                         kind=wx.ITEM_RADIO)
+        mirror_number_three = options_mirror_number.Append(wx.ID_ANY,
+                                                         '3',
+                                                         'screen #3',
+                                                         kind=wx.ITEM_RADIO)
+        options_menu.AppendMenu(wx.ID_ANY, 'mirror screen num', options_mirror_number)
+
         self.options_override = options_menu.Append(wx.ID_ANY, 'global override',
                                                     'Override parameters',
                                                     kind=wx.ITEM_CHECK)
@@ -1919,6 +1935,9 @@ class MyMenuBar(wx.MenuBar):
                 self.options_log: self.on_options_log,
                 self.options_capture: self.on_options_capture,
                 self.options_mirror: self.on_options_mirror,
+                mirror_number_one: self.on_mirror_number_one,
+                mirror_number_two: self.on_mirror_number_two,
+                mirror_number_three: self.on_mirror_number_three,
                 self.options_override: self.on_options_override,
                 self.options_framepack: self.on_options_framepack,
                 tools_rec_map: self.on_options_tools_rec_map,
@@ -1986,7 +2005,6 @@ class MyMenuBar(wx.MenuBar):
                           lambda event, kwargs=kwargs: self.on_options_lcr4500_pattern_mode(event, **kwargs),
                           ctrl)
 
-
     def on_file_quit(self, event):
         """
         Handles quitting.
@@ -2050,6 +2068,39 @@ class MyMenuBar(wx.MenuBar):
 
         self.frame.parameters.set_param_value('global', 'small_win', val)
         pyStim.GlobalDefaults['small_win'] = val
+
+    def on_mirror_number_one(self, event):
+        """
+        Handles toggling capturing
+
+        :param event:
+        :return:
+        """
+        val = 0
+        self.frame.parameters.set_param_value('global', 'small_win_num', val)
+        pyStim.GlobalDefaults['small_win_num'] = val
+
+    def on_mirror_number_two(self, event):
+        """
+        Handles toggling capturing
+
+        :param event:
+        :return:
+        """
+        val = 1
+        self.frame.parameters.set_param_value('global', 'small_win_num', val)
+        pyStim.GlobalDefaults['small_win_num'] = val
+
+    def on_mirror_number_three(self, event):
+        """
+        Handles toggling capturing
+
+        :param event:
+        :return:
+        """
+        val = 2
+        self.frame.parameters.set_param_value('global', 'small_win_num', val)
+        pyStim.GlobalDefaults['small_win_num'] = val
 
     def on_options_override(self, event):
         """

@@ -633,6 +633,19 @@
             "hide": true
         },
 
+        "small_win_num": {
+            "type": "choice",
+            "label": "mirror screen number",
+            "choices": [
+                "1",
+                "2",
+                "3"
+            ],
+            "default": false,
+            "is_child": false,
+            "hide": true
+        },
+
         "framepack": {
             "type": "choice",
             "label": "framepack",

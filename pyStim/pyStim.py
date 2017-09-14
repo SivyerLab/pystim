@@ -157,7 +157,8 @@ class GlobalDefaults(object):
                     pref_dir=-1,
                     fullscreen=False,
                     log=False,
-                    screen_num=1,
+                    screen_num=0,
+                    small_win_num=0,
                     gamma_correction='default',
                     trigger_wait=6,
                     capture=False,
@@ -175,6 +176,7 @@ class GlobalDefaults(object):
                  pref_dir=None,
                  fullscreen=None,
                  screen_num=None,
+                 small_win_num=None,
                  trigger_wait=None,
                  log=None,
                  gamma_correction=None,
@@ -214,6 +216,9 @@ class GlobalDefaults(object):
 
         if screen_num is not None:
             self.defaults['screen_num'] = screen_num
+
+        if small_win_num is not None:
+            self.defaults['small_win_num'] = small_win_num
 
         if trigger_wait is not None:
             self.defaults['trigger_wait'] = int(trigger_wait * 1.0 *
@@ -409,7 +414,7 @@ class MyWindow(object):
                                            fullscr=False,
                                            # viewPos=GlobalDefaults['offset'],
                                            # viewScale=scaled_scale,
-                                           screen=0,
+                                           screen=GlobalDefaults['small_win_num'],
                                            waitBlanking=False,
                                            useFBO=True,
                                            # do_vsync=False
