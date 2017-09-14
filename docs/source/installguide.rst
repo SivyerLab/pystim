@@ -51,7 +51,7 @@ you to manually install Anaconda and Git first. Download the cmd file by itself 
 
 10. Navigate to where you want to save the pyStim repository. ::
 
-    cd C:/your/location/of/choice
+    cd "C:/your/location/of/choice"
 
 For example C:/Users/bensivyer/PycharmProjects
 
