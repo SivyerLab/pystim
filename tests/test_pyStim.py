@@ -1,7 +1,7 @@
 # NEED MUCH MORE COVERAGE
 from pyStim import pyStim
 # import unittest
-# import mock
+from mock import Mock
 import numpy as np
 # import u3
 import pytest
@@ -526,5 +526,35 @@ class TestGenTexture(object):
         tex = stim.gen_texture()[2, :, 3]
 
         np.testing.assert_array_equal(tex,
-                                       np.array([1.0, 1.0, -1.0, -1.0, 1.0]))
+                                      np.array([1.0, 1.0, -1.0, -1.0, 1.0]))
+
+
+class TestGenTiming(object):
+
+    def test_sine_single_all(self):
+        pyStim.GlobalDefaults['background'] = [0., 0., 0.]
+
+        stim = pyStim.StaticStim(fill_mode='uniform',
+                                 shape='rectangle',
+                                 size=[4, 4],
+                                 contrast_channel='all',
+                                 color_mode='intensity',
+                                 intensity=1,
+                                 intensity_dir='single',
+                                 alpha=1,
+                                 timing='sine',
+                                 frequency=1,
+                                 duration=1)
+
+        stim.draw_times()
+        stim.stim = Mock()
+        stim.stim.tex = stim.gen_texture()
+
+        stim.gen_timing(0)
+        np.testing.assert_array_equal(stim.stim.tex,
+                                      np.array([[[0., 0., 0., 1.0]]]))
+
+        stim.gen_timing(30)
+        np.testing.assert_array_equal(stim.stim.tex,
+                                      np.array([[[1.0, 1.0, 1.0, 1.0]]]))
 

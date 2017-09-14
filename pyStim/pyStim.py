@@ -928,10 +928,10 @@ class StaticStim(StimDefaults):
 
         color = high, low, delta, background
 
-        # print 'high      :', high
-        # print 'low       :', low
-        # print 'background:', background
-        # print 'delta     :', delta
+        print 'high      :', high
+        print 'low       :', low
+        print 'background:', background
+        print 'delta     :', delta
 
         self.colors = color
         return color
@@ -1176,7 +1176,13 @@ class StaticStim(StimDefaults):
 
         # fill texture array
         if self.contrast_channel != 3:
-            texture[:, :, self.contrast_channel] = color
+            # if color[0] > 0:
+            #     c = color * -1
+            # else:
+            #     c = color
+            c = color * -1
+            c[self.contrast_channel] = color[self.contrast_channel]
+            texture[:, :, 0:3] = c
         else:
             texture[:, :, 0:3] = color
 
