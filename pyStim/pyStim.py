@@ -540,6 +540,12 @@ class StimDefaults(object):
     :param float travel_distance: The distance that randomly moving stims
      will travel before choosing a new direction.
 
+    :param string intensity_dir: Whether to go one or both directions relative to background.
+
+    :param string contrast_opp: How the opposite of a color is determined.
+     Black means go to black, opposite indicates increase other color channels
+     as primary channel decreases.
+
     :param float sf: The spatial frequency of a stim texture.
 
     :param list phase: The offset of texture in the stim. Units are in
@@ -595,6 +601,7 @@ class StimDefaults(object):
                  travel_distance=50,
                  ori_with_dir=False,
                  intensity_dir='both',
+                 contrast_opp='opposite',
                  sf=1,
                  phase=None,
                  phase_speed=None,
@@ -627,6 +634,7 @@ class StimDefaults(object):
         self.fill_mode = fill_mode
         self.sf = sf
         self.intensity_dir = intensity_dir
+        self.contrast_opp = contrast_opp
         self.color_mode = color_mode
         self.intensity = intensity
         self.alpha = alpha
@@ -648,7 +656,6 @@ class StimDefaults(object):
         self.num_jumps = num_jumps
         self.shuffle = shuffle
         self.blend_jumps = blend_jumps
-
 
         self.contrast_channel = ['red', 'green', 'blue', 'all'].\
             index(contrast_channel)
@@ -1181,11 +1188,14 @@ class StaticStim(StimDefaults):
 
         # fill texture array
         if self.contrast_channel != 3:
-            # if color[0] > 0:
-            #     c = color * -1
-            # else:
-            #     c = color
-            c = color * -1
+            if self.contrast_opp == 'black':
+                if color[0] > 0:
+                    c = color * -1
+                else:
+                    c = color
+            elif self.contrast_opp == 'opposite':
+                c = color * -1
+
             c[self.contrast_channel] = color[self.contrast_channel]
             texture[:, :, 0:3] = c
         else:

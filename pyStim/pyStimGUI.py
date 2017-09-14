@@ -1476,7 +1476,7 @@ class MyParamGrid(wx.Frame):
 
         # make grid
         self.grid = wx.grid.Grid(panel)
-        self.grid.CreateGrid(50, 2)
+        self.grid.CreateGrid(51, 2)
         self.grid.SetColLabelValue(0, 'Parameter')
         self.grid.SetColLabelValue(1, 'Value')
 

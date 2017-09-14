@@ -168,18 +168,22 @@
             "children": {
                 "sine": [
                     "period_mod", 
-                    "intensity_dir"
+                    "intensity_dir",
+                    "contrast_opp"
                 ], 
                 "square": [
                     "period_mod", 
-                    "intensity_dir"
+                    "intensity_dir",
+                    "contrast_opp"
                 ], 
                 "linear": [
-                    "intensity_dir"
+                    "intensity_dir",
+                    "contrast_opp"
                 ], 
                 "sawtooth": [
                     "period_mod", 
-                    "intensity_dir"
+                    "intensity_dir",
+                    "contrast_opp"
                 ]
             }
         },
@@ -254,6 +258,17 @@
                 "both"
             ], 
             "default": "both", 
+            "is_child": true
+        },
+
+        "contrast_opp": {
+            "type": "choice",
+            "label": "opposite option",
+            "choices": [
+                "opposite",
+                "black"
+            ],
+            "default": "opposite",
             "is_child": true
         },
 
