@@ -602,6 +602,7 @@ class StimDefaults(object):
                  ori_with_dir=False,
                  intensity_dir='both',
                  contrast_opp='opposite',
+                 frequency=1,
                  sf=1,
                  phase=None,
                  phase_speed=None,
@@ -643,6 +644,7 @@ class StimDefaults(object):
         self.check_type = check_type
         self.fill_seed = fill_seed
         self.timing = timing
+        self.frequency = frequency
         self.period_mod = period_mod * 2.0 * duration
         self.move_seed = move_seed
         self.num_dirs = num_dirs
@@ -866,6 +868,7 @@ class StaticStim(StimDefaults):
 
             # draw to back buffer
             self.stim.draw(MyWindow.win)
+            print frame, self.stim.tex[0, 0, :]
 
             if self.small_stim is not None:
                 MyWindow.small_win.winHandle.switch_to()
@@ -940,10 +943,10 @@ class StaticStim(StimDefaults):
 
         color = high, low, delta, background
 
-        print 'high      :', high
-        print 'low       :', low
-        print 'background:', background
-        print 'delta     :', delta
+        # print 'high      :', high
+        # print 'low       :', low
+        # print 'background:', background
+        # print 'delta     :', delta
 
         self.colors = color
         return color
@@ -1173,11 +1176,8 @@ class StaticStim(StimDefaults):
                     delta + background
 
         elif self.timing == 'linear':
-            # if self.intensity_dir == 'both':
+            # don't need to check intensity dir, because determined by delta
             color = background + delta * (time_fraction * 2 - 1)
-
-            # if self.intensity_dir == 'single':
-            #     color = background + delta * time_fraction
 
         # unscale
         color = color * 2 - 1
@@ -1195,8 +1195,9 @@ class StaticStim(StimDefaults):
                     c = color
             elif self.contrast_opp == 'opposite':
                 c = color * -1
-
+            c = numpy.clip(c, -1, 1)
             c[self.contrast_channel] = color[self.contrast_channel]
+
             texture[:, :, 0:3] = c
         else:
             texture[:, :, 0:3] = color
