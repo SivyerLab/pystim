@@ -1,4 +1,5 @@
 language: python
+cache: pip
 branches:
   only:
     - master
@@ -18,7 +19,7 @@ install:
   - conda create -y -n sp_env python=2.7
   - source activate sp_env
   - conda install -y numpy scipy Pillow matplotlib pandas pyopengl lxml openpyxl configobj sortedcontainers sphinx
-  - pip install tabulate igor tqdm moviepy pyglet psychopy labjackpython rst2pdf pyusb pycrafter4500
+  - pip install tabulate igor tqdm moviepy pyglet psychopy labjackpython rst2pdf pyusb pycrafter4500 future json_tricks
   - conda install -y -c anaconda wxpython=3.0.0.0
   - conda install -y -c conda-forge ffmpeg=3.2.4
 
@@ -31,8 +32,8 @@ before_script:
 script:
   # build documentation
   - cd docs
-  - sphinx-build -b html source build/html
-  # sphinx-build -W -b html source build/html
+  # sphinx-build -b html source build/html
+  - sphinx-build -W -b html source build/html
   # sphinx-build -W -b pdf source build/pdf
 
 deploy:
