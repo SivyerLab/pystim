@@ -1295,3 +1295,74 @@ class TestGenTiming(object):
         stim.gen_timing(60)
         np.testing.assert_array_equal(stim.stim.tex,
                                       np.array([[[1.0, 1.0, 1.0, 1.0]]]))
+
+    def test_linear_single_red(self):
+        pyStim.GlobalDefaults['background'] = [0., 0., 0.]
+
+        stim = pyStim.StaticStim(fill_mode='uniform',
+                                 shape='rectangle',
+                                 size=[4, 4],
+                                 contrast_channel='red',
+                                 color_mode='intensity',
+                                 intensity=1,
+                                 intensity_dir='single',
+                                 alpha=1,
+                                 timing='linear',
+                                 frequency=1,
+                                 duration=1)
+
+        stim.draw_times()
+        stim.stim = Mock()
+        stim.stim.tex = stim.gen_texture()
+
+        stim.gen_timing(0)
+        np.testing.assert_array_equal(stim.stim.tex,
+                                      np.array([[[0., 0., 0., 1.0]]]))
+        stim.gen_timing(15)
+        np.testing.assert_array_equal(stim.stim.tex,
+                                      np.array([[[0.25, -0.25, -0.25, 1.0]]]))
+        stim.gen_timing(30)
+        np.testing.assert_array_equal(stim.stim.tex,
+                                      np.array([[[0.5, -0.5, -0.5, 1.0]]]))
+        stim.gen_timing(45)
+        np.testing.assert_array_equal(stim.stim.tex,
+                                      np.array([[[0.75, -0.75, -0.75, 1.0]]]))
+        stim.gen_timing(60)
+        np.testing.assert_array_equal(stim.stim.tex,
+                                      np.array([[[1.0, -1.0, -1.0, 1.0]]]))
+
+    def test_linear_both_red_opp(self):
+        pyStim.GlobalDefaults['background'] = [0., 0., 0.]
+
+        stim = pyStim.StaticStim(fill_mode='uniform',
+                                 shape='rectangle',
+                                 size=[4, 4],
+                                 contrast_channel='red',
+                                 color_mode='intensity',
+                                 intensity=1,
+                                 intensity_dir='both',
+                                 contrast_opp='opposite',
+                                 alpha=1,
+                                 timing='linear',
+                                 frequency=1,
+                                 duration=1)
+
+        stim.draw_times()
+        stim.stim = Mock()
+        stim.stim.tex = stim.gen_texture()
+
+        stim.gen_timing(0)
+        np.testing.assert_array_equal(stim.stim.tex,
+                                      np.array([[[-1.0, 1.0, 1.0, 1.0]]]))
+        stim.gen_timing(15)
+        np.testing.assert_array_equal(stim.stim.tex,
+                                      np.array([[[-0.5, 0.5, 0.5, 1.0]]]))
+        stim.gen_timing(30)
+        np.testing.assert_array_equal(stim.stim.tex,
+                                      np.array([[[0., 0., 0., 1.0]]]))
+        stim.gen_timing(45)
+        np.testing.assert_array_equal(stim.stim.tex,
+                                      np.array([[[0.5, -0.5, -0.5, 1.0]]]))
+        stim.gen_timing(60)
+        np.testing.assert_array_equal(stim.stim.tex,
+                                      np.array([[[1.0, -1.0, -1.0, 1.0]]]))
