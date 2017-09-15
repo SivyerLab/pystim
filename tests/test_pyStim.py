@@ -2,26 +2,18 @@
 Tests for pystim.
 """
 
-from pyStim import pyStim
-from mock import Mock
-import numpy as np
-# import u3
 import pytest
+import numpy as np
 
+from pyStim import pyStim
+from mock import Mock, patch
+import psychopy
 
-# class TestTrigger(unittest.TestCase):
-#
-#     @mock.path.object(StimProgram.MyWindow, 'make_win')
-#     @mock.patch('u3.U3')
-#     def test_send_trigger(self, mock_U3):
-#         StimProgram.has_u3 = True
-#
-#         reference = StimProgram.MyWindow()
-#         reference.d = u3.U3()
-#         print reference.d
-#         reference.send_trigger()
-#
-#         self.assertTrue(mock_U3.called)
+try:
+    import u3
+    HAS_U3 = True
+except ImportError:
+    HAS_U3 = False
 
 
 class TestDrawTimes(object):
@@ -1472,3 +1464,22 @@ class TestGenPhase(object):
         stim.gen_phase()
         np.testing.assert_array_equal(stim.stim.phase,
                                       np.array([1., 2.]))
+
+
+@pytest.mark.xfail
+class TestSetRGB(object):
+
+    # TODO: figure out mocking here
+
+    # @patch.object(psychopy.visual.GratingStim, 'setColor')
+    def test_set_rgb(self):
+        stim = pyStim.StaticStim()
+
+        win = Mock(spec=psychopy.visual.Window)
+        shape = Mock(spec=psychopy.visual.ShapeStim)
+        stim.stim = shape(win)
+
+        with patch.object(psychopy.visual.basevisual.ColorMixin, 'setColor') as mock:
+            stim.set_rgb((0, 0, 0))
+
+        assert mock.called
