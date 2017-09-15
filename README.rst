@@ -1,4 +1,5 @@
-[![Build Status](https://travis-ci.org/SivyerLab/pystim.svg?branch=master)](https://travis-ci.org/SivyerLab/pystim)
+.. image:: https://travis-ci.org/SivyerLab/pystim.svg?branch=master
+   :target: https://github.com/SivyerLab/pystim
 
 What is it?
 -----------
