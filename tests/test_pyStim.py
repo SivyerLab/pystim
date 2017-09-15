@@ -11,17 +11,17 @@ import pytest
 
 # class TestTrigger(unittest.TestCase):
 #
-    # @mock.path.object(StimProgram.MyWindow, 'make_win')
-    # @mock.patch('u3.U3')
-    # def test_send_trigger(self, mock_U3):
-    #     StimProgram.has_u3 = True
-    #
-    #     reference = StimProgram.MyWindow()
-    #     reference.d = u3.U3()
-    #     print reference.d
-    #     reference.send_trigger()
-    #
-    #     self.assertTrue(mock_U3.called)
+#     @mock.path.object(StimProgram.MyWindow, 'make_win')
+#     @mock.patch('u3.U3')
+#     def test_send_trigger(self, mock_U3):
+#         StimProgram.has_u3 = True
+#
+#         reference = StimProgram.MyWindow()
+#         reference.d = u3.U3()
+#         print reference.d
+#         reference.send_trigger()
+#
+#         self.assertTrue(mock_U3.called)
 
 
 class TestDrawTimes(object):
@@ -43,7 +43,24 @@ class TestDrawTimes(object):
         assert stim.draw_duration == 200
 
         assert duration == 400
-        assert False == True
+
+    def draw_times_force_stop_no_trigger(self):
+        pyStim.GlobalDefaults['frame_rate'] = 100
+
+        stim = pyStim.StaticStim(delay=1,
+                                 duration=2,
+                                 end_delay=1,
+                                 force_stop=2,
+                                 trigger=False)
+        duration = stim.draw_times()
+
+        assert stim.start_stim == 100
+        assert stim.end_stim == 200
+        assert stim.end_delay == 0
+        assert stim.force_stop == 200
+        assert stim.draw_duration == 200
+
+        assert duration == 200
 
 
 class TestGenRGB(object):
