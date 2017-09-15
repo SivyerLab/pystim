@@ -26,9 +26,12 @@ import pytest
 
 class TestDrawTimes(object):
 
-    def draw_times_no_force_stop_no_trigger(self):
+    # TODO: test triggering
+
+    def test_draw_times_no_force_stop_no_trigger(self):
         pyStim.GlobalDefaults['frame_rate'] = 100
 
+        print pyStim.GlobalDefaults['frame_rate']
         stim = pyStim.StaticStim(delay=1,
                                  duration=2,
                                  end_delay=1,
@@ -44,7 +47,7 @@ class TestDrawTimes(object):
 
         assert duration == 400
 
-    def draw_times_force_stop_no_trigger(self):
+    def test_draw_times_force_stop_no_trigger(self):
         pyStim.GlobalDefaults['frame_rate'] = 100
 
         stim = pyStim.StaticStim(delay=1,
@@ -451,6 +454,9 @@ class TestGenMask(object):
 
 class TestGenTexture(object):
 
+    # TODO: test image texture
+    # TODO: test non uniform in red channel
+
     def test_uniform_channel_all_color_1(self):
         pyStim.GlobalDefaults['background'] = [0., 0., 0.]
 
@@ -460,6 +466,7 @@ class TestGenTexture(object):
                                  color_mode='rgb',
                                  color=[1, 1, 1],
                                  alpha=1)
+        stim.colors = stim.gen_rgb()
         tex = stim.gen_texture()
 
         np.testing.assert_array_equal(tex,
@@ -573,9 +580,11 @@ class TestGenTexture(object):
 class TestGenTiming(object):
 
     # TODO: test at other background levels
+    # TODO: test small_stim
 
     def test_sine_single_all(self):
         pyStim.GlobalDefaults['background'] = [0., 0., 0.]
+        pyStim.GlobalDefaults['frame_rate'] = 60
 
         stim = pyStim.StaticStim(fill_mode='uniform',
                                  shape='rectangle',
@@ -611,6 +620,7 @@ class TestGenTiming(object):
 
     def test_sine_both_all(self):
         pyStim.GlobalDefaults['background'] = [0., 0., 0.]
+        pyStim.GlobalDefaults['frame_rate'] = 60
 
         stim = pyStim.StaticStim(fill_mode='uniform',
                                  shape='rectangle',
@@ -648,6 +658,7 @@ class TestGenTiming(object):
 
     def test_sine_single_red_black(self):
         pyStim.GlobalDefaults['background'] = [0., 0., 0.]
+        pyStim.GlobalDefaults['frame_rate'] = 60
 
         stim = pyStim.StaticStim(fill_mode='uniform',
                                  shape='rectangle',
@@ -684,6 +695,7 @@ class TestGenTiming(object):
 
     def test_sine_both_red_black(self):
         pyStim.GlobalDefaults['background'] = [0., 0., 0.]
+        pyStim.GlobalDefaults['frame_rate'] = 60
 
         stim = pyStim.StaticStim(fill_mode='uniform',
                                  shape='rectangle',
@@ -722,6 +734,7 @@ class TestGenTiming(object):
 
     def test_sine_single_red_opposite(self):
         pyStim.GlobalDefaults['background'] = [0., 0., 0.]
+        pyStim.GlobalDefaults['frame_rate'] = 60
 
         stim = pyStim.StaticStim(fill_mode='uniform',
                                  shape='rectangle',
@@ -758,6 +771,7 @@ class TestGenTiming(object):
 
     def test_sine_single_negint_red_opposite(self):
         pyStim.GlobalDefaults['background'] = [0., 0., 0.]
+        pyStim.GlobalDefaults['frame_rate'] = 60
 
         stim = pyStim.StaticStim(fill_mode='uniform',
                                  shape='rectangle',
@@ -794,6 +808,7 @@ class TestGenTiming(object):
 
     def test_sine_both_red_opposite(self):
         pyStim.GlobalDefaults['background'] = [0., 0., 0.]
+        pyStim.GlobalDefaults['frame_rate'] = 60
 
         stim = pyStim.StaticStim(fill_mode='uniform',
                                  shape='rectangle',
@@ -832,6 +847,7 @@ class TestGenTiming(object):
 
     def test_square_single_all(self):
         pyStim.GlobalDefaults['background'] = [0., 0., 0.]
+        pyStim.GlobalDefaults['frame_rate'] = 60
 
         stim = pyStim.StaticStim(fill_mode='uniform',
                                  shape='rectangle',
@@ -858,6 +874,7 @@ class TestGenTiming(object):
 
     def test_square_both_all(self):
         pyStim.GlobalDefaults['background'] = [0., 0., 0.]
+        pyStim.GlobalDefaults['frame_rate'] = 60
 
         stim = pyStim.StaticStim(fill_mode='uniform',
                                  shape='rectangle',
@@ -884,6 +901,7 @@ class TestGenTiming(object):
 
     def test_square_single_red_black(self):
         pyStim.GlobalDefaults['background'] = [0., 0., 0.]
+        pyStim.GlobalDefaults['frame_rate'] = 60
 
         stim = pyStim.StaticStim(fill_mode='uniform',
                                  shape='rectangle',
@@ -911,6 +929,7 @@ class TestGenTiming(object):
 
     def test_square_both_red_black(self):
         pyStim.GlobalDefaults['background'] = [0., 0., 0.]
+        pyStim.GlobalDefaults['frame_rate'] = 60
 
         stim = pyStim.StaticStim(fill_mode='uniform',
                                  shape='rectangle',
@@ -938,6 +957,7 @@ class TestGenTiming(object):
 
     def test_square_single_red_opposite(self):
         pyStim.GlobalDefaults['background'] = [0., 0., 0.]
+        pyStim.GlobalDefaults['frame_rate'] = 60
 
         stim = pyStim.StaticStim(fill_mode='uniform',
                                  shape='rectangle',
@@ -965,6 +985,7 @@ class TestGenTiming(object):
 
     def test_square_single_negint_red_opposite(self):
         pyStim.GlobalDefaults['background'] = [0., 0., 0.]
+        pyStim.GlobalDefaults['frame_rate'] = 60
 
         stim = pyStim.StaticStim(fill_mode='uniform',
                                  shape='rectangle',
@@ -992,6 +1013,7 @@ class TestGenTiming(object):
 
     def test_square_both_red_opposite(self):
         pyStim.GlobalDefaults['background'] = [0., 0., 0.]
+        pyStim.GlobalDefaults['frame_rate'] = 60
 
         stim = pyStim.StaticStim(fill_mode='uniform',
                                  shape='rectangle',
@@ -1019,6 +1041,7 @@ class TestGenTiming(object):
 
     def test_saw_single_all(self):
         pyStim.GlobalDefaults['background'] = [0., 0., 0.]
+        pyStim.GlobalDefaults['frame_rate'] = 60
 
         stim = pyStim.StaticStim(fill_mode='uniform',
                                  shape='rectangle',
@@ -1054,6 +1077,7 @@ class TestGenTiming(object):
 
     def test_saw_both_all(self):
         pyStim.GlobalDefaults['background'] = [0., 0., 0.]
+        pyStim.GlobalDefaults['frame_rate'] = 60
 
         stim = pyStim.StaticStim(fill_mode='uniform',
                                  shape='rectangle',
@@ -1089,6 +1113,7 @@ class TestGenTiming(object):
 
     def test_saw_single_red_black(self):
         pyStim.GlobalDefaults['background'] = [0., 0., 0.]
+        pyStim.GlobalDefaults['frame_rate'] = 60
 
         stim = pyStim.StaticStim(fill_mode='uniform',
                                  shape='rectangle',
@@ -1125,6 +1150,7 @@ class TestGenTiming(object):
 
     def test_saw_both_red_black(self):
         pyStim.GlobalDefaults['background'] = [0., 0., 0.]
+        pyStim.GlobalDefaults['frame_rate'] = 60
 
         stim = pyStim.StaticStim(fill_mode='uniform',
                                  shape='rectangle',
@@ -1161,6 +1187,7 @@ class TestGenTiming(object):
 
     def test_saw_single_red_opposite(self):
         pyStim.GlobalDefaults['background'] = [0., 0., 0.]
+        pyStim.GlobalDefaults['frame_rate'] = 60
 
         stim = pyStim.StaticStim(fill_mode='uniform',
                                  shape='rectangle',
@@ -1197,6 +1224,7 @@ class TestGenTiming(object):
 
     def test_saw_single_negint_red_opposite(self):
         pyStim.GlobalDefaults['background'] = [0., 0., 0.]
+        pyStim.GlobalDefaults['frame_rate'] = 60
 
         stim = pyStim.StaticStim(fill_mode='uniform',
                                  shape='rectangle',
@@ -1233,6 +1261,7 @@ class TestGenTiming(object):
 
     def test_saw_both_red_opposite(self):
         pyStim.GlobalDefaults['background'] = [0., 0., 0.]
+        pyStim.GlobalDefaults['frame_rate'] = 60
 
         stim = pyStim.StaticStim(fill_mode='uniform',
                                  shape='rectangle',
@@ -1269,6 +1298,7 @@ class TestGenTiming(object):
 
     def test_linear_single_all(self):
         pyStim.GlobalDefaults['background'] = [0., 0., 0.]
+        pyStim.GlobalDefaults['frame_rate'] = 60
 
         stim = pyStim.StaticStim(fill_mode='uniform',
                                  shape='rectangle',
@@ -1304,6 +1334,7 @@ class TestGenTiming(object):
 
     def test_linear_both_all(self):
         pyStim.GlobalDefaults['background'] = [0., 0., 0.]
+        pyStim.GlobalDefaults['frame_rate'] = 60
 
         stim = pyStim.StaticStim(fill_mode='uniform',
                                  shape='rectangle',
@@ -1339,6 +1370,7 @@ class TestGenTiming(object):
 
     def test_linear_single_red(self):
         pyStim.GlobalDefaults['background'] = [0., 0., 0.]
+        pyStim.GlobalDefaults['frame_rate'] = 60
 
         stim = pyStim.StaticStim(fill_mode='uniform',
                                  shape='rectangle',
@@ -1374,6 +1406,7 @@ class TestGenTiming(object):
 
     def test_linear_both_red_opp(self):
         pyStim.GlobalDefaults['background'] = [0., 0., 0.]
+        pyStim.GlobalDefaults['frame_rate'] = 60
 
         stim = pyStim.StaticStim(fill_mode='uniform',
                                  shape='rectangle',
