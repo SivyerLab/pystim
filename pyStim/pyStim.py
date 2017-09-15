@@ -868,7 +868,6 @@ class StaticStim(StimDefaults):
 
             # draw to back buffer
             self.stim.draw(MyWindow.win)
-            print frame, self.stim.tex[0, 0, :]
 
             if self.small_stim is not None:
                 MyWindow.small_win.winHandle.switch_to()

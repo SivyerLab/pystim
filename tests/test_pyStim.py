@@ -1,6 +1,8 @@
-# NEED MUCH MORE COVERAGE
+"""
+Tests for pystim.
+"""
+
 from pyStim import pyStim
-# import unittest
 from mock import Mock
 import numpy as np
 # import u3
@@ -22,10 +24,32 @@ import pytest
     #     self.assertTrue(mock_U3.called)
 
 
+class TestDrawTimes(object):
+
+    def draw_times_no_force_stop_no_trigger(self):
+        pyStim.GlobalDefaults['frame_rate'] = 100
+
+        stim = pyStim.StaticStim(delay=1,
+                                 duration=2,
+                                 end_delay=1,
+                                 force_stop=0,
+                                 trigger=False)
+        duration = stim.draw_times()
+
+        assert stim.start_stim == 100
+        assert stim.end_stim == 300
+        assert stim.end_delay == 100
+        assert stim.force_stop == 0
+        assert stim.draw_duration == 200
+
+        assert duration == 400
+        assert False == True
+
+
 class TestGenRGB(object):
 
     # deltas are weird because they're absolute differences, so to make sense
-    # think in terms of the scaling back to 0, 1 interval
+    # of think in terms of the scaling back to 0, 1 interval
 
     def test_bg0_mode_rgb_channel_all_color_1(self):
         pyStim.GlobalDefaults['background'] = [0., 0., 0.]
@@ -1366,3 +1390,35 @@ class TestGenTiming(object):
         stim.gen_timing(60)
         np.testing.assert_array_equal(stim.stim.tex,
                                       np.array([[[1.0, -1.0, -1.0, 1.0]]]))
+
+    def test_small_stim(self):
+        stim = pyStim.StaticStim()
+        stim.draw_times()
+
+        stim.stim = Mock()
+        stim.small_stim = Mock()
+
+        stim.gen_texture()
+
+
+class TestGenPhase(object):
+
+    def test_no_phase(self):
+        pyStim.GlobalDefaults['frame_rate'] = 60
+
+        stim = pyStim.StaticStim()
+        stim.stim = Mock()
+        stim.stim.phase = np.array([0., 0.])
+        stim.gen_phase()
+        np.testing.assert_array_equal(stim.stim.phase,
+                                      np.array([0., 0.]))
+
+    def test_phase(self):
+        pyStim.GlobalDefaults['frame_rate'] = 60
+
+        stim = pyStim.StaticStim(phase_speed=[60, 120])
+        stim.stim = Mock()
+        stim.stim.phase = np.array([0., 0.])
+        stim.gen_phase()
+        np.testing.assert_array_equal(stim.stim.phase,
+                                      np.array([1., 2.]))
