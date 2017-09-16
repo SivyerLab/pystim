@@ -31,7 +31,7 @@ before_script:
 
 script:
   # run tests
-  - py.test pystim/tests --cov=pyStim
+  - py.test tests --cov pyStim
   - coveralls
   # build documentation
   - cd docs
