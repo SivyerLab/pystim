@@ -1,5 +1,8 @@
 .. image:: https://travis-ci.org/SivyerLab/pystim.svg?branch=master
    :target: https://github.com/SivyerLab/pystim
+.. image:: https://coveralls.io/repos/github/SivyerLab/pystim/badge.svg?branch=master
+   :target: https://coveralls.io/github/SivyerLab/pystim?branch=master
+
 
 What is it?
 -----------
