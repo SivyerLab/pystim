@@ -32,14 +32,14 @@ before_script:
 script:
   # run tests
   - py.test tests --cov pyStim
-  - coveralls
   # build documentation
   - cd docs
   - sphinx-build -b html source build/html
-  # sphinx-build -W -b html source build/html
+  # sphinx-build -W -b html source build/html  # warnings as errors
   # sphinx-build -W -b pdf source build/pdf
 
 after_success:
+  # push coverage results
   - coveralls
 
 deploy:
