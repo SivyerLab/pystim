@@ -1474,16 +1474,21 @@ class MyParamGrid(wx.Frame):
         # panel to hold everything
         panel = wx.Panel(self)
 
-        # make grid
-        self.grid = wx.grid.Grid(panel)
-        self.grid.CreateGrid(51, 2)
-        self.grid.SetColLabelValue(0, 'Parameter')
-        self.grid.SetColLabelValue(1, 'Value')
-
         param_dict = {'shape parameters': self.parameters.shape_param,
                       'timing parameters': self.parameters.timing_param,
                       'fill parameters': self.parameters.fill_param,
                       'motion parameters': self.parameters.motion_param}
+
+        # get grid size
+        grid_size = len(param_dict)
+        for v in param_dict.itervalues():
+            grid_size += len(v)
+
+        # make grid
+        self.grid = wx.grid.Grid(panel)
+        self.grid.CreateGrid(grid_size, 2)
+        self.grid.SetColLabelValue(0, 'Parameter')
+        self.grid.SetColLabelValue(1, 'Value')
 
         row_ind = 0
         for k, v in param_dict.iteritems():
