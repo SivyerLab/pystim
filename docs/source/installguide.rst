@@ -16,7 +16,7 @@ command: use mouse right click and paste. Ctrl + v will not work.
 For windows, a cmd file is included in the repository that will run all the steps for you after 1 & 2. It still requires
 you to manually install Anaconda and Git first. Download the cmd file by itself and then run it.
 
-1. Install `Anaconda <https://www.continuum.io/anaconda-overview>`_ (environment manager) for python 3.6 to your user folder
+1. Install `Anaconda <https://www.continuum.io/anaconda-overview>`_ (environment manager) for python 3.6 to your user folder. Make sure to select the option to add conda to your PATH variable.
 2. Install `Git <https://git-scm.com/downloads>`_ (version control tool)
 3. Create the python environment for the pyStim by entering the following text into the terminal command. ::
 
