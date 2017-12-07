@@ -68,9 +68,9 @@ and simply paste this text after "cd" in the terminal command
 
     git clone https://github.com/SivyerLab/pystim.git
 
-12. Navigate into the pyStim folder and code folder. ::
+12. Navigate into the pyStim folder and code folder.
 
-    `cd pyStim/pyStim`
+    :code:`cd pyStim/pyStim`
 
 13. Run the pyStim GUI.
 
