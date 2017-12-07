@@ -17,7 +17,7 @@ For windows, a cmd file is included in the repository that will run all the step
 you to manually install Anaconda and Git first. Download the cmd file by itself and then run it.
 
 1. Install `Anaconda <https://www.continuum.io/anaconda-overview>`_ (environment manager) for python 3.6 to your user folder. Make sure to select the option to add conda to your PATH variable.
-2. Install `Git <https://git-scm.com/downloads>`_ (version control tool)
+2. Install `Git <https://git-scm.com/downloads>`_ (version control tool). Make sure to select the option to add conda to your PATH variable ("Run Git from Windows Command Prompt").
 3. Create the python environment for the pyStim by entering the following text into the terminal command. ::
 
     conda create -y -n sp_env python=2.7
@@ -29,13 +29,13 @@ you to manually install Anaconda and Git first. Download the cmd file by itself 
 .. image:: ../screenshots/cmd_4.jpg
     :width: 600 px
 
-5. Install the packages included with conda: (**NOTE** this may take ~5 min, wait while the underscore is blinking). ::
+5. Install the packages included with conda: (**NOTE** this may take up to several hours, wait while the underscore is blinking). ::
 
     conda install -y numpy scipy Pillow matplotlib pandas pyopengl lxml openpyxl configobj sortedcontainers
 
 6. Install the packages not included with conda. If you run into any problems here, simply close the command window, reopen it then reactivate the env. ::
 
-    pip install tabulate igor tqdm moviepy pyglet psychopy labjackpython pyusb pycrafter4500
+    pip install tabulate igor tqdm moviepy pyglet psychopy labjackpython pyusb pycrafter4500 json_tricks
 
 7. Install wxpython (gui interface). ::
 
@@ -69,10 +69,11 @@ and simply paste this text after "cd" in the terminal command
 
 12. Navigate into the pyStim folder and code folder. ::
 
-        cd pyStim/pyStim
+    cd pyStim/pyStim
 
 13. Run the pyStim GUI. ::
 
-        python pyStimGUI.py
+    python pyStimGUI.py
 
 14. If want to trigger an external device using a labjack install the labjack driver from the labjack site: `Labjack driver instructions <https://labjack.com/support/software/examples/ud/labjackpython>`_
+Make sure to run the install steps within the conda environment
