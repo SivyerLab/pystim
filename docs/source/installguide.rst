@@ -49,10 +49,9 @@ you to manually install Anaconda and Git first. Download the cmd file by itself 
 
     http://avbin.github.io/AVbin/Download.html
 
-10. Navigate to where you want to save the pyStim repository. ::
+10. Navigate to where you want to save the pyStim repository.
 
-    cd "C:/your/location/of/choice"
-
+    :code:`cd "C:/your/location/of/choice"`
 
 For example C:/Users/bensivyer/PycharmProjects
 
@@ -72,9 +71,7 @@ and simply paste this text after "cd" in the terminal command
 
     :code:`cd pyStim/pyStim`
 
-13. Run the pyStim GUI.
-
-.. code-block:: doscon
+13. Run the pyStim GUI. ::
 
     python pyStimGUI.py
 
