@@ -53,6 +53,7 @@ you to manually install Anaconda and Git first. Download the cmd file by itself 
 
     cd "C:/your/location/of/choice"
 
+
 For example C:/Users/bensivyer/PycharmProjects
 
 To copy the path location: go to your desired folder in Windows and click to the right of the foldername in the search bar
@@ -71,9 +72,11 @@ and simply paste this text after "cd" in the terminal command
 
     cd pyStim/pyStim
 
-13. Run the pyStim GUI. ::
+13. Run the pyStim GUI.
+
+.. code-block::
 
     python pyStimGUI.py
 
-14. If want to trigger an external device using a labjack install the labjack driver from the labjack site: `Labjack driver instructions <https://labjack.com/support/software/examples/ud/labjackpython>`_
+14. If want to trigger an external device using a labjack install the labjack driver from the labjack site: `Labjack driver instructions <https://labjack.com/support/software/examples/ud/labjackpython>`_.
 Make sure to run the install steps within the conda environment
