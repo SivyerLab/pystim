@@ -74,7 +74,7 @@ and simply paste this text after "cd" in the terminal command
 
 13. Run the pyStim GUI.
 
-.. code-block::
+.. code-block:: doscon
 
     python pyStimGUI.py
 
