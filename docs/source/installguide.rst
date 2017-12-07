@@ -63,15 +63,15 @@ and simply paste this text after "cd" in the terminal command
 .. image:: ../screenshots/Terminal_command.jpg
     :width: 800 px
 
-11. Download the repository (a new repositry folder will be automatically created). ::
+11. Download the repository (a new repositry folder will be automatically created).
 
-    git clone https://github.com/SivyerLab/pystim.git
+    :code:`git clone https://github.com/SivyerLab/pystim.git`
 
 12. Navigate into the pyStim folder and code folder.
 
     :code:`cd pyStim/pyStim`
 
-13. Run the pyStim GUI. ::
+13. Run the pyStim GUI. :::
 
     python pyStimGUI.py
 
