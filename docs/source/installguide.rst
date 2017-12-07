@@ -70,7 +70,7 @@ and simply paste this text after "cd" in the terminal command
 
 12. Navigate into the pyStim folder and code folder. ::
 
-    :code:`cd pyStim/pyStim`
+    `cd pyStim/pyStim`
 
 13. Run the pyStim GUI.
 
