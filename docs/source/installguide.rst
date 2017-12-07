@@ -71,9 +71,9 @@ and simply paste this text after "cd" in the terminal command
 
     :code:`cd pyStim/pyStim`
 
-13. Run the pyStim GUI. :::
+13. Run the pyStim GUI.
 
-    python pyStimGUI.py
+    :code:`python pyStimGUI.py`
 
 14. If want to trigger an external device using a labjack install the labjack driver from the labjack site: `Labjack driver instructions <https://labjack.com/support/software/examples/ud/labjackpython>`_.
-Make sure to run the install steps within the conda environment
+Make sure to run the install steps within the conda environment.
