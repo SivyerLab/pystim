@@ -2695,11 +2695,6 @@ class MyFrame(wx.Frame):
             # adjust screen number to zero based index
             global_defaults['screen_num'] -= 1
 
-            # offset needs to be passed as a scale relative to display size
-            global_defaults['offset'] = [float(x) / y * 2 for x, y in zip(
-                global_defaults['offset'],
-                global_defaults['display_size'])]
-
             self.win_open = True
             # pass global defaults to stim program
             pyStim.GlobalDefaults(**global_defaults)
