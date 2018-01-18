@@ -8,6 +8,8 @@ import numpy as np
 from pyStim import pyStim
 from mock import Mock, patch
 import psychopy
+import cPickle
+import os
 
 try:
     import u3
@@ -1483,3 +1485,19 @@ class TestSetRGB(object):
             stim.set_rgb((0, 0, 0))
 
         assert mock.called
+
+
+class TestConfigFile(object):
+
+    def test_open_pickle_globals(self):
+        g = None
+        p = pyStim.config.get('GUI', 'data_dir')
+
+        globals_file = os.path.abspath(os.path.join(p, 'global_defaults.txt'))
+        if os.path.exists(globals_file):
+            with open(globals_file, 'rb') as f:
+                g = cPickle.load(f)
+
+            assert g is not None
+        else:
+            assert g is None
