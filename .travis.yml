@@ -19,7 +19,7 @@ install:
   - conda create -y -n sp_env python=2.7
   - source activate sp_env
   - conda install -y numpy scipy Pillow matplotlib pandas pyopengl lxml openpyxl configobj sortedcontainers sphinx
-  - pip install tabulate igor tqdm moviepy pyglet psychopy labjackpython rst2pdf pyusb pycrafter4500 future json_tricks pytest mock pytest-cov python-coveralls json_tricks
+  - pip install tabulate igor tqdm moviepy pyglet psychopy==1.90.dev2 labjackpython rst2pdf pyusb pycrafter4500 future json_tricks pytest mock pytest-cov python-coveralls json_tricks
 
   - conda install -y -c anaconda wxpython=3.0.0.0
   - conda install -y -c conda-forge ffmpeg=3.2.4
