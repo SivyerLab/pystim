@@ -48,6 +48,6 @@ deploy:
   provider: pages
   skip_cleanup: true
   github_token: $travis_sphinx_ghpages
-  local_dir: build/html
+  local_dir: docs/build/html
   on:
     branch: master
