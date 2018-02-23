@@ -345,6 +345,7 @@ class MyWindow(object):
         MyWindow.should_break = True
 
         # TODO: fix race condition, where window closes and gets set to None before main() finishes after breaking
+        # TODO: fix other race condition where window close gets called before window finishes opening
         MyWindow.win.close()
         MyWindow.win = None
 

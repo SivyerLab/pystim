@@ -2466,8 +2466,11 @@ class MyFrame(wx.Frame):
         panel_row.Add(self.panel_global, proportion=1, flag=wx.EXPAND)
 
         # create buttons
-        button_labels = ['Run', 'Stop', 'Window', 'Exit']
+        # button_labels = ['Run', 'Stop', 'Window', 'Exit']
+        button_labels = ['Run', 'Stop', 'Exit']
         buttons = [wx.Button(self, label=label) for label in button_labels]
+
+        buttons.insert(2, wx.ToggleButton(self, label='Window'))
 
         button_callback = [self.on_run_button,
                            self.on_stop_button,
@@ -2484,6 +2487,8 @@ class MyFrame(wx.Frame):
                                    proportion=1,
                                    border=5,
                                    flag=wx.LEFT | wx.RIGHT)
+
+        self.Bind(wx.EVT_TOGGLEBUTTON, self.on_win_button, buttons[2])
 
         # sizer for input and global panels and buttons
         panel_button_sizer = wx.BoxSizer(wx.VERTICAL)
@@ -2687,7 +2692,11 @@ class MyFrame(wx.Frame):
         """
         if self.win_open:
             self.on_stop_button(event)
-            pyStim.MyWindow.close_win()
+            try:
+                pyStim.MyWindow.close_win()
+            except AttributeError:
+                event.GetEventObject().SetValue(True)
+                return
             self.win_open = False
 
         else:
