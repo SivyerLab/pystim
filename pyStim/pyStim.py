@@ -69,7 +69,9 @@ __status__  = "Beta"
 
 # read ini file
 config = ConfigParser.ConfigParser()
-config.read(os.path.abspath('../pyStim/psychopy/config.ini'))
+p = os.path.abspath('../pyStim/psychopy/config.ini')
+assert os.path.exists(p)
+config.read(p)
 
 
 class StimInfo(object):
