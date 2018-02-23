@@ -52,7 +52,7 @@ class Parameters(object):
         self.stim_params = None
 
         # init params
-        config_file = os.path.abspath('../pyStim/psychopy/config.ini')
+        config_file = os.path.abspath('pyStim/psychopy/config.ini')
         self.gui_params, self.stim_params, config_dict = self.read_config_file(
             config_file)
         self.init_params(config_dict)
@@ -211,7 +211,7 @@ class Parameters(object):
 
         :param config_dict: dictionary of defaults
         """
-        json_path = os.path.abspath('../pyStim/psychopy/params_json.txt')
+        json_path = os.path.abspath('pyStim/psychopy/params_json.txt')
         with open(json_path, 'r') as f:
             params = json.load(f, object_pairs_hook=OrderedDict)
 
