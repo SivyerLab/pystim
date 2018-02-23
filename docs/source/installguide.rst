@@ -35,7 +35,7 @@ you to manually install Anaconda and Git first. Download the cmd file by itself 
 
 6. Install the packages not included with conda. If you run into any problems here, simply close the command window, reopen it then reactivate the env. ::
 
-    pip install tabulate igor tqdm moviepy pyglet psychopy labjackpython pyusb pycrafter4500 json_tricks
+    pip install tabulate igor tqdm moviepy pyglet psychopy=1.85.3 labjackpython pyusb pycrafter4500 json_tricks
 
 7. Install wxpython (gui interface). ::
 
