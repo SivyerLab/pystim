@@ -2,10 +2,14 @@
 Program for presenting visual stimuli to patch clamped retinal neurons.
 
 Stuck on python 2.7 because of u3 (labjackpython) dependency
+UPDATE: labjackpython now seems to support python 3!!!!
 """
+# TODO: migrate to python 3
 
 # Copyright (C) 2016 Alexander Tomlinson
 # Distributed under the terms of the GNU General Public License (GPL).
+
+from __future__ import print_function
 
 from GammaCorrection import GammaValues  # unused, but necessary for pickling
 import cPickle
@@ -291,9 +295,7 @@ class MyWindow(object):
             try:
                 MyWindow.d = u3.U3()
             except Exception as e:
-                print 'LabJack error:',
-                print e,
-                print "(ignore if don't desire triggering)"
+                print('LabJack error:', e, '(ignore if don\'t desire triggering)')
                 has_u3 = False
 
         # check if gamma splines present
@@ -453,11 +455,10 @@ class MyWindow(object):
                 # reset
                 MyWindow.d.setFIOState(4, 0)
             except Exception as e:
-                print 'Triggering Error:',
-                print str(e)
+                print('Triggering Error:', str(e))
 
         else:
-            print '\nTo trigger, need labjackpython library. See documentation'
+            print('\nTo trigger, need labjackpython library. See documentation')
 
 
 class StimDefaults(object):
@@ -630,8 +631,8 @@ class StimDefaults(object):
         Default variable constructors; distance and time units converted
         appropriately.
         """
-        for key, value in kwargs.iteritems():
-            print 'NOT USED: {}={}'.format(key, value)
+        for key, value in kwargs.items():
+            print('NOT USED: {}={}'.format(key, value))
 
         self.shape = shape
         self.fill_mode = fill_mode
@@ -1359,7 +1360,7 @@ class MovingStim(StaticStim):
             off_x = (GlobalDefaults['display_size'][0] + max_size) / 2
             off_y = (GlobalDefaults['display_size'][1] + max_size) / 2
 
-            for i in xrange(self.move_delay):
+            for i in range(self.move_delay):
                 self.x_array = scipy.append(self.x_array, off_x)
                 self.y_array = scipy.append(self.y_array, off_y)
 
@@ -1393,8 +1394,8 @@ class MovingStim(StaticStim):
         dx = self.speed * scipy.sin(angle * scipy.pi / 180.0)
         dy = self.speed * scipy.cos(angle * scipy.pi / 180.0)
 
-        x = scipy.array([start_x + i * dx for i in xrange(num_frames)])
-        y = scipy.array([start_y + i * dy for i in xrange(num_frames)])
+        x = scipy.array([start_x + i * dx for i in range(num_frames)])
+        y = scipy.array([start_y + i * dy for i in range(num_frames)])
 
         return x, y
 
@@ -1449,7 +1450,7 @@ class RandomlyMovingStim(MovingStim):
         self.end_stim = super(MovingStim, self).draw_times() - self.end_delay
 
         if self.trigger:
-            for x in xrange(int(self.duration / self.num_frames + 0.99)):
+            for x in range(int(self.duration / self.num_frames + 0.99)):
                 trigger_frame = self.num_frames * x + self.start_stim
                 if trigger_frame not in MyWindow.frame_trigger_list:
                     MyWindow.frame_trigger_list.add(trigger_frame)
@@ -1571,7 +1572,7 @@ class TableStim(MovingStim):
         off_x = (GlobalDefaults['display_size'][0] + max_size) / 2
         off_y = (GlobalDefaults['display_size'][1] + max_size) / 2
 
-        for i in xrange(self.move_delay):
+        for i in range(self.move_delay):
             self.x_array = scipy.append(self.x_array, off_x)
             self.y_array = scipy.append(self.y_array, off_y)
 
@@ -1719,7 +1720,7 @@ class TableStim(MovingStim):
             trigger_list = map(int, trigger_list)
             self.trigger_frames = []
 
-            for i in xrange(len(trigger_list)):
+            for i in range(len(trigger_list)):
                 if trigger_list[i] == 1:
                     self.trigger_frames.append(i)
 
@@ -1956,8 +1957,8 @@ def board_texture_class(bases, **kwargs):
             # array of coordinates for each element
             xys = []
             # populate xys
-            for y in xrange(self.num_check / -2, self.num_check / 2):
-                for x in xrange(self.num_check / -2, self.num_check / 2):
+            for y in range(self.num_check / -2, self.num_check / 2):
+                for x in range(self.num_check / -2, self.num_check / 2):
                     xys.append((self.check_size[0] * x,
                                 self.check_size[1] * y))
 
@@ -1994,7 +1995,7 @@ def board_texture_class(bases, **kwargs):
                 # randomly populate for a random checkerboard
                 elif self.check_type == 'random':
                     self.index = numpy.concatenate(self.index[:])
-                    for i in xrange(len(self.index)):
+                    for i in range(len(self.index)):
                         self.index[i] = self.fill_random.randint(0, 1)
 
                 # use index to assign colors for board and random
@@ -2340,7 +2341,7 @@ def save_movie(current_time, save_loc):
             os.path.join(save_loc, save_name)]
 
     # make movie using ffmpeg
-    print 'ffmpeg...'
+    print('ffmpeg...')
     # print save_loc
     # print os.path.join(save_loc, 'capture_%05d.png')
 
@@ -2348,7 +2349,7 @@ def save_movie(current_time, save_loc):
                                stdout=subprocess.PIPE,
                                stderr=subprocess.PIPE)
     stdout, stderr = process.communicate()
-    print stdout, stderr
+    print(stdout, stderr)
 
     args2 = ['ffmpeg',
              '-i', os.path.join(save_loc, save_name),
@@ -2356,21 +2357,21 @@ def save_movie(current_time, save_loc):
              '-qscale', '0',
              os.path.join(save_loc, save_name_gray)]
 
-    print '\ngrayscale conversion...'
+    print('\ngrayscale conversion...')
 
     process = subprocess.Popen(args2,
                                stdout=subprocess.PIPE,
                                stderr=subprocess.PIPE)
     stdout, stderr = process.communicate()
-    print stdout, stderr
+    print(stdout, stderr)
 
     # delete .pngs
     # to_delete = [f for f in os.listdir(save_loc) if f.endswith('.png')]
     # for f in to_delete:
     #     os.remove(os.path.join(save_loc, f))
 
-    print 'Saved in: {}'.format(save_loc)
-    print '\nDONE'
+    print('Saved in: {}'.format(save_loc))
+    print('\nDONE')
 
 
 def stim_factory(stim):
@@ -2420,7 +2421,7 @@ def animation_loop(to_animate, num_frames, current_time, save_loc):
     # clock for timing
     elapsed_time_clock = core.MonotonicClock()
 
-    # for frame in xrange(num_frames):
+    # for frame in range(num_frames):
     # trange for pretty, low overhead (on the order of ns), progress bar in stdout
     for frame in trange(num_frames):
         for stim in to_animate:
@@ -2480,7 +2481,7 @@ def animation_loop(to_animate, num_frames, current_time, save_loc):
 
     # outer break
     if MyWindow.should_break:
-        print '\n Interrupt!'
+        print('\n Interrupt!')
         return reps, elapsed_time, frames, dropped
 
     reps += 1
@@ -2540,7 +2541,7 @@ def main(stim_list, verbose=True):
                 MyWindow.win.callOnFlip(MyWindow.send_trigger)
                 # print 'trigger'
                 # MyWindow.flip()
-                for y in xrange(GlobalDefaults['trigger_wait'] - 1):
+                for y in range(GlobalDefaults['trigger_wait'] - 1):
                     MyWindow.flip()
 
             save_loc = None
@@ -2595,17 +2596,17 @@ def main(stim_list, verbose=True):
         x/x frames displayed. Average fps: x hz.
         Elapsed time: x seconds.
         """
-        print "\n{} rep(s) of {} stim(s) generated.". \
-            format(reps, len(stim_list))
-        print "{}/{} frames displayed.". \
+        print("\n{} rep(s) of {} stim(s) generated.". \
+            format(reps, len(stim_list)), end='')
+        print("{}/{} frames displayed.". \
             format(count_reps * (num_frames) + count_frames, reps *
-                   (num_frames)),
-        print "Average fps: {0:.2f} hz.". \
+                   (num_frames)), end='')
+        print("Average fps: {0:.2f} hz.". \
             format((count_reps * (num_frames) + count_frames) /
-                   count_elapsed_time),
-        print "{} frame(s) dropped.".format(dropped)
-        print "Elapsed time: {0:.3f} seconds.\n". \
-            format(count_elapsed_time)
+                   count_elapsed_time), end='')
+        print("{} frame(s) dropped.".format(dropped))
+        print("Elapsed time: {0:.3f} seconds.\n". \
+            format(count_elapsed_time))
 
     time_stamp = None
 
