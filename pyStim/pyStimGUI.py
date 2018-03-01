@@ -82,7 +82,7 @@ class Parameters(object):
                 option_dict[option] = config.get(section, option)
 
             # cast, for proper set up of controls
-            for key, value in option_dict.iteritems():
+            for key, value in option_dict.items():
                 option_dict[key] = Parameters.lit_eval(value)
 
         return gui_config_dict, stim_config_dict, default_config_dict
@@ -216,8 +216,8 @@ class Parameters(object):
             params = json.load(f, object_pairs_hook=OrderedDict)
 
         # set defaults
-        for category in params.itervalues():
-            for k, param in category.iteritems():
+        for category in params.values():
+            for k, param in category.items():
                 param['default'] = config_dict[k]
 
         self.shape_param = params['shape_param']
@@ -449,7 +449,7 @@ class InputPanel(wx.Panel):
         """
 
         # iterate through params in param dict
-        for param, param_info in self.params.iteritems():
+        for param, param_info in self.params.items():
             # only generate fields for params that aren't children
             if not param_info['is_child'] and 'hide' not in param_info:
                 # label widget
@@ -505,7 +505,7 @@ class InputPanel(wx.Panel):
                 subpanel_sizer = wx.BoxSizer(wx.VERTICAL)
 
                 # iterate through the dictionary of child params
-                for choice, child_params in param_info['children'].iteritems():
+                for choice, child_params in param_info['children'].items():
                     # create new ordered dict to hold only child params
                     child_param_dict = OrderedDict()
 
@@ -517,7 +517,7 @@ class InputPanel(wx.Panel):
                             self.params[child_param])
 
                     # iterate through new child param dict and reset is_child
-                    for values in child_param_dict.itervalues():
+                    for values in child_param_dict.values():
                         values['is_child'] = False
 
                     # make sub panel with new dict
@@ -525,7 +525,7 @@ class InputPanel(wx.Panel):
                         child_param_dict, self, self.category)
 
                 # add panels to subpanel sizer
-                for panel in self.sub_panel_dict[param].itervalues():
+                for panel in self.sub_panel_dict[param].values():
                     subpanel_sizer.Add(panel, proportion=1, flag=wx.EXPAND)
 
                 # add subpanel sizer to panel sizer, spanning both columns
@@ -829,7 +829,7 @@ class GlobalPanel(InputPanel):
         with open(self.globals_file, 'rb') as f:
             params_to_load = cPickle.load(f)[selected]
 
-        for param, controls in self.frame.all_controls.iteritems():
+        for param, controls in self.frame.all_controls.items():
             for control in controls:
                 try:
                     # if not a list text control
@@ -1176,7 +1176,7 @@ class ListPanel(wx.Panel):
         params['move_type'] = stim_type
 
         # compatibility for old checkerboards
-        if 'check_type' not in params.iterkeys():
+        if 'check_type' not in params.keys():
             if params['fill_mode'] == 'random':
                 params['fill_mode'] = 'checkerboard'
                 params['check_type'] = 'random'
@@ -1196,7 +1196,7 @@ class ListPanel(wx.Panel):
             grid.GetEventHandler().ProcessEvent(evt)
 
         # iterate through params and set values
-        for param, controls in self.frame.all_controls.iteritems():
+        for param, controls in self.frame.all_controls.items():
             for control in controls:
                 try:
                     # if not a list text control
@@ -1212,7 +1212,7 @@ class ListPanel(wx.Panel):
 
         # iterate through values in grid dict and populate
         col_index = 0
-        for param, values in grid_dict.iteritems():
+        for param, values in grid_dict.items():
             # simulate adding param to grid
             ctrl = self.frame.all_controls[param][0]
             evt = wx.CommandEvent(wx.EVT_CONTEXT_MENU.typeId,
@@ -1241,7 +1241,7 @@ class ListPanel(wx.Panel):
 
             col_index += 1
 
-        print '\nStim params populated'
+        print('\nStim params populated')
 
 
 class DirPanel(wx.Panel):
@@ -1373,7 +1373,7 @@ class DirPanel(wx.Panel):
                 with open(path, 'rb') as f:
                     to_load = cPickle.load(f)
             except IOError:
-                print '\nNo file selected. Please select file.'
+                print('\nNo file selected. Please select file.')
                 return
 
         # if log file, need to seek to end to find the pickle data
@@ -1396,7 +1396,7 @@ class DirPanel(wx.Panel):
                     to_load = cPickle.loads(to_load)
 
             except ValueError:
-                print '\nERROR: file not a properly formatted parameter file'
+                print('\nERROR: file not a properly formatted parameter file')
                 return
 
         # load stims in to list panel
@@ -1413,7 +1413,7 @@ class DirPanel(wx.Panel):
                     grid_dict = {}
 
             # compatibility for old checkerboards
-            if 'check_type' not in params.iterkeys():
+            if 'check_type' not in params.keys():
                 if params['fill_mode'] == 'random':
                     params['fill_mode'] = 'checkerboard'
                     params['check_type'] = 'random'
@@ -1426,7 +1426,7 @@ class DirPanel(wx.Panel):
             # load
             self.frame.list_panel.add_to_list(stim_type, params, grid_dict)
 
-        print '\nStim(s) loaded'
+        print('\nStim(s) loaded')
 
     def on_double_click(self, event):
         """
@@ -1481,7 +1481,7 @@ class MyParamGrid(wx.Frame):
 
         # get grid size
         grid_size = len(param_dict)
-        for v in param_dict.itervalues():
+        for v in param_dict.values():
             grid_size += len(v)
 
         # make grid
@@ -1491,12 +1491,12 @@ class MyParamGrid(wx.Frame):
         self.grid.SetColLabelValue(1, 'Value')
 
         row_ind = 0
-        for k, v in param_dict.iteritems():
+        for k, v in param_dict.items():
             self.grid.SetCellValue(row_ind, 0, k.upper())
             self.grid.SetReadOnly(row_ind, 0)
             row_ind += 1
 
-            for param in v.iterkeys():
+            for param in v.keys():
                 self.grid.SetCellValue(row_ind, 0, param)
                 self.grid.SetReadOnly(row_ind, 0)
                 row_ind += 1
@@ -1732,7 +1732,7 @@ class MyGrid(wx.Frame):
             if col == -1:
                 self.grid.AppendRows(5)
                 # add to control dict lists
-                for value in self.control_dict.itervalues():
+                for value in self.control_dict.values():
                         value.extend([None] * 5)
 
             # any other column header
@@ -1754,7 +1754,7 @@ class MyGrid(wx.Frame):
 
         # row headers
         elif col == -1:
-            for value in self.control_dict.itervalues():
+            for value in self.control_dict.values():
                 del value[row]
 
             self.grid.DeleteRows(row, 1)
@@ -1782,7 +1782,7 @@ class MyGrid(wx.Frame):
         ret = {}
         to_edit = deepcopy(self.control_dict)
 
-        for param, values in to_edit.iteritems():
+        for param, values in to_edit.items():
             if values[0] is None:
                 raise IndexError('First value of table cannot be empty.')
 
@@ -1928,8 +1928,8 @@ class MyMenuBar(wx.MenuBar):
 
         # TODO: convert all binding to use function
         def binder(bind_dict):
-            for evt, ctrls in bind_dict.iteritems():
-                for ctrl, target in ctrls.iteritems():
+            for evt, ctrls in bind_dict.items():
+                for ctrl, target in ctrls.items():
                     self.Bind(evt, target, ctrl)
 
         to_bind = {
@@ -2168,9 +2168,9 @@ class MyMenuBar(wx.MenuBar):
             for jump in jump_paths:
                 assert os.path.exists(jump)
         except AssertionError:
-            print '\nOne or more of the selected paths do not exist:'
+            print('\nOne or more of the selected paths do not exist:')
             for jump in jump_paths:
-                print '    {}'.format(jump)
+                print('    {}'.format(jump))
             return
 
         prompt = 'Select heka wave file'
@@ -2211,8 +2211,8 @@ class MyMenuBar(wx.MenuBar):
             from heka_reader import process_data
             rec_field = process_data.main(**kwargs)
         except Exception as e:
-            print traceback.print_exc()
-            print 'Something went wrong: {}'.format(e)
+            print(traceback.print_exc())
+            print('Something went wrong: {}'.format(e))
             return
 
         rec_field = Image.fromarray(rec_field)
@@ -2232,7 +2232,7 @@ class MyMenuBar(wx.MenuBar):
             return
 
         path = save_dialog.GetPath()
-        print path
+        print(path)
 
         rec_field.save(path)
         return
@@ -2301,7 +2301,7 @@ class MyMenuBar(wx.MenuBar):
 
         inputs = []
 
-        for tag, values in params.iteritems():
+        for tag, values in params.items():
             label = wx.StaticText(dlg, label=values['label'] + ':')
             ctrl = TextCtrlTag(dlg,
                                size=(-1, -1),
@@ -2531,8 +2531,8 @@ class MyFrame(wx.Frame):
 
         # hide all subpanels
         for panel in self.input_nb.GetChildren():
-            for param in panel.sub_panel_dict.iterkeys():
-                for subpanel in panel.sub_panel_dict[param].iterkeys():
+            for param in panel.sub_panel_dict.keys():
+                for subpanel in panel.sub_panel_dict[param].keys():
                     panel.sub_panel_dict[param][subpanel].Hide()
 
         # set sizer
@@ -2541,8 +2541,8 @@ class MyFrame(wx.Frame):
 
         # show/hide appropriate subpanels
         for panel in self.input_nb.GetChildren():
-            for param in panel.sub_panel_dict.iterkeys():
-                for subpanel in panel.sub_panel_dict[param].iterkeys():
+            for param in panel.sub_panel_dict.keys():
+                for subpanel in panel.sub_panel_dict[param].keys():
                     if subpanel != panel.params[param]['default']:
                         panel.sub_panel_dict[param][subpanel].Hide()
                     else:
@@ -2575,7 +2575,7 @@ class MyFrame(wx.Frame):
 
                 for stim in self.list_panel.stims_to_run_w_grid:
                     if stim:
-                        for values in stim.itervalues():
+                        for values in stim.values():
                             length = sum(x is not None for x in values)
                             grid_max = max(grid_max, length)
 
@@ -2591,7 +2591,7 @@ class MyFrame(wx.Frame):
                                 enumerate(self.list_panel.stims_to_run_w_grid):
 
                             # for each grid dict
-                            for param, values in stim.iteritems():
+                            for param, values in stim.items():
 
                                 # set values
                                 value = values[i]
@@ -2635,7 +2635,7 @@ class MyFrame(wx.Frame):
                 self.on_run_button(event)
 
         else:
-            print 'Please add stims.'
+            print('Please add stims.')
             self.SetStatusText('Please add stims.')
 
     def run(self):
@@ -2650,7 +2650,7 @@ class MyFrame(wx.Frame):
             edits = self.param_grid.get_grid_dict()
 
             for stim in to_run:
-                for k, v in edits.iteritems():
+                for k, v in edits.items():
                     stim.parameters[k] = v
 
         try:
