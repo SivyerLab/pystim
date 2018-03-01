@@ -12,7 +12,7 @@ UPDATE: labjackpython now seems to support python 3!!!!
 from __future__ import print_function
 
 from GammaCorrection import GammaValues  # unused, but necessary for pickling
-import cPickle
+import pickle
 
 from psychopy.visual.windowframepack import ProjectorFramePacker
 from psychopy.tools.coordinatetools import pol2cart
@@ -30,7 +30,7 @@ import scipy, scipy.signal
 import numpy
 
 import sortedcontainers
-import ConfigParser
+import configparser
 import subprocess
 import traceback
 import copy

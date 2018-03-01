@@ -16,11 +16,11 @@ from ast import literal_eval
 from copy import deepcopy
 from sys import platform
 from PIL import Image
-import ConfigParser
+import configparser
 import pyStim
 import subprocess
 import traceback
-import cPickle
+import pickle
 import json
 import os
 
