@@ -35,16 +35,15 @@ Quick Install
 
 pyStim is tested and works on Windows, though it should work on OSX/Linux.
 
-1. Clone the repository
+1. Clone the repository.
 
    ::code::`git clone https://github.com/SivyerLab/pystim.git`
 
-2. Install pipenv ::
+2. Install pipenv. ::
 
     pip install pipenv
 
-3. Create the python environment for pystim and automatically install all the necessary packages by entering the
-following text into the terminal command ::
+3. Create the python environment for pystim and automatically install all the necessary packages by entering the following text into the terminal command. ::
 
     pipenv install --skip-lock
 
