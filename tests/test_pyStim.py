@@ -1514,9 +1514,6 @@ class TestTrigger(object):
                 w.d = u3.U3()
                 w.send_trigger()
                 assert True
-            except AttributeError:  # on travis, can't install labjack driver
-                w.d = Mock(spec=u3.U3)
+            except AttributeError:  # on travis, can't install labjack driver (Windows only)
+                pytest.skip('driver not installed')
 
-                with patch.object(w, 'send_trigger') as mock:
-                    w.send_trigger()
-                assert mock.called()

@@ -41,7 +41,7 @@ extensions = [
     'sphinx.ext.intersphinx',
     # 'sphinx.ext.mathjax',
     'sphinx.ext.viewcode',
-    'rst2pdf.pdfbuilder'
+    # 'rst2pdf.pdfbuilder'  # add rst2pdf to pipfile if want to try building PDFs
 ]
 
 # Add any paths that contain templates here, relative to this directory.
