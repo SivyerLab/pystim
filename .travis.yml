@@ -11,7 +11,7 @@ install:
   - pip install pipenv
 
   # run through install as written in docs
-  - pipenv install --dev
+  - pipenv install --dev --skip-lock
   - pipenv run pip install git+https://github.com/labjack/LabJackPython.git
 
   # install ffmpeg
