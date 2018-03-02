@@ -1517,6 +1517,6 @@ class TestTrigger(object):
             except AttributeError:  # on travis, can't install labjack driver
                 w.d = Mock(spec=u3.U3)
 
-                with patch.object(pyStim.MyWindow, 'send_trigger') as mock:
+                with patch.object(w, 'send_trigger') as mock:
                     w.send_trigger()
                 assert mock.called()
