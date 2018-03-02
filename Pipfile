@@ -1,0 +1,37 @@
+[[source]]
+
+url = "https://pypi.python.org/simple"
+verify_ssl = true
+name = "pypi"
+
+
+[packages]
+
+numpy = "*"
+scipy = "*"
+pillow = "*"
+sortedcontainers = "*"
+tqdm = "*"
+psychopy = "==1.90.dev3"
+tabulate = "*"
+igor = "*"
+pyusb = "*"
+"pycrafter4500" = "*"
+pyglet = "*"
+
+
+[dev-packages]
+
+sphinx = "*"
+pytest = "*"
+"pycrafter4500" = "*"
+pytest-cov = "*"
+mock = "*"
+python-coveralls = "*"
+tabulate = "*"
+igor = "*"
+
+
+[requires]
+
+python_version = "3.6"

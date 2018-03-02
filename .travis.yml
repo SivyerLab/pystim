@@ -3,26 +3,19 @@ cache: pip
 branches:
   only:
     - master
+    - 2to3
 python:
-  - 2.7
+  - 3.6
 install:
-  # prep conda environment
-  - sudo apt-get update
-  - wget https://repo.continuum.io/miniconda/Miniconda2-latest-Linux-x86_64.sh -O miniconda.sh
-  - bash miniconda.sh -b -p $HOME/miniconda
-  - export PATH="$HOME/miniconda/bin:$PATH"
-  - hash -r
-  - conda config --set always_yes yes --set changeps1 no
-  - conda update -q conda
+  # get pipenv to install dependencies
+  - pip install pipenv
 
   # run through install as written in docs
-  - conda create -y -n sp_env python=2.7
-  - source activate sp_env
-  - conda install -y numpy scipy Pillow matplotlib pandas pyopengl lxml openpyxl configobj sortedcontainers sphinx
-  - pip install tabulate igor tqdm moviepy pyglet psychopy==1.85.3 labjackpython rst2pdf pyusb pycrafter4500 future json_tricks pytest mock pytest-cov python-coveralls json_tricks
+  - pipenv install
+  - pipenv run pip install git+https://github.com/labjack/LabJackPython.git
 
-  - conda install -y -c anaconda wxpython=3.0.0.0
-  - conda install -y -c conda-forge ffmpeg=3.2.4
+  # install ffmpeg
+  # install avbin
 
 before_script:
   # setup virtual frame buffer (i.e. headless display)
@@ -32,16 +25,16 @@ before_script:
 
 script:
   # run tests
-  - py.test tests --cov pyStim
+  - pipen run py.test tests --cov pyStim
   # build documentation
   - cd docs
-  - sphinx-build -b html source build/html
+  - pipenv run sphinx-build -b html source build/html
   # sphinx-build -W -b html source build/html  # warnings as errors
   # sphinx-build -W -b pdf source build/pdf
 
 after_success:
   # push coverage results
-  - coveralls
+  - pipenv run coveralls
 
 deploy:
   # push html documentation to github pages
