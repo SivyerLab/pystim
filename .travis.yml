@@ -37,11 +37,12 @@ install:
   # install ffmpeg
   # install avbin
 
-before_script:
-  # setup virtual frame buffer (i.e. headless display)
-  - "export DISPLAY=:99.0"
-  - "sh -e /etc/init.d/xvfb start"
-  - sleep 3 # give xvfb some time to start
+
+# setup virtual frame buffer (i.e. headless display)
+# before_script:
+#   - "export DISPLAY=:99.0"
+#   - "sh -e /etc/init.d/xvfb start"
+#   - sleep 3 # give xvfb some time to start
 
 script:
   # run tests
