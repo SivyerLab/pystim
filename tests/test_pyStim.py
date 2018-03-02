@@ -2,21 +2,25 @@
 Tests for pystim.
 """
 
-import pytest
-import numpy as np
-
-from pyStim import pyStim
-from mock import Mock, patch
-import psychopy
-import cPickle
 import os
+import sys
+
+sys.path.append(os.path.abspath('pyStim'))
+
+import pickle
+
+import numpy as np
+import psychopy
+import pytest
+from mock import Mock, patch
+
+import pyStim
 
 try:
     import u3
     HAS_U3 = True
 except ImportError:
     HAS_U3 = False
-
 
 class TestDrawTimes(object):
 
@@ -25,7 +29,6 @@ class TestDrawTimes(object):
     def test_draw_times_no_force_stop_no_trigger(self):
         pyStim.GlobalDefaults['frame_rate'] = 100
 
-        print pyStim.GlobalDefaults['frame_rate']
         stim = pyStim.StaticStim(delay=1,
                                  duration=2,
                                  end_delay=1,
@@ -1496,8 +1499,20 @@ class TestConfigFile(object):
         globals_file = os.path.abspath(os.path.join(p, 'global_defaults.txt'))
         if os.path.exists(globals_file):
             with open(globals_file, 'rb') as f:
-                g = cPickle.load(f)
+                g = pickle.load(f)
 
             assert g is not None
         else:
             assert g is None
+
+class TestTrigger(object):
+
+    def test_send_ttl(self):
+        if HAS_U3:
+            w = pyStim.MyWindow
+            w.d = u3.U3()
+            w.send_trigger()
+            assert True
+            print('yo')
+        else:
+            print('hmm')

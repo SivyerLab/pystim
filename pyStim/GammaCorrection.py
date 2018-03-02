@@ -37,17 +37,14 @@ See the psychopy documentation for information on using the built in gamma
 correction.
 """
 
-from psychopy import visual, core, logging
-# from psychopy.monitors import Monitor
-from scipy import stats, interpolate
-# from multiprocessing import Process, Queue
-import ConfigParser
-import cPickle
 import os.path
-import numpy
-# import sys
-# import copy_reg, types
+import pickle
+
+import configparser
 import matplotlib.pyplot as plt
+import numpy
+from psychopy import visual, core, logging
+from scipy import stats, interpolate
 
 # suppress extra warnings
 logging.console.setLevel(logging.CRITICAL)
@@ -60,236 +57,6 @@ logging.console.setLevel(logging.CRITICAL)
 #     return (getattr, (m.__self__, m.__func__.__name__))
 #
 # copy_reg.pickle(types.MethodType, reduce_method)
-
-
-def gammaCorrect():
-    """
-    Prompts user for inputs. Generates evenly spaced RGB values in each gun
-    if user desires. Gets splines and prompts for saving.
-    """
-    prompt = True
-
-    while prompt:
-        should_step = raw_input('Run through RGB steps for each gun? Y, '
-                                'N: ').rstrip()
-
-        if should_step == 'Y':
-            should_step = True
-            # mon_name = raw_input('Gamma profile to use? None or name: ')
-
-            num_steps = raw_input('\nNumber of steps per gun? ').rstrip()
-
-            if num_steps.isdigit():
-                num_steps = int(num_steps)
-                colors = [i * 1.0 / num_steps * 2 - 1 for
-                          i in range(num_steps + 1)]
-                # inputs = [(i + 1) / 2 for i in colors]
-
-                step_time = raw_input('Time between steps (ms)? ').rstrip()
-
-                if step_time.isdigit():
-                    step_time = int(step_time)
-
-                    screen_num = raw_input('Screen number? ').rstrip()
-
-                    if screen_num.isdigit():
-                        screen_num = int(screen_num)
-
-                        should_flash = raw_input('Flash black? Y, N: ')
-
-                        if should_flash == 'Y':
-                            should_flash = True
-                            prompt = False
-
-                        elif should_flash == 'N':
-                            should_flash = False
-                            prompt = False
-
-        elif should_step == 'N':
-            should_step = False
-            prompt = False
-        else:
-            print '\nAnswer correctly.'
-
-    if should_step:
-        win = visual.Window(monitor='testMonitor', fullscr=False,
-                            screen=screen_num, winType='pyglet',
-                            units='norm')
-        rect = visual.Rect(win, width=2.1, height=2.1, fillColorSpace='rgb',
-                           fillColor=(-1, -1, -1))
-
-        rgb = ['RED', 'GREEN', 'BLUE']
-
-        for i in range(3):
-            raw_input("\n{}\npress enter to proceed when ready...".
-                      format(rgb[i])).rstrip()
-
-            for color in colors:
-                fill = [-1, -1, -1]
-                if should_flash:
-                    for x in range(5):
-                        rect.setFillColor(fill)
-                        rect.draw()
-                        win.flip()
-                fill[i] = color
-                rect.setFillColor(fill)
-                rect.draw()
-                win.flip()
-                core.wait(step_time * 1.0 / 1000)
-
-        win.close()
-
-    print '\nEnter lums into a text file. Each entry separated by new line, ' \
-          'colors seperated by 2 new lines, in RGB order.'
-    lums = raw_input('Enter file location: ').rstrip()
-    try:
-        with open(lums, 'r') as f:
-            rgbs = f.read()
-            rgbs = rgbs.replace('\r', '')
-    except IOError:
-        print '\n File not found. Restarting. \n'
-        gammaCorrect()
-
-    rgbs = rgbs.split('\n\n')
-    r = rgbs[0].split('\n')
-    g = rgbs[1].split('\n')
-    b = rgbs[2].split('\n')
-
-    r = map(float, r)
-    g = map(float, g)
-    b = map(float, b)
-
-    mon = raw_input('\nMonitor to edit: ')
-
-    r_tuple = make_correction(r)
-    g_tuple = make_correction(g)
-    b_tuple = make_correction(b)
-
-    show_plot = raw_input('\nShow plots? Y, N: ')
-    # if show_plot == 'Y':
-    #     plt.legend(loc=0)
-    #     plt.show()
-
-    gamma_correction = GammaValues(r_tuple, g_tuple, b_tuple)
-
-    # GRAPHING STUFF TO TEST
-    vals = [i * 1.0 / (51 - 1) * 2 - 1 for i in range(51)]
-    corrected = [[], [], []]
-    for i in range(len(vals)):
-        rgb = [vals[i]] * 3
-        rgb = gamma_correction(rgb)
-        corrected[0].append(rgb[0])
-        corrected[1].append(rgb[1])
-        corrected[2].append(rgb[2])
-
-    if show_plot == 'Y':
-        plt.plot(vals, vals, 'k--', label='linear')
-        plt.plot(vals, corrected[0], 'r', label='red')
-        plt.plot(vals, corrected[1], 'g', label='green')
-        plt.plot(vals, corrected[2], 'b', label='blue')
-        plt.legend(loc=0)
-        plt.show()
-
-    should_save = raw_input('\nSave? Y, N: ')
-
-    # save dir
-    config = ConfigParser.ConfigParser()
-    config.read(os.path.abspath('./psychopy/config.ini'))
-    data_dir = config.get('GUI', 'data_dir')
-    # gamma file
-    gamma_file = os.path.join(data_dir, 'gammaTables.txt')
-
-    if should_save == 'Y':
-        if os.path.exists(gamma_file):
-            with open(gamma_file, 'rb') as f:
-                gamma_dict = cPickle.load(f)
-            print 'existing:',
-            for k, v in gamma_dict.iteritems():
-                print k + ',',
-            gamma_dict[mon] = gamma_correction
-
-        else:
-            gamma_dict = {mon: gamma_correction}
-
-        with open(gamma_file, 'wb') as f:
-            cPickle.dump(gamma_dict, f)
-
-        print '\n Gamma correction saved. Done.'
-
-    else:
-        print 'Done.\n'
-
-
-def make_correction(measured):
-    """
-    Calculates a conversion spline of RGB values to corrected values to
-    linearize screen luminosity.
-
-    :param measured: Recorded values of screen luminosity. Passed by
-     gammaCorrect, pulled out of text file.
-    :return: Tuple of spline, slope, and intercept
-    """
-    # values where lum was measured, assuming even spacing and starting at
-    # min and max
-    measured_at = [i * 1.0 / (len(measured) - 1) * 2 - 1
-                   for i in range(len(measured))]
-
-    # for spline, x must be increasing, so do check on values
-    is_increasing = [x < y for x, y in zip(measured, measured[1:])]
-    # is_increasing = [x > y for x, y in zip(reversed(measured), list(reversed(measured))[1:])]
-    # print(list(reversed(is_increasing)))
-
-    # remove non increasing values, going backwards to not change indices
-    for i in range(len(is_increasing) - 1, -1, -1):
-        if not is_increasing[i]:
-            # del measured[i + 1]
-            # del measured_at[i + 1]
-            del measured[i]
-            del measured_at[i]
-
-    print
-    print('measured and measured at')
-    for i in range(len(measured_at)):
-        print measured[i], measured_at[i]
-    print
-
-    min = measured[0]
-    max = measured[-1]
-
-    # line to linearize to
-    slope, intercept, _, _, _ = stats.linregress([-1.0, 1.0], [min, max])
-
-    # splines to fit to data
-    spline = interpolate.InterpolatedUnivariateSpline(measured_at, measured)
-    inverse_spline = interpolate.InterpolatedUnivariateSpline(measured,
-                                                              measured_at)
-
-    # ##GRAPHING STUFF TO TEST##
-    linear = [i * slope + intercept for i in measured_at]
-    spline_values = spline([i for i in measured_at])
-    corrected_values = inverse_spline([i * slope + intercept for i in
-                                       measured_at])
-    graph_corrected = spline([i for i in corrected_values])
-
-    print('measured at and corrected')
-    for i in range(len(corrected_values)):
-        print "%.3f" % measured_at[i], "%.3f" % corrected_values[i]
-    print
-
-    to_plot = []
-    # points
-    to_plot.append(plt.plot(measured_at, measured, 'ro', label='measured'))
-    # fit
-    to_plot.append(plt.plot(measured_at, spline_values,
-                            label='interpolated'))
-    # corrected
-    to_plot.append(plt.plot(measured_at, graph_corrected, label='corrected'))
-    # check against linear
-    to_plot.append(plt.plot(measured_at, linear, label='linear'))
-    plt.legend(loc=0)
-    plt.show()
-
-    return inverse_spline, slope, intercept, to_plot
 
 
 class GammaValues(object):
@@ -459,8 +226,7 @@ class GammaValues(object):
 
                 # if grayscale image
                 if numpy.shape(color)[1] != 3:
-                    print '\nWARNING: Cannot gamma correct grayscale .iml'
-                    'images.'
+                    print('\nWARNING: Cannot gamma correct grayscale .iml images.')
                     adj_color = color
 
                 # if noise checkerboard
@@ -507,6 +273,236 @@ class GammaValues(object):
                 adj_color = -1.0
 
         return adj_color
+
+
+def make_correction(measured):
+    """
+    Calculates a conversion spline of RGB values to corrected values to
+    linearize screen luminosity.
+
+    :param measured: Recorded values of screen luminosity. Passed by
+     gammaCorrect, pulled out of text file.
+    :return: Tuple of spline, slope, and intercept
+    """
+    # values where lum was measured, assuming even spacing and starting at
+    # min and max
+    measured_at = [i * 1.0 / (len(measured) - 1) * 2 - 1
+                   for i in range(len(measured))]
+
+    # for spline, x must be increasing, so do check on values
+    is_increasing = [x < y for x, y in zip(measured, measured[1:])]
+    # is_increasing = [x > y for x, y in zip(reversed(measured), list(reversed(measured))[1:])]
+    # print(list(reversed(is_increasing)))
+
+    # remove non increasing values, going backwards to not change indices
+    for i in range(len(is_increasing) - 1, -1, -1):
+        if not is_increasing[i]:
+            # del measured[i + 1]
+            # del measured_at[i + 1]
+            del measured[i]
+            del measured_at[i]
+
+    print()
+    print('measured and measured at')
+    for i in range(len(measured_at)):
+        print(measured[i], measured_at[i])
+    print()
+
+    min = measured[0]
+    max = measured[-1]
+
+    # line to linearize to
+    slope, intercept, _, _, _ = stats.linregress([-1.0, 1.0], [min, max])
+
+    # splines to fit to data
+    spline = interpolate.InterpolatedUnivariateSpline(measured_at, measured)
+    inverse_spline = interpolate.InterpolatedUnivariateSpline(measured,
+                                                              measured_at)
+
+    # ##GRAPHING STUFF TO TEST##
+    linear = [i * slope + intercept for i in measured_at]
+    spline_values = spline([i for i in measured_at])
+    corrected_values = inverse_spline([i * slope + intercept for i in
+                                       measured_at])
+    graph_corrected = spline([i for i in corrected_values])
+
+    print('measured at and corrected')
+    for i in range(len(corrected_values)):
+        print("%.3f" % measured_at[i], "%.3f" % corrected_values[i])
+    print()
+
+    to_plot = []
+    # points
+    to_plot.append(plt.plot(measured_at, measured, 'ro', label='measured'))
+    # fit
+    to_plot.append(plt.plot(measured_at, spline_values,
+                            label='interpolated'))
+    # corrected
+    to_plot.append(plt.plot(measured_at, graph_corrected, label='corrected'))
+    # check against linear
+    to_plot.append(plt.plot(measured_at, linear, label='linear'))
+    plt.legend(loc=0)
+    plt.show()
+
+    return inverse_spline, slope, intercept, to_plot
+
+
+def gammaCorrect():
+    """
+    Prompts user for inputs. Generates evenly spaced RGB values in each gun
+    if user desires. Gets splines and prompts for saving.
+    """
+    prompt = True
+
+    while prompt:
+        should_step = input('Run through RGB steps for each gun? Y, '
+                                'N: ').rstrip()
+
+        if should_step == 'Y':
+            should_step = True
+            # mon_name = raw_input('Gamma profile to use? None or name: ')
+
+            num_steps = input('\nNumber of steps per gun? ').rstrip()
+
+            if num_steps.isdigit():
+                num_steps = int(num_steps)
+                colors = [i * 1.0 / num_steps * 2 - 1 for
+                          i in range(num_steps + 1)]
+                # inputs = [(i + 1) / 2 for i in colors]
+
+                step_time = input('Time between steps (ms)? ').rstrip()
+
+                if step_time.isdigit():
+                    step_time = int(step_time)
+
+                    screen_num = input('Screen number? ').rstrip()
+
+                    if screen_num.isdigit():
+                        screen_num = int(screen_num)
+
+                        should_flash = input('Flash black? Y, N: ')
+
+                        if should_flash == 'Y':
+                            should_flash = True
+                            prompt = False
+
+                        elif should_flash == 'N':
+                            should_flash = False
+                            prompt = False
+
+        elif should_step == 'N':
+            should_step = False
+            prompt = False
+        else:
+            print('\nAnswer correctly.')
+
+    if should_step:
+        win = visual.Window(monitor='testMonitor', fullscr=False,
+                            screen=screen_num, winType='pyglet',
+                            units='norm')
+        rect = visual.Rect(win, width=2.1, height=2.1, fillColorSpace='rgb',
+                           fillColor=(-1, -1, -1))
+
+        rgb = ['RED', 'GREEN', 'BLUE']
+
+        for i in range(3):
+            input("\n{}\npress enter to proceed when ready...".
+                      format(rgb[i])).rstrip()
+
+            for color in colors:
+                fill = [-1, -1, -1]
+                if should_flash:
+                    for x in range(5):
+                        rect.setFillColor(fill)
+                        rect.draw()
+                        win.flip()
+                fill[i] = color
+                rect.setFillColor(fill)
+                rect.draw()
+                win.flip()
+                core.wait(step_time * 1.0 / 1000)
+
+        win.close()
+
+    print('\nEnter lums into a text file. Each entry separated by new line, ' \
+          'colors seperated by 2 new lines, in RGB order.')
+    lums = input('Enter file location: ').rstrip()
+    try:
+        with open(lums, 'r') as f:
+            rgbs = f.read()
+            rgbs = rgbs.replace('\r', '')
+    except IOError:
+        print('\n File not found. Restarting. \n')
+        gammaCorrect()
+
+    rgbs = rgbs.split('\n\n')
+    r = rgbs[0].split('\n')
+    g = rgbs[1].split('\n')
+    b = rgbs[2].split('\n')
+
+    r = map(float, r)
+    g = map(float, g)
+    b = map(float, b)
+
+    mon = input('\nMonitor to edit: ')
+
+    r_tuple = make_correction(r)
+    g_tuple = make_correction(g)
+    b_tuple = make_correction(b)
+
+    show_plot = input('\nShow plots? Y, N: ')
+    # if show_plot == 'Y':
+    #     plt.legend(loc=0)
+    #     plt.show()
+
+    gamma_correction = GammaValues(r_tuple, g_tuple, b_tuple)
+
+    # GRAPHING STUFF TO TEST
+    vals = [i * 1.0 / (51 - 1) * 2 - 1 for i in range(51)]
+    corrected = [[], [], []]
+    for i in range(len(vals)):
+        rgb = [vals[i]] * 3
+        rgb = gamma_correction(rgb)
+        corrected[0].append(rgb[0])
+        corrected[1].append(rgb[1])
+        corrected[2].append(rgb[2])
+
+    if show_plot == 'Y':
+        plt.plot(vals, vals, 'k--', label='linear')
+        plt.plot(vals, corrected[0], 'r', label='red')
+        plt.plot(vals, corrected[1], 'g', label='green')
+        plt.plot(vals, corrected[2], 'b', label='blue')
+        plt.legend(loc=0)
+        plt.show()
+
+    should_save = input('\nSave? Y, N: ')
+
+    # save dir
+    config = configparser.ConfigParser()
+    config.read(os.path.abspath('./psychopy/config.ini'))
+    data_dir = config.get('GUI', 'data_dir')
+    # gamma file
+    gamma_file = os.path.join(data_dir, 'gammaTables.txt')
+
+    if should_save == 'Y':
+        if os.path.exists(gamma_file):
+            with open(gamma_file, 'rb') as f:
+                gamma_dict = pickle.load(f)
+            print('existing:', end='')
+            for k, v in gamma_dict.items():
+                print(k + ',', end='')
+            gamma_dict[mon] = gamma_correction
+
+        else:
+            gamma_dict = {mon: gamma_correction}
+
+        with open(gamma_file, 'wb') as f:
+            pickle.dump(gamma_dict, f)
+
+        print('\n Gamma correction saved. Done.')
+
+    else:
+        print('Done.\n')
 
 if __name__ == "__main__":
     gammaCorrect()

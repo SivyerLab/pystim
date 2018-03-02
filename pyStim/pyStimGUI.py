@@ -10,22 +10,23 @@ GUI for pyStim
 import pyglet
 pyglet.options['shadow_window'] = False
 
-from GammaCorrection import GammaValues  # unused, but necessary for pickling
-from collections import OrderedDict
-from ast import literal_eval
-from copy import deepcopy
-from sys import platform
-from PIL import Image
-import configparser
-import pyStim
-import subprocess
-import traceback
-import pickle
 import json
 import os
+import pickle
+import subprocess
+import traceback
+from ast import literal_eval
+from collections import OrderedDict
+from copy import deepcopy
+from sys import platform
 
+import configparser
+import wx
+import wx.grid
 import wx.lib.agw.multidirdialog as mdd
-import wx, wx.grid
+from PIL import Image
+
+import pyStim
 
 global has_lcr
 try:
@@ -65,7 +66,7 @@ class Parameters(object):
         :param config_file: file where defaults are stored
         :return: returns dictionary of defaults
         """
-        config = ConfigParser.ConfigParser()
+        config = configparser.ConfigParser()
         config.read(config_file)
 
         default_config_dict = {}
@@ -130,7 +131,7 @@ class Parameters(object):
 
         if os.path.exists(gamma_file):
             with open(gamma_file, 'rb') as f:
-                gamma_dict = cPickle.load(f)
+                gamma_dict = pickle.load(f)
             gamma_mons = gamma_dict.keys()
         else:
             gamma_mons = []
@@ -337,7 +338,7 @@ class FilePickerCtrlTag(wx.FilePickerCtrl):
                                                             value)
 
 
-class TextCtrlValidator(wx.PyValidator):
+class TextCtrlValidator(wx.Validator):
     """
     Validator class to ensure proper entry of parameters.
     """
@@ -345,7 +346,7 @@ class TextCtrlValidator(wx.PyValidator):
         """
         Normal init.
         """
-        wx.PyValidator.__init__(self)
+        wx.Validator.__init__(self)
 
     def Clone(self):
         """
@@ -465,7 +466,7 @@ class InputPanel(wx.Panel):
                     # get length of list for sizer and TextCtrl sizing
                     length = len(param_info['default'])
                     # sizer for adding text boxes into grid
-                    list_sizer = wx.GridSizer(rows=1, cols=length, hgap=5)
+                    list_sizer = wx.GridSizer(rows=1, cols=length, vgap=0, hgap=5)
 
                     # iterate through number of fields in each list and
                     # create a TextCtrl for each, with tag2 as the position
@@ -691,8 +692,9 @@ class GlobalPanel(InputPanel):
         super(GlobalPanel, self).__init__(parent, params, category)
 
         # move items down a few slots to insert spacers and titles
+        # print(self.grid_sizer.GetChildren())
         for item in reversed(self.grid_sizer.GetChildren()):
-            x, y = item.GetPosTuple()
+            x, y = item.GetPos()
             x += 2
             pos = x, y
             item.SetPos(pos)
@@ -708,7 +710,7 @@ class GlobalPanel(InputPanel):
         # check if file exists, and if so load different options
         if os.path.exists(self.globals_file):
             with open(self.globals_file, 'rb') as f:
-                global_dict = cPickle.load(f)
+                global_dict = pickle.load(f)
 
             defaults_list = global_dict.keys()
 
@@ -763,7 +765,7 @@ class GlobalPanel(InputPanel):
         # get saved globals if present
         if os.path.exists(self.globals_file):
             with open(self.globals_file, 'rb') as f:
-                global_dict = cPickle.load(f)
+                global_dict = pickle.load(f)
 
         # leave dict empty otherwise
         else:
@@ -780,7 +782,7 @@ class GlobalPanel(InputPanel):
         global_dict[save_name] = params_to_save
 
         with open(self.globals_file, 'wb') as f:
-            cPickle.dump(global_dict, f)
+            pickle.dump(global_dict, f)
 
     def on_default_delete(self, event):
         """
@@ -795,14 +797,14 @@ class GlobalPanel(InputPanel):
 
             # get list of saves from file
             with open(self.globals_file, 'rb') as f:
-                global_dict = cPickle.load(f)
+                global_dict = pickle.load(f)
 
             # remove from dict
             del global_dict[selected]
 
             # redump dict to file
             with open(self.globals_file, 'wb') as f:
-                cPickle.dump(global_dict, f)
+                pickle.dump(global_dict, f)
 
             # add blank spot in control to switch to
             self.which_default.Append('')
@@ -827,7 +829,7 @@ class GlobalPanel(InputPanel):
 
         # get params to load
         with open(self.globals_file, 'rb') as f:
-            params_to_load = cPickle.load(f)[selected]
+            params_to_load = pickle.load(f)[selected]
 
         for param, controls in self.frame.all_controls.items():
             for control in controls:
@@ -1026,10 +1028,10 @@ class ListPanel(wx.Panel):
         trigger = str(param_dict['trigger'])
 
         # add info about stim to list
-        self.list_control.InsertStringItem(insert_pos, fill)
-        self.list_control.SetStringItem(insert_pos, 1, shape)
-        self.list_control.SetStringItem(insert_pos, 2, stim_type)
-        self.list_control.SetStringItem(insert_pos, 3, trigger)
+        self.list_control.InsertItem(insert_pos, fill)
+        self.list_control.SetItem(insert_pos, 1, shape)
+        self.list_control.SetItem(insert_pos, 2, stim_type)
+        self.list_control.SetItem(insert_pos, 3, trigger)
         # resize columns to fit
         self.list_control.SetColumnWidth(0, wx.LIST_AUTOSIZE)
         self.list_control.SetColumnWidth(1, wx.LIST_AUTOSIZE)
@@ -1349,7 +1351,7 @@ class DirPanel(wx.Panel):
 
         # open text file in binary mode to dump
         with open(path, 'wb') as f:
-            cPickle.dump(to_save, f)
+            pickle.dump(to_save, f)
 
         # refresh file browser to show new saved file
         # ugly way of doing this
@@ -1371,7 +1373,7 @@ class DirPanel(wx.Panel):
         if not is_log:
             try:
                 with open(path, 'rb') as f:
-                    to_load = cPickle.load(f)
+                    to_load = pickle.load(f)
             except IOError:
                 print('\nNo file selected. Please select file.')
                 return
@@ -1393,7 +1395,7 @@ class DirPanel(wx.Panel):
                         if line == '#BEGIN PICKLE#':
                             next_is_pickle = True
 
-                    to_load = cPickle.loads(to_load)
+                    to_load = pickle.loads(to_load)
 
             except ValueError:
                 print('\nERROR: file not a properly formatted parameter file')
@@ -1835,7 +1837,7 @@ class MyMenuBar(wx.MenuBar):
                                                kind=wx.ITEM_CHECK)
 
         if self.frame.parameters.get_param_value('global', 'log'):
-            self.options_log.Toggle()  # default to True
+            self.options_log.Check(True)  # default to True
 
         self.options_capture = options_menu.Append(wx.ID_ANY, 'capture',
                                                    'Capture run and create '
@@ -1858,7 +1860,7 @@ class MyMenuBar(wx.MenuBar):
                                                          '3',
                                                          'screen #3',
                                                          kind=wx.ITEM_RADIO)
-        options_menu.AppendMenu(wx.ID_ANY, 'mirror screen num', options_mirror_number)
+        options_menu.Append(wx.ID_ANY, 'mirror screen num', options_mirror_number)
 
         self.options_override = options_menu.Append(wx.ID_ANY, 'global override',
                                                     'Override parameters',
@@ -1877,7 +1879,7 @@ class MyMenuBar(wx.MenuBar):
                                              'Map receptive field',
                                              'Generate receptive field map')
 
-        options_menu.AppendMenu(wx.ID_ANY, 'tools', options_tools)
+        options_menu.Append(wx.ID_ANY, 'tools', options_tools)
 
         if has_lcr:
             options_lcr4500 = wx.Menu()
@@ -1951,15 +1953,15 @@ class MyMenuBar(wx.MenuBar):
 
         binder(to_bind)
 
-        lcr_to_bind = {
-            wx.EVT_MENU: {
-                lcr4500_video_off: self.on_options_lcr4500_video_off,
-                lcr4500_video_on: self.on_options_lcr4500_video_on,
-                lcr4500_video_mode: self.on_options_lcr4500_video_mode,
-            }
-        }
-
         if has_lcr:
+
+            lcr_to_bind = {
+                wx.EVT_MENU: {
+                    lcr4500_video_off: self.on_options_lcr4500_video_off,
+                    lcr4500_video_on: self.on_options_lcr4500_video_on,
+                    lcr4500_video_mode: self.on_options_lcr4500_video_mode,
+                }
+            }
             binder(lcr_to_bind)
 
             sequences = {
@@ -2005,7 +2007,7 @@ class MyMenuBar(wx.MenuBar):
                 },
             }
 
-            for ctrl, kwargs in sequences.iteritems():
+            for ctrl, kwargs in sequences.items():
                 self.Bind(wx.EVT_MENU,
                           lambda event, kwargs=kwargs: self.on_options_lcr4500_pattern_mode(event, **kwargs),
                           ctrl)
@@ -2663,7 +2665,7 @@ class MyFrame(wx.Frame):
             if time != 'error':
                 status_text = 'Last run: {0:.2f} fps, '.format(fps) \
                               + '{0:.2f} seconds, '.format(time) \
-                              + '{} dropped.'.format(dropped)
+                              + '{} missed.'.format(dropped)
 
                 if time_stamp is not None:
                     status_text += ' Timestamp: {}'.format(time_stamp)

@@ -11,33 +11,31 @@ UPDATE: labjackpython now seems to support python 3!!!!
 
 from __future__ import print_function
 
-from GammaCorrection import GammaValues  # unused, but necessary for pickling
+import copy
+import os
 import pickle
-
-from psychopy.visual.windowframepack import ProjectorFramePacker
-from psychopy.tools.coordinatetools import pol2cart
-from psychopy.tools.typetools import uint8_float, float_uint8
-from psychopy import visual, core, event, filters
-from psychopy.visual import globalVars
-
+import subprocess
+import sys
+import traceback
+from math import ceil
+from random import Random
 from time import strftime, localtime
+
+import configparser
+import numpy
+import pyglet
+import scipy
+import scipy.signal
+import sortedcontainers
+from PIL import Image
 from tqdm import tqdm, trange
 
-from random import Random
-from math import ceil
-from PIL import Image
-import scipy, scipy.signal
-import numpy
+from psychopy import visual, core, event, filters
+from psychopy.tools.coordinatetools import pol2cart
+from psychopy.tools.typetools import uint8_float, float_uint8
+from psychopy.visual import globalVars
+from psychopy.visual.windowframepack import ProjectorFramePacker
 
-import sortedcontainers
-import configparser
-import subprocess
-import traceback
-import copy
-import sys
-import os
-
-import pyglet
 GL = pyglet.gl
 
 global has_igor
@@ -63,7 +61,7 @@ except ImportError:
 
 __author__  = "Alexander Tomlinson"
 __license__ = "GPL"
-__version__ = "1.1"
+__version__ = "2.0"
 __email__   = "tomlinsa@ohsu.edu"
 __status__  = "Beta"
 
@@ -72,7 +70,7 @@ __status__  = "Beta"
 # logging.console.setLevel(logging.CRITICAL)
 
 # read ini file
-config = ConfigParser.ConfigParser()
+config = configparser.ConfigParser()
 p = os.path.abspath('pyStim/psychopy/config.ini')
 config.read(p)
 
@@ -112,15 +110,17 @@ class StimInfo(object):
 class GlobalDefaultsMeta(type):
     """Metaclass to redefine get and set item for :py:class:`GlobalDefaults`.
     """
-    def __getitem__(self, key):
-        return self.defaults[key]
+    def __getitem__(cls, key):
+        return cls.defaults[key]
 
-    def __setitem__(self, key, item):
-        self.defaults[key] = item
+    def __setitem__(cls, key, item):
+        cls.defaults[key] = item
 
 
-class GlobalDefaults(object):
+class GlobalDefaults(object, metaclass=GlobalDefaultsMeta):
     """Class with global constants, such as window information.
+
+    metaclass: allow static __getitem__ and __setitem__
 
     TODO: better, more pythonic, way to do this
 
@@ -146,9 +146,6 @@ class GlobalDefaults(object):
     :param list offset: List of microns in xy coordinates of how much to
      offset the center of the window.
     """
-
-    # allow static __getitem__ and __setitem__
-    __metaclass__ = GlobalDefaultsMeta
 
     #: Dictionary of default defaults.
     defaults = dict(frame_rate=60,
@@ -278,7 +275,8 @@ class MyWindow(object):
     d = None
     #: List of frames to trigger on
     frame_trigger_list = sortedcontainers.SortedList()
-    frame_trigger_list.add(sys.maxint)  # need an extra last value for indexing
+    frame_trigger_list.add(float('inf'))  # need an extra last value for indexing
+    # frame_trigger_list.add(sys.maxint)  # need an extra last value for indexing
 
     framepacker = None
     mirror_counter = 0
@@ -306,7 +304,7 @@ class MyWindow(object):
 
             if os.path.exists(gamma_file):
                 with open(gamma_file, 'rb') as f:
-                    MyWindow.gamma_mon = cPickle.load(f)[gamma]
+                    MyWindow.gamma_mon = pickle.load(f)[gamma]
 
         else:
             MyWindow.gamma_mon = None
@@ -730,11 +728,9 @@ class StimDefaults(object):
             self.movie_size = [100, 100]
 
         if image_size is not None:
-            self.image_size = map(int,
-                                  [image_size[0] *
-                                   GlobalDefaults['pix_per_micron'],
-                                   image_size[1] *
-                                   GlobalDefaults['pix_per_micron']])
+            self.image_size = list(map(int,
+                                       [image_size[0] * GlobalDefaults['pix_per_micron'],
+                                        image_size[1] * GlobalDefaults['pix_per_micron']]))
         else:
             self.movie_size = [100, 100]
 
@@ -2206,7 +2202,7 @@ def log_stats(count_reps, reps, count_frames, num_frames, elapsed_time,
             para_copy['move_type'] = i.stim_type
             to_write.append(para_copy)
 
-        f.write(cPickle.dumps(to_write))
+        f.write(pickle.dumps(to_write))
 
     for i in range(len(stim_list)):
         if stim_list[i].parameters['shape'] != 'annulus':
@@ -2597,14 +2593,14 @@ def main(stim_list, verbose=True):
         Elapsed time: x seconds.
         """
         print("\n{} rep(s) of {} stim(s) generated.". \
-            format(reps, len(stim_list)), end='')
+            format(reps, len(stim_list)), end=' ')
         print("{}/{} frames displayed.". \
             format(count_reps * (num_frames) + count_frames, reps *
-                   (num_frames)), end='')
+                   (num_frames)), end=' ')
         print("Average fps: {0:.2f} hz.". \
             format((count_reps * (num_frames) + count_frames) /
-                   count_elapsed_time), end='')
-        print("{} frame(s) dropped.".format(dropped))
+                   count_elapsed_time), end=' ')
+        print("{} frame(s) missed.".format(dropped))
         print("Elapsed time: {0:.3f} seconds.\n". \
             format(count_elapsed_time))
 
