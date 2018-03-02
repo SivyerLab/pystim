@@ -30,10 +30,10 @@ import sortedcontainers
 from PIL import Image
 from tqdm import tqdm, trange
 
-from psychopy import visual, core, event, filters
+from psychopy import visual, core, event
 from psychopy.tools.coordinatetools import pol2cart
 from psychopy.tools.typetools import uint8_float, float_uint8
-from psychopy.visual import globalVars
+from psychopy.visual import globalVars, filters
 from psychopy.visual.windowframepack import ProjectorFramePacker
 
 GL = pyglet.gl
