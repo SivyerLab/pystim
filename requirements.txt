@@ -1,6 +1,6 @@
 # pipenv is the recommended virtual environment manager
 
-psychopy
+psychopy==1.90.dev3
 wxpython
 pyglet
 numpy
