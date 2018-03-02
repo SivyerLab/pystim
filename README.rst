@@ -33,24 +33,28 @@ psychopy `website <http://www.psychopy.org>`_.
 Quick Install
 -------------
 
-pyStim is tested and works on both OSX and Windows. It does
-not work with Python 3, due to incompatible dependencies. pyStim
-requires several libraries, along with their associated dependencies, to run.
-They are listed below:
+pyStim is tested and works on Windows, though it should work on OSX/Linux.
 
-- psychopy (see psychopy `documentation <http://www.psychopy.org/documentation.html>`_ for required `dependencies <http://www.psychopy.org/installation.html#essential-packages>`_).
-- sortedcontainers (available through pip)
-- `wxPython <http://www.wxpython.org/download.php>`_ (for GUI)
+1. Clone the repository ::
+
+   git clone https://github.com/SivyerLab/pystim.git
+
+5. Install pipenv. ::
+
+    pip install pipenv
+
+6. Create the python environment for pystim and automatically install all the necessary packages by entering the
+following text into the terminal command. ::
+
+    pipenv install --skip-lock
 
 Optional libraries:
 
+- pycrafter4500 (for control of a lightcrafter 4500)
 - tabulate (for formatting logs)
 - igor (for parsing tables)
-- `u3 <https://labjack.com/support/software/examples/ud/labjackpython>`_ (for triggering from LabJack)
-- `ffmpeg <https://www.ffmpeg.org/>`_ (for making movies from captured frames)
-
-Psychopy requires some small editing to source for it to work as of version 1.84.2 (fixed on current master on github).
-See docs for detailed instructions.
+- labjackpython (see install guide for details)
+- `ffmpeg <https://www.ffmpeg.org/>`_ (for generating movies)
 
 Licensing
 ---------
