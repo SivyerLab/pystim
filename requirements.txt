@@ -1,29 +1,25 @@
-# conda is the recommended environment manager.
+# pipenv is the recommended virtual environment manager
 
-# included with conda
+psychopy
+wxpython
+pyglet
 numpy
 scipy
-Pillow
+pillow
+tqdm
 sortedcontainers
 
-# not on conda, use pip
-tqdm
-PsychoPy  # along with it's dependencies since pip won't install them
-# current dependencies: pip install numpy scipy matplotlib pandas pyopengl pyglet pillow moviepy lxml openpyxl configobj
+## dev-packages
 
-## optional
-# LabJackPython (needs manual install)
-tabulate
-igor
-pyusb  # to connect to LCR4500
-pycrafter4500  # to connect to LCR4500
+# sphinx
+# pytest
+# pycrafter4500
+# pytest-cov
+# mock
+# python-coveralls
+# tabulate
+# igor
 
-## needs to be installed manually (or with conda):
-# wxpython
-# labjackpython needs to be manually installed as well (on win32, need driver also, see labjack site)
-# ffmpeg (if want to make videos of stims)
-# avbin (for video playback)
-
-# compiled windows binaries of popular python libraries
-# can be found at http://www.lfd.uci.edu/~gohlke/pythonlibs/
-# if having problems installing on windows (conda resolves this problem though)
+## optionally needs to be installed manually
+# ffmpeg
+# avbin

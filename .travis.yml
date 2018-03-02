@@ -1,16 +1,18 @@
-language: python
+matrix:
+  include:
+    - os: linux
+      dist: trusty
+      language: python
+      python: 3.6
 
-os:
-  - linux
-  - osx
+    - os: osx
+      language: generic
 
 cache: pip
 branches:
   only:
     - master
     - 2to3
-python:
-  - 3.6
 
 notifications:
   email:
@@ -18,6 +20,9 @@ notifications:
     on_failure: change
 
 install:
+  # need to first install python3 on osx
+  - if [[ $TRAVIS_OS_NAME == 'osx' ]]; then brew install python3; fi
+
   # get pipenv to install dependencies
   - pip install pipenv
 
@@ -25,6 +30,7 @@ install:
   # except no wxPython compiled for linux on pypi, and building from source takes ~45 min
   # so instead grab build from online
   - if [[ $TRAVIS_OS_NAME == 'linux' ]]; then pip install -U -f https://extras.wxpython.org/wxPython4/extras/linux/gtk3/ubuntu-14.04 wxPython; fi
+
   - pipenv install --dev --skip-lock
   - pip install git+https://github.com/labjack/LabJackPython.git
 
