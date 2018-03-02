@@ -1510,9 +1510,13 @@ class TestTrigger(object):
     def test_send_ttl(self):
         if HAS_U3:
             w = pyStim.MyWindow
-            w.d = u3.U3()
-            w.send_trigger()
-            assert True
-            print('yo')
-        else:
-            print('hmm')
+            try:
+                w.d = u3.U3()
+                w.send_trigger()
+                assert True
+            except AttributeError:  # on travis, can't install labjack driver
+                w.d = Mock(spec=u3.U3)
+
+                with patch.object(pyStim.Window, 'send_trigger') as mock:
+                    w.send_trigger()
+                assert mock.called()
