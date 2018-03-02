@@ -29,10 +29,10 @@ install:
   # run through install as written in docs (but already in env)
   # except no wxPython compiled for linux on pypi, and building from source takes ~45 min
   # so instead grab build from online
-  - if [[ $TRAVIS_OS_NAME == 'linux' ]]; then pip install -U -f https://extras.wxpython.org/wxPython4/extras/linux/gtk3/ubuntu-14.04 wxPython; fi
+  - if [[ $TRAVIS_OS_NAME == 'linux' ]]; then pipenv run pip install -U -f https://extras.wxpython.org/wxPython4/extras/linux/gtk3/ubuntu-14.04 wxPython; fi
 
   - pipenv install --dev --skip-lock
-  - pip install git+https://github.com/labjack/LabJackPython.git
+  - pipenv run pip install git+https://github.com/labjack/LabJackPython.git
 
   # install ffmpeg
   # install avbin
@@ -47,16 +47,16 @@ before_script:
 
 script:
   # run tests
-  - py.test tests --cov pyStim
+  - pipenv run py.test tests --cov pyStim
   # build documentation
   - cd docs
-  - sphinx-build -b html source build/html
-  # sphinx-build -W -b html source build/html  # warnings as errors
-  # sphinx-build -W -b pdf source build/pdf
+  - pipenv run sphinx-build -b html source build/html
+  # pipenv run sphinx-build -W -b html source build/html  # warnings as errors
+  # pipenv run sphinx-build -W -b pdf source build/pdf
 
 after_success:
   # push coverage results
-  - coveralls
+  - pipenv run coveralls
 
 deploy:
   # push html documentation to github pages
