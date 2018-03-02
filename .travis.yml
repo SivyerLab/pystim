@@ -6,11 +6,20 @@ branches:
     - 2to3
 python:
   - 3.6
+
+notifications:
+  email:
+    on_success: never
+    on_failure: change
+
 install:
   # get pipenv to install dependencies
   - pip install pipenv
 
   # run through install as written in docs
+  # except no wxPython compiled for linux on pypi, and building from source takes ~45 min
+  # so instead grab build from online
+  - pipenv run install -U -f https://extras.wxpython.org/wxPython4/extras/linux/gtk3/ubuntu-14.04 wxPython
   - pipenv install --dev --skip-lock
   - pipenv run pip install git+https://github.com/labjack/LabJackPython.git
 
