@@ -11,7 +11,7 @@ install:
   - pip install pipenv
 
   # run through install as written in docs
-  - pipenv install
+  - pipenv install --dev
   - pipenv run pip install git+https://github.com/labjack/LabJackPython.git
 
   # install ffmpeg
@@ -25,7 +25,7 @@ before_script:
 
 script:
   # run tests
-  - pipen run py.test tests --cov pyStim
+  - pipenv run py.test tests --cov pyStim
   # build documentation
   - cd docs
   - pipenv run sphinx-build -b html source build/html
