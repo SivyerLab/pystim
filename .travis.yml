@@ -1,4 +1,9 @@
 language: python
+
+os:
+  - linux
+  - osx
+
 cache: pip
 branches:
   only:
@@ -19,7 +24,7 @@ install:
   # run through install as written in docs (but already in env)
   # except no wxPython compiled for linux on pypi, and building from source takes ~45 min
   # so instead grab build from online
-  - pip install -U -f https://extras.wxpython.org/wxPython4/extras/linux/gtk3/ubuntu-14.04 wxPython
+  - if [[ $TRAVIS_OS_NAME == 'linux' ]]; then pip install -U -f https://extras.wxpython.org/wxPython4/extras/linux/gtk3/ubuntu-14.04 wxPython; fi
   - pipenv install --dev --skip-lock
   - pip install git+https://github.com/labjack/LabJackPython.git
 
