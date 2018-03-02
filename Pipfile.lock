@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "33e604b601d2bc18df0ffdc864f066a010623296190e0f89888bb4ccace591d1"
+            "sha256": "fc554842335228a203e62f750d3f3c31f8450ed11f72ccd81efe90a8b2415d39"
         },
         "host-environment-markers": {
             "implementation_name": "cpython",
@@ -73,7 +73,6 @@
                 "sha256:3c85641778460581c42924384f5e68076d724ceac0f267d66c757f7535069c93",
                 "sha256:e90f17980e6ab0f3c2f3730e56d1fe9bcba1891eeea58966e89d352492cc74f4"
             ],
-            "markers": "platform_python_implementation != 'PyPy'",
             "version": "==1.11.5"
         },
         "chardet": {
@@ -205,12 +204,6 @@
                 "sha256:2c6a5de3089009e3da7c5dde64a141dbc8551d5b7f6cf4ed7c2568d0cc520a8f"
             ],
             "version": "==2.6"
-        },
-        "igor": {
-            "hashes": [
-                "sha256:b04ac38c68fb81cf3167a9981dc5a20379112d40268bb72c5a8514dc8051abba"
-            ],
-            "version": "==0.3"
         },
         "imageio": {
             "hashes": [
@@ -447,12 +440,6 @@
             ],
             "version": "==2.18"
         },
-        "pycrafter4500": {
-            "hashes": [
-                "sha256:5864e5a6ba082ab7c9b048f456853a9288c268a08d5a1352c72d1e8dbcc98442"
-            ],
-            "version": "==0.4"
-        },
         "pygame": {
             "hashes": [
                 "sha256:66746c32d21d8193ab066fdf90da96ed993c4818adb13bf4eaa472f306f7f421",
@@ -575,12 +562,6 @@
                 "sha256:410bcd1d6409026fbaa65d9ed33bf6dd8b1e94a499e32168acfc7b332e4095c0"
             ],
             "version": "==2018.3"
-        },
-        "pyusb": {
-            "hashes": [
-                "sha256:4e9b72cc4a4205ca64fbf1f3fff39a335512166c151ad103e55c8223ac147362"
-            ],
-            "version": "==1.0.2"
         },
         "pywin32": {
             "hashes": [
@@ -758,12 +739,6 @@
                 "sha256:fdbbea4edb6bad0ac0e53fc7bc6970e78e12eef4944aa4146bcdcb573201676c"
             ],
             "version": "==3.4.2"
-        },
-        "tabulate": {
-            "hashes": [
-                "sha256:e4ca13f26d0a6be2a2915428dc21e732f1e44dad7f76d7030b2ef1ec251cf7f2"
-            ],
-            "version": "==0.8.2"
         },
         "tqdm": {
             "hashes": [

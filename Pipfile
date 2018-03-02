@@ -13,10 +13,6 @@ pillow = "*"
 sortedcontainers = "*"
 tqdm = "*"
 psychopy = "==1.90.dev3"
-tabulate = "*"
-igor = "*"
-pyusb = "*"
-"pycrafter4500" = "*"
 pyglet = "*"
 
 
