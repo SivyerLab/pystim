@@ -46,7 +46,7 @@ following text into the terminal command. ::
 
 7. (OPTIONAL) If you wish to be able to save captures of your stims, install ffmpeg.
 
-8. (OPTIONAL) If you wish to be able to playback movies, install `avbin<http://avbin.github.io/AVbin/Download.html>`_.
+8. (OPTIONAL) If you wish to be able to playback movies, install `avbin <http://avbin.github.io/AVbin/Download.html>`_.
 
 9. Run the pyStim GUI. ::
 
