@@ -2,7 +2,7 @@ Install walkthrough
 ===================
 
 The following instructions are for Windows machines. The instructions are mostly similar for OSX/Linux. If you run into
-a problem with installing wxPython, please see the wxPython `website<https://www.wxpython.org/>`_ for help.
+a problem with installing wxPython, please see the wxPython `website <https://www.wxpython.org/>`_ for help.
 
 Setting up environment
 ----------------------
@@ -14,9 +14,9 @@ Enter lines of code in the terminal/command line. To open the terminal/command p
 **NOTE** to paste text copied from this guide into the terminal command: use mouse right click and paste. Ctrl + v will
 not work.
 
-1. Install `Python 3.6<https://www.python.org/downloads/>`_.
+1. Install `Python 3.6 <https://www.python.org/downloads/>`_.
 
-2. Install `Git<https://git-scm.com/downloads>`_ (version control tool). Make sure to select the option to add git to
+2. Install `Git <https://git-scm.com/downloads>`_ (version control tool). Make sure to select the option to add git to
 your PATH variable ("Run Git from Windows Command Prompt").
 
 3. Navigate to where you want to save the pyStim repository. ::
