@@ -26,6 +26,10 @@ install:
   # get pipenv to install dependencies
   - pip install pipenv
 
+  # install pypandoc/pandoc
+  - python -c "from pypandoc import download_pandoc as dp; dp(targetfolder='~/bin/');"
+  - export PATH=~/bin:$PATH
+
   # run through install as written in docs (but already in env)
   # except no wxPython compiled for linux on pypi, and building from source takes ~45 min
   # so instead grab build from online
@@ -48,6 +52,8 @@ before_script:
 script:
   # run tests
   - pipenv run py.test tests --cov pyStim
+  # make rst copy of readme for docs
+  - - ~/bin/pandoc --from=markdown --to=rst --output=docs/source/README.rst README.md
   # build documentation
   - cd docs
   # pipenv run sphinx-build -b html source build/html  # ignore warnings

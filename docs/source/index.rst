@@ -10,7 +10,7 @@ Guides
 .. toctree::
    :maxdepth: 2
 
-   readmelink
+   readme
    installguide
    usageguide
    lcr4500setup
