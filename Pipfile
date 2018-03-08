@@ -27,6 +27,7 @@ python-coveralls = "*"
 tabulate = "*"
 igor = "*"
 "pycrafter4500" = "*"
+pypandoc = "*"
 
 
 [requires]
