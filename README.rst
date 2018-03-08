@@ -33,23 +33,31 @@ psychopy `website <http://www.psychopy.org>`_.
 Quick Install
 -------------
 
-pyStim is tested and works on Windows, though it should work on OSX/Linux.
+pyStim is tested and works on Windows, though it should work on OSX/Linux (successfully builds on Travis).
 
-1. Clone the repository.
+1. Clone the repository:
 
-``git clone https://github.com/SivyerLab/pystim.git``
+.. code-block:: bash
 
-2. Install pipenv.
+  git clone https://github.com/SivyerLab/pystim.git
 
-``pip install pipenv``
+2. Install pipenv:
 
-3. Create the python environment for pystim and automatically install all the necessary packages.
+.. code-block:: bash
 
-``pipenv install --skip-lock``
+  pip install pipenv
 
-4. Run the GUI.
+3. Create the python environment for pystim and automatically install all the necessary packages:
 
-``pipenv run python pyStim/pyStimGUI.py``
+.. code-block:: bash
+
+  pipenv install --skip-lock
+
+4. Run the GUI:
+
+.. code-block:: bash
+
+  pipenv run python pyStim/pyStimGUI.py
 
 Optional libraries:
 
