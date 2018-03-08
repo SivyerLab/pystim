@@ -50,8 +50,8 @@ script:
   - pipenv run py.test tests --cov pyStim
   # build documentation
   - cd docs
-  - pipenv run sphinx-build -b html source build/html
-  # pipenv run sphinx-build -W -b html source build/html  # warnings as errors
+  # pipenv run sphinx-build -b html source build/html  # ignore warnings
+  - pipenv run sphinx-build -W -b html source build/html  # warnings as errors
   # pipenv run sphinx-build -W -b pdf source build/pdf
 
 after_success:
