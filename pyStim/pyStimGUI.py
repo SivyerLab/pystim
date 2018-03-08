@@ -1921,7 +1921,7 @@ class MyMenuBar(wx.MenuBar):
                                                                       disp_str.format(360, 4, 'green'),
                                                                       set_str.format(360, 4, 'green'))
 
-            options_menu.AppendMenu(wx.ID_ANY, 'lcr 4500', options_lcr4500)
+            options_menu.Append(wx.ID_ANY, 'lcr 4500', options_lcr4500)
 
         # add top level menus to menu bar
         self.Append(file_menu, '&File')
