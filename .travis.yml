@@ -58,8 +58,8 @@ script:
   - cd docs
   # pipenv run sphinx-build -b html source build/html  # ignore warnings
   # pipenv run sphinx-build -W -b html source build/html  # warnings as errors
-  - if [[ $TRAVIS_OS_NAME == 'linux' ]]; then pipenv run sphinx-build -b html source build/html; fi
-  - if [[ $TRAVIS_OS_NAME == 'osx' ]]; then pipenv run sphinx-build -W -b html source build/html; fi  # b/c matplot python framework runtime warning
+  - if [[ $TRAVIS_OS_NAME == 'linux' ]]; then pipenv run sphinx-build -W -b html source build/html; fi
+  - if [[ $TRAVIS_OS_NAME == 'osx' ]]; then pipenv run sphinx-build -b html source build/html; fi  # b/c matplot python framework runtime warning
 
 after_success:
   # push coverage results
