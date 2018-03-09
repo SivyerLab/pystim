@@ -1,15 +1,9 @@
 """
-Program for presenting visual stimuli to patch clamped retinal neurons.
-
-Stuck on python 2.7 because of u3 (labjackpython) dependency
-UPDATE: labjackpython now seems to support python 3!!!!
+Program for presenting visual stimuli to retinal neurons for eletrophysiology experiments.
 """
-# TODO: migrate to python 3
 
-# Copyright (C) 2016 Alexander Tomlinson
+# Copyright (C) 2018 Alexander Tomlinson
 # Distributed under the terms of the GNU General Public License (GPL).
-
-from __future__ import print_function
 
 import copy
 import os

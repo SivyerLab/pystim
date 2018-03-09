@@ -2,13 +2,16 @@
 GUI for pyStim
 """
 
-# Copyright (C) 2016 Alexander Tomlinson
+# Copyright (C) 2018 Alexander Tomlinson
 # Distributed under the terms of the GNU General Public License (GPL).
 
 # must first turn pyglet shadow windows off to avoid conflict between wxPython
 # and psychopy.visual on OSX
-import pyglet
-pyglet.options['shadow_window'] = False
+
+from sys import platform
+if platform == 'darwin':
+    import pyglet
+    pyglet.options['shadow_window'] = False
 
 import json
 import os
@@ -18,7 +21,6 @@ import traceback
 from ast import literal_eval
 from collections import OrderedDict
 from copy import deepcopy
-from sys import platform
 
 import configparser
 import wx
