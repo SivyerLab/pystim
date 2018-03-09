@@ -68,8 +68,7 @@ Optional libraries:
 Licensing
 =========
 
-pyStim is licensed under GNU GPL v3.0. See <span
-role="doc">license &lt;LICENSE&gt;</span> for license rights and
+pyStim is licensed under GNU GPL v3.0. See [LICENSE] for license rights and
 limitations.
 
 Screenshots
@@ -84,4 +83,5 @@ Screenshots are available in the /docs/screenshots/ folder.
   [Psychopy]: http://www.psychopy.org
   [ghpages]: https://sivyerlab.github.io/pystim/
   [ffmpeg]: https://www.ffmpeg.org/
-  [screenshot]: ../screenshots/screens.gif
+  [LICENSE]: http://www.gnu.org/copyleft/gpl.html
+  [screenshot]: https://raw.githubusercontent.com/SivyerLab/pystim/master/docs/screenshots/screens.gif

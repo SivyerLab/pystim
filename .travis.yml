@@ -72,5 +72,5 @@ deploy:
   github_token: $travis_sphinx_ghpages
   local_dir: docs/build/html
   on:
-    # branch: master
+    branch: master
     condition: $TRAVIS_OS_NAME == 'linux'
