@@ -26,10 +26,6 @@ install:
   # get pipenv to install dependencies
   - pip install pipenv
 
-  # install pypandoc/pandoc
-  - pipenv run python -c "from pypandoc import download_pandoc as dp; dp(targetfolder='~/bin/');"
-  - export PATH=~/bin:$PATH
-
   # run through install as written in docs (but already in env)
   # except no wxPython compiled for linux on pypi, and building from source takes ~45 min
   # so instead grab build from online
@@ -37,6 +33,10 @@ install:
 
   - pipenv install --dev --skip-lock
   - pipenv run pip install git+https://github.com/labjack/LabJackPython.git
+
+  # install pypandoc/pandoc
+  - pipenv run python -c "from pypandoc import download_pandoc as dp; dp(targetfolder='~/bin/');"
+  - export PATH=~/bin:$PATH
 
   # install ffmpeg
   # install avbin
