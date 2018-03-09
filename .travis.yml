@@ -23,6 +23,10 @@ install:
   # need to first install python3 on osx
   - if [[ $TRAVIS_OS_NAME == 'osx' ]]; then brew upgrade python; fi
 
+  # install pandoc
+  - if [[ $TRAVIS_OS_NAME == 'osx' ]]; then brew install pandoc; fi
+  - if [[ $TRAVIS_OS_NAME == 'osx' ]]; then sudo apt-get install pandoc; fi
+
   # get pipenv to install dependencies
   - pip install pipenv
 
@@ -33,10 +37,6 @@ install:
 
   - pipenv install --dev --skip-lock
   - pipenv run pip install git+https://github.com/labjack/LabJackPython.git
-
-  # install pypandoc/pandoc
-  - pipenv run python -c "from pypandoc import download_pandoc as dp; dp(targetfolder='~/bin/');"
-  - export PATH=~/bin:$PATH
 
   # install ffmpeg
   # install avbin
@@ -53,7 +53,7 @@ script:
   # run tests
   - pipenv run py.test tests --cov pyStim
   # make rst copy of readme for docs
-  - - ~/bin/pandoc --from=markdown --to=rst --output=docs/source/README.rst README.md
+  - pandoc --from=markdown --to=rst --output=docs/source/README.rst README.md
   # build documentation
   - cd docs
   # pipenv run sphinx-build -b html source build/html  # ignore warnings
