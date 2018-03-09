@@ -64,6 +64,7 @@ Optional libraries:
 -   igor (for parsing tables)
 -   labjackpython (see install guide for details)
 -   [ffmpeg] (for generating movies)
+-   [avbin] (for displaying movies)
 
 Licensing
 =========
@@ -83,5 +84,6 @@ Screenshots are available in the /docs/screenshots/ folder.
   [Psychopy]: http://www.psychopy.org
   [ghpages]: https://sivyerlab.github.io/pystim/
   [ffmpeg]: https://www.ffmpeg.org/
+  [avbin]: http://avbin.github.io/AVbin/Download.html
   [LICENSE]: http://www.gnu.org/copyleft/gpl.html
   [screenshot]: https://raw.githubusercontent.com/SivyerLab/pystim/master/docs/screenshots/screens.gif

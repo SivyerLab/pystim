@@ -61,9 +61,11 @@ script:
 
 after_success:
   # push coverage results
-  - pipenv run coveralls
+  - if [[ $TRAVIS_OS_NAME == 'linux' ]]; then pipenv run coveralls; fi
 
 deploy:
+  edge:
+    branch: v1.8.47  # temp since deploy broken on latest
   # push html documentation to github pages
   provider: pages
   skip_cleanup: true
