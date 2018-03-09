@@ -27,7 +27,7 @@ install:
   - pip install pipenv
 
   # install pypandoc/pandoc
-  - pipen run python -c "from pypandoc import download_pandoc as dp; dp(targetfolder='~/bin/');"
+  - pipenv run python -c "from pypandoc import download_pandoc as dp; dp(targetfolder='~/bin/');"
   - export PATH=~/bin:$PATH
 
   # run through install as written in docs (but already in env)
