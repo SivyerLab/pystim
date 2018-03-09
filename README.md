@@ -21,10 +21,10 @@ mostly functional.
 Documentation
 =============
 
-Documentation is available on github pages [ghpages]. The source of the
+Documentation is available on [github pages][ghpages]. The source of the
 documentation can be found in the code and in the /docs/source/ folder.
-Further documentation on Psychopy can be found on the psychopy
-[website][Psychopy].
+Further documentation on Psychopy can be found on the Psychopy
+[website][psychopy].
 
 Quick Install
 =============
@@ -72,16 +72,14 @@ Licensing
 pyStim is licensed under GNU GPL v3.0. See [LICENSE] for license rights and
 limitations.
 
-Screenshots
-===========
-
-Screenshots are available in the /docs/screenshots/ folder.
+Screenshot
+==========
 
 ![screenshot]
 
   [travis]: https://travis-ci.org/SivyerLab/pystim.svg?branch=master
   [coveralls]: https://coveralls.io/repos/github/SivyerLab/pystim/badge.svg?branch=master
-  [Psychopy]: http://www.psychopy.org
+  [psychopy]: http://www.psychopy.org
   [ghpages]: https://sivyerlab.github.io/pystim/
   [ffmpeg]: https://www.ffmpeg.org/
   [avbin]: http://avbin.github.io/AVbin/Download.html
