@@ -14,7 +14,7 @@ Enter lines of code in the terminal/command line. To open the terminal/command p
 **NOTE** to paste text copied from this guide into the terminal command: use mouse right click and paste. Ctrl + v will
 not work.
 
-#. Install `Python 3.6`_.
+#. Install `Python 3.6`_.Make sure to select the option to add Python to your PATH variable.
 
 #. Install `Git`_ (version control tool). Make sure to select the option to add git to your PATH variable
    ("Run Git from Windows Command Prompt").
