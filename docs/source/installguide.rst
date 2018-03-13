@@ -30,6 +30,10 @@ not work.
 #. Install pipenv: ::
 
     pip install pipenv
+    
+#. Enter the pystim directory: ::
+
+    cd pystim
 
 #. Create the python environment for pystim and automatically install all the necessary packages by entering the
    following text into the terminal command. ::
