@@ -53,7 +53,7 @@ not work.
 
     pipenv run python pyStim/pyStimGUI.py
 
-.. _Python 3.6: http://www.psychopy.org
+.. _Python 3.6: https://www.python.org/downloads/
 .. _Git: https://git-scm.com/downloads
 .. _avbin: http://avbin.github.io/AVbin/Download.html
 .. _ffmpeg: https://www.ffmpeg.org/
