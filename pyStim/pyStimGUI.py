@@ -21,6 +21,7 @@ import traceback
 from ast import literal_eval
 from collections import OrderedDict
 from copy import deepcopy
+from pathlib import Path
 
 import configparser
 import wx
@@ -55,9 +56,9 @@ class Parameters(object):
         self.stim_params = None
 
         # init params
-        config_file = os.path.abspath('pyStim/psychopy/config.ini')
+        config_file = Path(r'pyStim/psychopy/config.ini')
         self.gui_params, self.stim_params, config_dict = self.read_config_file(
-            config_file)
+            str(config_file))
         self.init_params(config_dict)
 
     def read_config_file(self, config_file):
@@ -129,10 +130,10 @@ class Parameters(object):
 
         :return: returns list of saved gamma profiles
         """
-        gamma_file = os.path.abspath('./psychopy/data/gammaTables.txt')
+        gamma_file = Path(r'./psychopy/data/gammaTables.txt')
 
-        if os.path.exists(gamma_file):
-            with open(gamma_file, 'rb') as f:
+        if Path.exists(gamma_file):
+            with open(str(gamma_file), 'rb') as f:
                 gamma_dict = pickle.load(f)
             gamma_mons = gamma_dict.keys()
         else:
@@ -214,8 +215,8 @@ class Parameters(object):
 
         :param config_dict: dictionary of defaults
         """
-        json_path = os.path.abspath('pyStim/psychopy/params_json.txt')
-        with open(json_path, 'r') as f:
+        json_path = Path(r'pyStim/psychopy/params_json.txt')
+        with open(str(json_path), 'r') as f:
             params = json.load(f, object_pairs_hook=OrderedDict)
 
         # set defaults
@@ -706,12 +707,11 @@ class GlobalPanel(InputPanel):
         self.grid_sizer.Add(self.title, pos=(0, 0))
 
         # global file
-        self.globals_file = os.path.abspath(os.path.join(
-            self.frame.gui_params['data_dir'], 'global_defaults.txt'))
+        self.globals_file = Path(self.frame.gui_params['data_dir']) / 'global_defaults.txt'
 
         # check if file exists, and if so load different options
-        if os.path.exists(self.globals_file):
-            with open(self.globals_file, 'rb') as f:
+        if Path.exists(self.globals_file):
+            with open(str(self.globals_file), 'rb') as f:
                 global_dict = pickle.load(f)
 
             defaults_list = global_dict.keys()
@@ -758,15 +758,15 @@ class GlobalPanel(InputPanel):
         params_to_save = self.parameters.get_global_params()
 
         # data folder
-        data_folder = os.path.abspath(self.frame.gui_params['data_dir'])
+        data_folder = Path(self.frame.gui_params['data_dir'])
 
         # create folder if not present
-        if not os.path.exists(data_folder):
-            os.makedirs(data_folder)
+        if not Path.exists(data_folder):
+            Path.mkdir(data_folder, parents=True)
 
         # get saved globals if present
-        if os.path.exists(self.globals_file):
-            with open(self.globals_file, 'rb') as f:
+        if Path.exists(self.globals_file):
+            with open(str(self.globals_file), 'rb') as f:
                 global_dict = pickle.load(f)
 
         # leave dict empty otherwise
@@ -783,7 +783,7 @@ class GlobalPanel(InputPanel):
         # add entry to global dict and redump to file
         global_dict[save_name] = params_to_save
 
-        with open(self.globals_file, 'wb') as f:
+        with open(str(self.globals_file), 'wb') as f:
             pickle.dump(global_dict, f)
 
     def on_default_delete(self, event):
@@ -798,14 +798,14 @@ class GlobalPanel(InputPanel):
         if selected != '':
 
             # get list of saves from file
-            with open(self.globals_file, 'rb') as f:
+            with open(str(self.globals_file), 'rb') as f:
                 global_dict = pickle.load(f)
 
             # remove from dict
             del global_dict[selected]
 
             # redump dict to file
-            with open(self.globals_file, 'wb') as f:
+            with open(str(self.globals_file), 'wb') as f:
                 pickle.dump(global_dict, f)
 
             # add blank spot in control to switch to
@@ -830,7 +830,7 @@ class GlobalPanel(InputPanel):
         selected = event.GetString()
 
         # get params to load
-        with open(self.globals_file, 'rb') as f:
+        with open(str(self.globals_file), 'rb') as f:
             params_to_load = pickle.load(f)[selected]
 
         for param, controls in self.frame.all_controls.items():
@@ -1269,11 +1269,11 @@ class DirPanel(wx.Panel):
         panel_sizer = wx.BoxSizer(wx.VERTICAL)
 
         # file browser
-        default_dir = os.path.abspath(self.frame.gui_params['saved_stim_dir'])
+        default_dir = Path(self.frame.gui_params['saved_stim_dir'])
         self.browser = wx.FileCtrl(self,
                                    wildCard='*.txt',
                                    size=(200, -1),
-                                   defaultDirectory=default_dir,
+                                   defaultDirectory=str(default_dir),
                                    # style=wx.FC_NOSHOWHIDDEN
                                    )
 
@@ -1322,12 +1322,12 @@ class DirPanel(wx.Panel):
 
         :param event:
         """
-        default_dir = os.path.abspath('./psychopy/stims/')
+        default_dir = Path('./psychopy/stims/')
 
         # popup save dialog
         save_dialog = wx.FileDialog(self.frame,
                                     message='File path',
-                                    defaultDir=default_dir,
+                                    defaultDir=str(default_dir),
                                     wildcard='*.txt',
                                     style=wx.FD_SAVE | wx.FD_OVERWRITE_PROMPT)
 
@@ -1438,16 +1438,15 @@ class DirPanel(wx.Panel):
 
         :param event:
         """
-        path = self.browser.GetPath()
+        path = Path(self.browser.GetPath())
 
-        is_log = os.path.split(os.path.split(os.path.dirname(path))[0])[1] ==\
-            'logs'
+        is_log = path.parents[2].stem == 'logs'
 
         if is_log:
             if platform == 'win32':
                 os.startfile(path)
             elif platform == 'darwin':
-                os.system('open ' + path)
+                os.system('open ' + str(path))
 
         else:
             if wx.GetMouseState().ControlDown():
@@ -2145,11 +2144,11 @@ class MyMenuBar(wx.MenuBar):
         :return:
         """
         # start dialog to select folders
-        log_dir = os.path.abspath(self.frame.stim_params['logs_dir'])
+        log_dir = Path(self.frame.stim_params['logs_dir'])
         prompt = 'Select folder(s) with desired JumpStim logs'
         folder_select_dialog = mdd.MultiDirDialog(self.frame,
                                                   message=prompt,
-                                                  defaultPath=log_dir,
+                                                  defaultPath=str(log_dir),
                                                   agwStyle=mdd.DD_MULTIPLE)
 
         # to exit out of dialog on cancel
@@ -2160,6 +2159,7 @@ class MyMenuBar(wx.MenuBar):
 
         # GetPaths of MultiDirDialog prepends volume information to paths,
         # so need to strip out, platform dependant
+        # TODO: switch to pathlib
         if platform == 'win32':
             jump_paths = map(lambda x: x.split()[2].replace(')',
                              '').replace('(', ''), jump_paths)
@@ -2170,7 +2170,7 @@ class MyMenuBar(wx.MenuBar):
 
         try:
             for jump in jump_paths:
-                assert os.path.exists(jump)
+                assert Path.exists(jump)
         except AssertionError:
             print('\nOne or more of the selected paths do not exist:')
             for jump in jump_paths:
@@ -2189,11 +2189,11 @@ class MyMenuBar(wx.MenuBar):
         if wave_dialog.ShowModal() == wx.ID_CANCEL:
             return
 
-        wave_path = os.path.abspath(wave_dialog.GetPath())
+        wave_path = Path(wave_dialog.GetPath())
 
         wave_details = self.prompt_wave_details()
 
-        kwargs = dict(dat_file=wave_path,
+        kwargs = dict(dat_file=str(wave_path),
                       jump_logs=jump_paths,
                       group=int(wave_details['group']),
                       series=int(wave_details['series']),
