@@ -15,6 +15,7 @@ if platform == 'darwin':
 
 import json
 import os
+# TODO: stop using pickle, use json instead to save dicts
 import pickle
 import subprocess
 import traceback
