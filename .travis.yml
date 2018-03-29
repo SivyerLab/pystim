@@ -12,6 +12,7 @@ cache: pip
 branches:
   only:
     - master
+    - dev
 
 notifications:
   email:
@@ -21,7 +22,7 @@ notifications:
 install:
   # need to first install python3 on osx
   - if [[ $TRAVIS_OS_NAME == 'osx' ]]; then brew upgrade python; fi
-  - if [[ $TRAVIS_OS_NAME == 'osx' ]]; then python --version; fi
+  - if [[ $TRAVIS_OS_NAME == 'osx' ]]; then python3 --version; fi
   - if [[ $TRAVIS_OS_NAME == 'osx' ]]; then brew postinstall python; fi
 
   # install pandoc
@@ -29,7 +30,7 @@ install:
   - if [[ $TRAVIS_OS_NAME == 'osx' ]]; then brew install pandoc; fi
 
   # get pipenv to install dependencies
-  - pip install pipenv
+  - pip3 install pipenv
 
   # run through install as written in docs (but already in env)
   # except no wxPython compiled for linux on pypi, and building from source takes ~45 min
