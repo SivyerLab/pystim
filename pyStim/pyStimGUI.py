@@ -709,14 +709,19 @@ class GlobalPanel(InputPanel):
         # global file
         self.globals_file = Path(self.frame.gui_params['data_dir']) / 'global_defaults.txt'
 
-        # check if file exists, and if so load different options
-        if Path.exists(self.globals_file):
+        # check if json file exists first, and if so load different options
+        json_global = self.globals_file.with_suffix('.json')
+        if Path.exists(json_global):
+            with open(str(json_global), 'r') as f:
+                global_dict = json.load(f)
+
+        elif Path.exists(self.globals_file):
             with open(str(self.globals_file), 'rb') as f:
                 global_dict = pickle.load(f)
 
+        try:
             defaults_list = global_dict.keys()
-
-        else:
+        except NameError:
             defaults_list = []
 
         self.which_default = ChoiceCtrlTag(self, tag='defaults',
@@ -765,7 +770,12 @@ class GlobalPanel(InputPanel):
             Path.mkdir(data_folder, parents=True)
 
         # get saved globals if present
-        if Path.exists(self.globals_file):
+        json_global = self.globals_file.with_suffix('.json')
+        if Path.exists(json_global):
+            with open(str(json_global), 'r') as f:
+                global_dict = json.load(f)
+
+        elif Path.exists(self.globals_file):
             with open(str(self.globals_file), 'rb') as f:
                 global_dict = pickle.load(f)
 
@@ -783,8 +793,9 @@ class GlobalPanel(InputPanel):
         # add entry to global dict and redump to file
         global_dict[save_name] = params_to_save
 
-        with open(str(self.globals_file), 'wb') as f:
-            pickle.dump(global_dict, f)
+        to_write = str(self.globals_file.with_suffix('.json'))
+        with open(to_write, 'w') as f:
+            json.dump(global_dict, f, indent=4)
 
     def on_default_delete(self, event):
         """
@@ -798,15 +809,25 @@ class GlobalPanel(InputPanel):
         if selected != '':
 
             # get list of saves from file
-            with open(str(self.globals_file), 'rb') as f:
-                global_dict = pickle.load(f)
+            json_global = self.globals_file.with_suffix('.json')
+            if Path.exists(json_global):
+                with open(str(json_global), 'r') as f:
+                    global_dict = json.load(f)
+
+            elif Path.exists(self.globals_file):
+                with open(str(self.globals_file), 'rb') as f:
+                    global_dict = pickle.load(f)
 
             # remove from dict
-            del global_dict[selected]
+            try:
+                del global_dict[selected]
+            except NameError:
+                return
 
             # redump dict to file
-            with open(str(self.globals_file), 'wb') as f:
-                pickle.dump(global_dict, f)
+            to_write = str(self.globals_file.with_suffix('.json'))
+            with open(to_write, 'w') as f:
+                json.dump(global_dict, f, indent=4)
 
             # add blank spot in control to switch to
             self.which_default.Append('')
@@ -830,8 +851,14 @@ class GlobalPanel(InputPanel):
         selected = event.GetString()
 
         # get params to load
-        with open(str(self.globals_file), 'rb') as f:
-            params_to_load = pickle.load(f)[selected]
+        json_global = self.globals_file.with_suffix('.json')
+        if Path.exists(json_global):
+            with open(str(json_global), 'r') as f:
+                params_to_load = json.load(f)[selected]
+
+        elif Path.exists(self.globals_file):
+            with open(str(self.globals_file), 'rb') as f:
+                params_to_load = pickle.load(f)[selected]
 
         for param, controls in self.frame.all_controls.items():
             for control in controls:
