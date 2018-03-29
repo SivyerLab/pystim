@@ -321,6 +321,7 @@ class MyWindow(object):
                                      viewScale=GlobalDefaults['scale'],
                                      screen=GlobalDefaults['screen_num'],
                                      useFBO=True,
+                                     checkTiming=False,
                                      # waitBlanking=False
                                      )
 
@@ -413,6 +414,7 @@ class MyWindow(object):
                                            screen=GlobalDefaults['small_win_num'],
                                            waitBlanking=False,
                                            useFBO=True,
+                                           checkTiming=False,
                                            # do_vsync=False
                                            )
 
