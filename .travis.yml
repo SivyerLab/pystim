@@ -12,7 +12,6 @@ cache: pip
 branches:
   only:
     - master
-    - dev
 
 notifications:
   email:

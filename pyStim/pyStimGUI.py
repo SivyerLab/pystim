@@ -1424,7 +1424,7 @@ class DirPanel(wx.Panel):
                         line = line.rstrip()
                         if line == '#BEGIN PICKLE#':
                             next_is_pickle = True
-
+                    # TODO: fix
                     to_load = pickle.loads(to_load)
 
             except ValueError:

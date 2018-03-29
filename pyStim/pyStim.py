@@ -1949,8 +1949,10 @@ def board_texture_class(bases, **kwargs):
             # array of coordinates for each element
             xys = []
             # populate xys
-            for y in range(self.num_check / -2, self.num_check / 2):
-                for x in range(self.num_check / -2, self.num_check / 2):
+            low, high = self.num_check // -2, self.num_check // 2
+
+            for y in range(low, high):
+                for x in range(low, high):
                     xys.append((self.check_size[0] * x,
                                 self.check_size[1] * y))
 
