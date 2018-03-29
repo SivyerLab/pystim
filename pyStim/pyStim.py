@@ -620,6 +620,7 @@ class StimDefaults(object):
                  blend_jumps=False,
                  force_stop=0,
                  end_delay=0,
+                 noisy_hz=60,
                  **kwargs):
         """
         Default variable constructors; distance and time units converted
@@ -655,6 +656,7 @@ class StimDefaults(object):
         self.num_jumps = num_jumps
         self.shuffle = shuffle
         self.blend_jumps = blend_jumps
+        self.noisy_hz = noisy_hz
 
         self.contrast_channel = ['red', 'green', 'blue', 'all'].\
             index(contrast_channel)
@@ -848,7 +850,8 @@ class StaticStim(StimDefaults):
             # adjust colors and phase based on timing
             if self.fill_mode not in ['movie', 'image']:
                 if self.fill_mode == 'checkerboard' and self.check_type == 'noisy noise':
-                    self.gen_timing(frame)
+                    if frame % (GlobalDefaults['frame_rate'] // self.noisy_hz) == 0:
+                        self.gen_timing(frame)
 
                 elif self.timing != 'step':
                     self.gen_timing(frame)
@@ -2015,8 +2018,11 @@ def board_texture_class(bases, **kwargs):
                 if MyWindow.gamma_mon is not None:
                     self.colors = MyWindow.gamma_mon(self.colors)
 
+            loc = numpy.array(self.location) + numpy.array(self.check_size) // 2
+
             self.stim = visual.ElementArrayStim(MyWindow.win,
                                                 xys=xys,
+                                                fieldPos=loc,
                                                 colors=self.colors,
                                                 nElements=self.num_check**2,
                                                 elementMask=None,
@@ -2032,6 +2038,7 @@ def board_texture_class(bases, **kwargs):
 
                 self.small_stim = visual.ElementArrayStim(MyWindow.small_win,
                                                           xys=xys,
+                                                          fieldPos=loc,
                                                           colors=self.colors,
                                                           nElements=self.num_check**2,
                                                           elementMask=None,
@@ -2042,6 +2049,10 @@ def board_texture_class(bases, **kwargs):
 
                 self.small_stim.size = (self.check_size[0] * self.num_check,
                                         self.check_size[1] * self.num_check)
+
+            # ensure noisy hz is not greater than fps
+            if self.noisy_hz > GlobalDefaults['frame_rate']:
+                self.noisy_hz = GlobalDefaults['frame_rate']
 
         def gen_timing(self, frame):
             """ElementArrayStim does not support assigning alpha values.
@@ -2055,6 +2066,7 @@ def board_texture_class(bases, **kwargs):
                 r = numpy.random.uniform(low=self.low[0], high=self.high[0], size=self.num_check**2)
                 g = numpy.random.uniform(low=self.low[1], high=self.high[1], size=self.num_check**2)
                 b = numpy.random.uniform(low=self.low[2], high=self.high[2], size=self.num_check**2)
+                # self.colors[:] = numpy.dstack([r, r, r])
                 self.colors[:] = numpy.dstack([r, g, b])
 
             # gamma correct
@@ -2083,9 +2095,11 @@ def board_texture_class(bases, **kwargs):
             :param x: x coordinate
             :param y: y coordinate
             """
-            self.stim.setFieldPos((x, y))
+            loc = numpy.array([x, y]) + numpy.array(self.check_size) // 2
+
+            self.stim.setFieldPos(loc)
             if self.small_stim is not None:
-                self.small_stim.setFieldPos((x, y))
+                self.small_stim.setFieldPos(loc)
 
         def get_pos(self):
             """Position getter.

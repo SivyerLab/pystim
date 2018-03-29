@@ -226,7 +226,8 @@
                     "phase", 
                     "fill_seed", 
                     "check_type", 
-                    "intensity_dir"
+                    "intensity_dir",
+                    "noisy_hz"
                 ], 
                 "concentric": [
                     "intensity_dir", 
@@ -282,6 +283,13 @@
                 "noisy noise"
             ], 
             "default": "board", 
+            "is_child": true
+        },
+
+        "noisy_hz": {
+            "type": "text",
+            "label": "noisy hz",
+            "default": 60,
             "is_child": true
         },
 
