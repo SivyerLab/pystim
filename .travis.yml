@@ -21,6 +21,8 @@ notifications:
 install:
   # need to first install python3 on osx
   - if [[ $TRAVIS_OS_NAME == 'osx' ]]; then brew upgrade python; fi
+  - if [[ $TRAVIS_OS_NAME == 'osx' ]]; then python --version; fi
+  - if [[ $TRAVIS_OS_NAME == 'osx' ]]; then brew postinstall python; fi
 
   # install pandoc
   - if [[ $TRAVIS_OS_NAME == 'linux' ]]; then sudo apt-get install pandoc; fi
