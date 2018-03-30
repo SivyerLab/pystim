@@ -60,8 +60,8 @@ __email__   = "tomlinsa@ohsu.edu"
 __status__  = "Beta"
 
 # to suppress extra warnings, uncomment next 2 lines
-# from psychopy import logging
-# logging.console.setLevel(logging.CRITICAL)
+from psychopy import logging
+logging.console.setLevel(logging.CRITICAL)
 
 # read ini file
 config = configparser.ConfigParser()
@@ -1989,7 +1989,7 @@ def board_texture_class(bases, **kwargs):
                     self.index[1::2, 1::2] = 1
                     self.index = numpy.concatenate(self.index[:])
 
-                # randomly populate for a random checkerboard
+                # randomly populate for a random checkerboard, from fill seed
                 elif self.check_type == 'random':
                     self.index = numpy.concatenate(self.index[:])
                     for i in range(len(self.index)):
@@ -2004,15 +2004,6 @@ def board_texture_class(bases, **kwargs):
 
             elif self.check_type in ['noise', 'noisy noise']:
                 numpy.random.seed(self.fill_seed)
-
-                if len(self.low.shape) == 0:
-                    self.colors[:, self.contrast_channel] = numpy.random.uniform(
-                        low=self.low, high=self.high, size=self.num_check**2)
-                else:
-                    r = numpy.random.uniform(low=self.low[0], high=self.high[0], size=self.num_check**2)
-                    g = numpy.random.uniform(low=self.low[1], high=self.high[1], size=self.num_check**2)
-                    b = numpy.random.uniform(low=self.low[2], high=self.high[2], size=self.num_check**2)
-                    self.colors[:] = numpy.dstack([r, g, b])
 
                 # gamma correct
                 if MyWindow.gamma_mon is not None:
@@ -2060,8 +2051,8 @@ def board_texture_class(bases, **kwargs):
             :param int frame: current frame number
             """
             if len(self.low.shape) == 0:
-                self.colors[:, self.contrast_channel] = numpy.random.uniform(
-                    low=self.low, high=self.high, size=self.num_check**2)
+                c = numpy.random.uniform(low=self.low, high=self.high, size=self.num_check**2)
+                self.colors[:, self.contrast_channel] = c
             else:
                 r = numpy.random.uniform(low=self.low[0], high=self.high[0], size=self.num_check**2)
                 g = numpy.random.uniform(low=self.low[1], high=self.high[1], size=self.num_check**2)
