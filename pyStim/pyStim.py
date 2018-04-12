@@ -329,6 +329,9 @@ class MyWindow(object):
         if GlobalDefaults['small_win']:
             MyWindow.make_small_win()
 
+        # flip once to display
+        MyWindow.flip()
+
     @staticmethod
     def close_win():
         """Static method to close window. Also closes labjack if present.
@@ -850,7 +853,7 @@ class StaticStim(StimDefaults):
             # adjust colors and phase based on timing
             if self.fill_mode not in ['movie', 'image']:
                 if self.fill_mode == 'checkerboard' and self.check_type == 'noisy noise':
-                    if frame % (GlobalDefaults['frame_rate'] // self.noisy_hz) == 0:
+                    if frame % (GlobalDefaults['frame_rate'] // self.noisy_hz) == self.start_stim % GlobalDefaults['frame_rate']:
                         self.gen_timing(frame)
 
                 elif self.timing != 'step':
@@ -2045,6 +2048,22 @@ def board_texture_class(bases, **kwargs):
             if self.noisy_hz > GlobalDefaults['frame_rate']:
                 self.noisy_hz = GlobalDefaults['frame_rate']
 
+        def draw_times(self):
+            """
+            Adds triggers for noisy noise texture changes
+            """
+            ret = super().draw_times()
+
+            # frame % (GlobalDefaults['frame_rate'] // self.noisy_hz) == self.start_stim
+            triggers = [frame for frame in range(self.duration) if
+                            frame % (GlobalDefaults['frame_rate'] // self.noisy_hz) == self.start_stim % GlobalDefaults['frame_rate']]
+
+            for trigger_frame in triggers:
+                if trigger_frame not in MyWindow.frame_trigger_list:
+                        MyWindow.frame_trigger_list.add(trigger_frame)
+
+            return ret
+
         def gen_timing(self, frame):
             """ElementArrayStim does not support assigning alpha values.
 
@@ -2444,7 +2463,7 @@ def animation_loop(to_animate, num_frames, current_time, save_loc):
 
         if frame == MyWindow.frame_trigger_list[index]:
             MyWindow.send_trigger()
-            # print frame, 'triggered'
+            print(frame, 'triggered')
             index += 1
 
         # escape key breaks if focus on window
