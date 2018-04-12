@@ -2054,7 +2054,7 @@ def board_texture_class(bases, **kwargs):
             """
             ret = super().draw_times()
 
-            if self.trigger:
+            if self.trigger and self.check_type == 'noisy noise':
                 triggers = [frame for frame in range(self.start_stim, self.end_stim) if
                                 (frame - self.start_stim) % (GlobalDefaults['frame_rate'] // self.noisy_hz) == 0]
 
