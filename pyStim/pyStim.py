@@ -11,6 +11,7 @@ import pickle
 import subprocess
 import sys
 import traceback
+import itertools as it
 from math import ceil
 from random import Random
 from time import strftime, localtime
@@ -1950,17 +1951,19 @@ def board_texture_class(bases, **kwargs):
             self.colors = None
 
         def make_stim(self):
-            """Creates instance of psychopy stim object.
             """
-            # array of coordinates for each element
-            xys = []
-            # populate xys
-            low, high = self.num_check // -2, self.num_check // 2
+            Creates instance of psychopy stim object.
+            """
+            # list of coordinates for each element
+            cycler = lambda n, s: it.cycle(range(n // -2 * s, n // 2 * s, s))
 
-            for y in range(low, high):
-                for x in range(low, high):
-                    xys.append((self.check_size[0] * x,
-                                self.check_size[1] * y))
+            cx = cycler(self.num_check, self.check_size[0])
+            cy = cycler(self.num_check, self.check_size[1])
+
+            xs = [next(cx) for i in range(self.num_check ** 2)]
+            ys = sorted([next(cy) for i in range(self.num_check ** 2)])
+
+            xys = list(zip(xs, ys))
 
             # get colors
             self.high, self.low, _, _ = self.gen_rgb()
