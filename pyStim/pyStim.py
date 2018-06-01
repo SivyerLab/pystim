@@ -11,7 +11,6 @@ import pickle
 import subprocess
 import sys
 import traceback
-import itertools as it
 from math import ceil
 from random import Random
 from time import strftime, localtime
@@ -1955,13 +1954,16 @@ def board_texture_class(bases, **kwargs):
             Creates instance of psychopy stim object.
             """
             # list of coordinates for each element
-            cycler = lambda n, s: it.cycle(range(n // -2 * s, n // 2 * s, s))
+            xs = list(range(self.num_check // -2 * self.check_size[0],
+                            self.num_check // 2 * self.check_size[0],
+                            self.check_size[0])) * self.num_check
 
-            cx = cycler(self.num_check, self.check_size[0])
-            cy = cycler(self.num_check, self.check_size[1])
 
-            xs = [next(cx) for i in range(self.num_check ** 2)]
-            ys = sorted([next(cy) for i in range(self.num_check ** 2)])
+            ys = sorted(
+                list(range(self.num_check // -2 * self.check_size[1],
+                           self.num_check // 2 * self.check_size[1],
+                           self.check_size[1])) * self.num_check
+                )
 
             xys = list(zip(xs, ys))
 
