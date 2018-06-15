@@ -11,6 +11,7 @@ import pickle
 import subprocess
 import sys
 import traceback
+import itertools as it
 from math import ceil
 from random import Random
 from time import strftime, localtime
@@ -1956,16 +1957,14 @@ def board_texture_class(bases, **kwargs):
             # list of coordinates for each element
             xs = list(range(self.num_check // -2 * self.check_size[0],
                             self.num_check // 2 * self.check_size[0],
-                            self.check_size[0])) * self.num_check
+                            self.check_size[0]))
 
 
-            ys = sorted(
-                list(range(self.num_check // -2 * self.check_size[1],
-                           self.num_check // 2 * self.check_size[1],
-                           self.check_size[1])) * self.num_check
-                )
+            ys = list(range(self.num_check // -2 * self.check_size[1],
+                            self.num_check // 2 * self.check_size[1],
+                            self.check_size[1]))
 
-            xys = list(zip(xs, ys))
+            xys = list(it.product(xs, ys))
 
             # get colors
             self.high, self.low, _, _ = self.gen_rgb()
@@ -2010,12 +2009,9 @@ def board_texture_class(bases, **kwargs):
                 else:
                     self.colors[numpy.where(self.index)] = self.high[:3]
 
-            elif self.check_type in ['noise', 'noisy noise']:
-                numpy.random.seed(self.fill_seed)
-
-                # gamma correct
-                if MyWindow.gamma_mon is not None:
-                    self.colors = MyWindow.gamma_mon(self.colors)
+            # gamma correct
+            if MyWindow.gamma_mon is not None:
+                self.colors = MyWindow.gamma_mon(self.colors)
 
             loc = numpy.array(self.location) + numpy.array(self.check_size) // 2
 
@@ -2029,6 +2025,10 @@ def board_texture_class(bases, **kwargs):
                                                 sizes=(self.check_size[0],
                                                        self.check_size[1]),
                                                 autoLog=False)
+
+            if self.check_type in ['noise', 'noisy noise']:
+                numpy.random.seed(self.fill_seed)
+                self.gen_timing(0)
 
             self.stim.size = (self.check_size[0] * self.num_check,
                               self.check_size[1] * self.num_check)
