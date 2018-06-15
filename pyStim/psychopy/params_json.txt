@@ -342,9 +342,9 @@
         },
 
         "num_check": {
-            "type": "text", 
+            "type": "list",
             "label": "number of checks", 
-            "default": 64, 
+            "default": [64, 64],
             "is_child": true
         },
 

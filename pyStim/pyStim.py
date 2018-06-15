@@ -642,7 +642,6 @@ class StimDefaults(object):
         self.intensity = intensity
         self.alpha = alpha
         self.orientation = orientation
-        self.num_check = num_check
         self.check_type = check_type
         self.fill_seed = fill_seed
         self.timing = timing
@@ -683,6 +682,11 @@ class StimDefaults(object):
             self.movie_size = movie_size
         else:
             self.movie_size = [100, 100]
+
+        if num_check is not None:
+            self.num_check = num_check
+        else:
+            self.num_check = [64, 64]
 
         if phase is not None:
             self.phase = phase
@@ -1955,13 +1959,12 @@ def board_texture_class(bases, **kwargs):
             Creates instance of psychopy stim object.
             """
             # list of coordinates for each element
-            xs = list(range(self.num_check // -2 * self.check_size[0],
-                            self.num_check // 2 * self.check_size[0],
+            xs = list(range(self.num_check[0] // -2 * self.check_size[0],
+                            self.num_check[0] // 2 * self.check_size[0],
                             self.check_size[0]))
 
-
-            ys = list(range(self.num_check // -2 * self.check_size[1],
-                            self.num_check // 2 * self.check_size[1],
+            ys = list(range(self.num_check[1] // -2 * self.check_size[1],
+                            self.num_check[1] // 2 * self.check_size[1],
                             self.check_size[1]))
 
             xys = list(it.product(xs, ys))
@@ -1970,7 +1973,7 @@ def board_texture_class(bases, **kwargs):
             self.high, self.low, _, _ = self.gen_rgb()
 
             # array of rgbs for each element (2D)
-            self.colors = numpy.full((self.num_check ** 2, 3), -1,
+            self.colors = numpy.full((self.num_check[0] * self.num_check[1], 3), -1,
                                      dtype=numpy.float)
 
             if self.check_type in ['board', 'random']:
@@ -1988,7 +1991,7 @@ def board_texture_class(bases, **kwargs):
                     self.colors[:] = self.low[:3]
 
                 # index to know how to color elements in array
-                self.index = numpy.zeros((self.num_check, self.num_check))
+                self.index = numpy.zeros((self.num_check[0], self.num_check[1]))
 
                 # populate every other for a checkerboard
                 if self.check_type == 'board':
@@ -2019,7 +2022,7 @@ def board_texture_class(bases, **kwargs):
                                                 xys=xys,
                                                 fieldPos=loc,
                                                 colors=self.colors,
-                                                nElements=self.num_check**2,
+                                                nElements=self.num_check[0] * self.num_check[1],
                                                 elementMask=None,
                                                 elementTex=None,
                                                 sizes=(self.check_size[0],
@@ -2030,8 +2033,8 @@ def board_texture_class(bases, **kwargs):
                 numpy.random.seed(self.fill_seed)
                 self.gen_timing(0)
 
-            self.stim.size = (self.check_size[0] * self.num_check,
-                              self.check_size[1] * self.num_check)
+            self.stim.size = (self.check_size[0] * self.num_check[0],
+                              self.check_size[1] * self.num_check[1])
 
             if MyWindow.small_win is not None:
 
@@ -2039,15 +2042,15 @@ def board_texture_class(bases, **kwargs):
                                                           xys=xys,
                                                           fieldPos=loc,
                                                           colors=self.colors,
-                                                          nElements=self.num_check**2,
+                                                          nElements=self.num_check[0] * self.num_check[1],
                                                           elementMask=None,
                                                           elementTex=None,
                                                           sizes=(self.check_size[0],
                                                                  self.check_size[1]),
                                                           autoLog=False)
 
-                self.small_stim.size = (self.check_size[0] * self.num_check,
-                                        self.check_size[1] * self.num_check)
+                self.small_stim.size = (self.check_size[0] * self.num_check[0],
+                                        self.check_size[1] * self.num_check[1])
 
             # ensure noisy hz is not greater than fps
             if self.noisy_hz > GlobalDefaults['frame_rate']:
@@ -2075,12 +2078,12 @@ def board_texture_class(bases, **kwargs):
             :param int frame: current frame number
             """
             if len(self.low.shape) == 0:
-                c = numpy.random.uniform(low=self.low, high=self.high, size=self.num_check**2)
+                c = numpy.random.uniform(low=self.low, high=self.high, size=self.num_check[0] * self.num_check[1])
                 self.colors[:, self.contrast_channel] = c
             else:
-                r = numpy.random.uniform(low=self.low[0], high=self.high[0], size=self.num_check**2)
-                g = numpy.random.uniform(low=self.low[1], high=self.high[1], size=self.num_check**2)
-                b = numpy.random.uniform(low=self.low[2], high=self.high[2], size=self.num_check**2)
+                r = numpy.random.uniform(low=self.low[0], high=self.high[0], size=self.num_check[0] * self.num_check[1])
+                g = numpy.random.uniform(low=self.low[1], high=self.high[1], size=self.num_check[0] * self.num_check[1])
+                b = numpy.random.uniform(low=self.low[2], high=self.high[2], size=self.num_check[0] * self.num_check[1])
                 # self.colors[:] = numpy.dstack([r, r, r])
                 self.colors[:] = numpy.dstack([r, g, b])
 
