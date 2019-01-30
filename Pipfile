@@ -12,7 +12,7 @@ scipy = "*"
 pillow = "*"
 sortedcontainers = "*"
 tqdm = "*"
-psychopy = "==1.90.dev3"
+psychopy = "*"
 pyglet = "*"
 wxpython = "*"
 
