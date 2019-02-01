@@ -20,7 +20,7 @@ notifications:
 
 install:
   # need to first install python3 on osx
-  - if [[ $TRAVIS_OS_NAME == 'osx' ]]; then brew upgrade python; fi
+  - if [[ $TRAVIS_OS_NAME == 'osx' ]]; then brew upgrade https://raw.githubusercontent.com/Homebrew/homebrew-core/f2a764ef944b1080be64bd88dca9a1d80130c558/Formula/python.rb; fi
   - if [[ $TRAVIS_OS_NAME == 'osx' ]]; then python3 --version; fi
   - if [[ $TRAVIS_OS_NAME == 'osx' ]]; then brew postinstall python; fi
 
