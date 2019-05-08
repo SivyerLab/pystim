@@ -57,7 +57,7 @@ OSX/Linux (successfully builds on Travis).
 	pipenv run python pyStim/pyStimGUI.py
 	```
 
-Optional libraries:
+Optional libraries (see detailed install [instructions]):
 
 -   pycrafter4500 (for control of a lightcrafter 4500)
 -   tabulate (for formatting logs)
@@ -81,6 +81,7 @@ Screenshot
   [coveralls]: https://coveralls.io/repos/github/SivyerLab/pystim/badge.svg?branch=master
   [psychopy]: http://www.psychopy.org
   [ghpages]: https://sivyerlab.github.io/pystim/
+  [instructions]: https://sivyerlab.github.io/pystim/installguide.html
   [ffmpeg]: https://www.ffmpeg.org/
   [avbin]: http://avbin.github.io/AVbin/Download.html
   [LICENSE]: http://www.gnu.org/copyleft/gpl.html
