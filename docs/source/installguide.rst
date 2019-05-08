@@ -49,6 +49,10 @@ not work.
 
     pipenv run pip install git+https://github.com/labjack/LabJackPython.git
 
+#. (OPTIONAL) If you wish to interface with a TI Lightcrafter 4500, install `pycrafter4500`_: ::
+
+    pipenv install pycrafter4500
+
 #. Run the pyStim GUI. ::
 
     pipenv run python pyStim/pyStimGUI.py
@@ -58,3 +62,4 @@ not work.
 .. _avbin: http://avbin.github.io/AVbin/Download.html
 .. _ffmpeg: https://www.ffmpeg.org/
 .. _labjack website: https://labjack.com/support/software/examples/ud/labjackpython
+.. _pycrafter4500: https://github.com/SivyerLab/pyCrafter4500
