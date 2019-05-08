@@ -21,7 +21,7 @@ wxpython = "*"
 
 sphinx = "*"
 pytest = "*"
-pytest-cov = "*"
+pytest-cov = "2.5.0"
 mock = "*"
 python-coveralls = "*"
 tabulate = "*"
