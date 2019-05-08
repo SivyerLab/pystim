@@ -61,13 +61,13 @@ script:
   - if [[ $TRAVIS_OS_NAME == 'linux' ]]; then pipenv run sphinx-build -W -b html source build/html; fi
   - if [[ $TRAVIS_OS_NAME == 'osx' ]]; then pipenv run sphinx-build -b html source build/html; fi  # b/c matplot python framework runtime warning
 
-# after_success:
-  # # push coverage results
-  # - if [[ $TRAVIS_OS_NAME == 'linux' ]]; then pipenv run coveralls; fi
+after_success:
+  # push coverage results
+  - if [[ $TRAVIS_OS_NAME == 'linux' ]]; then pipenv run coveralls; fi
 
 deploy:
-  edge:
-    branch: v1.8.47  # temp since deploy broken on latest
+  # edge:
+  #   branch: v1.8.47  # temp since deploy broken on latest
   # push html documentation to github pages
   provider: pages
   skip_cleanup: true
