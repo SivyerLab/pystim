@@ -41,6 +41,9 @@ install:
 
   # install ffmpeg
   # install avbin
+  
+  # for easier debugging
+  - pip list
 
 
 # setup virtual frame buffer (i.e. headless display)
