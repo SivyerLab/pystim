@@ -1,14 +1,13 @@
 matrix:
   include:
     - os: linux
-      dist: trusty
       language: python
-      python: 3.6
+      python: 3.8
       services: xvfb
 
     - os: osx
-      osx_image: xcode9.4  # Python 3.6.5 running on macOS 10.13
       language: generic
+      python: 3.8
       services: xvfb
 
 cache: pip
@@ -29,16 +28,14 @@ install:
   - if [[ $TRAVIS_OS_NAME == 'linux' ]]; then sudo apt-get install pandoc; fi
   - if [[ $TRAVIS_OS_NAME == 'osx' ]]; then brew install pandoc; fi
 
-  # get pipenv to install dependencies
-  - pip3 install pipenv
-
   # run through install as written in docs (but already in env)
   # except no wxPython compiled for linux on pypi, and building from source takes ~45 min
   # so instead grab build from online
-  - if [[ $TRAVIS_OS_NAME == 'linux' ]]; then pipenv run pip install -U -f https://extras.wxpython.org/wxPython4/extras/linux/gtk3/ubuntu-14.04 wxPython; fi
+  - if [[ $TRAVIS_OS_NAME == 'linux' ]]; then pip install -U -f https://extras.wxpython.org/wxPython4/extras/linux/gtk3/ubuntu-16.04 wxPython; fi
 
-  - pipenv install --dev --skip-lock
-  - pipenv run pip install git+https://github.com/labjack/LabJackPython.git
+  - pip install -r requirements.txt
+  - pip install -r requirements-dev.txt
+  - pip install git+https://github.com/labjack/LabJackPython.git
 
   # install ffmpeg
   # install avbin
@@ -46,28 +43,20 @@ install:
   # for easier debugging
   - pip list
 
-
-# setup virtual frame buffer (i.e. headless display)
-before_script:
-  - export DISPLAY=:99.0
-  - if [[ $TRAVIS_OS_NAME == 'linux' ]]; then sh -e /etc/init.d/xvfb start ; fi
-  - if [[ $TRAVIS_OS_NAME == 'osx' ]]; then ( sudo Xvfb :99 -ac -screen 0 1024x768x8; echo ok )& fi
-  - sleep 3 # give xvfb some time to start
-
 script:
   # run tests
-  - pipenv run py.test tests --cov pyStim
+  - pytest tests --cov pyStim
   # make rst copy of readme for docs
   - pandoc --from=markdown --to=rst --output=docs/source/README.rst README.md
   # build documentation
   - cd docs
-  # pipenv run sphinx-build -W -b html source build/html  # warnings as errors
-  - if [[ $TRAVIS_OS_NAME == 'linux' ]]; then pipenv run sphinx-build -W -b html source build/html; fi
-  - if [[ $TRAVIS_OS_NAME == 'osx' ]]; then pipenv run sphinx-build -b html source build/html; fi  # b/c matplot python framework runtime warning
+  # sphinx-build -W -b html source build/html  # warnings as errors
+  - if [[ $TRAVIS_OS_NAME == 'linux' ]]; then sphinx-build -W -b html source build/html; fi
+  - if [[ $TRAVIS_OS_NAME == 'osx' ]]; then sphinx-build -b html source build/html; fi  # b/c matplot python framework runtime warning
 
 after_success:
   # push coverage results
-  - if [[ $TRAVIS_OS_NAME == 'linux' ]]; then pipenv run coveralls; fi
+  - if [[ $TRAVIS_OS_NAME == 'linux' ]]; then coveralls; fi
 
 deploy:
   # edge:
