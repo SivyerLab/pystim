@@ -16,7 +16,7 @@ Enter lines of code in the terminal/command line. To open the command prompt, hi
 not work.
 
 #. Install `Miniconda`_. Two important options during install must be adhered to: Check the option to add conda to
-   your PATH, and select the option to install conda only for the local user, NOT all users.
+   your PATH environment variable, and select the option to install conda only for the local user, NOT all users.
 
 #. Install `Git`_ (version control tool). Make sure to select the option to add git to your PATH variable
    ("Git from the command line and also from 3rd-party software").
