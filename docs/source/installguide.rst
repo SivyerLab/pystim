@@ -55,6 +55,7 @@ not work.
     pip install pycrafter4500
     
 #. Navigate to pystim. ::
+
     cd pystim
 
 #. Run the pyStim GUI. ::
