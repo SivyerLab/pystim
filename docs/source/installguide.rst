@@ -19,7 +19,7 @@ not work.
    your PATH, and select the option to install conda only for the local user, NOT all users.
 
 #. Install `Git`_ (version control tool). Make sure to select the option to add git to your PATH variable
-   ("Run Git from Windows Command Prompt").
+   ("Git from the command line and also from 3rd-party software").
 
 #. Navigate to where you want to install the pyStim repository (ex: C:/Users/sivyer/stimulus_software): ::
 
@@ -53,6 +53,9 @@ not work.
 #. (OPTIONAL) If you wish to interface with a TI Lightcrafter 4500, install `pycrafter4500`_: ::
 
     pip install pycrafter4500
+    
+#. Navigate to pystim. ::
+   cd pystim
 
 #. Run the pyStim GUI. ::
 
