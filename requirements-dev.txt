@@ -1,0 +1,8 @@
+sphinx
+pytest
+pycrafter4500
+pytest-cov
+mock
+python-coveralls
+tabulate
+igor

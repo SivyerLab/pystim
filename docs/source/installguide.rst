@@ -6,39 +6,40 @@ a problem with installing wxPython, please see the wxPython `website <https://ww
 
 Installing PyStim
 *****************
-The following walkthrough uses pipenv, an all in one Python environment manager. Unless otherwise noted, leave options
+The following walkthrough uses Anaconda, an all in one Python environment manager. Unless otherwise noted, leave options
 during install as defaults.
 
-Enter lines of code in the terminal/command line. To open the terminal/command prompt, hit windows + r, and enter "cmd".
-|
-**NOTE** to paste text copied from this guide into the terminal command: use mouse right click and paste. Ctrl + v will
+Enter lines of code in the terminal/command line. To open the command prompt, hit Windows + r, and type "cmd".
+
+
+**NOTE:** to paste text copied from this guide into the terminal command: use mouse right click and paste. Ctrl + v will
 not work.
 
-#. Install `Python 3.6`_. Make sure to select the option to add Python to your PATH variable.
+#. Install `Miniconda`_. Two important options during install must be adhered to: Check the option to add conda to
+   your PATH, and select the option to install conda only for the local user, NOT all users.
 
 #. Install `Git`_ (version control tool). Make sure to select the option to add git to your PATH variable
    ("Run Git from Windows Command Prompt").
 
-#. Navigate to where you want to install the pyStim repository (ex: C:/Users/bensivyer/stimulus_software): ::
+#. Navigate to where you want to install the pyStim repository (ex: C:/Users/sivyer/stimulus_software): ::
 
-    cd "C:/Users/bensivyer/stimulus_software"
+    cd "C:/Users/sivyer/stimulus_software"
 
 #. Download the repository (a new folder called pystim will be automatically created): ::
 
     git clone https://github.com/SivyerLab/pystim.git
 
-#. Install pipenv: ::
+#. Create a conda environment: ::
 
-    pip install pipenv
+    conda create -y -n pystim python=3.8
     
-#. Enter the pystim directory: ::
+#. Activate the environment. You should see `(pystim)` prepend lines on the command prompt after this: ::
 
-    cd pystim
+    conda activate pystim
 
-#. Create the python environment for pystim and automatically install all the necessary packages by entering the
-   following text into the terminal command. ::
+#. Install all the necessary packages: ::
 
-    pipenv install --skip-lock
+    pip install psychopy sortedcontainers
 
 #. (OPTIONAL) If you wish to be able to save captures of your stims, install `ffmpeg`_.
 
@@ -47,17 +48,17 @@ not work.
 #. (OPTIONAL) If needing to trigger an external device using a labjack install the labjack "UD driver" from the
    `labjack website`_. Then install the labjack package: ::
 
-    pipenv run pip install git+https://github.com/labjack/LabJackPython.git
+    pip install git+https://github.com/labjack/LabJackPython.git
 
 #. (OPTIONAL) If you wish to interface with a TI Lightcrafter 4500, install `pycrafter4500`_: ::
 
-    pipenv install pycrafter4500
+    pip install pycrafter4500
 
 #. Run the pyStim GUI. ::
 
-    pipenv run python pyStim/pyStimGUI.py
+    python pyStim/pyStimGUI.py
 
-.. _Python 3.6: https://www.python.org/downloads/
+.. _Miniconda: https://docs.conda.io/en/latest/miniconda.html
 .. _Git: https://git-scm.com/downloads
 .. _avbin: http://avbin.github.io/AVbin/Download.html
 .. _ffmpeg: https://www.ffmpeg.org/

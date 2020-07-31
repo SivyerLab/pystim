@@ -1,24 +1,5 @@
-# pipenv is the recommended virtual environment manager
-
-psychopy==1.90.dev3
-wxpython
-pyglet
-numpy
-scipy
-pillow
-tqdm
+psychopy
 sortedcontainers
-
-## dev-packages
-
-# sphinx
-# pytest
-# pycrafter4500
-# pytest-cov
-# mock
-# python-coveralls
-# tabulate
-# igor
 
 ## optionally needs to be installed manually
 # ffmpeg

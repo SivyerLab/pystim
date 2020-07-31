@@ -38,23 +38,17 @@ OSX/Linux (successfully builds on Travis).
 	git clone https://github.com/SivyerLab/pystim.git
 	```
 
-2.  Install pipenv:
+2.  Install the necessary packages:
 
-	```
-	pip install pipenv
-	```
-
-3.  Create the python environment for pystim and automatically install
-    all the necessary packages:
-
-	```
-    pipenv install --skip-lock
+	```bash
+	pip install psychopy sortedcontainers
 	```
 
-4.  Run the GUI:
+3.  Run the GUI:
 
-	```
-	pipenv run python pyStim/pyStimGUI.py
+	```bash
+	cd pystim
+	python pyStim/pyStimGUI.py
 	```
 
 Optional libraries (see detailed install [instructions]):
