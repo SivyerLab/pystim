@@ -52,7 +52,7 @@ script:
   # build documentation
   - cd docs
   # sphinx-build -W -b html source build/html  # warnings as errors
-  - if [[ $TRAVIS_OS_NAME == 'linux' ]]; then sphinx-build -W -b html source build/html; fi
+  - if [[ $TRAVIS_OS_NAME == 'linux' ]]; then sphinx-build -b html source build/html; fi
   - if [[ $TRAVIS_OS_NAME == 'osx' ]]; then sphinx-build -b html source build/html; fi  # b/c matplot python framework runtime warning
 
 after_success:
