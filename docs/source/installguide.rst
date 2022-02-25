@@ -35,7 +35,7 @@ not work.
     
 #. Activate the environment. You should see `(pystim)` prepend lines on the command prompt after this: ::
 
-    conda activate pystim
+    activate pystim
 
 #. Install all the necessary packages: ::
 
