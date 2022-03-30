@@ -2003,13 +2003,18 @@ def board_texture_class(bases, **kwargs):
                 numpy.random.seed(self.fill_seed)
 
                 if len(self.low.shape) == 0:
-                    self.colors[:, self.contrast_channel] = numpy.random.uniform(
-                        low=self.low, high=self.high, size=self.num_check**2)
+                    # self.colors[:, self.contrast_channel] = numpy.random.uniform(
+                        # low=self.low, high=self.high, size=self.num_check**2)
+                    self.colors[:, self.contrast_channel] = numpy.random.randint(
+                        low=0, high=2, size=self.num_check**2) * 2 - 1
                 else:
-                    r = numpy.random.uniform(low=self.low[0], high=self.high[0], size=self.num_check**2)
-                    g = numpy.random.uniform(low=self.low[1], high=self.high[1], size=self.num_check**2)
-                    b = numpy.random.uniform(low=self.low[2], high=self.high[2], size=self.num_check**2)
-                    self.colors[:] = numpy.dstack([r, g, b])
+                    #r = numpy.random.uniform(low=self.low[0], high=self.high[0], size=self.num_check**2)
+                    #g = numpy.random.uniform(low=self.low[1], high=self.high[1], size=self.num_check**2)
+                    #b = numpy.random.uniform(low=self.low[2], high=self.high[2], size=self.num_check**2)
+                    r = numpy.random.randint(low=0, high=2, size=self.num_check**2) * 2 - 1
+                    #g = numpy.random.randint(low=0, high=1, size=self.num_check**2) * 2 - 1
+                    #b = numpy.random.randint(low=0, high=1, size=self.num_check**2) * 2 - 1
+                    self.colors[:] = numpy.dstack([r, r, r])
 
                 # gamma correct
                 if MyWindow.gamma_mon is not None:
@@ -2048,14 +2053,22 @@ def board_texture_class(bases, **kwargs):
 
             :param int frame: current frame number
             """
+            if frame % (60 // 5) != 0:
+                return
+            
             if len(self.low.shape) == 0:
-                self.colors[:, self.contrast_channel] = numpy.random.uniform(
-                    low=self.low, high=self.high, size=self.num_check**2)
+                #self.colors[:, self.contrast_channel] = numpy.random.uniform(
+                    #low=self.low, high=self.high, size=self.num_check**2)
+                
+                self.colors[:, self.contrast_channel] = numpy.random.randint(
+                     low=0, high=2, size=self.num_check**2) * 2 - 1
+                print(self.colors[0, :])
             else:
-                r = numpy.random.uniform(low=self.low[0], high=self.high[0], size=self.num_check**2)
-                g = numpy.random.uniform(low=self.low[1], high=self.high[1], size=self.num_check**2)
-                b = numpy.random.uniform(low=self.low[2], high=self.high[2], size=self.num_check**2)
-                self.colors[:] = numpy.dstack([r, g, b])
+                #r = numpy.random.uniform(low=self.low[0], high=self.high[0], size=self.num_check**2)
+                #g = numpy.random.uniform(low=self.low[1], high=self.high[1], size=self.num_check**2)
+                #b = numpy.random.uniform(low=self.low[2], high=self.high[2], size=self.num_check**2)
+                r = numpy.random.randint(low=0, high=2, size=self.num_check**2) * 2 - 1
+                self.colors[:] = numpy.dstack([r, r, r])
 
             # gamma correct
             if MyWindow.gamma_mon is not None:
