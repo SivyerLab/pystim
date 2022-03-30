@@ -7,3 +7,4 @@ dependencies:
  - psychopy
  - pip:
     - labjackpython
+    - pycrafter4500
