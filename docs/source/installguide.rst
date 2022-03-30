@@ -29,34 +29,22 @@ not work.
 
     git clone https://github.com/SivyerLab/pystim.git
 
-#. Create a conda environment: ::
+#. Create a conda environment from the included environment file: ::
 
-    conda create -y -n pystim python=3.8
+    cd pystim
+    conda env create -f environment.yml
     
 #. Activate the environment. You should see `(pystim)` prepend lines on the command prompt after this: ::
 
     activate pystim
 
-#. Install all the necessary packages: ::
-
-    pip install psychopy sortedcontainers
-
 #. (OPTIONAL) If you wish to be able to save captures of your stims, install `ffmpeg`_.
 
 #. (OPTIONAL) If you wish to be able to playback movies, install `avbin`_.
 
-#. (OPTIONAL) If needing to trigger an external device using a labjack install the labjack "UD driver" from the
-   `labjack website`_. Then install the labjack package: ::
-
-    pip install git+https://github.com/labjack/LabJackPython.git
-
 #. (OPTIONAL) If you wish to interface with a TI Lightcrafter 4500, install `pycrafter4500`_: ::
 
     pip install pycrafter4500
-    
-#. Navigate to pystim. ::
-
-    cd pystim
 
 #. Run the pyStim GUI. ::
 
