@@ -41,13 +41,13 @@ OSX/Linux (successfully builds on Travis).
 2.  Install the necessary packages:
 
 	```bash
-	pip install psychopy sortedcontainers
+	cd pystim
+	conda env create -f environment.yml
 	```
 
 3.  Run the GUI:
 
 	```bash
-	cd pystim
 	python pyStim/pyStimGUI.py
 	```
 
