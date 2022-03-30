@@ -31,6 +31,7 @@ import wx.lib.agw.multidirdialog as mdd
 from PIL import Image
 
 import pyStim
+from GammaCorrection import GammaValues
 
 global has_lcr
 try:
@@ -132,6 +133,9 @@ class Parameters(object):
         :return: returns list of saved gamma profiles
         """
         gamma_file = Path(r'./psychopy/data/gammaTables.txt')
+        print('EXISTS:', gamma_file.exists())
+        gamma_file = Path(self.gui_params['data_dir']) / 'gammaTables.txt'
+        # print('EXISTS:', tp.exists())
 
         if Path.exists(gamma_file):
             with open(str(gamma_file), 'rb') as f:
@@ -140,6 +144,7 @@ class Parameters(object):
         else:
             gamma_mons = []
 
+        print('GAMMA MONS:', gamma_mons)
         return gamma_mons
 
     def get_global_params(self):
@@ -1830,7 +1835,7 @@ class MyGrid(wx.Frame):
                 if values[i] is None:
                     values[i] = values[i - 1]
 
-            values = map(Parameters.lit_eval, values)
+            values = list(map(Parameters.lit_eval, values))
             ret[param] = values
 
         return ret
@@ -1921,6 +1926,12 @@ class MyMenuBar(wx.MenuBar):
             lcr4500_video_mode = options_lcr4500.Append(wx.ID_ANY,
                                                         'video mode',
                                                         'set LCR4500 to video mode')
+            lcr4500_gamma_disable = options_lcr4500.Append(wx.ID_ANY,
+                                                           'disable gamma',
+                                                           'disables gamma correction in video mode')
+            lcr4500_gamma_enable = options_lcr4500.Append(wx.ID_ANY,
+                                                           'enable gamma',
+                                                           'enables gamma correction in video mode')
 
             disp_str = '{} hz, {}, bit, {}'
             set_str = 'set LCR4500 to pattern mode at {} hz {} bit {} LED'
@@ -1931,18 +1942,36 @@ class MyMenuBar(wx.MenuBar):
             lcr4500_pattern_120hz_8bit_green = options_lcr4500.Append(wx.ID_ANY,
                                                                       disp_str.format(120, 8, 'green'),
                                                                       set_str.format(120, 8, 'green'))
+            
             lcr4500_pattern_180hz_7bit_white = options_lcr4500.Append(wx.ID_ANY,
                                                                       disp_str.format(180, 7, 'white'),
                                                                       set_str.format(180, 7, 'white'))
+            lcr4500_pattern_180hz_7bit_red = options_lcr4500.Append(wx.ID_ANY,
+                                                                      disp_str.format(180, 7, 'red'),
+                                                                      set_str.format(180, 7, 'red'))
             lcr4500_pattern_180hz_7bit_green = options_lcr4500.Append(wx.ID_ANY,
                                                                       disp_str.format(180, 7, 'green'),
                                                                       set_str.format(180, 7, 'green'))
+            lcr4500_pattern_180hz_7bit_blue = options_lcr4500.Append(wx.ID_ANY,
+                                                                      disp_str.format(180, 7, 'blue'),
+                                                                      set_str.format(180, 7, 'blue'))
+            lcr4500_pattern_180hz_7bit_yellow = options_lcr4500.Append(wx.ID_ANY,
+                                                                      disp_str.format(180, 7, 'yellow'),
+                                                                      set_str.format(180, 7, 'yellow'))
+            lcr4500_pattern_180hz_7bit_cyan = options_lcr4500.Append(wx.ID_ANY,
+                                                                      disp_str.format(180, 7, 'cyan'),
+                                                                      set_str.format(180, 7, 'cyan'))
+            lcr4500_pattern_180hz_7bit_magenta = options_lcr4500.Append(wx.ID_ANY,
+                                                                      disp_str.format(180, 7, 'magenta'),
+                                                                      set_str.format(180, 7, 'magenta'))
+
             lcr4500_pattern_222hz_7bit_white = options_lcr4500.Append(wx.ID_ANY,
                                                                       disp_str.format(222, 7, 'white'),
                                                                       set_str.format(222, 7, 'white'))
             lcr4500_pattern_222hz_7bit_green = options_lcr4500.Append(wx.ID_ANY,
                                                                       disp_str.format(222, 7, 'green'),
                                                                       set_str.format(222, 7, 'green'))
+
             lcr4500_pattern_360hz_4bit_white = options_lcr4500.Append(wx.ID_ANY,
                                                                       disp_str.format(360, 4, 'white'),
                                                                       set_str.format(360, 4, 'white'))
@@ -1989,6 +2018,8 @@ class MyMenuBar(wx.MenuBar):
                     lcr4500_video_off: self.on_options_lcr4500_video_off,
                     lcr4500_video_on: self.on_options_lcr4500_video_on,
                     lcr4500_video_mode: self.on_options_lcr4500_video_mode,
+                    lcr4500_gamma_disable: self.on_options_lcr4500_gamma_disable,
+                    lcr4500_gamma_enable: self.on_options_lcr4500_gamma_enable,
                 }
             }
             binder(lcr_to_bind)
@@ -2009,8 +2040,33 @@ class MyMenuBar(wx.MenuBar):
                     'fps': 180,
                     'bit_depth': 7
                 },
+                lcr4500_pattern_180hz_7bit_red: {
+                    'led_color': 'red',
+                    'fps': 180,
+                    'bit_depth': 7
+                },
                 lcr4500_pattern_180hz_7bit_green: {
                     'led_color': 'green',
+                    'fps': 180,
+                    'bit_depth': 7
+                },
+                lcr4500_pattern_180hz_7bit_blue: {
+                    'led_color': 'blue',
+                    'fps': 180,
+                    'bit_depth': 7
+                },
+                lcr4500_pattern_180hz_7bit_cyan: {
+                    'led_color': 'cyan',
+                    'fps': 180,
+                    'bit_depth': 7
+                },
+                lcr4500_pattern_180hz_7bit_magenta: {
+                    'led_color': 'magenta',
+                    'fps': 180,
+                    'bit_depth': 7
+                },
+                lcr4500_pattern_180hz_7bit_yellow: {
+                    'led_color': 'yellow',
                     'fps': 180,
                     'bit_depth': 7
                 },
@@ -2389,6 +2445,22 @@ class MyMenuBar(wx.MenuBar):
         """
         pycrafter4500.power_up()
 
+    def on_options_lcr4500_gamma_disable(self, event):
+        """
+        Sets LCR 4500 projector to video mode
+
+        :param event: required param
+        """
+        pycrafter4500.set_gamma(False)
+
+    def on_options_lcr4500_gamma_enable(self, event):
+        """
+        Sets LCR 4500 projector to video mode
+
+        :param event: required param
+        """
+        pycrafter4500.set_gamma(True)
+
     def on_options_lcr4500_video_mode(self, event):
         """
         Sets LCR 4500 projector to video mode
@@ -2408,8 +2480,18 @@ class MyMenuBar(wx.MenuBar):
         if 'led_color' in kwargs:
             if kwargs['led_color'] == 'green':
                 kwargs['led_color'] = 0b010
+            if kwargs['led_color'] == 'red':
+                kwargs['led_color'] = 0b001
+            if kwargs['led_color'] == 'blue':
+                kwargs['led_color'] = 0b100
             if kwargs['led_color'] == 'white':
                 kwargs['led_color'] = 0b111
+            if kwargs['led_color'] == 'yellow':
+                kwargs['led_color'] = 0b011
+            if kwargs['led_color'] == 'magenta':
+                kwargs['led_color'] = 0b101
+            if kwargs['led_color'] == 'cyan':
+                kwargs['led_color'] = 0b110
 
         if kwargs:
             pycrafter4500.pattern_mode(**kwargs)
