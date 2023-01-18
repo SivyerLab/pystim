@@ -36,15 +36,11 @@ not work.
     
 #. Activate the environment. You should see `(pystim)` prepend lines on the command prompt after this: ::
 
-    activate pystim
+    conda activate pystim
 
 #. (OPTIONAL) If you wish to be able to save captures of your stims, install `ffmpeg`_.
 
 #. (OPTIONAL) If you wish to be able to playback movies, install `avbin`_.
-
-#. (OPTIONAL) If you wish to interface with a TI Lightcrafter 4500, install `pycrafter4500`_: ::
-
-    pip install pycrafter4500
 
 #. Run the pyStim GUI. ::
 
