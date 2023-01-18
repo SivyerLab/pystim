@@ -3,8 +3,9 @@ channels:
  - conda-forge
 dependencies:
  - python=3.8
- - sortedcontainers
- - psychopy=2022.2.4
  - pip:
+    - psychopy==2022.2.4
+    - sortedcontainers
     - labjackpython
     - pycrafter4500
+    
