@@ -2,9 +2,9 @@ name: pystim
 channels:
  - conda-forge
 dependencies:
- - python=3.6
+ - python=3.8
  - sortedcontainers
- - psychopy
+ - psychopy=2022.2.4
  - pip:
     - labjackpython
     - pycrafter4500
