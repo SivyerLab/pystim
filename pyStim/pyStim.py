@@ -1961,7 +1961,7 @@ def board_texture_class(bases, **kwargs):
 
             # array of rgbs for each element (2D)
             self.colors = numpy.full((self.num_check ** 2, 3), -1,
-                                     dtype=numpy.float)
+                                     dtype=numpy.float64)
 
             if self.check_type in ['board', 'random']:
 
