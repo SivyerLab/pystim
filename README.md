@@ -1,5 +1,3 @@
-![travis] ![coveralls]
-
 What is it?
 ===========
 
@@ -21,16 +19,13 @@ mostly functional.
 Documentation
 =============
 
-Documentation is available on [github pages][ghpages]. The source of the
-documentation can be found in the code and in the /docs/source/ folder.
-Further documentation on Psychopy can be found on the Psychopy
-[website][psychopy].
+Documentation can be found in the code and in the /docs/source/ folder.
+Further documentation on Psychopy can be found on the Psychopy [website][psychopy].
 
 Quick Install
 =============
 
-pyStim is tested and works on Windows, though it should work on
-OSX/Linux (successfully builds on Travis).
+pyStim is tested and works on Windows.
 
 1.  Clone the repository:
 
@@ -51,7 +46,7 @@ OSX/Linux (successfully builds on Travis).
 	python pyStim/pyStimGUI.py
 	```
 
-Optional libraries (see detailed install [instructions]):
+Optional libraries (see detailed install):
 
 -   pycrafter4500 (for control of a lightcrafter 4500)
 -   tabulate (for formatting logs)
@@ -71,11 +66,7 @@ Screenshot
 
 ![screenshot]
 
-  [travis]: https://travis-ci.org/SivyerLab/pystim.svg?branch=master
-  [coveralls]: https://coveralls.io/repos/github/SivyerLab/pystim/badge.svg?branch=master
   [psychopy]: http://www.psychopy.org
-  [ghpages]: https://sivyerlab.github.io/pystim/
-  [instructions]: https://sivyerlab.github.io/pystim/installguide.html
   [ffmpeg]: https://www.ffmpeg.org/
   [avbin]: http://avbin.github.io/AVbin/Download.html
   [LICENSE]: http://www.gnu.org/copyleft/gpl.html
